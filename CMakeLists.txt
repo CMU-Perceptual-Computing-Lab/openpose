@@ -10,12 +10,27 @@ set(CMAKE_MACOSX_RPATH 1)
 
 
 ### CMAKE HEADERS
-if (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
- cmake_policy(SET CMP0048 NEW)
- project(OpenPose VERSION ${OpenPose_VERSION})
-else (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
- project(OpenPose)
-endif (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
+# Ubuntu 18 default. After 3.8, no need for find_CUDA
+# https://cmake.org/cmake/help/v3.10/module/FindCUDA.html
+# https://cmake.org/cmake/help/v3.10/command/project.html
+# https://devblogs.nvidia.com/building-cuda-applications-cmake/
+if (${CMAKE_VERSION} VERSION_GREATER 3.9.0)
+  cmake_policy(SET CMP0048 NEW)
+  project(OpenPose VERSION ${OpenPose_VERSION})
+  # # Not tested
+  # cmake_policy(SET CMP0048 NEW)
+  # set(CUDACXX /usr/local/cuda/bin/nvcc)
+  # project(OpenPose VERSION ${OpenPose_VERSION} LANGUAGES CXX CUDA)
+  # set(AUTO_FOUND_CUDA TRUE)
+  # # else
+  # set(AUTO_FOUND_CUDA FALSE)
+# Ubuntu 16 default
+elseif (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
+  cmake_policy(SET CMP0048 NEW)
+  project(OpenPose VERSION ${OpenPose_VERSION})
+else (${CMAKE_VERSION} VERSION_GREATER 3.9.0)
+  project(OpenPose)
+endif (${CMAKE_VERSION} VERSION_GREATER 3.9.0)
 cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommended by Caffe
 
 

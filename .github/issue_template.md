@@ -78,4 +78,4 @@ You might select multiple topics, delete the rest:
     - Portable demo or compiled library?
 
 10. If **speed performance** issue:
-    - Report OpenPose timing speed based on [this link](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/installation.md#profiling-speed).
+    - Report OpenPose timing speed based on [this link](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/speed_up_openpose.md#profiling-speed).

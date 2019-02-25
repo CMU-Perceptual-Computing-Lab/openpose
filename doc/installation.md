@@ -11,20 +11,19 @@ OpenPose - Installation
 7. [Reinstallation](#reinstallation)
 8. [Uninstallation](#uninstallation)
 9. [Optional Settings](#optional-settings)
-    1. [Profiling Speed](#profiling-speed)
-    2. [Faster GUI Display](#faster-gui-display)
-    3. [COCO and MPI Models](#coco-and-mpi-models)
-    4. [Python API](#python-api)
-    5. [CPU Version](#cpu-version)
-    6. [OpenCL Version](#opencl-version)
-    7. [Mac OSX Version](#mac-osx-version)
-    8. [3D Reconstruction Module](#3d-reconstruction-module)
-    9. [Calibration Module](#calibration-module)
-    10. [Compiling without cuDNN](#compiling-without-cudnn)
-    11. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
-    12. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
-    13. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
-    14. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
+    1. [Maximum Speed](#maximum-speed)
+    2. [COCO and MPI Models](#coco-and-mpi-models)
+    3. [Python API](#python-api)
+    4. [CPU Version](#cpu-version)
+    5. [OpenCL Version](#opencl-version)
+    6. [Mac OSX Version](#mac-osx-version)
+    7. [3D Reconstruction Module](#3d-reconstruction-module)
+    8. [Calibration Module](#calibration-module)
+    9. [Compiling without cuDNN](#compiling-without-cudnn)
+    10. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
+    11. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
+    12. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
+    13. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
 
 
 
@@ -36,8 +35,8 @@ This installation section is only intended if you plan to modify the OpenPose co
 
 
 ## Operating Systems
-- **Ubuntu** 14 and 16.
-- **Windows** 7, 8, 10.
+- **Ubuntu** 14, 16, 18.
+- **Windows** 7, 8, 10. Note: Only CUDA 8 and graphic cards up to 10XX series. **20XX series and V100 graphic cards are not compatible yet** (check GitHub issue #996 for updates).
 - **Mac OSX** Mavericks and above.
 - **Nvidia Jetson TX2** (for JetPack 3.1 or 3.3), installation instructions in [doc/installation_jetson_tx2_jetpack3.1.md](./installation_jetson_tx2_jetpack3.1.md) and [doc/installation_jetson_tx2_jetpack3.3.md](./installation_jetson_tx2_jetpack3.3.md) respectively.
 - OpenPose has also been used on **Windows 7**, **CentOS**, and **Nvidia Jetson (TK1 and TX1)** embedded systems. However, we do not officially support them at the moment.
@@ -111,59 +110,96 @@ Any problem installing OpenPose? Check [doc/faq.md](./faq.md) and/or post a GitH
 
 
 ### Prerequisites
+**Very important**: New Nvidia model GPUs (e.g., Nvidia V, GTX 2080, v100, any Nvidia with Volta or Turing architecture, etc.) require (at least) CUDA 10. CUDA 8 would fail!
+
+In addition, CMake automatically downloads all the OpenPose models. However, **some firewall or company networks block these downloads**. You might prefer to download them manually:
+    - [BODY_25 model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/body_25/pose_iter_584000.caffemodel): download in `models/pose/body_25/`.
+    - [COCO model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/coco/pose_iter_440000.caffemodel): download in `models/pose/coco/`.
+    - [MPI model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/mpi/pose_iter_160000.caffemodel): download in `models/pose/mpi/`.
+    - [Face model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/face/pose_iter_116000.caffemodel): download in `models/face/`.
+    - [Hands model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/hand/pose_iter_102000.caffemodel): download in `models/hand/`.
+
+#### Ubuntu Prerequisites
 1. Ubuntu - **Anaconda should not be installed** on your system. Anaconda includes a Protobuf version that is incompatible with Caffe. Either you uninstall anaconda and install protobuf via apt-get, or you compile your own Caffe and link it to OpenPose.
-2. Download and install CMake GUI:
-    - Ubuntu: run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only).
-    - Windows: download and install the latest CMake win64-x64 msi installer from the [CMake website](https://cmake.org/download/), called `cmake-X.X.X-win64-x64.msi`.
-    - Mac: `brew cask install cmake`.
-3. Windows - **Microsoft Visual Studio (VS) 2015 Enterprise Update 3**:
+2. Install **CMake GUI**:
+    - Ubuntu 14 or 16: run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only).
+    - Ubuntu 18: **Download and compile CMake-gui from source**. The default CMake-gui version (3.10) installed via `sudo apt-get install cmake-qt-gui` provokes some compiling errors. Required CMake version >= 3.12.
+        - Uninstall your current Cmake-gui version by running `sudo apt purge cmake-qt-gui`.
+        - Run `sudo apt-get install qtbase5-dev`.
+        - Download the `Latest Release` of `CMake Unix/Linux Source` from the [CMake download website](https://cmake.org/download/), called `cmake-X.X.X.tar.gz`.
+        - Unzip it and go inside that folder from the terminal.
+        - Run `./configure --qt-gui`. Make sure no error occurred.
+        - Run `./bootstrap && make -j8 && make install -j8`. Make sure no error occurred.
+        - Assuming your CMake downloaded folder is in {CMAKE_FOLDER_PATH}, everytime these instructions mentions `cmake-gui`, you will have to replace that line by `{CMAKE_FOLDER_PATH}/bin/cmake-gui`.
+3. Nvidia GPU version prerequisites:
+    1. **Note: OpenPose has been tested extensively with CUDA 8.0 (cuDNN 5.1) and CUDA 10.0 (cuDNN 7.2)**. We highly recommend using those versions to minimize potential installation issues. Other versions should also work, but we do not provide support about any CUDA/cuDNN installation/compilation issue, as well as problems relate dto their integration into OpenPose.
+    2. **CUDA**:
+        - Ubuntu 14 or 16 ([**CUDA 8**](https://developer.nvidia.com/cuda-80-ga2-download-archive) **or 10**): Run `sudo ./scripts/ubuntu/install_cuda.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX) or alternatively download and install it from their website.
+        - Ubuntu 18 ([**CUDA 10**](https://developer.nvidia.com/cuda-downloads)): Download the latest Nvidia CUDA version from their [official website](https://developer.nvidia.com/cuda-downloads).
+            - Select "Linux" -> "x86_64" -> "Ubuntu" -> "18.04" -> "runtime (local)", and download it.
+            - Follow the Nvidia website installation instructions. Make sure to enable the symbolic link in `usr/local/cuda` to minimize potential future errors.
+    3. **cuDNN**:
+        - Ubuntu 14 or 16 ([**cuDNN 5.1**](https://developer.nvidia.com/rdp/cudnn-archive) **or 7.2**): Run `sudo ./scripts/ubuntu/install_cudnn.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX) or alternatively download and install it from their website.
+        - Ubuntu 18 ([**cuDNN 7.2**](https://developer.nvidia.com/cudnn)): Download and install it from the [Nvidia website](https://developer.nvidia.com/cudnn).
+5. AMD GPU version prerequisites:
+    1. Ubuntu 14 or 16:
+        1. Download 3rd party ROCM driver for Ubuntu from [**AMD - OpenCL**](https://rocm.github.io/ROCmInstall.html).
+        2. Install `sudo apt-get install libviennacl-dev`.
+    2. Ubuntu 18: Not tested and not officially supported. Try at your risk.
+6. Install **Caffe, OpenCV, and Caffe prerequisites**:
+    - Caffe prerequisites: By default, OpenPose uses Caffe under the hood. If you have not used Caffe previously, install its dependencies by running `sudo bash ./scripts/ubuntu/install_deps_and_cuda.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX) or run `sudo bash ./scripts/ubuntu/install_deps.sh` after installing your desired CUDA and cuDNN versions.
+    - OpenCV must be already installed on your machine. It can be installed with `apt-get install libopencv-dev`. You can also use your own compiled OpenCV version.
+7. **Eigen prerequisite** (optional, only required for some specific extra functionality, such as extrinsic camera calibration):
+    - If you enable the `WITH_EIGEN` flag when running CMake. You can either:
+        1. Do not do anything if you set the `WITH_EIGEN` flag to `BUILD`, CMake will automatically download Eigen. Alternatively, you might prefer to download it manually:
+            - [Eigen3](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/eigen_2018_05_23.zip): Unzip as `3rdparty/eigen/`.
+        2. Run `sudo apt-get install libeigen3-dev` if you prefer to set `WITH_EIGEN` to `APT_GET`.
+        3. Use your own version of Eigen by setting `WITH_EIGEN` to `BUILD`, run CMake so that OpenPose downloads the zip file, and then replace the contents of `3rdparty/eigen/` by your own version.
+
+#### Mac OS Prerequisites
+1. If you don't have `brew`, install it by running `bash scripts/osx/install_brew.sh` on your terminal.
+2. Install **CMake GUI**: Run the command `brew cask install cmake`.
+3. Install **Caffe, OpenCV, and Caffe prerequisites**: Run `bash scripts/osx/install_deps.sh`.
+4. **Eigen prerequisite** (optional, only required for some specific extra functionality, such as extrinsic camera calibration):
+    - Enable the `WITH_EIGEN` flag when running CMake, and set it to `BUILD`.
+    - CMake will automatically download Eigen.
+    - Alternatively, you can manually download it from the [Eigen3 website](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/eigen_2018_05_23.zip), and unzip as `3rdparty/eigen/`.
+
+#### Windows Prerequisites
+NOTE: These instructions are only required when compiling OpenPose brom source. If you simply wanna use the OpenPose binaries for Windows, skip this step.
+
+1. Install **CMake GUI**: Download and install the `Latest Release` of CMake `Windows win64-x64 Installer` from the [CMake download website](https://cmake.org/download/), called `cmake-X.X.X-win64-x64.msi`.
+2. Install **Microsoft Visual Studio (VS) 2015 Enterprise Update 3**:
     - **IMPORTANT**: Enable all C++-related flags when selecting the components to install.
     - Different VS versions:
         - If **Visual Studio 2017 Community** is desired, we do not officially support it, but it might be compiled by firstly [enabling CUDA 8.0 in VS2017](https://stackoverflow.com/questions/43745099/using-cuda-with-visual-studio-2017?answertab=active#tab-top) or use **VS2017 with CUDA 9** by checking the `.vcxproj` file and changing the necessary paths from CUDA 8 to 9.
         - VS 2015 Enterprise Update 1 will give some compiler errors.
         - VS 2015 Community has not been tested.
-4. Nvidia GPU version prerequisites:
-    1. **Note: OpenPose has been tested extensively with CUDA 8.0 and cuDNN 5.1**. We highly recommend using those versions to minimize potential installation issues. Other versions should also work, but we do not provide support about any CUDA/cuDNN installation/compilation issue, as well as problems relate dto their integration into OpenPose.
+3. Nvidia GPU version prerequisites:
+    1. **Note: OpenPose has been tested extensively with CUDA 8.0 and cuDNN 5.1**. We highly recommend using those versions to minimize potential installation issues. Other versions should also work, but we do not provide support about any CUDA/cuDNN installation/compilation issue, as well as problems related to their integration into OpenPose.
     2. [**CUDA 8**](https://developer.nvidia.com/cuda-80-ga2-download-archive):
         - Ubuntu: Run `sudo ./scripts/ubuntu/install_cuda.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX) or alternatively download and install it from their website.
         - Windows: Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install it.
         - **Important installation tips**:
-            - New Nvidia model GPUs (e.g., Nvidia V, GTX 2080, any Nvidia with Volta or Turing architecture, etc.) require at least CUDA 9.
             - (Windows issue, reported Sep 2018): If your computer hangs when installing CUDA drivers, try installing first the [Nvidia drivers](http://www.nvidia.com/Download/index.aspx), and then installing CUDA without the Graphics Driver flag.
-            - (Windows): If CMake returns and error message similar to `CUDA_TOOLKIT_ROOT_DIR not found or specified` or any other CUDA component missing, then: 1) Re-install Visual Studio 2015; 2) Reboot your PC; 3) Re-install CUDA.
+            - If CMake returns and error message similar to `CUDA_TOOLKIT_ROOT_DIR not found or specified` or any other CUDA component missing, then: 1) Re-install Visual Studio 2015; 2) Reboot your PC; 3) Re-install CUDA (in this order!).
     3. [**cuDNN 5.1**](https://developer.nvidia.com/rdp/cudnn-archive):
         - Ubuntu: Run `sudo ./scripts/ubuntu/install_cudnn.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX) or alternatively download and install it from their website.
         - Windows (and Ubuntu if manual installation): In order to manually install it, just unzip it and copy (merge) the contents on the CUDA folder, usually `/usr/local/cuda/` in Ubuntu and `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0` in Windows.
-5. AMD GPU version prerequisites:
+4. AMD GPU version prerequisites:
     1. Download official AMD drivers for Windows from [**AMD - Windows**](https://support.amd.com/en-us/download).
-    2. Download 3rd party ROCM driver for Ubuntu from [**AMD - OpenCL**](https://rocm.github.io/ROCmInstall.html).
-    3. Ubuntu only: Install `sudo apt-get install libviennacl-dev`. This comes packaged inside OpenPose for Windows.
-    4. AMD Drivers have not been tested on OSX. Please email us if you wish to test it. This has only been tested on Vega series cards.
-6. Ubuntu - Other prerequisites:
-    - Caffe prerequisites: By default, OpenPose uses Caffe under the hood. If you have not used Caffe previously, install its dependencies by running `sudo bash ./scripts/ubuntu/install_deps_and_cuda.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX) or run `sudo bash ./scripts/ubuntu/install_deps.sh` after installing your desired CUDA and cuDNN versions.
-    - OpenCV must be already installed on your machine. It can be installed with `apt-get install libopencv-dev`. You can also use your own compiled OpenCV version.
-7. Windows - **Caffe, OpenCV, and Caffe prerequisites**:
+    2. The libviennacl package comes packaged inside OpenPose for Windows (i.e., no further action required).
+5. **Caffe, OpenCV, and Caffe prerequisites**:
     - CMake automatically downloads all the Windows DLLs. Alternatively, you might prefer to download them manually:
-        - Models:
-            - [COCO model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/coco/pose_iter_440000.caffemodel): download in `models/pose/coco/`.
-            - [MPI model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/mpi/pose_iter_160000.caffemodel): download in `models/pose/mpi/`.
-            - [Face model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/face/pose_iter_116000.caffemodel): download in `models/face/`.
-            - [Hands model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/hand/pose_iter_102000.caffemodel): download in `models/hand/`.
         - Dependencies:
             - Note: Leave the zip files in `3rdparty/windows/` so that CMake does not try to download them again.
             - [Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_2018_01_18.zip): Unzip as `3rdparty/windows/caffe/`.
             - [Caffe dependencies](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe3rdparty_2017_07_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
             - [OpenCV 3.1](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_310.zip): Unzip as `3rdparty/windows/opencv/`.
-8. Mac - **Caffe, OpenCV, and Caffe prerequisites**:
-    - If you don't have `brew`, install it with `bash scripts/osx/install_brew.sh` on your terminal.
-    - Install deps by running `bash scripts/osx/install_deps.sh` on your terminal.
-9. **Eigen prerequisite**:
-    - Note: This step is optional, only required for some specific extra functionality, such as extrinsic camera calibration.
-    - If you enable the `WITH_EIGEN` flag when running CMake. You can either:
-        1. Do not do anything if you set the `WITH_EIGEN` flag to `BUILD`, CMake will automatically download Eigen. Alternatively, you might prefer to download it manually:
-            - [Eigen3](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/eigen_2018_05_23.zip): Unzip as `3rdparty/eigen/`.
-        2. Run `sudo apt-get install libeigen3-dev` (Ubuntu only) if you prefer to set `WITH_EIGEN` to `APT_GET` (Ubuntu only).
-        3. Use your own version of Eigen by setting `WITH_EIGEN` to `BUILD`, run CMake so that OpenPose downloads the zip file, and then replace the contents of `3rdparty/eigen/` by your own version.
+6. **Eigen prerequisite** (optional, only required for some specific extra functionality, such as extrinsic camera calibration):
+    - Enable the `WITH_EIGEN` flag when running CMake, and set it to `BUILD`.
+    - CMake will automatically download Eigen.
+    - Alternatively, you can manually download it from the [Eigen3 website](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/eigen_2018_05_23.zip), run CMake so that OpenPose downloads the zip file, and then replace the contents of `3rdparty/eigen/` by your own version.
 
 
 
@@ -265,18 +301,8 @@ In order to uninstall OpenPose:
 
 
 ### Optional Settings
-#### Profiling Speed
-OpenPose displays the FPS in the basic GUI. However, more complex speed metrics can be obtained from the command line while running OpenPose. In order to obtain those, compile OpenPose with the `PROFILER_ENABLED` flag. OpenPose will automatically display time measurements for each subthread after processing `F` frames (by default `F = 1000`, but it can be modified with the `--profile_speed` flag).
-
-- Time measurement for 1 graphic card: The FPS will be the slowest time displayed in your terminal command line (as OpenPose is multi-threaded). Times are in milliseconds, so `FPS = 1000/millisecond_measurement`.
-- Time measurement for >1 graphic cards: Assuming `n` graphic cards, you will have to wait up to `n` x `F` frames to visualize each graphic card speed (as the frames are splitted among them). In addition, the FPS would be: `FPS = minFPS(speed_per_GPU/n, worst_time_measurement_other_than_GPUs)`. For < 4 GPUs, this is usually `FPS = speed_per_GPU/n`.
-
-Make sure that `wPoseExtractor` time is the slowest timing. Otherwise the input producer (video/webcam codecs issues with OpenCV, images too big, etc.) or the GUI display (use OpenGL support as detailed in [doc/speed_up_preserving_accuracy.md](./speed_up_preserving_accuracy.md)) might not be optimized.
-
-
-
-#### Faster GUI Display
-Reduce the lag and increase the speed of displaying images by enabling the `WITH_OPENCV_WITH_OPENCL` flag. It tells OpenCV to render the images using OpenGL support. This speeds up rendering about 3x. E.g., it reduces from about 30 msec to about 10 msec the display time for HD resolution images. It requires OpenCV to be compiled with OpenGL support and it provokes a visual aspect-ratio artifact when rendering a folder with images of different resolutions.
+#### Maximum Speed
+Check the OpenPose Benchmark as well as some hints to speed up and/or reduce the memory requirements for OpenPose on [doc/speed_up_openpose.md](./speed_up_openpose.md).
 
 
 
@@ -308,7 +334,7 @@ export MKL_NUM_THREADS="8"
 export OMP_NUM_THREADS="8"
 ```
 
-Do note that increasing the number of threads results in more memory use. You can check the [doc/speed_up_preserving_accuracy.md](./speed_up_preserving_accuracy.md) for more information about speed and memory requirements in several CPUs and GPUs.
+Do note that increasing the number of threads results in more memory use. You can check the [doc/speed_up_openpose.md](./speed_up_openpose.md) for more information about speed and memory requirements in several CPUs and GPUs.
 
 
 

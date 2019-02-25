@@ -37,19 +37,19 @@ OpenPose - Frequently Asked Question (FAQ)
 ### Speed Up, Memory Reduction, and Benchmark
 **Q: Low speed** - OpenPose is quite slow, is it normal? How can I speed it up?
 
-**A**: Check [doc/speed_up_preserving_accuracy.md](./speed_up_preserving_accuracy.md) to discover the approximate speed of your graphics card and some speed tips.
+**A**: Check [doc/speed_up_openpose.md](./speed_up_openpose.md) to discover the approximate speed of your graphics card and some speed tips.
 
 
 
 ### CPU Version Too Slow
 **Q: The CPU version is insanely slow compared to the GPU version.**
 
-**A**: Check [doc/speed_up_preserving_accuracy.md#cpu-version](./speed_up_preserving_accuracy.md#cpu-version) to discover the approximate speed and some speed tips.
+**A**: Check [doc/speed_up_openpose.md#cpu-version](./speed_up_openpose.md#cpu-version) to discover the approximate speed and some speed tips.
 
 
 
 ### Profiling Speed and Estimating FPS without Display
-Check the [doc/installation.md#profiling-speed](./installation.md#profiling-speed) section.
+Check the [doc/speed_up_openpose.md#profiling-speed](./speed_up_openpose.md#profiling-speed) section.
 
 
 
@@ -109,7 +109,7 @@ COCO model will eventually be removed. BODY_25 model is faster, more accurate, a
 ### How to Measure the Latency Time?
 **Q: How to measure/calculate/estimate the latency/lag time?**
 
-**A**: [Profile](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/installation.md#profiling-speed) the OpenPose speed. For 1-GPU or CPU-only systems (use `--disable_multi_thread` for simplicity in multi-GPU systems for latency measurement), the latency will be roughly the sum of all the reported measurements.
+**A**: [Profile](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/speed_up_openpose.md#profiling-speed) the OpenPose speed. For 1-GPU or CPU-only systems (use `--disable_multi_thread` for simplicity in multi-GPU systems for latency measurement), the latency will be roughly the sum of all the reported measurements.
 
 
 
