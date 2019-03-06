@@ -21,6 +21,7 @@ OpenPose - Frequently Asked Question (FAQ)
     16. [Protobuf Clip Param Caffe Error](#protobuf-clip-param-caffe-error)
     17. [The Human Skeleton Looks like Dotted Lines Rather than Solid Lines](#the-human-skeleton-looks-like-dotted-lines-rather-than-solid-lines)
     18. [Huge RAM Usage](#huge-ram-usage)
+    19. [CUDA_cublas_device_LIBRARY Not Found](#cuda_cublas_device_library_not_found)
 
 
 
@@ -162,3 +163,16 @@ If you wanna use your custom Caffe and it has this error: This error only happen
 **Q**: During the execution of the demo, the CPU usage oscillates between 50 and 99%, but the RAM is almost at 100%.
 
 **A**: Highly reducing the `--net_resolution` and following the tips in the [Speed Up, Memory Reduction, and Benchmark](#speed-up-memory-reduction-and-benchmark) section are the only way to reduce the RAM usage. Alternatively, you can disable `USE_MKL` in CMake, which will highly reduce the RAM usage of the Caffe version, but it might also reduce the program speed.
+
+
+
+### CUDA_cublas_device_LIBRARY Not Found
+**Q**: I encounter an error similar to the following:
+```
+CMake Error: The following variables are used in this project, but they are set to NOTFOUND.
+Please set them or make sure they are set and tested correctly in the CMake files:
+CUDA_cublas_device_LIBRARY (ADVANCED)
+    linked by target "caffe" in directory /home/jakebmalis/Documents/openpose/3rdparty/caffe/src/caffe
+```
+
+**A**: Make sure to download and install CMake-GUI following the [doc/prerequisites.md](./prerequisites.md) section. This is a known problem with CMake-GUI versions from 3.8 to 3.11 (unfortunately, default Ubuntu 18 CMake-GUI uses 3.10). You will need a CMake version >= 3.12.

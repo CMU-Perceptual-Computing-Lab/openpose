@@ -68,7 +68,8 @@ namespace op
                                cudaMemcpyHostToDevice);
                     cudaMemcpy(pGpuHand + handVolume, handKeypoints[1].getConstPtr(),
                                handVolume * sizeof(float), cudaMemcpyHostToDevice);
-                    renderHandKeypointsGpu(*spGpuMemory, frameSize, pGpuHand, 2 * numberPeople, mRenderThreshold);
+                    renderHandKeypointsGpu(
+                        *spGpuMemory, frameSize, pGpuHand, 2 * numberPeople, mRenderThreshold, getAlphaKeypoint());
                     // CUDA check
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 }

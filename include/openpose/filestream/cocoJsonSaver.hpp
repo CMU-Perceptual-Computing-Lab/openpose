@@ -27,7 +27,9 @@ namespace op
 
         virtual ~CocoJsonSaver();
 
-        void record(const Array<float>& poseKeypoints, const Array<float>& poseScores, const std::string& imageName);
+        void record(
+            const Array<float>& poseKeypoints, const Array<float>& poseScores, const std::string& imageName,
+            const unsigned long long frameNumber);
 
     private:
         const PoseModel mPoseModel;

@@ -349,6 +349,7 @@ OpenPose Library - Release Notes
     7. 3D module: If the image area was smaller than HD resolution image area, the 3D keypoints were not properly estimated.
     8. OpenCL fixes.
     9. If manual CUDA architectures are set in CMake, they are also set for Caffe rather than only for OpenPose.
+    10. Fixed flag `--hand_alpha_pose`.
 
 
 

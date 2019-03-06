@@ -1,3 +1,5 @@
+#include <numeric> // std::iota
+#include <openpose/pose/poseParametersRender.hpp>
 #include <openpose/utilities/string.hpp>
 #include <openpose/filestream/cocoJsonSaver.hpp>
 
@@ -38,8 +40,9 @@ namespace op
         }
     }
 
-    void CocoJsonSaver::record(const Array<float>& poseKeypoints, const Array<float>& poseScores,
-                               const std::string& imageName)
+    void CocoJsonSaver::record(
+        const Array<float>& poseKeypoints, const Array<float>& poseScores, const std::string& imageName,
+        const unsigned long long frameNumber)
     {
         try
         {
@@ -54,6 +57,7 @@ namespace op
                 // Get indexesInCocoOrder
                 std::vector<int> indexesInCocoOrder;
                 // Body/car
+                auto imageId = getLastNumber(imageName);
                 if (mCocoJsonFormat == CocoJsonFormat::Body)
                 {
                     // Body
@@ -63,11 +67,37 @@ namespace op
                         indexesInCocoOrder = std::vector<int>{0, 15,14,17,16,    5,2,6,3,7,    4,11,8,12, 9,    13,10};
                     else if (mPoseModel == PoseModel::BODY_25B || mPoseModel == PoseModel::BODY_95
                         || mPoseModel == PoseModel::BODY_135)
-                        indexesInCocoOrder = std::vector<int>{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+                    {
+                        indexesInCocoOrder = std::vector<int>(17);
+                        std::iota(indexesInCocoOrder.begin(), indexesInCocoOrder.end(), 0);
+                    }
                     else if (numberBodyParts == 19 || numberBodyParts == 25 || numberBodyParts == 59)
                         indexesInCocoOrder = std::vector<int>{0, 16,15,18,17,    5,2,6,3,7,    4,12,9,13,10,    14,11};
                     // else if (numberBodyParts == 23)
                     //     indexesInCocoOrder = std::vector<int>{18,21,19,22,20,    4,1,5,2,6,    3,13,8,14, 9,    15,10};
+                }
+                // Hand
+                else if (mCocoJsonFormat == CocoJsonFormat::Hand)
+                {
+                    imageId = frameNumber;
+                    if (numberBodyParts == 135)
+                    {
+                        indexesInCocoOrder = std::vector<int>(42);
+                        indexesInCocoOrder[0] = 9;
+                        std::iota(indexesInCocoOrder.begin()+1, indexesInCocoOrder.end(), H135);
+                        indexesInCocoOrder[21] = 10;
+                        std::iota(indexesInCocoOrder.begin()+2, indexesInCocoOrder.end(), H135+20);
+                    }
+                }
+                // Face
+                else if (mCocoJsonFormat == CocoJsonFormat::Face)
+                {
+                    imageId = frameNumber;
+                    if (numberBodyParts == 135)
+                    {
+                        indexesInCocoOrder = std::vector<int>(70);
+                        std::iota(indexesInCocoOrder.begin(), indexesInCocoOrder.end(), F135);
+                    }
                 }
                 // Foot
                 else if (mCocoJsonFormat == CocoJsonFormat::Foot)
@@ -103,7 +133,6 @@ namespace op
                     error("Invalid number of body parts (" + std::to_string(numberBodyParts) + ").",
                           __LINE__, __FUNCTION__, __FILE__);
                 // Save on JSON file
-                const auto imageId = getLastNumber(imageName);
                 for (auto person = 0 ; person < numberPeople ; person++)
                 {
                     bool foundAtLeast1Keypoint = true;
