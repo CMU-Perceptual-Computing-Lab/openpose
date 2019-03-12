@@ -43,12 +43,12 @@ namespace op
         template <typename T>
         inline void plainText(const T& value)
         {
-            mOfstream << value;
+            *upOfstream << value;
         }
 
         inline void comma()
         {
-            mOfstream << ",";
+            *upOfstream << ",";
         }
 
         void enter();
@@ -57,7 +57,7 @@ namespace op
         bool mHumanReadable;
         long long mBracesCounter;
         long long mBracketsCounter;
-        std::ofstream mOfstream;
+        std::unique_ptr<std::ofstream> upOfstream; // std::unique_ptr to solve std::move issue in GCC < 5
 
         DELETE_COPY(JsonOfstream);
     };
