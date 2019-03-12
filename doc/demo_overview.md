@@ -241,9 +241,9 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_string(write_video_3d,           "",             "Analogous to `--write_video`, but applied to the 3D output.");
 - DEFINE_string(write_video_adam,         "",             "Experimental, not available yet. Analogous to `--write_video`, but applied to Adam model.");
 - DEFINE_string(write_json,               "",             "Directory to write OpenPose output in JSON format. It includes body, hand, and face pose keypoints (2-D and 3-D), as well as pose candidates (if `--part_candidates` enabled).");
-- DEFINE_string(write_coco_json,          "",             "Full file path to write people pose data with JSON COCO validation format.");
-- DEFINE_string(write_coco_foot_json,     "",             "Full file path to write people foot pose data with JSON COCO validation format.");
-- DEFINE_int32(write_coco_json_variant,   0,             "Currently, this option is experimental and only makes effect on car JSON generation. It selects the COCO variant for cocoJsonSaver.");
+- DEFINE_string(write_coco_json,          "",             "Full file path to write people pose data with JSON COCO validation format. If foot, face, hands, etc. JSON is also desired (`--write_coco_json_variants`), they are saved with different file name suffix.");
+- DEFINE_int32(write_coco_json_variants,  1,              "Add 1 for body, add 2 for foot, 4 for face, and/or 8 for hands. Use 0 to use all the possible candidates. E.g., 7 would mean body+foot+face COCO JSON.");
+- DEFINE_int32(write_coco_json_variant,   0,              "Currently, this option is experimental and only makes effect on car JSON generation. It selects the COCO variant for cocoJsonSaver.");
 - DEFINE_string(write_heatmaps,           "",             "Directory to write body pose heatmaps in PNG format. At least 1 `add_heatmaps_X` flag must be enabled.");
 - DEFINE_string(write_heatmaps_format,    "png",          "File extension and format for `write_heatmaps`, analogous to `write_images_format`. For lossless compression, recommended `png` for integer `heatmaps_scale` and `float` for floating values.");
 - DEFINE_string(write_keypoint,           "",             "(Deprecated, use `write_json`) Directory to write the people pose keypoint data. Set format with `write_keypoint_format`.");

@@ -41,12 +41,14 @@ namespace op
             // Add extrinsics if not empty
             if (!cameraExtrinsics.empty())
                 mCameraExtrinsics.emplace_back(cameraExtrinsics.clone());
+            else
+                mCameraExtrinsics.emplace_back(cv::Mat::eye(3, 4, cameraIntrinsics.type()));
             // Add extrinsics (initial) if not empty
             if (!cameraExtrinsicsInitial.empty())
                 mCameraExtrinsicsInitial.emplace_back(cameraExtrinsicsInitial.clone());
             // Otherwise, add cv::eye
             else
-                mCameraExtrinsics.emplace_back(cv::Mat::eye(3, 4, cameraIntrinsics.type()));
+                mCameraExtrinsicsInitial.emplace_back(cv::Mat::eye(3, 4, cameraIntrinsics.type()));
             mCameraMatrices.emplace_back(mCameraIntrinsics.back() * mCameraExtrinsics.back());
             // Undistortion cv::Mats
             mRemoveDistortionMaps1.resize(getNumberCameras());

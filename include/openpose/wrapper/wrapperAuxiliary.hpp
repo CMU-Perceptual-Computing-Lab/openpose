@@ -667,7 +667,7 @@ namespace op
                     outputWs.emplace_back(std::make_shared<WHandSaver<TDatumsSP>>(keypointSaver));
             }
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-            // Write OpenPose output data on disk in json format (body/hand/face keypoints, body part locations if
+            // Write OpenPose output data on disk in JSON format (body/hand/face keypoints, body part locations if
             // enabled, etc.)
             if (!writeJsonCleaned.empty())
             {
@@ -676,7 +676,7 @@ namespace op
                 outputWs.emplace_back(std::make_shared<WPeopleJsonSaver<TDatumsSP>>(peopleJsonSaver));
             }
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-            // Write people pose data on disk (COCO validation json format)
+            // Write people pose/foot/face/hand/etc. data on disk (COCO validation JSON format)
             if (!wrapperStructOutput.writeCocoJson.empty())
             {
                 log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
@@ -684,6 +684,7 @@ namespace op
                 const auto humanFormat = true;
                 const auto cocoJsonSaver = std::make_shared<CocoJsonSaver>(
                     wrapperStructOutput.writeCocoJson, wrapperStructPose.poseModel, humanFormat,
+                    wrapperStructOutput.writeCocoJsonVariants,
                     (wrapperStructPose.poseModel != PoseModel::CAR_22
                         && wrapperStructPose.poseModel != PoseModel::CAR_12
                         ? CocoJsonFormat::Body : CocoJsonFormat::Car),
@@ -691,16 +692,6 @@ namespace op
                 outputWs.emplace_back(std::make_shared<WCocoJsonSaver<TDatumsSP>>(cocoJsonSaver));
             }
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-            // Write people foot pose data on disk (COCO validation json format for foot data)
-            if (!wrapperStructOutput.writeCocoFootJson.empty())
-            {
-                // If humanFormat: bigger size (& maybe slower to process), but easier for user to read it
-                const auto humanFormat = true;
-                const auto cocoJsonSaver = std::make_shared<CocoJsonSaver>(
-                    wrapperStructOutput.writeCocoFootJson, wrapperStructPose.poseModel, humanFormat,
-                    CocoJsonFormat::Foot);
-                outputWs.emplace_back(std::make_shared<WCocoJsonSaver<TDatumsSP>>(cocoJsonSaver));
-            }
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Write frames as desired image format on hard disk
             if (!writeImagesCleaned.empty())

@@ -323,6 +323,7 @@ OpenPose Library - Release Notes
     31. Removed boost::shared_ptr and caffe::Blob dependencies from the headers. No 3rdparty dependencies left on headers (except dim3 for CUDA).
     32. Added Array `poseNetOutput` to Datum so that user can introduce his custom network output.
     33. OpenPose will never provoke a core dumped or crash. Exceptions in threads (`errorWorker()` instead of `error()`) lead to stopping the threads and reporting the error from the main thread, while exceptions in destructors (`errorDestructor()` instead of `error()`) are reported with std::cerr but not thrown as std::exceptions.
+    34. When reading a directory of images, they will be sorted in natural order (rather than regular sort).
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.
@@ -339,6 +340,7 @@ OpenPose Library - Release Notes
     11. Moved most sh scripts into the `scripts/` folder. Only models/getModels.sh and the `*.bat` files are kept under `models/` and `3rdparty/windows`.
     12. For Python compatibility and scalability increase, template `TDatums` used for `include/openpose/wrapper/wrapper.hpp` has changed from `std::vector<Datum>` to `std::vector<std::shared_ptr<Datum>>`, including the respective changes in all the worker classes. In addition, some template classes have been simplified to only take 1 template parameter for user simplicity.
     13. Renamed intRound, charRound, etc. by positiveIntRound, positiveCharRound, etc. so that people can realize it is not safe for negative numbers.
+    14. Replaced flag `--write_coco_foot_json` by `--write_coco_json_variants` in order to generalize to any COCO JSON format (i.e., hand, face, etc).
 3. Main bugs fixed:
     1. CMake-GUI was forcing to Release mode, allowed Debug modes too.
     2. NMS returns in index 0 the number of found peaks. However, while the number of peaks was truncated to a maximum of 127, this index 0 was saving the real number instead of the truncated one.

@@ -11,6 +11,21 @@ namespace op
     public:
         explicit JsonOfstream(const std::string& filePath, const bool humanReadable = true);
 
+        /**
+         * Move constructor.
+         * It destroys the original JsonOfstream to be moved.
+         * @param array JsonOfstream to be moved.
+         */
+        JsonOfstream(JsonOfstream&& jsonOfstream);
+
+        /**
+         * Move assignment.
+         * Similar to JsonOfstream(JsonOfstream&& jsonOfstream).
+         * @param array JsonOfstream to be moved.
+         * @return The resulting JsonOfstream.
+         */
+        JsonOfstream& operator=(JsonOfstream&& jsonOfstream);
+
         virtual ~JsonOfstream();
 
         void objectOpen();
@@ -39,7 +54,7 @@ namespace op
         void enter();
 
     private:
-        const bool mHumanReadable;
+        bool mHumanReadable;
         long long mBracesCounter;
         long long mBracketsCounter;
         std::ofstream mOfstream;

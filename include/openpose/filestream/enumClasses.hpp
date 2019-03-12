@@ -14,7 +14,8 @@ namespace op
     enum class CocoJsonFormat : unsigned char
     {
         Body,
-        Hand,
+        Hand21,
+        Hand42,
         Face,
         Foot,
         Car,

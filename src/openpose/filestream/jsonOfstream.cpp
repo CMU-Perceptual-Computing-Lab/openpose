@@ -37,6 +37,39 @@ namespace op
         }
     }
 
+    JsonOfstream::JsonOfstream(JsonOfstream&& jsonOfstream) :
+        mHumanReadable{jsonOfstream.mHumanReadable},
+        mBracesCounter{jsonOfstream.mBracesCounter},
+        mBracketsCounter{jsonOfstream.mBracketsCounter}
+    {
+        try
+        {
+            std::swap(mOfstream, jsonOfstream.mOfstream);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    JsonOfstream& JsonOfstream::operator=(JsonOfstream&& jsonOfstream)
+    {
+        try
+        {
+            mHumanReadable = jsonOfstream.mHumanReadable;
+            mBracesCounter = jsonOfstream.mBracesCounter;
+            mBracketsCounter = jsonOfstream.mBracketsCounter;
+            std::swap(mOfstream, jsonOfstream.mOfstream);
+            // Return
+            return *this;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return *this;
+        }
+    }
+
     JsonOfstream::~JsonOfstream()
     {
         try

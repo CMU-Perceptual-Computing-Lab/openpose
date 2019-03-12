@@ -51,9 +51,11 @@ namespace op
         std::string writeCocoJson;
 
         /**
-         * Analogous to writeCocoJson but for foot keypoints.
+         * It selects the COCO variants for cocoJsonSaver.
+         * Add 1 for body, add 2 for foot, 4 for face, and/or 8 for hands. Use 0 to use all the possible candidates.
+         * E.g., 7 would mean body+foot+face COCO JSON..
          */
-        std::string writeCocoFootJson;
+        int writeCocoJsonVariants;
 
         /**
          * Experimental option (only makes effect on car JSON generation).
@@ -148,7 +150,7 @@ namespace op
         WrapperStructOutput(
             const double verbose = -1, const std::string& writeKeypoint = "",
             const DataFormat writeKeypointFormat = DataFormat::Xml, const std::string& writeJson = "",
-            const std::string& writeCocoJson = "", const std::string& writeCocoFootJson = "",
+            const std::string& writeCocoJson = "", const int writeCocoJsonVariants = 1,
             const int writeCocoJsonVariant = 1, const std::string& writeImages = "",
             const std::string& writeImagesFormat = "", const std::string& writeVideo = "",
             const double writeVideoFps = -1., const bool writeVideoWithAudio = false,
