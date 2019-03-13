@@ -128,7 +128,7 @@ namespace op
                     {
                         if (numberBodyParts == 135)
                         {
-                            indexesInCocoOrder = std::vector<int>(70);
+                            indexesInCocoOrder = std::vector<int>(68);
                             std::iota(indexesInCocoOrder.begin(), indexesInCocoOrder.end(), F135);
                         }
                     }

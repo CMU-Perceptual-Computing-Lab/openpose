@@ -76,19 +76,22 @@ namespace op
     {
         try
         {
+            // Moved(std::unique_ptr) will be a nullptr in the old one
             if (upOfstream != nullptr)
+            {
                 enterAndTab(*upOfstream, mHumanReadable, mBracesCounter, mBracketsCounter);
 
-            if (mBracesCounter != 0 || mBracketsCounter != 0)
-            {
-                std::string errorMessage = "Json file wronly generated";
-                if (mBracesCounter != 0)
-                    errorMessage += ", number \"{\" != number \"}\": " + std::to_string(mBracesCounter) + ".";
-                else if (mBracketsCounter != 0)
-                    errorMessage += ", number \"[\" != number \"]\": " + std::to_string(mBracketsCounter) + ".";
-                else
-                    errorMessage += ".";
-                error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
+                if (mBracesCounter != 0 || mBracketsCounter != 0)
+                {
+                    std::string errorMessage = "Json file wronly generated";
+                    if (mBracesCounter != 0)
+                        errorMessage += ", number \"{\" != number \"}\": " + std::to_string(mBracesCounter) + ".";
+                    else if (mBracketsCounter != 0)
+                        errorMessage += ", number \"[\" != number \"]\": " + std::to_string(mBracketsCounter) + ".";
+                    else
+                        errorMessage += ".";
+                    error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
+                }
             }
         }
         catch (const std::exception& e)
