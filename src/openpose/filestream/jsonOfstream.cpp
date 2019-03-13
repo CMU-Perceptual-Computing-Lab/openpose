@@ -76,7 +76,8 @@ namespace op
     {
         try
         {
-            enterAndTab(*upOfstream, mHumanReadable, mBracesCounter, mBracketsCounter);
+            if (upOfstream != nullptr)
+                enterAndTab(*upOfstream, mHumanReadable, mBracesCounter, mBracketsCounter);
 
             if (mBracesCounter != 0 || mBracketsCounter != 0)
             {
