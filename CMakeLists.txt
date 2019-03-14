@@ -501,26 +501,29 @@ if (WIN32)
   set(OP_WIN_DIR "${CMAKE_SOURCE_DIR}/3rdparty/windows")
 
   # Download required zip files
-  download_zip("opencv_401_2019_03_12.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 4da2ec29a18c120efe17aa2ef18c9637)
-  download_zip("caffe3rdparty_2019_03_12.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 34c49be6a2418fd1670b46fc455eebc0)
+  download_zip("opencv_401_v14_15_2019_03_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} df8f611c032cfa86c56a8ad419f01832)
+  # download_zip("caffe3rdparty_2019_03_12.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 34c49be6a2418fd1670b46fc455eebc0)
+  download_zip("caffe3rdparty_15_2019_03_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 9fcc6bdf4765db699d1a279c8d6b830b)
   if (${GPU_MODE} MATCHES "OPENCL")
     download_zip("caffe_opencl_2018_02_13.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 3ac3e1acf5ee6a4e57920be73053067a)
   elseif (${GPU_MODE} MATCHES "CPU_ONLY")
     download_zip("caffe_cpu_2018_05_27.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 87E8401B6DFBAC5B8E909DD20E3B3390)
   else (${GPU_MODE} MATCHES "OPENCL")
-    download_zip("caffe_2019_03_12.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 859a592310f0928fd4f40da1456a217f)
+    # download_zip("caffe_2019_03_12.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 859a592310f0928fd4f40da1456a217f)
+    download_zip("caffe_15_2019_03_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} f2d8beee9e4959fa419dcb54d507107c)
   endif (${GPU_MODE} MATCHES "OPENCL")
   if (WITH_3D_RENDERER)
     download_zip("freeglut_2018_01_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} BB182187285E06880F0EDE3A39530091)
   endif (WITH_3D_RENDERER)
   message(STATUS "Windows dependencies downloaded.")
 
-  find_library(OpenCV_LIBS opencv_world401 HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc14/lib)
+  # set(VS_VERSION "14")
+  set(VS_VERSION "15") # Note: VS2017 code seems to simply works in VS2015
+  find_library(OpenCV_LIBS opencv_world401 HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc${VS_VERSION}/lib)
   find_library(GFLAGS_LIBRARY_RELEASE gflags HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
   find_library(GFLAGS_LIBRARY_DEBUG gflagsd HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
   find_library(GLOG_LIBRARY_RELEASE glog HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
   find_library(GLOG_LIBRARY_DEBUG glogd HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
-  find_library(OpenCV_LIBS opencv_world401 HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc14/lib)
 
   # If OpenPose builds it
   if (BUILD_CAFFE)
@@ -549,10 +552,10 @@ if (WIN32)
   endif (${GPU_MODE} MATCHES "OPENCL")
   # Boost DepCopy over required DLL F
   if (${GPU_MODE} MATCHES "CPU_ONLY" OR ${GPU_MODE} MATCHES "OPENCL" OR BUILD_PYTHON)
-      find_library(BOOST_SYSTEM_LIB_RELEASE libboost_system-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
-      find_library(BOOST_SYSTEM_LIB_DEBUG libboost_system-vc140-mt-gd-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
-      find_library(BOOST_FILESYSTEM_LIB_RELEASE libboost_filesystem-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
-      find_library(BOOST_FILESYSTEM_LIB_DEBUG libboost_filesystem-vc140-mt-gd-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+      find_library(BOOST_SYSTEM_LIB_RELEASE libboost_system-vc141-mt-x64-1_69 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+      find_library(BOOST_SYSTEM_LIB_DEBUG libboost_system-vc141-mt-gd-x64-1_69 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+      find_library(BOOST_FILESYSTEM_LIB_RELEASE libboost_filesystem-vc141-mt-x64-1_69 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+      find_library(BOOST_FILESYSTEM_LIB_DEBUG libboost_filesystem-vc141-mt-gd-x64-1_69 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
   else ()
       set(BOOST_SYSTEM_LIB_RELEASE "")
       set(BOOST_SYSTEM_LIB_DEBUG "")
@@ -582,7 +585,7 @@ if (WIN32)
       set(Caffe_INCLUDE_DIRS "3rdparty/windows/caffe/include;3rdparty/windows/caffe/include2" CACHE FILEPATH "Caffe_INCLUDE_DIRS")
     endif (${GPU_MODE} MATCHES "CPU_ONLY")
   endif (${GPU_MODE} MATCHES "OPENCL")
-  set(Boost_INCLUDE_DIRS "3rdparty/windows/caffe3rdparty/include/boost-1_61")
+  # set(Boost_INCLUDE_DIRS "3rdparty/windows/caffe3rdparty/include/boost-1_61") # Added in WINDOWS_INCLUDE_DIRS
   set(WINDOWS_INCLUDE_DIRS "3rdparty/windows/caffe3rdparty/include")
   if (WITH_3D_RENDERER)
     set(GLUT_INCLUDE_DIRS "3rdparty/windows/freeglut/include")
@@ -613,7 +616,7 @@ if (WIN32)
     # Caffe 3rd-party DLLs
     file(GLOB CAFFE_3RD_PARTY_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/*.dll")
     # OpenCV DLLs
-    file(GLOB OPENCV_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv/x64/vc14/bin/*.dll")
+    file(GLOB OPENCV_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv/x64/vc${VS_VERSION}/bin/*.dll")
     # GLUT DLLs
     file(GLOB GLUT_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/freeglut/bin/*.dll")
     # Spinnaker DLLs and other files
@@ -845,7 +848,7 @@ endif (WITH_3D_ADAM_MODEL)
 # Windows includes
 if (WIN32)
   include_directories(
-    ${Boost_INCLUDE_DIRS}
+    # ${Boost_INCLUDE_DIRS}
     ${WINDOWS_INCLUDE_DIRS})
 endif (WIN32)
 

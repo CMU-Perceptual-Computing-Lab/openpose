@@ -36,7 +36,7 @@ This installation section is only intended if you plan to modify the OpenPose co
 
 ## Operating Systems
 - **Ubuntu** 14, 16, 18.
-- **Windows** 7, 8, 10. Note: Only CUDA 8 and graphic cards up to 10XX series. **20XX series and V100 graphic cards are not compatible yet** (check GitHub issue #996 for updates).
+- **Windows** 7, 8, 10.
 - **Mac OSX** Mavericks and above.
 - **Nvidia Jetson TX2** (for JetPack 3.1 or 3.3), installation instructions in [doc/installation_jetson_tx2_jetpack3.1.md](./installation_jetson_tx2_jetpack3.1.md) and [doc/installation_jetson_tx2_jetpack3.3.md](./installation_jetson_tx2_jetpack3.3.md) respectively.
 - OpenPose has also been used on **Windows 7**, **CentOS**, and **Nvidia Jetson (TK1 and TX1)** embedded systems. However, we do not officially support them at the moment.

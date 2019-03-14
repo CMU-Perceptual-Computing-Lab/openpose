@@ -44,6 +44,7 @@ In addition, CMake automatically downloads all the OpenPose models. However, **s
     3. **cuDNN**:
         - Ubuntu 14 or 16 ([**cuDNN 5.1**](https://developer.nvidia.com/rdp/cudnn-archive) **or 7.2**): Run `sudo ./scripts/ubuntu/install_cudnn.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX) or alternatively download and install it from their website.
         - Ubuntu 18 ([**cuDNN 7.2**](https://developer.nvidia.com/cudnn)): Download and install it from the [Nvidia website](https://developer.nvidia.com/cudnn).
+        - In order to manually install it (any version), just unzip it and copy (merge) the contents on the CUDA folder, usually `/usr/local/cuda/` in Ubuntu and `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0` in Windows.
 5. AMD GPU version prerequisites:
     1. Ubuntu 14 or 16:
         1. Download 3rd party ROCM driver for Ubuntu from [**AMD - OpenCL**](https://rocm.github.io/ROCmInstall.html).
@@ -76,23 +77,20 @@ In addition, CMake automatically downloads all the OpenPose models. However, **s
 NOTE: These instructions are only required when compiling OpenPose brom source. If you simply wanna use the OpenPose binaries for Windows, skip this step.
 
 1. Install **CMake GUI**: Download and install the `Latest Release` of CMake `Windows win64-x64 Installer` from the [CMake download website](https://cmake.org/download/), called `cmake-X.X.X-win64-x64.msi`.
-2. Install **Microsoft Visual Studio (VS) 2015 Enterprise Update 3**:
+2. Install **Microsoft Visual Studio (VS) 2017 Enterprise** or **VS 2015 Enterprise Update 3**:
     - **IMPORTANT**: Enable all C++-related flags when selecting the components to install.
     - Different VS versions:
-        - If **Visual Studio 2017 Community** is desired, we do not officially support it, but it might be compiled by firstly [enabling CUDA 8.0 in VS2017](https://stackoverflow.com/questions/43745099/using-cuda-with-visual-studio-2017?answertab=active#tab-top) or use **VS2017 with CUDA 9** by checking the `.vcxproj` file and changing the necessary paths from CUDA 8 to 9.
-        - VS 2015 Enterprise Update 1 will give some compiler errors.
-        - VS 2015 Community has not been tested.
+        - If **Visual Studio 2017 Community** is desired, we do not officially support it, but it should run similarly to VS 2017 Enterprise.
+        - VS 2015 Community and Enterprise Update 1 might give some compiler errors. They have not been tested and they are totally not supported (use VS 2017 Community instead).
 3. Nvidia GPU version prerequisites:
-    1. **Note: OpenPose has been tested extensively with CUDA 8.0 and cuDNN 5.1**. We highly recommend using those versions to minimize potential installation issues. Other versions should also work, but we do not provide support about any CUDA/cuDNN installation/compilation issue, as well as problems related to their integration into OpenPose.
-    2. [**CUDA 8**](https://developer.nvidia.com/cuda-80-ga2-download-archive):
-        - Ubuntu: Run `sudo ./scripts/ubuntu/install_cuda.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX) or alternatively download and install it from their website.
-        - Windows: Install CUDA 8.0 after Visual Studio 2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install it.
+    1. **Note: OpenPose has been tested extensively with CUDA 10.0 / cuDNN 7.5 for VS2017 and CUDA 8.0 / cuDNN 5.1 for VS 2015**. We highly recommend using those versions to minimize potential installation issues. Other versions should also work, but we do not provide support about any CUDA/cuDNN installation/compilation issue, as well as problems related to their integration into OpenPose.
+    2. [**CUDA 10**](https://developer.nvidia.com/cuda-downloads) or [**CUDA 8**](https://developer.nvidia.com/cuda-80-ga2-download-archive):
+        - Install CUDA 8.0/10.0 after Visual Studio 2015/2017 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install it.
         - **Important installation tips**:
             - (Windows issue, reported Sep 2018): If your computer hangs when installing CUDA drivers, try installing first the [Nvidia drivers](http://www.nvidia.com/Download/index.aspx), and then installing CUDA without the Graphics Driver flag.
             - If CMake returns and error message similar to `CUDA_TOOLKIT_ROOT_DIR not found or specified` or any other CUDA component missing, then: 1) Re-install Visual Studio 2015; 2) Reboot your PC; 3) Re-install CUDA (in this order!).
-    3. [**cuDNN 5.1**](https://developer.nvidia.com/rdp/cudnn-archive):
-        - Ubuntu: Run `sudo ./scripts/ubuntu/install_cudnn.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX) or alternatively download and install it from their website.
-        - Windows (and Ubuntu if manual installation): In order to manually install it, just unzip it and copy (merge) the contents on the CUDA folder, usually `/usr/local/cuda/` in Ubuntu and `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0` in Windows.
+    3. [**cuDNN 7.5**](https://developer.nvidia.com/cudnn) or [**cuDNN 5.1**](https://developer.nvidia.com/rdp/cudnn-archive):
+        - In order to manually install it, just unzip it and copy (merge) the contents on the CUDA folder, usually `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0` in Windows and `/usr/local/cuda/` in Ubuntu.
 4. AMD GPU version prerequisites:
     1. Download official AMD drivers for Windows from [**AMD - Windows**](https://support.amd.com/en-us/download).
     2. The libviennacl package comes packaged inside OpenPose for Windows (i.e., no further action required).
@@ -100,9 +98,9 @@ NOTE: These instructions are only required when compiling OpenPose brom source. 
     - CMake automatically downloads all the Windows DLLs. Alternatively, you might prefer to download them manually:
         - Dependencies:
             - Note: Leave the zip files in `3rdparty/windows/` so that CMake does not try to download them again.
-            - [Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_2018_01_18.zip): Unzip as `3rdparty/windows/caffe/`.
-            - [Caffe dependencies](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe3rdparty_2017_07_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
-            - [OpenCV 3.1](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_310.zip): Unzip as `3rdparty/windows/opencv/`.
+            - [Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_15_2019_03_14.zip): Unzip as `3rdparty/windows/caffe/`.
+            - [Caffe dependencies](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe3rdparty_15_2019_03_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
+            - [OpenCV 4.0.1](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_401_v14_15_2019_03_14.zip): Unzip as `3rdparty/windows/opencv/`.
 6. **Eigen prerequisite** (optional, only required for some specific extra functionality, such as extrinsic camera calibration):
     - Enable the `WITH_EIGEN` flag when running CMake, and set it to `BUILD`.
     - CMake will automatically download Eigen.
