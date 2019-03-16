@@ -1,0 +1,33 @@
+image: Visual Studio 2017
+clone_folder: c:\openpose
+
+build_script:
+    - mkdir build
+    - cd build
+    - cmake -DGPU_MODE=CPU_ONLY -G "Visual Studio 15 2017 Win64" ..
+    - cmake --build . --config "Release"
+
+after_build:
+    - ps: cd ..
+    - ps: mkdir artifacts
+    - ps: mkdir artifacts/bin
+    - ps: mkdir artifacts/examples
+    - ps: mkdir artifacts/examples/media
+    - ps: mkdir artifacts/include
+    - ps: mkdir artifacts/lib
+    - ps: Get-ChildItem -Path build/x64/Release/*.exe -Recurse -File | Copy-Item -Destination artifacts/bin
+    - ps: Get-ChildItem -Path build/x64/Release/*.dll -Recurse -File | Copy-Item -Destination artifacts/bin
+    - ps: Get-ChildItem -Path build/bin/*.dll -Recurse -File | Copy-Item -Destination artifacts/bin
+    - ps: Get-ChildItem -Path examples/media/* -Recurse -File | Copy-Item -Destination artifacts/examples/media
+    - ps: Copy-Item include/openpose -Recurse -Destination artifacts/include/
+    - ps: Copy-Item 3rdparty/windows/opencv/include/opencv2 -Recurse -Destination artifacts/include/
+    - ps: Get-ChildItem -Path build/*.lib -Recurse -File | Copy-Item -Destination artifacts/lib
+    - ps: Get-ChildItem -Path 3rdparty/*.lib -Recurse -File | Copy-Item -Destination artifacts/lib
+    - ps: Copy-Item models -Recurse -Destination artifacts/
+    - ps: cd artifacts
+    - ps: 7z a ..\openpose.zip .
+    - ps: cd ..
+
+artifacts:
+    - path: openpose.zip
+      name: OpenPose
