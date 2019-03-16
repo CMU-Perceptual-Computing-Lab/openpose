@@ -1,6 +1,7 @@
 #ifndef OPENPOSE_HAND_HAND_PARAMETERS_HPP
 #define OPENPOSE_HAND_HAND_PARAMETERS_HPP
 
+#include <openpose/core/enumClasses.hpp>
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/pose/poseParametersRender.hpp>
 
@@ -47,6 +48,12 @@ namespace op
     // Rendering parameters
     const auto HAND_DEFAULT_ALPHA_KEYPOINT = POSE_DEFAULT_ALPHA_KEYPOINT;
     const auto HAND_DEFAULT_ALPHA_HEAT_MAP = POSE_DEFAULT_ALPHA_HEAT_MAP;
+
+#ifdef USE_CUDA
+    const auto HAND_DEFAULT_RENDER_MODE = RenderMode::Gpu;
+#else
+    const auto HAND_DEFAULT_RENDER_MODE = RenderMode::Cpu;
+#endif
 }
 
 #endif // OPENPOSE_HAND_HAND_PARAMETERS_HPP

@@ -2,6 +2,7 @@
 #define OPENPOSE_POSE_POSE_PARAMETERS_RENDER_HPP
 
 #include <openpose/core/common.hpp>
+#include <openpose/core/enumClasses.hpp>
 #include <openpose/pose/enumClasses.hpp>
 
 namespace op
@@ -9,6 +10,12 @@ namespace op
     // Rendering parameters
     const auto POSE_DEFAULT_ALPHA_KEYPOINT = 0.6f;
     const auto POSE_DEFAULT_ALPHA_HEAT_MAP = 0.7f;
+
+#ifdef USE_CUDA
+    const auto POSE_DEFAULT_RENDER_MODE = RenderMode::Gpu;
+#else
+    const auto POSE_DEFAULT_RENDER_MODE = RenderMode::Cpu;
+#endif
 
     // Model-Dependent Parameters
     // CUDA-code Model-Dependent Parameters must be defined with #define
