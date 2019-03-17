@@ -1,7 +1,6 @@
 #ifndef OPENPOSE_FACE_FACE_PARAMETERS_HPP
 #define OPENPOSE_FACE_FACE_PARAMETERS_HPP
 
-#include <openpose/core/enumClasses.hpp>
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/pose/poseParametersRender.hpp>
 
@@ -29,12 +28,6 @@ namespace op
     // Rendering parameters
     const auto FACE_DEFAULT_ALPHA_KEYPOINT = POSE_DEFAULT_ALPHA_KEYPOINT;
     const auto FACE_DEFAULT_ALPHA_HEAT_MAP = POSE_DEFAULT_ALPHA_HEAT_MAP;
-
-#ifdef USE_CUDA
-    const auto FACE_DEFAULT_RENDER_MODE = RenderMode::Gpu;
-#else
-    const auto FACE_DEFAULT_RENDER_MODE = RenderMode::Cpu;
-#endif
 }
 
 #endif // OPENPOSE_FACE_FACE_PARAMETERS_HPP
