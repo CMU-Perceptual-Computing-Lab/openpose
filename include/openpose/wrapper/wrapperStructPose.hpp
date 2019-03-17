@@ -17,6 +17,10 @@ namespace op
      */
     struct OP_API WrapperStructPose
     {
+    private:
+        static const RenderMode POSE_DEFAULT_RENDER_MODE;
+
+    public:
         /**
          * Whether to extract body.
          * It might be optionally disabled for very few cases (e.g., if only face keypoint detection is desired for
@@ -213,7 +217,7 @@ namespace op
             const Point<int>& outputSize = Point<int>{-1, -1},
             const ScaleMode keypointScaleMode = ScaleMode::InputResolution, const int gpuNumber = -1,
             const int gpuNumberStart = 0, const int scalesNumber = 1, const float scaleGap = 0.15f,
-            const RenderMode renderMode = RenderMode::Gpu, const PoseModel poseModel = PoseModel::BODY_25,
+            const RenderMode renderMode = POSE_DEFAULT_RENDER_MODE, const PoseModel poseModel = PoseModel::BODY_25,
             const bool blendOriginalFrame = true, const float alphaKeypoint = POSE_DEFAULT_ALPHA_KEYPOINT,
             const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP, const int defaultPartToRender = 0,
             const std::string& modelFolder = "models/", const std::vector<HeatMapType>& heatMapTypes = {},

@@ -40,4 +40,10 @@ namespace op
         enableGoogleLogging{enableGoogleLogging_}
     {
     }
+
+#ifdef USE_CUDA
+    const RenderMode WrapperStructPose::POSE_DEFAULT_RENDER_MODE = RenderMode::Gpu;
+#else
+    const RenderMode WrapperStructPose::POSE_DEFAULT_RENDER_MODE = RenderMode::Cpu;
+#endif
 }

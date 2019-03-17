@@ -17,4 +17,10 @@ namespace op
         renderThreshold{renderThreshold_}
     {
     }
+
+#ifdef USE_CUDA
+    const RenderMode WrapperStructHand::HAND_DEFAULT_RENDER_MODE = RenderMode::Gpu;
+#else
+    const RenderMode WrapperStructHand::HAND_DEFAULT_RENDER_MODE = RenderMode::Cpu;
+#endif
 }
