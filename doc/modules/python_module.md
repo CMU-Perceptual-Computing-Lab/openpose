@@ -50,7 +50,7 @@ If run via the command line, you may need to run cmake twice in order for this c
 
 
 ## Installation
-Check [doc/installation.md#python-module](../installation.md#python-api) for installation steps.
+Check [doc/installation.md#python-api](../installation.md#python-api) for installation steps.
 
 The Python API requires python-dev, Numpy (for array management), and OpenCV (for image loading). They can be installed via:
 
