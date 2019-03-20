@@ -20,7 +20,7 @@ Note: We are not aiming to have the best calibration toolbox, but the simplest o
 
 
 ## Installing the Calibration Module
-Check [doc/installation.md#calibration-module](./installation.md#calibration-module) for installation steps.
+Check [doc/installation.md#calibration-module](../installation.md#calibration-module) for installation steps.
 
 
 
@@ -150,7 +150,7 @@ Examples:
 ## Using a Different Camera Brand
 If you plan to use the calibration tool without using OpenPose, you can manually save a video sequence of your desired camera into each of the camera image folders (i.e., in the above example, the `~/Desktop/intrinsics_0`, `~/Desktop/intrinsics_1`, etc. folders).
 
-If you wanna eventually run that camera with OpenPose, check [doc/modules/3d_reconstruction_module.md#using-a-different-camera-brand](./modules/3d_reconstruction_module.md#using-a-different-camera-brand).
+If you wanna eventually run that camera with OpenPose, check [doc/modules/3d_reconstruction_module.md#using-a-different-camera-brand](./3d_reconstruction_module.md#using-a-different-camera-brand).
 
 
 
