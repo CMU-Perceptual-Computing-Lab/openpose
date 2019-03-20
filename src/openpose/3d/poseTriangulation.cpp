@@ -435,8 +435,10 @@ namespace op
                         log("Unusual high re-projection error (averaged over #keypoints) of value "
                             + std::to_string(reprojectionErrorTotal) + " pixels, while the average for a good OpenPose"
                             " detection from 4 cameras is about 2-3 pixels. It might be simply a wrong OpenPose"
-                            " detection. If this message appears very frequently, your calibration parameters"
-                            " might be wrong.", Priority::High);
+                            " detection. However, if this message appears very frequently, your calibration parameters"
+                            " might be wrong. Note: If you have introduced your own camera intrinsics, are they an"
+                            " upper triangular matrix (as specified in the OpenPose doc/modules/calibration_module.md"
+                            " and 3d_reconstruction_module.md)?", Priority::High);
                     // log("Reprojection error: " + std::to_string(reprojectionErrorTotal)); // To debug reprojection error
                 }
             }

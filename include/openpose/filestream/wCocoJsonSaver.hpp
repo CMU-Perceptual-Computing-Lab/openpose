@@ -67,7 +67,8 @@ namespace op
                 // T* to T
                 const auto& tDatumPtr = tDatums->at(0);
                 // Record json in COCO format
-                spCocoJsonSaver->record(tDatumPtr->poseKeypoints, tDatumPtr->poseScores, tDatumPtr->name, tDatumPtr->frameNumber);
+                spCocoJsonSaver->record(
+                    tDatumPtr->poseKeypoints, tDatumPtr->poseScores, tDatumPtr->name, tDatumPtr->frameNumber);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);

@@ -17,10 +17,13 @@ This experimental module performs camera calibration (distortion, intrinsic, and
 
 Note: We are not aiming to have the best calibration toolbox, but the simplest one. If very high quality calibration is required, I am sure there must exist many other toolboxs with better extrinsic parameter estimation tools.
 
+**VERY IMPORTANT**: OpenPose requires an upper triangular matrix for the intrinsic camera matrix. If you plan to use your own camera intrinsics, be aware of this.
+
+
 
 
 ## Installing the Calibration Module
-Check [doc/installation.md#calibration-module](./installation.md#calibration-module) for installation steps.
+Check [doc/installation.md#calibration-module](../installation.md#calibration-module) for installation steps.
 
 
 
@@ -150,7 +153,7 @@ Examples:
 ## Using a Different Camera Brand
 If you plan to use the calibration tool without using OpenPose, you can manually save a video sequence of your desired camera into each of the camera image folders (i.e., in the above example, the `~/Desktop/intrinsics_0`, `~/Desktop/intrinsics_1`, etc. folders).
 
-If you wanna eventually run that camera with OpenPose, check [doc/modules/3d_reconstruction_module.md#using-a-different-camera-brand](./modules/3d_reconstruction_module.md#using-a-different-camera-brand).
+If you wanna eventually run that camera with OpenPose, check [doc/modules/3d_reconstruction_module.md#using-a-different-camera-brand](./3d_reconstruction_module.md#using-a-different-camera-brand).
 
 
 

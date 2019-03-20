@@ -100,9 +100,11 @@ namespace op
                         imageId = getLastNumber(imageName);
                         // Body
                         if (numberBodyParts == 23)
-                            indexesInCocoOrder = std::vector<int>{0, 14,13,16,15,    4,1,5,2,6,    3,10,7,11, 8,    12, 9};
+                            indexesInCocoOrder = std::vector<int>{
+                                0, 14,13,16,15,    4,1,5,2,6,    3,10,7,11, 8,    12, 9};
                         else if (numberBodyParts == 18)
-                            indexesInCocoOrder = std::vector<int>{0, 15,14,17,16,    5,2,6,3,7,    4,11,8,12, 9,    13,10};
+                            indexesInCocoOrder = std::vector<int>{
+                                0, 15,14,17,16,    5,2,6,3,7,    4,11,8,12, 9,    13,10};
                         else if (mPoseModel == PoseModel::BODY_25B || mPoseModel == PoseModel::BODY_95
                             || mPoseModel == PoseModel::BODY_135)
                         {
@@ -110,9 +112,11 @@ namespace op
                             std::iota(indexesInCocoOrder.begin(), indexesInCocoOrder.end(), 0);
                         }
                         else if (numberBodyParts == 19 || numberBodyParts == 25 || numberBodyParts == 59)
-                            indexesInCocoOrder = std::vector<int>{0, 16,15,18,17,    5,2,6,3,7,    4,12,9,13,10,    14,11};
+                            indexesInCocoOrder = std::vector<int>{
+                                0, 16,15,18,17,    5,2,6,3,7,    4,12,9,13,10,    14,11};
                         // else if (numberBodyParts == 23)
-                        //     indexesInCocoOrder = std::vector<int>{18,21,19,22,20,    4,1,5,2,6,    3,13,8,14, 9,    15,10};
+                        //     indexesInCocoOrder = std::vector<int>{
+                        //         18,21,19,22,20,    4,1,5,2,6,    3,13,8,14, 9,    15,10};
                     }
                     // Foot
                     else if (cocoJsonFormat == CocoJsonFormat::Foot)
@@ -183,21 +187,17 @@ namespace op
                     // Save on JSON file
                     for (auto person = 0 ; person < numberPeople ; person++)
                     {
-                        bool foundAtLeast1Keypoint = true;
-                        // Foot
-                        if (cocoJsonFormat == CocoJsonFormat::Foot)
+                        // At least 1 valid keypoint?
+                        // Reason: When saving any combination of Body + Foot + Face + Hand, the others might be empty
+                        bool foundAtLeast1Keypoint = false;
+                        for (auto bodyPart = 0u ; bodyPart < indexesInCocoOrder.size() ; bodyPart++)
                         {
-                            // At least 1 valid keypoint?
-                            foundAtLeast1Keypoint = false;
-                            for (auto bodyPart = 0u ; bodyPart < indexesInCocoOrder.size() ; bodyPart++)
+                            const auto finalIndex = 3*(person*numberBodyParts + indexesInCocoOrder.at(bodyPart));
+                            const auto validPoint = (poseKeypoints[finalIndex+2] > 0.f);
+                            if (validPoint)
                             {
-                                const auto finalIndex = 3*(person*numberBodyParts + indexesInCocoOrder.at(bodyPart));
-                                const auto validPoint = (poseKeypoints[finalIndex+2] > 0.f);
-                                if (validPoint)
-                                {
-                                    foundAtLeast1Keypoint = true;
-                                    break;
-                                }
+                                foundAtLeast1Keypoint = true;
+                                break;
                             }
                         }
 

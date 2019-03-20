@@ -36,7 +36,7 @@ params = dict()
 params["model_folder"] = "../../../models/"
 params["face"] = True
 params["face_detector"] = 2
-params["body_disable"] = True
+params["body"] = 0
 
 # Add others in path?
 for i in range(0, len(args[1])):
