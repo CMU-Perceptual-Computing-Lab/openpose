@@ -342,7 +342,10 @@ We only modified some Caffe compilation flags and minor details. You can use you
     <img src="media/cmake_installation/im_5.png", width="480">
 </p>
 
-
+#### Using NVIDIA NVCaffe
+To use NVIDIA's NVCaffe instead of the standard Caffe, you can use the `NV_CAFFE` build variable.
+When using a NVCaffe docker image, this should be used togehter with `BUILD_CAFFE=OFF`
+and setting the correct `Caffe_INCLUDE_DIRS` and `Caffe_LIBS` paths.
 
 #### Custom OpenCV (Ubuntu Only)
 If you have built OpenCV from source and OpenPose cannot find it automatically, you can set the `OPENCV_DIR` variable to the directory where you build OpenCV.
