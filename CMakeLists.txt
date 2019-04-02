@@ -139,6 +139,12 @@ if (${DL_FRAMEWORK} MATCHES "CAFFE")
   add_definitions(-DUSE_CAFFE)
 endif (${DL_FRAMEWORK} MATCHES "CAFFE")
 
+OPTION (NV_CAFFE "Use NVCaffe instead of normal Caffe." OFF)
+if (NV_CAFFE)
+    MESSAGE("-- Using NVIDIA NVCaffe")
+    add_definitions(-DNV_CAFFE)
+endif (NV_CAFFE)
+
 if (WIN32)
   # Select the Enhanced Instruction Set
   set(INSTRUCTION_SET NONE CACHE STRING "Enable Enhanced Instruction Set")
