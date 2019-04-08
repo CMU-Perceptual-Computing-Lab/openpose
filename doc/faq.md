@@ -9,11 +9,11 @@ OpenPose - Frequently Asked Question (FAQ)
     4. [Profiling Speed and Estimating FPS without Display](#profiling-speed-and-estimating-fps-without-display)
     5. [Webcam Slower than Images](#webcam-slower-than-images)
     6. [Video/Webcam Not Working](#videowebcam-not-working)
-    7. [Cannot Find OpenPose.dll Error](#cannot-find-openpose.dll-error-windows)
+    7. [Cannot Find OpenPose.dll Error](#cannot-find-openposedll-error-windows)
     8. [Free Invalid Pointer Error](#free-invalid-pointer-error)
-    9. [Source Directory does not Contain CMakeLists.txt (Windows)](#source-directory-does-not-contain-cmakelists.txt-windows)
+    9. [Source Directory does not Contain CMakeLists.txt (Windows)](#source-directory-does-not-contain-cmakeliststxt-windows)
     10. [How Should I Link my IP Camera?](#how-should-i-link-my-ip-camera)
-    11. [Difference between BODY_25 vs. COCO vs. MPI](#difference-between-body_25-vs.-coco-vs.-mpi)
+    11. [Difference between BODY_25 vs. COCO vs. MPI](#difference-between-body_25-vs-coco-vs-mpi)
     12. [How to Measure the Latency Time?](#how-to-measure-the-latency-time)
     13. [Zero People Detected](#zero-people-detected)
     14. [Check Failed for ReadProtoFromBinaryFile (Failed to Parse NetParameter File)](#check-failed-for-readprotofrombinaryfile-failed-to-parse-netparameter-file)
@@ -21,7 +21,8 @@ OpenPose - Frequently Asked Question (FAQ)
     16. [Protobuf Clip Param Caffe Error](#protobuf-clip-param-caffe-error)
     17. [The Human Skeleton Looks like Dotted Lines Rather than Solid Lines](#the-human-skeleton-looks-like-dotted-lines-rather-than-solid-lines)
     18. [Huge RAM Usage](#huge-ram-usage)
-    19. [CUDA_cublas_device_LIBRARY Not Found](#cuda_cublas_device_library_not_found)
+    19. [CUDA_cublas_device_LIBRARY Not Found](#cuda_cublas_device_library-not-found)
+    20. [CMake-GUI Error While Getting Default Caffe](#cmake-gui-error-while-getting-default-caffe)
 
 
 
@@ -176,3 +177,17 @@ CUDA_cublas_device_LIBRARY (ADVANCED)
 ```
 
 **A**: Make sure to download and install CMake-GUI following the [doc/prerequisites.md](./prerequisites.md) section. This is a known problem with CMake-GUI versions from 3.8 to 3.11 (unfortunately, default Ubuntu 18 CMake-GUI uses 3.10). You will need a CMake version >= 3.12.
+
+
+
+### CMake-GUI Error While Getting Default Caffe
+**Q**: It seems to me CMake-gui does not download Caffe at all. I tried to wipe everything and try to install OpenPose again, but received the same mistake. I also tried to see if cmake follows the ifs in the CMakeLists.txt correctly and reaches the branches where he establishes that Caffe needs to be downloaded and it seems to me it does so.
+
+**A**: There are 2 solutions to try. First, if you were using an old OP version and you just updated it, you should simply completely remove that OpenPose folder, and then re-download and re-compile OpenPose. Second, and only if after re-cloning master and running CMake-GUI the `3rdparty/caffe/` folder stays empty, manually trigger the git submodules to update. So the clone step becomes:
+```
+git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose
+cd openpose
+
+git submodule init
+git submodle update
+```

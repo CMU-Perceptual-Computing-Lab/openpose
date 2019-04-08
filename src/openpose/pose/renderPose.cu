@@ -49,7 +49,7 @@ namespace op
 
     inline __device__ void getColorHeatMap(float* colorPtr, float v, const float vmin, const float vmax)
     {
-        v = fastTruncate(v, vmin, vmax);
+        v = fastTruncateCuda(v, vmin, vmax);
         const auto dv = vmax - vmin;
 
         if (v < (vmin + 0.125f * dv))
@@ -93,7 +93,7 @@ namespace op
         const auto BM = 13;
         const auto MR =  6;
         const auto summed = RY+YG+GC+CB+BM+MR;       // 55
-        v = fastTruncate(v, vmin, vmax) * summed;
+        v = fastTruncateCuda(v, vmin, vmax) * summed;
 
         if (v < RY)
             colorPtr = {255.f,                        255.f*(v/(RY)),               0.f};
@@ -113,7 +113,7 @@ namespace op
 
     inline __device__ void getColorXYAffinity(float3& colorPtr, const float x, const float y)
     {
-        const auto rad = fastMin(1.f, sqrt( x*x + y*y ) );
+        const auto rad = fastMinCuda(1.f, sqrt( x*x + y*y ) );
         const float a = atan2(-y,-x)/PI;
         auto fk = (a+1.f)/2.f; // 0 to 1
         if (::isnan(fk))
@@ -142,8 +142,8 @@ namespace op
         const auto numberPartPairs = sizeof(COCO_PAIRS_GPU) / (2*sizeof(COCO_PAIRS_GPU[0]));
         const auto numberScales = sizeof(COCO_SCALES) / sizeof(COCO_SCALES[0]);
         const auto numberColors = sizeof(COCO_COLORS) / (3*sizeof(COCO_COLORS[0]));
-        const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
-        const auto lineWidth = fastMin(targetWidth, targetHeight) / 120.f;
+        const auto radius = fastMinCuda(targetWidth, targetHeight) / 100.f;
+        const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
         renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
@@ -170,8 +170,8 @@ namespace op
         const auto numberPartPairs = sizeof(BODY_19_PAIRS_GPU) / (2*sizeof(BODY_19_PAIRS_GPU[0]));
         const auto numberScales = sizeof(BODY_19_SCALES) / sizeof(BODY_19_SCALES[0]);
         const auto numberColors = sizeof(BODY_19_COLORS) / (3*sizeof(BODY_19_COLORS[0]));
-        const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
-        const auto lineWidth = fastMin(targetWidth, targetHeight) / 120.f;
+        const auto radius = fastMinCuda(targetWidth, targetHeight) / 100.f;
+        const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
         renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
@@ -198,8 +198,8 @@ namespace op
         const auto numberPartPairs = sizeof(BODY_23_PAIRS_GPU) / (2*sizeof(BODY_23_PAIRS_GPU[0]));
         const auto numberScales = sizeof(BODY_23_SCALES) / sizeof(BODY_23_SCALES[0]);
         const auto numberColors = sizeof(BODY_23_COLORS) / (3*sizeof(BODY_23_COLORS[0]));
-        const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
-        const auto lineWidth = fastMin(targetWidth, targetHeight) / 120.f;
+        const auto radius = fastMinCuda(targetWidth, targetHeight) / 100.f;
+        const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
         renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
@@ -226,8 +226,8 @@ namespace op
         const auto numberPartPairs = sizeof(BODY_25_PAIRS_GPU) / (2*sizeof(BODY_25_PAIRS_GPU[0]));
         const auto numberScales = sizeof(BODY_25_SCALES) / sizeof(BODY_25_SCALES[0]);
         const auto numberColors = sizeof(BODY_25_COLORS) / (3*sizeof(BODY_25_COLORS[0]));
-        const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
-        const auto lineWidth = fastMin(targetWidth, targetHeight) / 120.f;
+        const auto radius = fastMinCuda(targetWidth, targetHeight) / 100.f;
+        const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
         renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
@@ -254,8 +254,8 @@ namespace op
         const auto numberPartPairs = sizeof(BODY_25B_PAIRS_GPU) / (2*sizeof(BODY_25B_PAIRS_GPU[0]));
         const auto numberScales = sizeof(BODY_25B_SCALES) / sizeof(BODY_25B_SCALES[0]);
         const auto numberColors = sizeof(BODY_25B_COLORS) / (3*sizeof(BODY_25B_COLORS[0]));
-        const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
-        const auto lineWidth = fastMin(targetWidth, targetHeight) / 120.f;
+        const auto radius = fastMinCuda(targetWidth, targetHeight) / 100.f;
+        const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
         renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
@@ -282,8 +282,8 @@ namespace op
         const auto numberPartPairs = sizeof(BODY_65_PAIRS_GPU) / (2*sizeof(BODY_65_PAIRS_GPU[0]));
         const auto numberScales = sizeof(BODY_65_SCALES) / sizeof(BODY_65_SCALES[0]);
         const auto numberColors = sizeof(BODY_65_COLORS) / (3*sizeof(BODY_65_COLORS[0]));
-        const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
-        const auto lineWidth = fastMin(targetWidth, targetHeight) / 120.f;
+        const auto radius = fastMinCuda(targetWidth, targetHeight) / 100.f;
+        const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
         renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
@@ -310,8 +310,8 @@ namespace op
         const auto numberPartPairs = sizeof(BODY_95_PAIRS_GPU) / (2*sizeof(BODY_95_PAIRS_GPU[0]));
         const auto numberScales = sizeof(BODY_95_SCALES) / sizeof(BODY_95_SCALES[0]);
         const auto numberColors = sizeof(BODY_95_COLORS) / (3*sizeof(BODY_95_COLORS[0]));
-        const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
-        const auto lineWidth = fastMin(targetWidth, targetHeight) / 120.f;
+        const auto radius = fastMinCuda(targetWidth, targetHeight) / 100.f;
+        const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
         renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
@@ -338,8 +338,8 @@ namespace op
         const auto numberPartPairs = sizeof(BODY_135_PAIRS_GPU) / (2*sizeof(BODY_135_PAIRS_GPU[0]));
         const auto numberScales = sizeof(BODY_135_SCALES) / sizeof(BODY_135_SCALES[0]);
         const auto numberColors = sizeof(BODY_135_COLORS) / (3*sizeof(BODY_135_COLORS[0]));
-        const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
-        const auto lineWidth = fastMin(targetWidth, targetHeight) / 120.f;
+        const auto radius = fastMinCuda(targetWidth, targetHeight) / 100.f;
+        const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
         renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
@@ -365,8 +365,8 @@ namespace op
         const auto numberPartPairs = sizeof(MPI_PAIRS_GPU) / (2*sizeof(MPI_PAIRS_GPU[0]));
         const auto numberScales = sizeof(MPI_SCALES) / sizeof(MPI_SCALES[0]);
         const auto numberColors = sizeof(MPI_COLORS) / (3*sizeof(MPI_COLORS[0]));
-        const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
-        const auto lineWidth = fastMin(targetWidth, targetHeight) / 120.f;
+        const auto radius = fastMinCuda(targetWidth, targetHeight) / 100.f;
+        const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
         renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
@@ -392,8 +392,8 @@ namespace op
         const auto numberPartPairs = sizeof(CAR_12_PAIRS_GPU) / (2*sizeof(CAR_12_PAIRS_GPU[0]));
         const auto numberScales = sizeof(CAR_12_SCALES) / sizeof(CAR_12_SCALES[0]);
         const auto numberColors = sizeof(CAR_12_COLORS) / (3*sizeof(CAR_12_COLORS[0]));
-        const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
-        const auto lineWidth = fastMin(targetWidth, targetHeight) / 120.f;
+        const auto radius = fastMinCuda(targetWidth, targetHeight) / 100.f;
+        const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
         renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
@@ -420,8 +420,8 @@ namespace op
         const auto numberPartPairs = sizeof(CAR_22_PAIRS_GPU) / (2*sizeof(CAR_22_PAIRS_GPU[0]));
         const auto numberScales = sizeof(CAR_22_SCALES) / sizeof(CAR_22_SCALES[0]);
         const auto numberColors = sizeof(CAR_22_COLORS) / (3*sizeof(CAR_22_COLORS[0]));
-        const auto radius = fastMin(targetWidth, targetHeight) / 100.f;
-        const auto lineWidth = fastMin(targetWidth, targetHeight) / 120.f;
+        const auto radius = fastMinCuda(targetWidth, targetHeight) / 100.f;
+        const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
         renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
@@ -445,8 +445,8 @@ namespace op
             float rgbColor [3] = {0.f,0.f,0.f};
             const auto xSource = (x + 0.5f) / scaleToKeepRatio - 0.5f;
             const auto ySource = (y + 0.5f) / scaleToKeepRatio - 0.5f;
-            const auto xHeatMap = fastTruncate(int(xSource + 1e-5), 0, widthHeatMap);
-            const auto yHeatMap = fastTruncate(int(ySource + 1e-5), 0, heightHeatMap);
+            const auto xHeatMap = fastTruncateCuda(int(xSource + 1e-5), 0, widthHeatMap);
+            const auto yHeatMap = fastTruncateCuda(int(ySource + 1e-5), 0, heightHeatMap);
             const auto heatMapArea = widthHeatMap * heightHeatMap;
             for (auto part = 0u ; part < numberBodyParts ; part++)
             {
