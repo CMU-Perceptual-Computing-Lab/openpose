@@ -6,16 +6,16 @@ In case of hand camera views at which the hands are visible but not the rest of 
 ## OpenCV-based Face Keypoint Detector
 Note that this method will be faster than the current system if there is few people in the image, but it is also much less accurate (OpenCV face detector only works with big and frontal faces, while OpenPose works with more scales and face rotations).
 ```
-./build/examples/openpose/openpose.bin --body_disable --face --face_detector 1
+./build/examples/openpose/openpose.bin --body 0 --face --face_detector 1
 ```
 
 ## Custom Standalone Face or Hand Keypoint Detector
 Check the examples in `examples/tutorial_api_cpp/`, in particular [examples/tutorial_api_cpp/06_face_from_image.cpp](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/examples/tutorial_api_cpp/06_face_from_image.cpp) and [examples/tutorial_api_cpp/07_hand_from_image.cpp](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/examples/tutorial_api_cpp/07_hand_from_image.cpp). The provide examples of face and/or hand keypoint detection given a known bounding box or rectangle for the face and/or hand locations. These examples are equivalent to use the following flags:
 ```
 # Face
-examples/tutorial_api_cpp/06_face_from_image.cpp --body_disable --face --face_detector 2
+examples/tutorial_api_cpp/06_face_from_image.cpp --body 0 --face --face_detector 2
 # Hands
-examples/tutorial_api_cpp/07_hand_from_image.cpp --body_disable --hand --hand_detector 2
+examples/tutorial_api_cpp/07_hand_from_image.cpp --body 0 --hand --hand_detector 2
 ```
 
 Note: both `FaceExtractor` and `HandExtractor` classes requires as input **squared rectangles**.

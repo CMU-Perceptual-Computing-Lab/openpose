@@ -1,6 +1,11 @@
 #ifndef OPENPOSE_GPU_CUDA_HU
 #define OPENPOSE_GPU_CUDA_HU
 
+// Note: This class should only be included if CUDA is enabled
+
+#include <cuda.h>
+#include <cuda_runtime.h>
+
 namespace op
 {
     // VERY IMPORTANT: These fast functions does NOT work for negative integer numbers.

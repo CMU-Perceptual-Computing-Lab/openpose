@@ -29,7 +29,7 @@ namespace op
         try
         {
             if (!filePath.empty() && !upOfstream->is_open())
-                error("Json file could not be opened.", __LINE__, __FUNCTION__, __FILE__);
+                error("Json file " + filePath + " could not be opened.", __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
         {

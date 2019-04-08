@@ -108,7 +108,7 @@ namespace op
             if (wrapperStructPose.poseMode == PoseMode::Disabled && !wrapperStructFace.enable
                 && !wrapperStructHand.enable)
                 error("Body, face, and hand keypoint detectors are disabled. You must enable at least one (i.e,"
-                      " unselect `--body_disable`, select `--face`, or select `--hand`.",
+                      " unselect `--body 0`, select `--face`, or select `--hand`.",
                       __LINE__, __FUNCTION__, __FILE__);
             const auto ownDetectorProvided = (wrapperStructFace.detector == Detector::Provided
                                               || wrapperStructHand.detector == Detector::Provided);
@@ -126,7 +126,7 @@ namespace op
                 log("Warning: Body keypoint estimation is enabled while you have also selected to provide your own"
                     " face and/or hand rectangle detections (`face_detector 2` and/or `hand_detector 2`). Therefore,"
                     " OpenPose will not detect face and/or hand keypoints based on the body keypoints. Are you sure"
-                    " you want to keep enabled the body keypoint detector? (disable it with `--body_disable`).",
+                    " you want to keep enabled the body keypoint detector? (disable it with `--body 0`).",
                     Priority::High);
             // If 3-D module, 1 person is the maximum
             if (wrapperStructExtra.reconstruct3d && wrapperStructPose.numberPeopleMax != 1)
