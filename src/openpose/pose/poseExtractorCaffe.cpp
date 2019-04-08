@@ -1,6 +1,8 @@
 #include <limits> // std::numeric_limits
 #include <openpose/gpu/cuda.hpp>
-#include <openpose/gpu/cuda.hu>
+#ifdef USE_CUDA
+    #include <openpose/gpu/cuda.hu>
+#endif
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/utilities/check.hpp>
 #include <openpose/utilities/fastMath.hpp>
