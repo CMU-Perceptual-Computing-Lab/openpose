@@ -23,5 +23,8 @@ make -j`nproc`
 
 ### For NVprof
 ```
+# Super fast
+./build/examples/openpose/openpose.bin --num_gpu 1 --frame_last 1 --net_resolution -1x128 --display 0 --profile_speed 100 --video examples/media/video.avi
+# Fast
 ./build/examples/openpose/openpose.bin --num_gpu 1 --frame_last 5 --display 0 --profile_speed 100 --video examples/media/video.avi
 ```
