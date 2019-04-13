@@ -196,7 +196,7 @@ namespace op
             if (errorMode == 1)
             {
                 errorMessageToPropagate = errorInitBase + " occurred on a thread. OpenPose closed all its"
-                    " threads and then propagated the error to the main thread:\n"
+                    " threads and then propagated the error to the main thread. Error description:\n\n"
                     + errorMessageToPropagate.substr(errorInit.size(), errorMessageToPropagate.size()-1);
             }
             if (errorMode == 2)

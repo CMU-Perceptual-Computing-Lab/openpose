@@ -104,24 +104,61 @@ endif (WIN32)
 
 # C++ additional flags
 if (CMAKE_COMPILER_IS_GNUCXX)
-
-  # Select the Enhanced Instruction Set
-  set(INSTRUCTION_SET NONE CACHE STRING "Enable Enhanced Instruction Set")
-  set_property(CACHE INSTRUCTION_SET PROPERTY STRINGS NONE SSE4 AVX)
-
-  if (${INSTRUCTION_SET} MATCHES "SSE4")
-    add_definitions("-DWITH_SSE4")
-    set(SIMD_FLAGS "${SIMD_FLAGS} -msse4.1")
-  endif (${INSTRUCTION_SET} MATCHES "SSE4")
-
-  if (${INSTRUCTION_SET} MATCHES "AVX")
-    add_definitions("-DWITH_AVX")
-    set(SIMD_FLAGS "${SIMD_FLAGS} -mavx")
-  endif (${INSTRUCTION_SET} MATCHES "AVX")
-
   message(STATUS "GCC detected, adding compile flags")
-  set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMD_FLAGS} -fopenmp -Wpedantic -Wall -Wextra -Wfatal-errors")
+  # set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -Wpedantic -Wall -Wextra -Wfatal-errors")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+  set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpedantic -Wall -Wextra -Wfatal-errors")
+  # set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -Wpedantic -Wall -Wextra -Wfatal-errors")
 endif (CMAKE_COMPILER_IS_GNUCXX)
+
+# Select the Enhanced Instruction Set
+set(INSTRUCTION_SET NONE CACHE STRING "Enable Enhanced Instruction Set")
+set_property(CACHE INSTRUCTION_SET PROPERTY STRINGS NONE AVX2)
+if (${INSTRUCTION_SET} MATCHES "AVX2")
+  add_definitions("-DWITH_AVX")
+endif (${INSTRUCTION_SET} MATCHES "AVX2")
+# Windows
+if (WIN32)
+  # Suboptions for Enhanced Instruction Set
+  if (${INSTRUCTION_SET} MATCHES "AVX2")
+    add_definitions("/arch:AVX2")
+  endif (${INSTRUCTION_SET} MATCHES "AVX2")
+# Ubuntu
+else (WIN32) # if (CMAKE_COMPILER_IS_GNUCXX)
+  if (${INSTRUCTION_SET} MATCHES "AVX2")
+    set(SIMD_FLAGS "${SIMD_FLAGS} -mavx")
+  endif (${INSTRUCTION_SET} MATCHES "AVX2")
+  message(STATUS "GCC detected, adding compile flags")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMD_FLAGS}")
+endif (WIN32)
+# if (CMAKE_COMPILER_IS_GNUCXX)
+#   set_property(CACHE INSTRUCTION_SET PROPERTY STRINGS NONE SSE4 AVX)
+#   if (${INSTRUCTION_SET} MATCHES "SSE4")
+#     add_definitions("-DWITH_SSE4")
+#     set(SIMD_FLAGS "${SIMD_FLAGS} -msse4.1")
+#   endif (${INSTRUCTION_SET} MATCHES "SSE4")
+#   if (${INSTRUCTION_SET} MATCHES "AVX2")
+#     add_definitions("-DWITH_AVX")
+#     set(SIMD_FLAGS "${SIMD_FLAGS} -mavx")
+#   endif (${INSTRUCTION_SET} MATCHES "AVX")
+#   message(STATUS "GCC detected, adding compile flags")
+#   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMD_FLAGS}")
+# endif (CMAKE_COMPILER_IS_GNUCXX)
+# if (WIN32)
+#   # set_property(CACHE INSTRUCTION_SET PROPERTY STRINGS NONE SSE SSE2 AVX AVX2 IA32)
+#   # Suboptions for Enhanced Instruction Set
+#   if (${INSTRUCTION_SET} MATCHES "SSE")
+#     add_definitions("/arch:SSE")
+#   elseif (${INSTRUCTION_SET} MATCHES "SSE2")
+#     add_definitions("/arch:SSE2")
+#   elseif (${INSTRUCTION_SET} MATCHES "AVX")
+#     add_definitions("/arch:AVX")
+#   elseif (${INSTRUCTION_SET} MATCHES "AVX2")
+#     add_definitions("/arch:AVX2")
+#   elseif (${INSTRUCTION_SET} MATCHES "IA32")
+#     add_definitions("/arch:IA32")
+#   endif (${INSTRUCTION_SET} MATCHES "SSE")
+# endif (WIN32)
 
 
 ### PROJECT OPTIONS
@@ -138,25 +175,6 @@ if (${DL_FRAMEWORK} MATCHES "CAFFE")
   # OpenPose flags
   add_definitions(-DUSE_CAFFE)
 endif (${DL_FRAMEWORK} MATCHES "CAFFE")
-
-if (WIN32)
-  # Select the Enhanced Instruction Set
-  set(INSTRUCTION_SET NONE CACHE STRING "Enable Enhanced Instruction Set")
-  set_property(CACHE INSTRUCTION_SET PROPERTY STRINGS NONE SSE SSE2 AVX AVX2 IA32)
-
-  # Suboptions for Enhanced Instruction Set
-  if (${INSTRUCTION_SET} MATCHES "SSE")
-    add_definitions("/arch:SSE")
-  elseif (${INSTRUCTION_SET} MATCHES "SSE2")
-    add_definitions("/arch:SSE2")
-  elseif (${INSTRUCTION_SET} MATCHES "AVX")
-    add_definitions("/arch:AVX")
-  elseif (${INSTRUCTION_SET} MATCHES "AVX2")
-    add_definitions("/arch:AVX2")
-  elseif (${INSTRUCTION_SET} MATCHES "IA32")
-    add_definitions("/arch:IA32")
-  endif (${INSTRUCTION_SET} MATCHES "SSE")
-endif (WIN32)
 
 # Set the acceleration library
 if (APPLE)

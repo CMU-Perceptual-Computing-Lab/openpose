@@ -152,31 +152,40 @@ namespace op
                 // Background
                 if (heatMapTypesHas(mHeatMapTypes, HeatMapType::Background))
                 {
-                    auto* heatMapsPtr = heatMaps.getPtr() + totalOffset;
-                    #ifdef USE_CUDA
-                        cudaMemcpy(heatMapsPtr, getHeatMapGpuConstPtr() + volumeBodyParts,
-                                   channelOffset * sizeof(float), cudaMemcpyDeviceToHost);
-                    #else
-                        const auto* heatMapCpuPtr = getHeatMapCpuConstPtr();
-                        std::copy(heatMapCpuPtr + volumeBodyParts, heatMapCpuPtr + volumeBodyParts + channelOffset,
-                                  heatMapsPtr);
-                    #endif
-                    if (mHeatMapScaleMode != ScaleMode::NoScale)
+                    if (addBkgChannel(mPoseModel))
                     {
-                        // Change from [0,1] to [-1,1]
-                        if (mHeatMapScaleMode == ScaleMode::PlusMinusOne)
-                            for (auto i = 0u ; i < channelOffset ; i++)
-                                heatMapsPtr[i] = fastTruncate(heatMapsPtr[i]) * 2.f - 1.f;
-                        // [0, 255]
-                        else if (mHeatMapScaleMode == ScaleMode::UnsignedChar)
-                            for (auto i = 0u ; i < channelOffset ; i++)
-                                heatMapsPtr[i] = (float)positiveIntRound(fastTruncate(heatMapsPtr[i]) * 255.f);
-                        // Avoid values outside original range
-                        else
-                            for (auto i = 0u ; i < channelOffset ; i++)
-                                heatMapsPtr[i] = fastTruncate(heatMapsPtr[i]);
+                        auto* heatMapsPtr = heatMaps.getPtr() + totalOffset;
+                        #ifdef USE_CUDA
+                            cudaMemcpy(heatMapsPtr, getHeatMapGpuConstPtr() + volumeBodyParts,
+                                       channelOffset * sizeof(float), cudaMemcpyDeviceToHost);
+                        #else
+                            const auto* heatMapCpuPtr = getHeatMapCpuConstPtr();
+                            std::copy(
+                                heatMapCpuPtr + volumeBodyParts, heatMapCpuPtr + volumeBodyParts + channelOffset,
+                                heatMapsPtr);
+                        #endif
+                        if (mHeatMapScaleMode != ScaleMode::NoScale)
+                        {
+                            // Change from [0,1] to [-1,1]
+                            if (mHeatMapScaleMode == ScaleMode::PlusMinusOne)
+                                for (auto i = 0u ; i < channelOffset ; i++)
+                                    heatMapsPtr[i] = fastTruncate(heatMapsPtr[i]) * 2.f - 1.f;
+                            // [0, 255]
+                            else if (mHeatMapScaleMode == ScaleMode::UnsignedChar)
+                                for (auto i = 0u ; i < channelOffset ; i++)
+                                    heatMapsPtr[i] = (float)positiveIntRound(fastTruncate(heatMapsPtr[i]) * 255.f);
+                            // Avoid values outside original range
+                            else
+                                for (auto i = 0u ; i < channelOffset ; i++)
+                                    heatMapsPtr[i] = fastTruncate(heatMapsPtr[i]);
+                        }
+                        totalOffset += (unsigned int)channelOffset;
                     }
-                    totalOffset += (unsigned int)channelOffset;
+                    else
+                    {
+                        error("You enabled `--heatmaps_add_bkg` for a model that does not contain one. Please,"
+                              " remove this flag for this model.", __LINE__, __FUNCTION__, __FILE__);
+                    }
                 }
                 // PAFs
                 if (heatMapTypesHas(mHeatMapTypes, HeatMapType::PAFs))
@@ -184,12 +193,12 @@ namespace op
                     auto* heatMapsPtr = heatMaps.getPtr() + totalOffset;
                     #ifdef USE_CUDA
                         cudaMemcpy(heatMapsPtr,
-                                   getHeatMapGpuConstPtr() + volumeBodyParts + channelOffset,
+                                   getHeatMapGpuConstPtr() + volumeBodyParts + (addBkgChannel(mPoseModel) ? channelOffset : 0),
                                    volumePAFs * sizeof(float), cudaMemcpyDeviceToHost);
                     #else
                         const auto* heatMapCpuPtr = getHeatMapCpuConstPtr();
-                        std::copy(heatMapCpuPtr + volumeBodyParts + channelOffset,
-                                  heatMapCpuPtr + volumeBodyParts + channelOffset + volumePAFs,
+                        std::copy(heatMapCpuPtr + volumeBodyParts + (addBkgChannel(mPoseModel) ? channelOffset : 0),
+                                  heatMapCpuPtr + volumeBodyParts + (addBkgChannel(mPoseModel) ? channelOffset : 0) + volumePAFs,
                                   heatMapsPtr);
                     #endif
                     if (mHeatMapScaleMode != ScaleMode::NoScale)
