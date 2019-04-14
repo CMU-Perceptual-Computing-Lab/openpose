@@ -67,7 +67,7 @@ namespace op
          */
         WrapperStructFace(
             const bool enable = false, const Detector detector = Detector::Body,
-            const Point<int>& netInputSize = Point<int>{368, 368}, const RenderMode renderMode = RenderMode::Gpu,
+            const Point<int>& netInputSize = Point<int>{368, 368}, const RenderMode renderMode = RenderMode::Auto,
             const float alphaKeypoint = FACE_DEFAULT_ALPHA_KEYPOINT,
             const float alphaHeatMap = FACE_DEFAULT_ALPHA_HEAT_MAP, const float renderThreshold = 0.4f);
     };
