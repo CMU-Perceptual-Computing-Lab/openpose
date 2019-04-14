@@ -2,7 +2,6 @@
 #define OPENPOSE_HAND_HAND_EXTRACTOR_HPP
 
 #include <atomic>
-#include <thread>
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/common.hpp>
 #include <openpose/core/enumClasses.hpp>
@@ -24,9 +23,9 @@ namespace op
          * @param rangeScales The range between the smaller and bigger scale.
          */
         explicit HandExtractorNet(const Point<int>& netInputSize, const Point<int>& netOutputSize,
-                               const unsigned short numberScales = 1, const float rangeScales = 0.4f,
-                               const std::vector<HeatMapType>& heatMapTypes = {},
-                               const ScaleMode heatMapScale = ScaleMode::ZeroToOne);
+                                  const unsigned short numberScales = 1, const float rangeScales = 0.4f,
+                                  const std::vector<HeatMapType>& heatMapTypes = {},
+                                  const ScaleMode heatMapScaleMode = ScaleMode::ZeroToOne);
 
         /**
          * Virtual destructor of the HandExtractorNet class.
@@ -46,7 +45,7 @@ namespace op
          * each index corresponds to a different person in the image. Internally the std::vector, a std::array of 2
          * elements: index 0 and 1 for left and right hand respectively. Inside each array element, a
          * op::Rectangle<float> (similar to cv::Rect for floating values) with the position of that hand (or 0,0,0,0 if
-         * some hand is missing, e.g. if a specific person has only half of the body inside the image).
+         * some hand is missing, e.g., if a specific person has only half of the body inside the image).
          * @param cvInputData Original image in cv::Mat format and BGR format.
          */
         virtual void forwardPass(const std::vector<std::array<Rectangle<float>, 2>> handRectangles,
@@ -58,7 +57,7 @@ namespace op
          * This function returns the hand keypoins. VERY IMPORTANT: use getHandKeypoints().clone() if the keypoints are
          * going to be edited in a different thread.
          * @return A std::array with all the left hand keypoints (index 0) and all the right ones (index 1). Each
-         * Array<float> follows the pose structure, i.e. the first dimension corresponds to all the people in the
+         * Array<float> follows the pose structure, i.e., the first dimension corresponds to all the people in the
          * image, the second to each specific keypoint, and the third one to (x, y, score).
          */
         std::array<Array<float>, 2> getHandKeypoints() const;

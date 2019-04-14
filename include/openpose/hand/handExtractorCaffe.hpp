@@ -28,7 +28,7 @@ namespace op
                            const std::string& modelFolder, const int gpuId,
                            const unsigned short numberScales = 1, const float rangeScales = 0.4f,
                            const std::vector<HeatMapType>& heatMapTypes = {},
-                           const ScaleMode heatMapScale = ScaleMode::ZeroToOne,
+                           const ScaleMode heatMapScaleMode = ScaleMode::ZeroToOne,
                            const bool enableGoogleLogging = true);
 
         /**
@@ -49,7 +49,7 @@ namespace op
          * each index corresponds to a different person in the image. Internally the std::vector, a std::array of 2
          * elements: index 0 and 1 for left and right hand respectively. Inside each array element, a
          * op::Rectangle<float> (similar to cv::Rect for floating values) with the position of that hand (or 0,0,0,0 if
-         * some hand is missing, e.g. if a specific person has only half of the body inside the image).
+         * some hand is missing, e.g., if a specific person has only half of the body inside the image).
          * @param cvInputData Original image in cv::Mat format and BGR format.
          */
         void forwardPass(const std::vector<std::array<Rectangle<float>, 2>> handRectangles, const cv::Mat& cvInputData);

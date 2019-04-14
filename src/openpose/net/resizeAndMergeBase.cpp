@@ -18,7 +18,7 @@ namespace op
             // CPU directly uses sourceWidth/Height and targetWidth/Height
             UNUSED(scaleInputToNetInputs);
 
-            // Security checks
+            // Sanity check
             if (sourceSizes.empty())
                 error("sourceSizes cannot be empty.", __LINE__, __FUNCTION__, __FILE__);
 
@@ -113,12 +113,10 @@ namespace op
         }
     }
 
-    template void resizeAndMergeCpu(float* targetPtr, const std::vector<const float*>& sourcePtrs,
-                                    const std::array<int, 4>& targetSize,
-                                    const std::vector<std::array<int, 4>>& sourceSizes,
-                                    const std::vector<float>& scaleInputToNetInputs);
-    template void resizeAndMergeCpu(double* targetPtr, const std::vector<const double*>& sourcePtrs,
-                                    const std::array<int, 4>& targetSize,
-                                    const std::vector<std::array<int, 4>>& sourceSizes,
-                                    const std::vector<double>& scaleInputToNetInputs);
+    template OP_API void resizeAndMergeCpu(
+        float* targetPtr, const std::vector<const float*>& sourcePtrs, const std::array<int, 4>& targetSize,
+        const std::vector<std::array<int, 4>>& sourceSizes, const std::vector<float>& scaleInputToNetInputs);
+    template OP_API void resizeAndMergeCpu(
+        double* targetPtr, const std::vector<const double*>& sourcePtrs, const std::array<int, 4>& targetSize,
+        const std::vector<std::array<int, 4>>& sourceSizes, const std::vector<double>& scaleInputToNetInputs);
 }

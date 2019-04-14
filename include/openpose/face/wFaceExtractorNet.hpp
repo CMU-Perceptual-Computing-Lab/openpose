@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WFaceExtractorNet(const std::shared_ptr<FaceExtractorNet>& faceExtractorNet);
 
+        virtual ~WFaceExtractorNet();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -39,6 +41,11 @@ namespace op
     }
 
     template<typename TDatums>
+    WFaceExtractorNet<TDatums>::~WFaceExtractorNet()
+    {
+    }
+
+    template<typename TDatums>
     void WFaceExtractorNet<TDatums>::initializationOnThread()
     {
         spFaceExtractorNet->initializationOnThread();
@@ -56,11 +63,11 @@ namespace op
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Extract people face
-                for (auto& tDatum : *tDatums)
+                for (auto& tDatumPtr : *tDatums)
                 {
-                    spFaceExtractorNet->forwardPass(tDatum.faceRectangles, tDatum.cvInputData);
-                    tDatum.faceHeatMaps = spFaceExtractorNet->getHeatMaps().clone();
-                    tDatum.faceKeypoints = spFaceExtractorNet->getFaceKeypoints().clone();
+                    spFaceExtractorNet->forwardPass(tDatumPtr->faceRectangles, tDatumPtr->cvInputData);
+                    tDatumPtr->faceHeatMaps = spFaceExtractorNet->getHeatMaps().clone();
+                    tDatumPtr->faceKeypoints = spFaceExtractorNet->getFaceKeypoints().clone();
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

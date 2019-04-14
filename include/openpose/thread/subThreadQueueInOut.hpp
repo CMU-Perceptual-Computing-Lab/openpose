@@ -12,7 +12,10 @@ namespace op
     class SubThreadQueueInOut : public SubThread<TDatums, TWorker>
     {
     public:
-        SubThreadQueueInOut(const std::vector<TWorker>& tWorkers, const std::shared_ptr<TQueue>& tQueueIn, const std::shared_ptr<TQueue>& tQueueOut);
+        SubThreadQueueInOut(const std::vector<TWorker>& tWorkers, const std::shared_ptr<TQueue>& tQueueIn,
+                            const std::shared_ptr<TQueue>& tQueueOut);
+
+        virtual ~SubThreadQueueInOut();
 
         bool work();
 
@@ -32,7 +35,8 @@ namespace op
 namespace op
 {
     template<typename TDatums, typename TWorker, typename TQueue>
-    SubThreadQueueInOut<TDatums, TWorker, TQueue>::SubThreadQueueInOut(const std::vector<TWorker>& tWorkers, const std::shared_ptr<TQueue>& tQueueIn,
+    SubThreadQueueInOut<TDatums, TWorker, TQueue>::SubThreadQueueInOut(const std::vector<TWorker>& tWorkers,
+                                                                       const std::shared_ptr<TQueue>& tQueueIn,
                                                                        const std::shared_ptr<TQueue>& tQueueOut) :
         SubThread<TDatums, TWorker>{tWorkers},
         spTQueueIn{tQueueIn},
@@ -40,6 +44,11 @@ namespace op
     {
         // spTQueueIn->addPopper();
         spTQueueOut->addPusher();
+    }
+
+    template<typename TDatums, typename TWorker, typename TQueue>
+    SubThreadQueueInOut<TDatums, TWorker, TQueue>::~SubThreadQueueInOut()
+    {
     }
 
     template<typename TDatums, typename TWorker, typename TQueue>

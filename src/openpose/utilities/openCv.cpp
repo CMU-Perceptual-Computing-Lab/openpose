@@ -1,3 +1,4 @@
+#include <openpose/utilities/avx.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/openCv.hpp>
 
@@ -12,8 +13,8 @@ namespace op
             const auto ratio = imageWidth/1280.;
             // const auto fontScale = 0.75;
             const auto fontScale = 0.8 * ratio;
-            const auto fontThickness = std::max(1, intRound(2*ratio));
-            const auto shadowOffset = std::max(1, intRound(2*ratio));
+            const auto fontThickness = std::max(1, positiveIntRound(2*ratio));
+            const auto shadowOffset = std::max(1, positiveIntRound(2*ratio));
             int baseline = 0;
             const auto textSize = cv::getTextSize(textToDisplay, font, fontScale, fontThickness, &baseline);
             const cv::Size finalPosition{position.x - (normalizeWidth ? textSize.width : 0),
@@ -60,7 +61,8 @@ namespace op
                         const auto offsetHeight = y * width;
                         for (auto x = 0 ; x < width ; x++)
                         {
-                            const auto value = uchar( fastTruncate(intRound(arrayPtr[offsetHeight + x]), 0, 255) );
+                            const auto value = uchar(
+                                fastTruncate(positiveIntRound(arrayPtr[offsetHeight + x]), 0, 255));
                             cvMatROIPtr[x] = (unsigned char)(value);
                         }
                     }
@@ -94,20 +96,44 @@ namespace op
                     const auto floatPtrImageOffsetY = (floatPtrImageOffsetC + y) * width;
                     const auto originFramePtrOffsetY = y * width;
                     for (auto x = 0; x < width; x++)
-                        floatPtrImage[floatPtrImageOffsetY + x] = float(originFramePtr[(originFramePtrOffsetY + x)
-                                                                        * channels + c]);
+                        floatPtrImage[floatPtrImageOffsetY + x] = float(
+                            originFramePtr[(originFramePtrOffsetY + x) * channels + c]);
                 }
             }
             // Normalizing if desired
-            // floatPtrImage wrapped as cv::Mat
-                // Empirically tested - OpenCV is more efficient normalizing a whole matrix/image (it uses AVX and
-                // other optimized instruction sets).
-                // In addition, the following if statement does not copy the pointer to a cv::Mat, just wrapps it.
             // VGG
             if (normalize == 1)
             {
-                cv::Mat floatPtrImageCvWrapper(height, width, CV_32FC3, floatPtrImage);
-                floatPtrImageCvWrapper = floatPtrImageCvWrapper/256.f - 0.5f;
+                #ifdef WITH_AVX
+                    // // C++ code
+                    // const auto ratio = 1.f/256.f;
+                    // for (auto pixel = 0 ; pixel < width*height*channels ; ++pixel)
+                    //     floatPtrImage[pixel] = floatPtrImage[pixel]*ratio - 0.5f;
+                    // AVX code
+                    const auto volume = width*height*channels;
+                    int pixel;
+                    const __m256 mmRatio = _mm256_set1_ps(1.f/256.f);
+                    const __m256 mmBias = _mm256_set1_ps(-0.5f);
+                    for (pixel = 0 ; pixel < volume-7 ; pixel += 8)
+                    {
+                        const __m256 input = _mm256_load_ps(&floatPtrImage[pixel]);
+                        // const __m256 input = _mm256_loadu_ps(&floatPtrImage[pixel]); // If non-aligned pointer
+                        const __m256 output = _mm256_fmadd_ps(input, mmRatio, mmBias);
+                        _mm256_store_ps(&floatPtrImage[pixel], output);
+                        // _mm256_storeu_ps(&floatPtrImage[pixel], output); // If non-aligned pointer
+                    }
+                    const auto ratio = 1.f/256.f;
+                    for (; pixel < volume ; ++pixel)
+                        floatPtrImage[pixel] = floatPtrImage[pixel]*ratio - 0.5f;
+                // Non optimized code
+                #else
+                    // floatPtrImage wrapped as cv::Mat
+                        // Empirically tested - OpenCV is more efficient normalizing a whole matrix/image (it uses AVX and
+                        // other optimized instruction sets).
+                        // In addition, the following if statement does not copy the pointer to a cv::Mat, just wrapps it.
+                    cv::Mat floatPtrImageCvWrapper(height, width, CV_32FC3, floatPtrImage);
+                    floatPtrImageCvWrapper = floatPtrImageCvWrapper*(1/256.f) - 0.5f;
+                #endif
             }
             // // ResNet
             // else if (normalize == 2)
@@ -125,7 +151,7 @@ namespace op
             {
                 const auto scaleDenseNet = 0.017;
                 const int imageArea = width * height;
-                const std::array<float,3> means{103.94,116.78,123.68};
+                const std::array<float,3> means{103.94f, 116.78f, 123.68f};
                 for (auto i = 0 ; i < 3 ; i++)
                 {
                     cv::Mat floatPtrImageCvWrapper(height, width, CV_32FC1, floatPtrImage + i*imageArea);
@@ -158,27 +184,98 @@ namespace op
         }
     }
 
-    cv::Mat resizeFixedAspectRatio(const cv::Mat& cvMat, const double scaleFactor, const Point<int>& targetSize,
-                                   const int borderMode, const cv::Scalar& borderValue)
+    void resizeFixedAspectRatio(cv::Mat& resizedCvMat, const cv::Mat& cvMat, const double scaleFactor,
+                                const Point<int>& targetSize, const int borderMode, const cv::Scalar& borderValue)
     {
         try
         {
             const cv::Size cvTargetSize{targetSize.x, targetSize.y};
-            cv::Mat resultingCvMat;
             cv::Mat M = cv::Mat::eye(2,3,CV_64F);
             M.at<double>(0,0) = scaleFactor;
             M.at<double>(1,1) = scaleFactor;
             if (scaleFactor != 1. || cvTargetSize != cvMat.size())
-                cv::warpAffine(cvMat, resultingCvMat, M, cvTargetSize,
-                               (scaleFactor < 1. ? cv::INTER_AREA : cv::INTER_CUBIC), borderMode, borderValue);
+                cv::warpAffine(cvMat, resizedCvMat, M, cvTargetSize,
+                               (scaleFactor > 1. ? cv::INTER_CUBIC : cv::INTER_AREA), borderMode, borderValue);
             else
-                resultingCvMat = cvMat.clone();
-            return resultingCvMat;
+                cvMat.copyTo(resizedCvMat);
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return cv::Mat();
+        }
+    }
+
+    void keepRoiInside(cv::Rect& roi, const int imageWidth, const int imageHeight)
+    {
+        try
+        {
+            // x,y < 0
+            if (roi.x < 0)
+            {
+                roi.width += roi.x;
+                roi.x = 0;
+            }
+            if (roi.y < 0)
+            {
+                roi.height += roi.y;
+                roi.y = 0;
+            }
+            // Bigger than image
+            if (roi.width + roi.x >= imageWidth)
+                roi.width = imageWidth - 1 - roi.x;
+            if (roi.height + roi.y >= imageHeight)
+                roi.height = imageHeight - 1 - roi.y;
+            // Width/height negative
+            roi.width = fastMax(0, roi.width);
+            roi.height = fastMax(0, roi.height);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    void rotateAndFlipFrame(cv::Mat& frame, const double rotationAngle, const bool flipFrame)
+    {
+        try
+        {
+            if (!frame.empty())
+            {
+                const auto rotationAngleInt = (int)std::round(rotationAngle) % 360;
+                if (rotationAngleInt == 0 || rotationAngleInt == 360)
+                {
+                    if (flipFrame)
+                        cv::flip(frame, frame, 1);
+                }
+                else if (rotationAngleInt == 90 || rotationAngleInt == -270)
+                {
+                    cv::transpose(frame, frame);
+                    if (!flipFrame)
+                        cv::flip(frame, frame, 0);
+                }
+                else if (rotationAngleInt == 180 || rotationAngleInt == -180)
+                {
+                    if (flipFrame)
+                        cv::flip(frame, frame, 0);
+                    else
+                        cv::flip(frame, frame, -1);
+                }
+                else if (rotationAngleInt == 270 || rotationAngleInt == -90)
+                {
+                    cv::transpose(frame, frame);
+                    if (flipFrame)
+                        cv::flip(frame, frame, -1);
+                    else
+                        cv::flip(frame, frame, 1);
+                }
+                else
+                    error("Rotation angle = " + std::to_string(rotationAngleInt)
+                          + " != {0, 90, 180, 270} degrees.", __LINE__, __FUNCTION__, __FILE__);
+            }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 }

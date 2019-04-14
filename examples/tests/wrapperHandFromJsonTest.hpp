@@ -5,7 +5,8 @@
 
 namespace op
 {
-    template<typename TDatums,
+    template<typename TDatum,
+             typename TDatums = std::vector<std::shared_ptr<TDatum>>,
              typename TWorker = std::shared_ptr<Worker<std::shared_ptr<TDatums>>>,
              typename TQueue = Queue<std::shared_ptr<TDatums>>>
     class WrapperHandFromJsonTest
@@ -95,13 +96,13 @@ namespace op
 #include <openpose/utilities/fileSystem.hpp>
 namespace op
 {
-    template<typename TDatums, typename TWorker, typename TQueue>
-    WrapperHandFromJsonTest<TDatums, TWorker, TQueue>::WrapperHandFromJsonTest()
+    template<typename TDatum, typename TDatums, typename TWorker, typename TQueue>
+    WrapperHandFromJsonTest<TDatum, TDatums, TWorker, TQueue>::WrapperHandFromJsonTest()
     {
     }
 
-    template<typename TDatums, typename TWorker, typename TQueue>
-    WrapperHandFromJsonTest<TDatums, TWorker, TQueue>::~WrapperHandFromJsonTest()
+    template<typename TDatum, typename TDatums, typename TWorker, typename TQueue>
+    WrapperHandFromJsonTest<TDatum, TDatums, TWorker, TQueue>::~WrapperHandFromJsonTest()
     {
         try
         {
@@ -110,17 +111,18 @@ namespace op
         }
         catch (const std::exception& e)
         {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 
-    template<typename TDatums, typename TWorker, typename TQueue>
-    void WrapperHandFromJsonTest<TDatums, TWorker, TQueue>::configure(const WrapperStructPose& wrapperStructPose,
-                                                                      const WrapperStructHand& wrapperStructHand,
-                                                                      const std::shared_ptr<Producer>& producerSharedPtr,
-                                                                      const std::string& handGroundTruth,
-                                                                      const std::string& writeJson,
-                                                                      const DisplayMode displayMode)
+    template<typename TDatum, typename TDatums, typename TWorker, typename TQueue>
+    void WrapperHandFromJsonTest<TDatum, TDatums, TWorker, TQueue>::configure(
+        const WrapperStructPose& wrapperStructPose,
+        const WrapperStructHand& wrapperStructHand,
+        const std::shared_ptr<Producer>& producerSharedPtr,
+        const std::string& handGroundTruth,
+        const std::string& writeJson,
+        const DisplayMode displayMode)
     {
         try
         {
@@ -172,8 +174,8 @@ namespace op
             }
 
             // Producer
-            const auto datumProducer = std::make_shared<DatumProducer<TDatums>>(producerSharedPtr);
-            wDatumProducer = std::make_shared<WDatumProducer<TDatumsPtr, TDatums>>(datumProducer);
+            const auto datumProducer = std::make_shared<DatumProducer<TDatum>>(producerSharedPtr);
+            wDatumProducer = std::make_shared<WDatumProducer<TDatum>>(datumProducer);
 
             // Get input scales and sizes
             const auto scaleAndSizeExtractor = std::make_shared<ScaleAndSizeExtractor>(
@@ -200,7 +202,7 @@ namespace op
                 {
                     // Hand detector
                     // If tracking
-                    if (wrapperStructHand.tracking)
+                    if (wrapperStructHand.detector == Detector::BodyWithTracking)
                         error("Tracking not valid for hand detector from JSON files.", __LINE__, __FUNCTION__, __FILE__);
                     // If detection
                     else
@@ -227,7 +229,7 @@ namespace op
                 cpuRenderers.emplace_back(std::make_shared<WHandRenderer<TDatumsPtr>>(handRenderer));
             }
 
-            // Itermediate workers (e.g. OpenPose format to cv::Mat, json & frames recorder, ...)
+            // Itermediate workers (e.g., OpenPose format to cv::Mat, json & frames recorder, ...)
             mPostProcessingWs.clear();
             // Frame buffer and ordering
             if (spWPoses.size() > 1)
@@ -240,8 +242,9 @@ namespace op
                 mPostProcessingWs.emplace_back(std::make_shared<WOpOutputToCvMat<TDatumsPtr>>(opOutputToCvMat));
             }
             // Re-scale pose if desired
-            if (wrapperStructPose.keypointScale != ScaleMode::InputResolution)
-                error("Only wrapperStructPose.keypointScale == ScaleMode::InputResolution.", __LINE__, __FUNCTION__, __FILE__);
+            if (wrapperStructPose.keypointScaleMode != ScaleMode::InputResolution)
+                error("Only wrapperStructPose.keypointScaleMode == ScaleMode::InputResolution.",
+                      __LINE__, __FUNCTION__, __FILE__);
 
             mOutputWs.clear();
             // Write people pose data on disk (json format)
@@ -269,8 +272,8 @@ namespace op
         }
     }
 
-    template<typename TDatums, typename TWorker, typename TQueue>
-    void WrapperHandFromJsonTest<TDatums, TWorker, TQueue>::exec()
+    template<typename TDatum, typename TDatums, typename TWorker, typename TQueue>
+    void WrapperHandFromJsonTest<TDatum, TDatums, TWorker, TQueue>::exec()
     {
         try
         {
@@ -283,8 +286,8 @@ namespace op
         }
     }
 
-    template<typename TDatums, typename TWorker, typename TQueue>
-    void WrapperHandFromJsonTest<TDatums, TWorker, TQueue>::reset()
+    template<typename TDatum, typename TDatums, typename TWorker, typename TQueue>
+    void WrapperHandFromJsonTest<TDatum, TDatums, TWorker, TQueue>::reset()
     {
         try
         {
@@ -305,12 +308,12 @@ namespace op
         }
     }
 
-    template<typename TDatums, typename TWorker, typename TQueue>
-    void WrapperHandFromJsonTest<TDatums, TWorker, TQueue>::configureThreadManager()
+    template<typename TDatum, typename TDatums, typename TWorker, typename TQueue>
+    void WrapperHandFromJsonTest<TDatum, TDatums, TWorker, TQueue>::configureThreadManager()
     {
         try
         {
-            // Security checks
+            // Sanity checks
             if (spWCvMatToOpInput == nullptr)
                 error("Configure the WrapperHandFromJsonTest class before calling `start()`.",
                       __LINE__, __FUNCTION__, __FILE__);
@@ -365,8 +368,8 @@ namespace op
         }
     }
 
-    template<typename TDatums, typename TWorker, typename TQueue>
-    std::vector<TWorker> WrapperHandFromJsonTest<TDatums, TWorker, TQueue>::mergeWorkers(const std::vector<TWorker>& workersA, const std::vector<TWorker>& workersB)
+    template<typename TDatum, typename TDatums, typename TWorker, typename TQueue>
+    std::vector<TWorker> WrapperHandFromJsonTest<TDatum, TDatums, TWorker, TQueue>::mergeWorkers(const std::vector<TWorker>& workersA, const std::vector<TWorker>& workersB)
     {
         try
         {

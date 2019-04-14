@@ -5,11 +5,12 @@ namespace op
 {
     HandExtractorNet::HandExtractorNet(const Point<int>& netInputSize, const Point<int>& netOutputSize,
                                        const unsigned short numberScales, const float rangeScales,
-                                       const std::vector<HeatMapType>& heatMapTypes, const ScaleMode heatMapScale) :
+                                       const std::vector<HeatMapType>& heatMapTypes,
+                                       const ScaleMode heatMapScaleMode) :
         mMultiScaleNumberAndRange{std::make_pair(numberScales, rangeScales)},
         mNetOutputSize{netOutputSize},
         mHandImageCrop{{1, 3, mNetOutputSize.y, mNetOutputSize.x}},
-        mHeatMapScaleMode{heatMapScale},
+        mHeatMapScaleMode{heatMapScaleMode},
         mHeatMapTypes{heatMapTypes},
         mEnabled{true}
     {
@@ -18,7 +19,7 @@ namespace op
             // Error check
             if (mHeatMapScaleMode != ScaleMode::ZeroToOne && mHeatMapScaleMode != ScaleMode::PlusMinusOne
                 && mHeatMapScaleMode != ScaleMode::UnsignedChar)
-                error("The ScaleMode heatMapScale must be ZeroToOne, PlusMinusOne or UnsignedChar.",
+                error("The ScaleMode heatMapScaleMode must be ZeroToOne, PlusMinusOne or UnsignedChar.",
                       __LINE__, __FUNCTION__, __FILE__);
             checkE(netOutputSize.x, netInputSize.x, "Net input and output size must be equal.",
                    __LINE__, __FUNCTION__, __FILE__);

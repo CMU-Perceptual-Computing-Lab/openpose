@@ -1,20 +1,19 @@
-// #include <iostream>
+#ifdef WITH_SSE4
+    #include <emmintrin.h>
+    #include "smmintrin.h"
+#endif
+
+#ifdef WITH_AVX
+    #include <immintrin.h>
+#endif
+
+#include <iostream>
 #include <opencv2/core/core.hpp> // cv::Point2f, cv::Mat
 #include <opencv2/imgproc/imgproc.hpp> // cv::pyrDown
 #include <opencv2/video/video.hpp> // cv::buildOpticalFlowPyramid
 #include <openpose/utilities/profiler.hpp>
 #include <openpose/tracking/pyramidalLK.hpp>
 
-#if defined (WITH_SSE4)
-#include <emmintrin.h>
-#include "smmintrin.h"
-#endif
-
-#if defined (WITH_AVX)
-#include <immintrin.h>
-#endif
-
-#include <iostream>
 //#define DEBUG
 // #ifdef DEBUG
 // // When debugging is enabled, these form aliases to useful functions
@@ -32,7 +31,7 @@
 
 namespace op
 {
-#if defined (WITH_SSE4)
+#ifdef WITH_SSE4
     float sse_dot_product(std::vector<float> &av, std::vector<float> &bv)
     {
 
@@ -51,7 +50,7 @@ namespace op
       /* Do SIMD dot product */
       for (unsigned int i = 0; i < niters; i++, ptrA++,ptrB++)
         res = _mm_add_ps(_mm_dp_ps(*ptrA, *ptrB, 255), res);
-      
+
 
       /* Get result back from the SIMD vector */
       float fres[4];
@@ -68,7 +67,7 @@ namespace op
     }
 #endif
 
-#if defined (WITH_AVX)
+#ifdef WITH_AVX
 
     float avx_dot_product(std::vector<float> &av, std::vector<float> &bv)
     {
@@ -100,7 +99,7 @@ namespace op
 
       return fres[0] + fres[4];
     }
-#endif 
+#endif
 
     char computeLK(cv::Point2f& delta,  std::vector<float>& ix,
                   std::vector<float>& iy, std::vector<float>& it)
@@ -114,7 +113,7 @@ namespace op
             auto sumYT = 0.f;
             auto sumXY = 0.f;
 
-#if defined (WITH_AVX)
+#ifdef WITH_AVX
             sumXX = avx_dot_product(ix,ix);
             sumYY = avx_dot_product(iy,iy);
             sumXY = avx_dot_product(ix,iy);
@@ -126,7 +125,7 @@ namespace op
             sumXY = sse_dot_product(ix,iy);
             sumXT = sse_dot_product(ix,it);
             sumYT = sse_dot_product(iy,it);
-#else            
+#else
             for (auto i = 0u; i < ix.size(); i++)
             {
               sumXX += ix[i] * ix[i];
@@ -134,8 +133,8 @@ namespace op
               sumXY += ix[i] * iy[i];
               sumXT += ix[i] * it[i];
               sumYT += iy[i] * it[i];
-            }            
-#endif            
+            }
+#endif
 
             // Get numerator and denominator of u and v
             const auto den = (sumXX*sumYY) - (sumXY * sumXY);
@@ -174,8 +173,8 @@ namespace op
                 const auto baseIndex = (i-1)*patchSize;
                 for (auto j = 1; j <= patchSize; j++)
                 {
-                    ix[baseIndex+j-1] = (patch[i][j+1] - patch[i][j-1])/2.0;
-                    iy[baseIndex+j-1] = (patch[i+1][j] - patch[i-1][j])/2.0;
+                    ix[baseIndex+j-1] = (patch[i][j+1] - patch[i][j-1])/2.f;
+                    iy[baseIndex+j-1] = (patch[i+1][j] - patch[i-1][j])/2.f;
                 }
             }
             // Get `it`
@@ -250,6 +249,7 @@ namespace op
             return UNDEFINED_ERROR;
         }
     }
+
     // Given an OpenCV image, build a gaussian pyramid of size 'levels'
     void buildGaussianPyramid(std::vector<cv::Mat>& pyramidImages, const cv::Mat& image, const int levels)
     {
@@ -271,8 +271,6 @@ namespace op
         }
     }
 
-
-
     cv::Point2f pyramidIteration(char& status, const cv::Point2f& pointI, const cv::Point2f& pointJ, const cv::Mat& I,
                                  const cv::Mat& J, const int patchSize = 5)
     {
@@ -285,13 +283,13 @@ namespace op
             std::vector<std::vector<float>> patchIt(patchSize, std::vector<float>(patchSize));
 
             status = extractPatch(patch, (int)pointI.x,(int)pointI.y, patchSize + 2, I);
-        //    if (status)
-        //        return result;
+            // if (status)
+            //     return result;
 
-            status = extractPatchIt(patchIt, pointI.x, pointI.y, pointJ.x, pointJ.y, I, J, patchSize);
+            status = extractPatchIt(patchIt, int(pointI.x), int(pointI.y), int(pointJ.x), int(pointJ.y), I, J, patchSize);
 
-        //    if (status)
-        //        return result;
+            // if (status)
+            //     return result;
 
             // Get the Ix, Iy and It vectors
             std::vector<float> ix, iy, it;
@@ -301,8 +299,8 @@ namespace op
             cv::Point2f delta;
             status = computeLK(delta, ix, iy, it);
 
-        //    if (status)
-        //        return result;
+            // if (status)
+            //     return result;
 
             result = pointJ + delta;
 
@@ -335,12 +333,12 @@ namespace op
 
             coordJ.clear();
             coordJ.assign(I.begin(), I.end());
-            
+
             if (pyramidImagesPrevious.empty())
                 buildGaussianPyramid(pyramidImagesPrevious, imagePrevious, levels);
             if (pyramidImagesCurrent.empty())
                 buildGaussianPyramid(pyramidImagesCurrent, imageCurrent, levels);
-  
+
 
             // Process all pixel requests
             for (auto i = 0u; i < coordI.size(); i++)
@@ -364,8 +362,6 @@ namespace op
                     coordJ[i] *= 2.f;
                 }
             }
-     
-
         }
         catch (const std::exception& e)
         {

@@ -14,4 +14,5 @@ namespace op
     DEFINE_TEMPLATE_DATUM(WPoseSaver);
     DEFINE_TEMPLATE_DATUM(WUdpSender);
     DEFINE_TEMPLATE_DATUM(WVideoSaver);
+    DEFINE_TEMPLATE_DATUM(WVideoSaver3D);
 }

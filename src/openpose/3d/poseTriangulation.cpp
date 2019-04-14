@@ -1,4 +1,3 @@
-// #include <thread>
 #include <numeric> // std::accumulate
 #ifdef USE_CERES
     #include <ceres/ceres.h>
@@ -122,7 +121,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity checks
             if (cameraMatrices.size() != pointsOnEachCamera.size())
                 error("numberCameras.size() != pointsOnEachCamera.size() (" + std::to_string(cameraMatrices.size())
                       + " vs. " + std::to_string(pointsOnEachCamera.size()) + ").",
@@ -190,8 +189,8 @@ namespace op
                     cameraMatricesSubset.erase(cameraMatricesSubset.begin() + i);
                     pointsOnEachCameraSubset.erase(pointsOnEachCameraSubset.begin() + i);
                     // Remove camera i
-                    const auto projectionErrorSubset = triangulate(reconstructedPoint, cameraMatricesSubset,
-                                                                   pointsOnEachCameraSubset);
+                    const auto projectionErrorSubset = triangulate(
+                        reconstructedPoint, cameraMatricesSubset, pointsOnEachCameraSubset);
                     // If projection doesn't change much, it usually means all points are bad.
                     if (projectionErrorSubset > 0.9 * projectionError
                         && projectionErrorSubset < 1.1 * projectionError)
@@ -279,6 +278,7 @@ namespace op
             #else
                 UNUSED(reprojectionMaxAcceptable);
             #endif
+            // // This value is always 1
             // assert(reconstructedPoint.at<double>(3) == 1.);
 
             // // Check that our implementation gives similar result than OpenCV
@@ -333,7 +333,7 @@ namespace op
         {
             auto& keypoints3D = *keypoints3DPtr;
 
-            // Security checks
+            // Sanity check
             if (cameraMatrices.size() < 2)
                 error("Only 1 camera detected. The 3-D reconstruction module can only be used with > 1 cameras"
                       " simultaneously. E.g., using FLIR stereo cameras (`--flir_camera`).",
@@ -352,7 +352,7 @@ namespace op
             if (!detectionMissed)
             {
                 const auto numberBodyParts = keypointsVector.at(0).getSize(1);
-                const auto lastChannelLength = keypointsVector.at(0).getSize(2);
+                const auto channel0Length = keypointsVector.at(0).getSize(2);
                 // Create x-y vector from high score results
                 std::vector<int> indexesUsed;
                 std::vector<std::vector<cv::Point2d>> xyPoints;
@@ -363,7 +363,7 @@ namespace op
                     // auto missedPoint = false;
                     std::vector<cv::Point2d> xyPointsElement;
                     std::vector<cv::Mat> cameraMatricesElement;
-                    const auto baseIndex = part * lastChannelLength;
+                    const auto baseIndex = part * channel0Length;
                     // for (auto& keypoints : keypointsVector)
                     for (auto i = 0u ; i < keypointsVector.size() ; i++)
                     {
@@ -386,7 +386,7 @@ namespace op
                     }
                 }
                 // 3D reconstruction
-                const auto imageRatio = std::sqrt(imageSizes[0].x * imageSizes[0].y / 1310720);
+                const auto imageRatio = std::sqrt(imageSizes[0].x * imageSizes[0].y / 1310720.);
                 const auto reprojectionMaxAcceptable = 25 * imageRatio;
                 std::vector<double> reprojectionErrors(xyPoints.size());
                 keypoints3D.reset({ 1, numberBodyParts, 4 }, 0);
@@ -397,13 +397,10 @@ namespace op
                     for (auto i = 0u; i < xyPoints.size(); i++)
                     {
                         cv::Mat reconstructedPoint;
-                        reprojectionErrors[i] = triangulateWithOptimization(reconstructedPoint,
-                                                                            cameraMatricesPerPoint[i],
-                                                                            xyPoints[i],
-                                                                            reprojectionMaxAcceptable);
+                        reprojectionErrors[i] = triangulateWithOptimization(
+                            reconstructedPoint, cameraMatricesPerPoint[i], xyPoints[i], reprojectionMaxAcceptable);
                         xyzPoints[i] = cv::Point3d{
-                            reconstructedPoint.at<double>(0),
-                            reconstructedPoint.at<double>(1),
+                            reconstructedPoint.at<double>(0), reconstructedPoint.at<double>(1),
                             reconstructedPoint.at<double>(2)};
                     }
                     const auto reprojectionErrorTotal = std::accumulate(
@@ -438,10 +435,12 @@ namespace op
                         log("Unusual high re-projection error (averaged over #keypoints) of value "
                             + std::to_string(reprojectionErrorTotal) + " pixels, while the average for a good OpenPose"
                             " detection from 4 cameras is about 2-3 pixels. It might be simply a wrong OpenPose"
-                            " detection. If this message appears very frequently, your calibration parameters"
-                            " might be wrong.", Priority::High);
+                            " detection. However, if this message appears very frequently, your calibration parameters"
+                            " might be wrong. Note: If you have introduced your own camera intrinsics, are they an"
+                            " upper triangular matrix (as specified in the OpenPose doc/modules/calibration_module.md"
+                            " and 3d_reconstruction_module.md)?", Priority::High);
+                    // log("Reprojection error: " + std::to_string(reprojectionErrorTotal)); // To debug reprojection error
                 }
-                // log("Reprojection error: " + std::to_string(reprojectionErrorTotal)); // To debug reprojection error
             }
         }
         catch (const std::exception& e)
@@ -455,7 +454,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity check
             if (0 <= mMinViews3d && mMinViews3d < 2)
                 error("Minimum number of views must be at least 2 (e.g., `--3d_min_views 2`) or negative.",
                       __LINE__, __FUNCTION__, __FILE__);
@@ -464,6 +463,10 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
+    }
+
+    PoseTriangulation::~PoseTriangulation()
+    {
     }
 
     void PoseTriangulation::initializationOnThread()

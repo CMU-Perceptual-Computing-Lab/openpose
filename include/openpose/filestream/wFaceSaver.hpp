@@ -14,6 +14,8 @@ namespace op
     public:
         explicit WFaceSaver(const std::shared_ptr<KeypointSaver>& keypointSaver);
 
+        virtual ~WFaceSaver();
+
         void initializationOnThread();
 
         void workConsumer(const TDatums& tDatums);
@@ -40,6 +42,11 @@ namespace op
     }
 
     template<typename TDatums>
+    WFaceSaver<TDatums>::~WFaceSaver()
+    {
+    }
+
+    template<typename TDatums>
     void WFaceSaver<TDatums>::initializationOnThread()
     {
     }
@@ -60,8 +67,9 @@ namespace op
                 // Record people face keypoint data
                 std::vector<Array<float>> keypointVector(tDatumsNoPtr.size());
                 for (auto i = 0u; i < tDatumsNoPtr.size(); i++)
-                    keypointVector[i] = tDatumsNoPtr[i].faceKeypoints;
-                const auto fileName = (!tDatumsNoPtr[0].name.empty() ? tDatumsNoPtr[0].name : std::to_string(tDatumsNoPtr[0].id));
+                    keypointVector[i] = tDatumsNoPtr[i]->faceKeypoints;
+                const auto fileName = (!tDatumsNoPtr[0]->name.empty()
+                    ? tDatumsNoPtr[0]->name : std::to_string(tDatumsNoPtr[0]->id));
                 spKeypointSaver->saveKeypoints(keypointVector, fileName, "face");
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

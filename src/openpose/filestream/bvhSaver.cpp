@@ -32,7 +32,7 @@ namespace op
             {
                 try
                 {
-                    // Security checks
+                    // Sanity check
                     if (!mBvhFilePath.empty() && spTotalModel == nullptr)
                         error("Given totalModel is a nullptr.", __LINE__, __FUNCTION__, __FILE__);
                 }
@@ -94,7 +94,7 @@ namespace op
         }
         catch (const std::exception& e)
         {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 

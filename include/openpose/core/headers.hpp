@@ -3,6 +3,7 @@
 
 // core module
 #include <openpose/core/array.hpp>
+#include <openpose/core/arrayCpuGpu.hpp>
 #include <openpose/core/common.hpp>
 #include <openpose/core/cvMatToOpInput.hpp>
 #include <openpose/core/cvMatToOpOutput.hpp>
@@ -17,11 +18,13 @@
 #include <openpose/core/rectangle.hpp>
 #include <openpose/core/renderer.hpp>
 #include <openpose/core/scaleAndSizeExtractor.hpp>
+#include <openpose/core/verbosePrinter.hpp>
 #include <openpose/core/wCvMatToOpInput.hpp>
 #include <openpose/core/wCvMatToOpOutput.hpp>
 #include <openpose/core/wKeepTopNPeople.hpp>
 #include <openpose/core/wKeypointScaler.hpp>
 #include <openpose/core/wOpOutputToCvMat.hpp>
 #include <openpose/core/wScaleAndSizeExtractor.hpp>
+#include <openpose/core/wVerbosePrinter.hpp>
 
 #endif // OPENPOSE_CORE_HEADERS_HPP

@@ -14,6 +14,8 @@ namespace op
     public:
         explicit WHandSaver(const std::shared_ptr<KeypointSaver>& keypointSaver);
 
+        virtual ~WHandSaver();
+
         void initializationOnThread();
 
         void workConsumer(const TDatums& tDatums);
@@ -40,6 +42,11 @@ namespace op
     }
 
     template<typename TDatums>
+    WHandSaver<TDatums>::~WHandSaver()
+    {
+    }
+
+    template<typename TDatums>
     void WHandSaver<TDatums>::initializationOnThread()
     {
     }
@@ -58,15 +65,16 @@ namespace op
                 // T* to T
                 auto& tDatumsNoPtr = *tDatums;
                 // Record people hand keypoint data
-                const auto fileName = (!tDatumsNoPtr[0].name.empty() ? tDatumsNoPtr[0].name : std::to_string(tDatumsNoPtr[0].id));
+                const auto fileName = (!tDatumsNoPtr[0]->name.empty()
+                    ? tDatumsNoPtr[0]->name : std::to_string(tDatumsNoPtr[0]->id));
                 std::vector<Array<float>> keypointVector(tDatumsNoPtr.size());
                 // Left hand
                 for (auto i = 0u; i < tDatumsNoPtr.size(); i++)
-                    keypointVector[i] = tDatumsNoPtr[i].handKeypoints[0];
+                    keypointVector[i] = tDatumsNoPtr[i]->handKeypoints[0];
                 spKeypointSaver->saveKeypoints(keypointVector, fileName, "hand_left");
                 // Right hand
                 for (auto i = 0u; i < tDatumsNoPtr.size(); i++)
-                    keypointVector[i] = tDatumsNoPtr[i].handKeypoints[1];
+                    keypointVector[i] = tDatumsNoPtr[i]->handKeypoints[1];
                 spKeypointSaver->saveKeypoints(keypointVector, fileName, "hand_right");
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

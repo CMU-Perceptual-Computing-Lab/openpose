@@ -5,30 +5,29 @@
 #include <openpose/core/enumClasses.hpp>
 #include <openpose/gui/enumClasses.hpp>
 #include <openpose/pose/enumClasses.hpp>
-#include <openpose/producer/producer.hpp>
+#include <openpose/producer/enumClasses.hpp>
+#include <openpose/wrapper/enumClasses.hpp>
 
 namespace op
 {
+    OP_API PoseMode flagsToPoseMode(const int poseModeInt);
+
     OP_API PoseModel flagsToPoseModel(const std::string& poseModeString);
 
-    OP_API ScaleMode flagsToScaleMode(const int keypointScale);
+    OP_API ScaleMode flagsToScaleMode(const int keypointScaleMode);
 
-    OP_API ScaleMode flagsToHeatMapScaleMode(const int heatMapScale);
+    OP_API ScaleMode flagsToHeatMapScaleMode(const int heatMapScaleMode);
+
+    OP_API Detector flagsToDetector(const int detector);
 
     // Determine type of frame source
     OP_API ProducerType flagsToProducerType(const std::string& imageDirectory, const std::string& videoPath,
                                             const std::string& ipCameraPath, const int webcamIndex,
                                             const bool flirCamera);
 
-    OP_API std::shared_ptr<Producer> flagsToProducer(const std::string& imageDirectory, const std::string& videoPath,
-                                                     const std::string& ipCameraPath, const int webcamIndex,
-                                                     const bool flirCamera = false,
-                                                     const std::string& cameraResolution = "-1x-1",
-                                                     const double webcamFps = 30.,
-                                                     const std::string& cameraParameterPath = "models/cameraParameters/",
-                                                     const bool undistortImage = true,
-                                                     const unsigned int imageDirectoryStereo = 1,
-                                                     const int flirCameraIndex = -1);
+    OP_API std::pair<ProducerType, std::string> flagsToProducer(
+        const std::string& imageDirectory, const std::string& videoPath, const std::string& ipCameraPath = "",
+        const int webcamIndex = -1, const bool flirCamera = false, const int flirCameraIndex = -1);
 
     OP_API std::vector<HeatMapType> flagsToHeatMaps(const bool heatMapsAddParts = false,
                                                     const bool heatMapsAddBkg = false,

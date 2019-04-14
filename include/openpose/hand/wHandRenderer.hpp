@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WHandRenderer(const std::shared_ptr<HandRenderer>& handRenderer);
 
+        virtual ~WHandRenderer();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -39,6 +41,11 @@ namespace op
     }
 
     template<typename TDatums>
+    WHandRenderer<TDatums>::~WHandRenderer()
+    {
+    }
+
+    template<typename TDatums>
     void WHandRenderer<TDatums>::initializationOnThread()
     {
         spHandRenderer->initializationOnThread();
@@ -56,9 +63,9 @@ namespace op
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Render people hands
-                for (auto& tDatum : *tDatums)
-                    spHandRenderer->renderHand(tDatum.outputData, tDatum.handKeypoints,
-                                               (float)tDatum.scaleInputToOutput);
+                for (auto& tDatumPtr : *tDatums)
+                    spHandRenderer->renderHand(
+                        tDatumPtr->outputData, tDatumPtr->handKeypoints, (float)tDatumPtr->scaleInputToOutput);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);

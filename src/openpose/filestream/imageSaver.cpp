@@ -18,6 +18,22 @@ namespace op
         }
     }
 
+    ImageSaver::~ImageSaver()
+    {
+    }
+
+    void ImageSaver::saveImages(const cv::Mat& cvOutputData, const std::string& fileName) const
+    {
+        try
+        {
+            saveImages(std::vector<cv::Mat>{cvOutputData}, fileName);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
     void ImageSaver::saveImages(const std::vector<cv::Mat>& cvOutputDatas, const std::string& fileName) const
     {
         try

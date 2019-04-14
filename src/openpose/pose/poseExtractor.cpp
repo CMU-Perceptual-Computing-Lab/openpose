@@ -38,12 +38,13 @@ namespace op
     void PoseExtractor::forwardPass(const std::vector<Array<float>>& inputNetData,
                                     const Point<int>& inputDataSize,
                                     const std::vector<double>& scaleInputToNetInputs,
+                                    const Array<float>& poseNetOutput,
                                     const long long frameId)
     {
         try
         {
             if (mTracking < 1 || frameId % (mTracking+1) == 0)
-                spPoseExtractorNet->forwardPass(inputNetData, inputDataSize, scaleInputToNetInputs);
+                spPoseExtractorNet->forwardPass(inputNetData, inputDataSize, scaleInputToNetInputs, poseNetOutput);
             else
                 spPoseExtractorNet->clear();
         }
@@ -180,7 +181,7 @@ namespace op
                 while (spPersonTrackers->size() <= imageViewIndex)
                     spPersonTrackers->emplace_back(std::make_shared<PersonTracker>(
                         (*spPersonTrackers)[0]->getMergeResults()));
-                // Security check
+                // Sanity check
                 if (!poseKeypoints.empty() && poseIds.empty() && mNumberPeopleMax != 1)
                     error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
                 // Reset poseIds if keypoints is empty
@@ -211,7 +212,7 @@ namespace op
                 while (spPersonTrackers->size() <= imageViewIndex)
                     spPersonTrackers->emplace_back(std::make_shared<PersonTracker>(
                         (*spPersonTrackers)[0]->getMergeResults()));
-                // Security check
+                // Sanity check
                 if (!poseKeypoints.empty() && poseIds.empty() && mNumberPeopleMax != 1)
                     error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
                 // Reset poseIds if keypoints is empty

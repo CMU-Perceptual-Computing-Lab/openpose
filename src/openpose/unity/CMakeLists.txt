@@ -1,0 +1,21 @@
+set(SOURCES_OP_UNITY
+    unityBinding.cpp
+)
+
+include(${CMAKE_SOURCE_DIR}/cmake/Utils.cmake)
+set(SOURCES_OP_UNITY_WITH_CP "" PARENT_SCOPE)
+prepend(SOURCES_OP_UNITY_WITH_CP ${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES_OP_UNITY})
+set(SOURCES_OP_UNITY_WITH_CP ${SOURCES_OP_UNITY_WITH_CP} PARENT_SCOPE)
+set(SOURCES_OP_FILESTREAM_WITH_CP ${SOURCES_OP_FILESTREAM_WITH_CP} PARENT_SCOPE)
+set(SOURCES_OPENPOSE ${SOURCES_OPENPOSE} ${SOURCES_OP_UNITY_WITH_CP} PARENT_SCOPE)
+
+if (UNIX OR APPLE)
+  add_library(openpose_unity ${SOURCES_OP_UNITY})
+  target_link_libraries(openpose_unity openpose_pose ${OpenPose_3rdparty_libraries})
+
+  install(TARGETS openpose_unity
+      EXPORT OpenPose
+      RUNTIME DESTINATION bin
+      LIBRARY DESTINATION lib
+      ARCHIVE DESTINATION lib/openpose)
+endif (UNIX OR APPLE)

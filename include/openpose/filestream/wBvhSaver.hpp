@@ -14,6 +14,8 @@ namespace op
     public:
         explicit WBvhSaver(const std::shared_ptr<BvhSaver>& bvhSaver);
 
+        virtual ~WBvhSaver();
+
         void initializationOnThread();
 
         void workConsumer(const TDatums& tDatums);
@@ -40,6 +42,11 @@ namespace op
     }
 
     template<typename TDatums>
+    WBvhSaver<TDatums>::~WBvhSaver()
+    {
+    }
+
+    template<typename TDatums>
     void WBvhSaver<TDatums>::initializationOnThread()
     {
     }
@@ -56,9 +63,9 @@ namespace op
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Record BVH file
-                const auto& tDatum = (*tDatums)[0];
-                if (!tDatum.poseKeypoints3D.empty())
-                    spBvhSaver->updateBvh(tDatum.adamPose, tDatum.adamTranslation, tDatum.j0Vec);
+                const auto& tDatumPtr = (*tDatums)[0];
+                if (!tDatumPtr->poseKeypoints3D.empty())
+                    spBvhSaver->updateBvh(tDatumPtr->adamPose, tDatumPtr->adamTranslation, tDatumPtr->j0Vec);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);

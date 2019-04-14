@@ -1,7 +1,5 @@
-#include <chrono>
 #include <map>
 #include <mutex>
-#include <thread>
 #include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/profiler.hpp>
 
@@ -12,6 +10,50 @@ namespace op
 {
     unsigned long long Profiler::DEFAULT_X = 1000;
 
+    std::chrono::time_point<std::chrono::high_resolution_clock> getTimerInit()
+    {
+        try
+        {
+            return std::chrono::high_resolution_clock::now();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return std::chrono::high_resolution_clock::now();
+        }
+    }
+
+    double getTimeSeconds(const std::chrono::time_point<std::chrono::high_resolution_clock>& timerInit)
+    {
+        try
+        {
+            const auto now = std::chrono::high_resolution_clock::now();
+            const auto totalTimeSec = double(
+                std::chrono::duration_cast<std::chrono::nanoseconds>(now-timerInit).count() * 1e-9);
+            return totalTimeSec;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return -1.;
+        }
+    }
+
+    void printTime(
+        const std::chrono::time_point<std::chrono::high_resolution_clock>& timerInit, const std::string& firstMessage,
+        const std::string& secondMessage, const Priority priority)
+    {
+        try
+        {
+            const auto message = firstMessage + std::to_string(getTimeSeconds(timerInit)) + secondMessage;
+            op::log(message, priority);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
     #ifdef PROFILER_ENABLED
 
         std::map<std::string, std::tuple<double, unsigned long long, std::chrono::high_resolution_clock::time_point>> sProfilerTuple{
@@ -21,15 +63,13 @@ namespace op
 
         std::string getKey(const int line, const std::string& function, const std::string& file)
         {
-            std::stringstream threadId;
-            threadId << std::this_thread::get_id();
-            return file + function + std::to_string(line) + threadId.str();
+            return file + function + std::to_string(line) + getThreadId();
         }
 
         void printAveragedTimeMsCommon(const double timePast, const unsigned long long timeCounter, const int line,
                                        const std::string& function, const std::string& file)
         {
-            const auto stringMessage = std::to_string(   timePast / timeCounter / 1e6   ) + " msec at";
+            const auto stringMessage = std::to_string(   timePast / timeCounter / 1e6   ) + " msec";
             log(stringMessage, Priority::Max, line, function, file);
         }
     #endif
@@ -120,14 +160,14 @@ namespace op
             std::unique_lock<std::mutex> lock{sMutexProfiler};
             if (sProfilerTuple.count(key) > 0)
             {
-                const auto tuple = sProfilerTuple[key];
+                const auto tupleElement = sProfilerTuple[key];
                 lock.unlock();
-                if (std::get<1>(tuple) == x)
+                if (std::get<1>(tupleElement) == x)
                 {
-                    printAveragedTimeMsCommon(std::get<0>(tuple), std::get<1>(tuple), line, function, file);
+                    printAveragedTimeMsCommon(std::get<0>(tupleElement), std::get<1>(tupleElement), line, function, file);
 
                     // Reset
-                    const std::lock_guard<std::mutex> lock{sMutexProfiler};
+                    const std::lock_guard<std::mutex> lockGuard{sMutexProfiler};
                     auto& tuple = sProfilerTuple[key];
                     std::get<0>(tuple) = 0.;
                     std::get<1>(tuple) = 0;
@@ -152,9 +192,9 @@ namespace op
             log("GPU usage.", Priority::Max, line, function, file);
 
             // GPU info
-            const auto answer = std::system("nvidia-smi | grep \"Processes:\"")
-                              | std::system("nvidia-smi | grep \"Process name\"");
-            if (answer != 0)
+            const auto nvidiaCommand = std::system("nvidia-smi | grep \"Processes:\"")
+                                     | std::system("nvidia-smi | grep \"Process name\"");
+            if (nvidiaCommand != 0)
                 log("Error on the nvidia-smi header. Please, inform us of this error.", Priority::Max);
             else
             {

@@ -1,4 +1,3 @@
-#include <chrono>
 #include <cstdio> // std::snprintf
 #include <limits> // std::numeric_limits
 #include <openpose/utilities/fastMath.hpp>
@@ -52,8 +51,9 @@ namespace op
         }
     }
 
-    void addPeopleIds(cv::Mat& cvOutputData, const Array<long long>& poseIds, const Array<float>& poseKeypoints,
-                      const int borderMargin)
+    void addPeopleIds(
+        cv::Mat& cvOutputData, const Array<long long>& poseIds, const Array<float>& poseKeypoints,
+        const int borderMargin)
     {
         try
         {
@@ -69,27 +69,28 @@ namespace op
                         const auto indexSecondary = i * poseKeypointsArea + poseKeypoints.getSize(2);
                         if (poseKeypoints[indexMain+2] > isVisible || poseKeypoints[indexSecondary+2] > isVisible)
                         {
-                            const auto xA = intRound(poseKeypoints[indexMain]);
-                            const auto yA = intRound(poseKeypoints[indexMain+1]);
-                            const auto xB = intRound(poseKeypoints[indexSecondary]);
-                            const auto yB = intRound(poseKeypoints[indexSecondary+1]);
+                            const auto xA = positiveIntRound(poseKeypoints[indexMain]);
+                            const auto yA = positiveIntRound(poseKeypoints[indexMain+1]);
+                            const auto xB = positiveIntRound(poseKeypoints[indexSecondary]);
+                            const auto yB = positiveIntRound(poseKeypoints[indexSecondary+1]);
                             int x;
                             int y;
                             if (poseKeypoints[indexMain+2] > isVisible && poseKeypoints[indexSecondary+2] > isVisible)
                             {
-                                const auto keypointRatio = intRound(0.15f * std::sqrt((xA-xB)*(xA-xB) + (yA-yB)*(yA-yB)));
+                                const auto keypointRatio = positiveIntRound(
+                                    0.15f * std::sqrt((xA-xB)*(xA-xB) + (yA-yB)*(yA-yB)));
                                 x = xA + 3*keypointRatio;
                                 y = yA - 3*keypointRatio;
                             }
                             else if (poseKeypoints[indexMain+2] > isVisible)
                             {
-                                x = xA + intRound(0.25f*borderMargin);
-                                y = yA - intRound(0.25f*borderMargin);
+                                x = xA + positiveIntRound(0.25f*borderMargin);
+                                y = yA - positiveIntRound(0.25f*borderMargin);
                             }
                             else //if (poseKeypoints[indexSecondary+2] > isVisible)
                             {
-                                x = xB + intRound(0.25f*borderMargin);
-                                y = yB - intRound(0.5f*borderMargin);
+                                x = xB + positiveIntRound(0.25f*borderMargin);
+                                y = yB - positiveIntRound(0.5f*borderMargin);
                             }
                             putTextOnCvMat(cvOutputData, std::to_string(poseIds[i]), {x, y}, WHITE_SCALAR, false, cvOutputData.cols);
                         }
@@ -112,17 +113,21 @@ namespace op
     {
     }
 
+    GuiInfoAdder::~GuiInfoAdder()
+    {
+    }
+
     void GuiInfoAdder::addInfo(cv::Mat& cvOutputData, const int numberPeople, const unsigned long long id,
                                const std::string& elementRenderedName, const unsigned long long frameNumber,
                                const Array<long long>& poseIds, const Array<float>& poseKeypoints)
     {
         try
         {
-            // Security checks
+            // Sanity check
             if (cvOutputData.empty())
                 error("Wrong input element (empty cvOutputData).", __LINE__, __FUNCTION__, __FILE__);
             // Size
-            const auto borderMargin = intRound(fastMax(cvOutputData.cols, cvOutputData.rows) * 0.025);
+            const auto borderMargin = positiveIntRound(fastMax(cvOutputData.cols, cvOutputData.rows) * 0.025);
             // Update fps
             updateFps(mLastId, mFps, mFpsCounter, mFpsQueue, id, mNumberGpus);
             // Fps or s/gpu
@@ -130,8 +135,9 @@ namespace op
             std::snprintf(charArrayAux, 15, "%4.1f fps", mFps);
             // Recording inverse: sec/gpu
             // std::snprintf(charArrayAux, 15, "%4.2f s/gpu", (mFps != 0. ? mNumberGpus/mFps : 0.));
-            putTextOnCvMat(cvOutputData, charArrayAux, {intRound(cvOutputData.cols - borderMargin), borderMargin},
-                           WHITE_SCALAR, true, cvOutputData.cols);
+            putTextOnCvMat(
+                cvOutputData, charArrayAux, {positiveIntRound(cvOutputData.cols - borderMargin), borderMargin},
+                WHITE_SCALAR, true, cvOutputData.cols);
             // Part to show
             // Allowing some buffer when changing the part to show (if >= 2 GPUs)
             // I.e. one GPU might return a previous part after the other GPU returns the new desired part, it looks

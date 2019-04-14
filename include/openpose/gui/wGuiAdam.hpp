@@ -14,6 +14,8 @@ namespace op
     public:
         explicit WGuiAdam(const std::shared_ptr<GuiAdam>& guiAdam);
 
+        virtual ~WGuiAdam();
+
         void initializationOnThread();
 
         void workConsumer(const TDatums& tDatums);
@@ -36,6 +38,11 @@ namespace op
     template<typename TDatums>
     WGuiAdam<TDatums>::WGuiAdam(const std::shared_ptr<GuiAdam>& guiAdam) :
         spGuiAdam{guiAdam}
+    {
+    }
+
+    template<typename TDatums>
+    WGuiAdam<TDatums>::~WGuiAdam()
     {
     }
 
@@ -70,16 +77,16 @@ namespace op
                     // Update cvMat
                     std::vector<cv::Mat> cvOutputDatas;
                     for (auto& tDatum : *tDatums)
-                        cvOutputDatas.emplace_back(tDatum.cvOutputData);
+                        cvOutputDatas.emplace_back(tDatumPtr->cvOutputData);
                     spGuiAdam->setImage(cvOutputDatas);
                     // Update keypoints
-                    const auto& tDatum = (*tDatums)[0];
-                    if (!tDatum.poseKeypoints3D.empty())
-                        spGuiAdam->generateMesh(tDatum.poseKeypoints3D, tDatum.faceKeypoints3D, tDatum.handKeypoints3D,
-                                                tDatum.adamPose.data(), tDatum.adamTranslation.data(),
-                                                tDatum.vtVec.data(), tDatum.vtVec.rows(),
-                                                tDatum.j0Vec.data(), tDatum.j0Vec.rows(),
-                                                tDatum.adamFaceCoeffsExp.data());
+                    const auto& tDatumPtr = (*tDatums)[0];
+                    if (!tDatumPtr->poseKeypoints3D.empty())
+                        spGuiAdam->generateMesh(
+                            tDatumPtr->poseKeypoints3D, tDatumPtr->faceKeypoints3D, tDatumPtr->handKeypoints3D,
+                            tDatumPtr->adamPose.data(), tDatumPtr->adamTranslation.data(), tDatumPtr->vtVec.data(),
+                            tDatumPtr->vtVec.rows(), tDatumPtr->j0Vec.data(), tDatumPtr->j0Vec.rows(),
+                            tDatumPtr->adamFaceCoeffsExp.data());
                 }
                 // Refresh/update GUI
                 spGuiAdam->update();

@@ -18,14 +18,14 @@ namespace op
     {
         try
         {
-            // Free CUDA pointers - Note that if pointers are 0 (i.e. nullptr), no operation is performed.
+            // Free CUDA pointers - Note that if pointers are 0 (i.e., nullptr), no operation is performed.
             #ifdef USE_CUDA
                 cudaFree(pGpuHand);
             #endif
         }
         catch (const std::exception& e)
         {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 
@@ -46,14 +46,14 @@ namespace op
         }
     }
 
-    void HandGpuRenderer::renderHandInherited(Array<float>& outputData,
-                                              const std::array<Array<float>, 2>& handKeypoints)
+    void HandGpuRenderer::renderHandInherited(
+        Array<float>& outputData, const std::array<Array<float>, 2>& handKeypoints)
     {
         try
         {
             // GPU rendering
             #ifdef USE_CUDA
-                // I prefer std::round(T&) over intRound(T) for std::atomic
+                // I prefer std::round(T&) over positiveIntRound(T) for std::atomic
                 const auto elementRendered = spElementToRender->load();
                 const auto numberPeople = handKeypoints[0].getSize(0);
                 const Point<int> frameSize{outputData.getSize(1), outputData.getSize(0)};
@@ -68,7 +68,8 @@ namespace op
                                cudaMemcpyHostToDevice);
                     cudaMemcpy(pGpuHand + handVolume, handKeypoints[1].getConstPtr(),
                                handVolume * sizeof(float), cudaMemcpyHostToDevice);
-                    renderHandKeypointsGpu(*spGpuMemory, frameSize, pGpuHand, 2 * numberPeople, mRenderThreshold);
+                    renderHandKeypointsGpu(
+                        *spGpuMemory, frameSize, pGpuHand, 2 * numberPeople, mRenderThreshold, getAlphaKeypoint());
                     // CUDA check
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 }

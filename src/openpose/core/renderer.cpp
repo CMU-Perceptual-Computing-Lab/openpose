@@ -13,13 +13,31 @@ namespace op
         mAlphaKeypoint{alphaKeypoint},
         mAlphaHeatMap{alphaHeatMap}
     {
+        try
+        {
+            // Sanity checks
+            if (mAlphaKeypoint < 0.f || mAlphaKeypoint > 1.f)
+                error("The value of mAlphaKeypoint (flag `--alpha_pose`) must be between 0 and 1.",
+                      __LINE__, __FUNCTION__, __FILE__);
+            if (mAlphaHeatMap < 0.f || mAlphaHeatMap > 1.f)
+                error("The value of mAlphaHeatMap (flag `--alpha_heatmap`) must be between 0 and 1.",
+                      __LINE__, __FUNCTION__, __FILE__);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    Renderer::~Renderer()
+    {
     }
 
     void Renderer::increaseElementToRender(const int increment)
     {
         try
         {
-            // Security checks
+            // Sanity check
             if (*spNumberElementsToRender == 0)
                 error("Number elements to render cannot be 0 for this function.",
                       __LINE__, __FUNCTION__, __FILE__);

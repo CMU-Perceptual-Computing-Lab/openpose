@@ -21,7 +21,7 @@ if (UNIX OR APPLE)
   target_link_libraries(openpose_3d caffe openpose_core ${MKL_LIBS})
 
   if (BUILD_CAFFE)
-    add_dependencies(openpose_3d openpose_caffe)
+    add_dependencies(openpose_3d openpose)
   endif (BUILD_CAFFE)
 
   install(TARGETS openpose_3d

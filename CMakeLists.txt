@@ -1,6 +1,6 @@
 ### VERSION INFO
 set(OpenPose_VERSION_MAJOR 1)
-set(OpenPose_VERSION_MINOR 3)
+set(OpenPose_VERSION_MINOR 4)
 set(OpenPose_VERSION_PATCH 0)
 set(OpenPose_VERSION ${OpenPose_VERSION_MAJOR}.${OpenPose_VERSION_MINOR}.${OpenPose_VERSION_PATCH})
 
@@ -10,13 +10,29 @@ set(CMAKE_MACOSX_RPATH 1)
 
 
 ### CMAKE HEADERS
-if (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
- cmake_policy(SET CMP0048 NEW)
- project(OpenPose VERSION ${OpenPose_VERSION})
-else (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
- project(OpenPose)
-endif (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
-cmake_minimum_required(VERSION 3.0 FATAL_ERROR) # required by cmake eigen finder to find locally installed versions (e.g. CUDA 9.2 support was added in eigen 3.3.5)
+# Ubuntu 18 default. After 3.8, no need for find_CUDA
+# https://cmake.org/cmake/help/v3.10/module/FindCUDA.html
+# https://cmake.org/cmake/help/v3.10/command/project.html
+# https://devblogs.nvidia.com/building-cuda-applications-cmake/
+if (${CMAKE_VERSION} VERSION_GREATER 3.9.0)
+  cmake_policy(SET CMP0048 NEW)
+  project(OpenPose VERSION ${OpenPose_VERSION})
+  # # Not tested
+  # cmake_policy(SET CMP0048 NEW)
+  # set(CUDACXX /usr/local/cuda/bin/nvcc)
+  # project(OpenPose VERSION ${OpenPose_VERSION} LANGUAGES CXX CUDA)
+  # set(AUTO_FOUND_CUDA TRUE)
+  # # else
+  # set(AUTO_FOUND_CUDA FALSE)
+# Ubuntu 16 default
+elseif (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
+  cmake_policy(SET CMP0048 NEW)
+  project(OpenPose VERSION ${OpenPose_VERSION})
+else (${CMAKE_VERSION} VERSION_GREATER 3.9.0)
+  project(OpenPose)
+endif (${CMAKE_VERSION} VERSION_GREATER 3.9.0)
+cmake_minimum_required(VERSION 3.0 FATAL_ERROR) # required by cmake eigen finder to find locally installed versions (e.g., CUDA 9.2 support was added in eigen 3.3.5)
+# cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommended by Caffe
 
 
 ### Extra functionality
@@ -26,10 +42,28 @@ if (NOT WIN32 AND NOT UNIX AND NOT APPLE)
 endif (NOT WIN32 AND NOT UNIX AND NOT APPLE)
 
 
-### BUILD_TYPE
+### CMAKE_BUILD_TYPE
 # Default: Release
-set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
-set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+# Bug fixed: By default, it uses something different to Release, that provokes OpenPose to be about 15% slower than
+# it should be.
+# Is CMAKE_BUILD_TYPE "Debug" or "MinSizeRel" or "RelWithDebInfo"?
+set(CMAKE_BUILD_TYPE_KNOWN FALSE)
+if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
+  set(CMAKE_BUILD_TYPE_KNOWN TRUE)
+endif (${CMAKE_BUILD_TYPE} MATCHES "Debug")
+if (${CMAKE_BUILD_TYPE} MATCHES "MinSizeRel")
+  set(CMAKE_BUILD_TYPE_KNOWN TRUE)
+endif (${CMAKE_BUILD_TYPE} MATCHES "MinSizeRel")
+if (${CMAKE_BUILD_TYPE} MATCHES "RelWithDebInfo")
+  set(CMAKE_BUILD_TYPE_KNOWN TRUE)
+endif (${CMAKE_BUILD_TYPE} MATCHES "RelWithDebInfo")
+# Assign proper CMAKE_BUILD_TYPE
+if (${CMAKE_BUILD_TYPE_KNOWN})
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build.")
+else (${CMAKE_BUILD_TYPE_KNOWN})
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
+endif (${CMAKE_BUILD_TYPE_KNOWN})
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Release" "Debug" "MinSizeRel" "RelWithDebInfo")
 
 
 ### FLAGS
@@ -71,24 +105,61 @@ endif (WIN32)
 
 # C++ additional flags
 if (CMAKE_COMPILER_IS_GNUCXX)
-
-  # Select the Enhanced Instruction Set
-  set(INSTRUCTION_SET NONE CACHE STRING "Enable Enhanced Instruction Set")
-  set_property(CACHE INSTRUCTION_SET PROPERTY STRINGS NONE SSE4 AVX)
-
-  if (${INSTRUCTION_SET} MATCHES "SSE4")
-    add_definitions("-DWITH_SSE4")
-    set(SIMD_FLAGS "${SIMD_FLAGS} -msse4.1")
-  endif (${INSTRUCTION_SET} MATCHES "SSE4")
-
-  if (${INSTRUCTION_SET} MATCHES "AVX")
-    add_definitions("-DWITH_AVX")
-    set(SIMD_FLAGS "${SIMD_FLAGS} -mavx")
-  endif (${INSTRUCTION_SET} MATCHES "AVX")
-
   message(STATUS "GCC detected, adding compile flags")
-  set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMD_FLAGS} -fopenmp -Wpedantic -Wall -Wextra -Wfatal-errors")
+  # set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -Wpedantic -Wall -Wextra -Wfatal-errors")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+  set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpedantic -Wall -Wextra -Wfatal-errors")
+  # set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -Wpedantic -Wall -Wextra -Wfatal-errors")
 endif (CMAKE_COMPILER_IS_GNUCXX)
+
+# Select the Enhanced Instruction Set
+set(INSTRUCTION_SET NONE CACHE STRING "Enable Enhanced Instruction Set")
+set_property(CACHE INSTRUCTION_SET PROPERTY STRINGS NONE AVX2)
+if (${INSTRUCTION_SET} MATCHES "AVX2")
+  add_definitions("-DWITH_AVX")
+endif (${INSTRUCTION_SET} MATCHES "AVX2")
+# Windows
+if (WIN32)
+  # Suboptions for Enhanced Instruction Set
+  if (${INSTRUCTION_SET} MATCHES "AVX2")
+    add_definitions("/arch:AVX2")
+  endif (${INSTRUCTION_SET} MATCHES "AVX2")
+# Ubuntu
+else (WIN32) # if (CMAKE_COMPILER_IS_GNUCXX)
+  if (${INSTRUCTION_SET} MATCHES "AVX2")
+    set(SIMD_FLAGS "${SIMD_FLAGS} -mavx")
+  endif (${INSTRUCTION_SET} MATCHES "AVX2")
+  message(STATUS "GCC detected, adding compile flags")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMD_FLAGS}")
+endif (WIN32)
+# if (CMAKE_COMPILER_IS_GNUCXX)
+#   set_property(CACHE INSTRUCTION_SET PROPERTY STRINGS NONE SSE4 AVX)
+#   if (${INSTRUCTION_SET} MATCHES "SSE4")
+#     add_definitions("-DWITH_SSE4")
+#     set(SIMD_FLAGS "${SIMD_FLAGS} -msse4.1")
+#   endif (${INSTRUCTION_SET} MATCHES "SSE4")
+#   if (${INSTRUCTION_SET} MATCHES "AVX2")
+#     add_definitions("-DWITH_AVX")
+#     set(SIMD_FLAGS "${SIMD_FLAGS} -mavx")
+#   endif (${INSTRUCTION_SET} MATCHES "AVX")
+#   message(STATUS "GCC detected, adding compile flags")
+#   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMD_FLAGS}")
+# endif (CMAKE_COMPILER_IS_GNUCXX)
+# if (WIN32)
+#   # set_property(CACHE INSTRUCTION_SET PROPERTY STRINGS NONE SSE SSE2 AVX AVX2 IA32)
+#   # Suboptions for Enhanced Instruction Set
+#   if (${INSTRUCTION_SET} MATCHES "SSE")
+#     add_definitions("/arch:SSE")
+#   elseif (${INSTRUCTION_SET} MATCHES "SSE2")
+#     add_definitions("/arch:SSE2")
+#   elseif (${INSTRUCTION_SET} MATCHES "AVX")
+#     add_definitions("/arch:AVX")
+#   elseif (${INSTRUCTION_SET} MATCHES "AVX2")
+#     add_definitions("/arch:AVX2")
+#   elseif (${INSTRUCTION_SET} MATCHES "IA32")
+#     add_definitions("/arch:IA32")
+#   endif (${INSTRUCTION_SET} MATCHES "SSE")
+# endif (WIN32)
 
 
 ### PROJECT OPTIONS
@@ -105,25 +176,6 @@ if (${DL_FRAMEWORK} MATCHES "CAFFE")
   # OpenPose flags
   add_definitions(-DUSE_CAFFE)
 endif (${DL_FRAMEWORK} MATCHES "CAFFE")
-
-if (WIN32)
-  # Select the Enhanced Instruction Set
-  set(INSTRUCTION_SET NONE CACHE STRING "Enable Enhanced Instruction Set")
-  set_property(CACHE INSTRUCTION_SET PROPERTY STRINGS NONE SSE SSE2 AVX AVX2 IA32)
-
-  # Suboptions for Enhanced Instruction Set
-  if (${INSTRUCTION_SET} MATCHES "SSE")
-    add_definitions("/arch:SSE")
-  elseif (${INSTRUCTION_SET} MATCHES "SSE2")
-    add_definitions("/arch:SSE2")
-  elseif (${INSTRUCTION_SET} MATCHES "AVX")
-    add_definitions("/arch:AVX")
-  elseif (${INSTRUCTION_SET} MATCHES "AVX2")
-    add_definitions("/arch:AVX2")
-  elseif (${INSTRUCTION_SET} MATCHES "IA32")
-    add_definitions("/arch:IA32")
-  endif (${INSTRUCTION_SET} MATCHES "SSE")
-endif (WIN32)
 
 # Set the acceleration library
 if (APPLE)
@@ -252,7 +304,10 @@ option(BUILD_DOCS "Build OpenPose documentation." OFF)
 option(BUILD_PYTHON "Build OpenPose python." OFF)
 if (WIN32)
   option(BUILD_BIN_FOLDER "Copy all required 3rd-party DLL files into {build_directory}/bin. Disable to save some memory." ON)
-endif ()
+endif (WIN32)
+
+# Unity
+option(BUILD_UNITY_SUPPORT "Build OpenPose as a Unity plugin." OFF)
 
 # Build as shared library
 option(BUILD_SHARED_LIBS "Build as shared lib." ON)
@@ -310,6 +365,12 @@ if (WITH_TRACKING)
   add_definitions(-DUSE_TRACKING)
 endif (WITH_TRACKING)
 
+# Unity
+if (BUILD_UNITY_SUPPORT)
+  # OpenPose flags
+  add_definitions(-DUSE_UNITY_SUPPORT)
+endif (BUILD_UNITY_SUPPORT)
+
 # Calibration
 # No Eigen
 if (${WITH_EIGEN} MATCHES "NONE")
@@ -344,10 +405,15 @@ if (UNIX OR APPLE)
     include(cmake/Cuda.cmake)
     find_package(CuDNN)
   endif (${GPU_MODE} MATCHES "CUDA")
-  find_package(GFlags)
-  find_package(Glog)
+  find_package(GFlags) # For Caffe and OpenPose
+  find_package(Glog) # For Caffe
+  find_package(Protobuf REQUIRED) # For Caffe
+
   if (OpenCV_CONFIG_FILE)
     include (${OpenCV_CONFIG_FILE})
+  # Allow explicitly setting the OpenCV includes and libs
+  elseif (OpenCV_INCLUDE_DIRS AND OpenCV_LIBS)
+    set(OpenCV_FOUND 1)
   elseif (OpenCV_INCLUDE_DIRS AND OpenCV_LIBS_DIR)
     file(GLOB_RECURSE OpenCV_LIBS "${OpenCV_LIBS_DIR}*.so")
     set(OpenCV_FOUND 1)
@@ -361,6 +427,8 @@ if (UNIX OR APPLE)
 	find_package(OpenGL REQUIRED)
     # GLUT
     find_package(GLUT REQUIRED)
+    # OpenGL
+    find_package(OpenGL REQUIRED)
   endif (WITH_3D_RENDERER)
   if (WITH_CERES)
     # Eigen + Ceres
@@ -378,6 +446,8 @@ if (UNIX OR APPLE)
     if (NOT WITH_3D_RENDERER)
       message(FATAL_ERROR "WITH_3D_RENDERER is required if WITH_3D_ADAM_MODEL is enabled.")
     endif (NOT WITH_3D_RENDERER)
+    # find_package(PkgConfig)
+    # pkg_check_modules(EIGEN3 REQUIRED eigen3)
     if (CUDA_VERSION_STRING STRGREATER "9.0")
       find_package(Eigen3 3.3.5 REQUIRED NO_MODULE)
     else (CUDA_VERSION_STRING STRGREATER "9.0")
@@ -417,13 +487,13 @@ if (UNIX OR APPLE)
 
     if (NOT CUDA_FOUND)
       message(STATUS "CUDA not found.")
-      execute_process(COMMAND cat install_cuda.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
+      execute_process(COMMAND cat install_cuda.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/scripts/ubuntu)
       message(FATAL_ERROR "Install CUDA using the above commands.")
     endif (NOT CUDA_FOUND)
 
     if (USE_CUDNN AND NOT CUDNN_FOUND)
       message(STATUS "cuDNN not found.")
-      execute_process(COMMAND cat install_cudnn.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ubuntu)
+      execute_process(COMMAND cat install_cudnn.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/scripts/ubuntu)
       message(FATAL_ERROR "Install cuDNN using the above commands. or turn off cuDNN by setting USE_CUDNN to OFF.")
     endif (USE_CUDNN AND NOT CUDNN_FOUND)
   endif (${GPU_MODE} MATCHES "CUDA")
@@ -460,26 +530,29 @@ if (WIN32)
   set(OP_WIN_DIR "${CMAKE_SOURCE_DIR}/3rdparty/windows")
 
   # Download required zip files
-  download_zip("opencv_310.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 1e5240a64b814b3c0b822f136be78ad7)
-  download_zip("caffe3rdparty_2018_06_26.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 892A39C0CFBAA11CA8648B125852E01F)
+  download_zip("opencv_401_v14_15_2019_03_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} df8f611c032cfa86c56a8ad419f01832)
+  # download_zip("caffe3rdparty_2019_03_12.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 34c49be6a2418fd1670b46fc455eebc0)
+  download_zip("caffe3rdparty_15_2019_03_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 9fcc6bdf4765db699d1a279c8d6b830b)
   if (${GPU_MODE} MATCHES "OPENCL")
     download_zip("caffe_opencl_2018_02_13.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 3ac3e1acf5ee6a4e57920be73053067a)
   elseif (${GPU_MODE} MATCHES "CPU_ONLY")
     download_zip("caffe_cpu_2018_05_27.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 87E8401B6DFBAC5B8E909DD20E3B3390)
   else (${GPU_MODE} MATCHES "OPENCL")
-    download_zip("caffe_2018_01_18.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 4b8e548cc7ea20abea472950dd5301bd)
+    # download_zip("caffe_2019_03_12.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 859a592310f0928fd4f40da1456a217f)
+    download_zip("caffe_15_2019_03_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} f2d8beee9e4959fa419dcb54d507107c)
   endif (${GPU_MODE} MATCHES "OPENCL")
   if (WITH_3D_RENDERER)
     download_zip("freeglut_2018_01_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} BB182187285E06880F0EDE3A39530091)
   endif (WITH_3D_RENDERER)
   message(STATUS "Windows dependencies downloaded.")
 
-  find_library(OpenCV_LIBS opencv_world310 HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc14/lib)
+  # set(VS_VERSION "14")
+  set(VS_VERSION "15") # Note: VS2017 code seems to simply works in VS2015
+  find_library(OpenCV_LIBS opencv_world401 HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc${VS_VERSION}/lib)
   find_library(GFLAGS_LIBRARY_RELEASE gflags HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
   find_library(GFLAGS_LIBRARY_DEBUG gflagsd HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
   find_library(GLOG_LIBRARY_RELEASE glog HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
   find_library(GLOG_LIBRARY_DEBUG glogd HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
-  find_library(OpenCV_LIBS opencv_world310 HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc14/lib)
 
   # If OpenPose builds it
   if (BUILD_CAFFE)
@@ -508,10 +581,10 @@ if (WIN32)
   endif (${GPU_MODE} MATCHES "OPENCL")
   # Boost DepCopy over required DLL F
   if (${GPU_MODE} MATCHES "CPU_ONLY" OR ${GPU_MODE} MATCHES "OPENCL" OR BUILD_PYTHON)
-      find_library(BOOST_SYSTEM_LIB_RELEASE libboost_system-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
-      find_library(BOOST_SYSTEM_LIB_DEBUG libboost_system-vc140-mt-gd-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
-      find_library(BOOST_FILESYSTEM_LIB_RELEASE libboost_filesystem-vc140-mt-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
-      find_library(BOOST_FILESYSTEM_LIB_DEBUG libboost_filesystem-vc140-mt-gd-1_61 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+      find_library(BOOST_SYSTEM_LIB_RELEASE boost_system-vc141-mt-x64-1_69 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+      find_library(BOOST_SYSTEM_LIB_DEBUG boost_system-vc141-mt-gd-x64-1_69 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+      find_library(BOOST_FILESYSTEM_LIB_RELEASE boost_filesystem-vc141-mt-x64-1_69 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
+      find_library(BOOST_FILESYSTEM_LIB_DEBUG boost_filesystem-vc141-mt-gd-x64-1_69 HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
   else ()
       set(BOOST_SYSTEM_LIB_RELEASE "")
       set(BOOST_SYSTEM_LIB_DEBUG "")
@@ -541,7 +614,7 @@ if (WIN32)
       set(Caffe_INCLUDE_DIRS "3rdparty/windows/caffe/include;3rdparty/windows/caffe/include2" CACHE FILEPATH "Caffe_INCLUDE_DIRS")
     endif (${GPU_MODE} MATCHES "CPU_ONLY")
   endif (${GPU_MODE} MATCHES "OPENCL")
-  set(Boost_INCLUDE_DIRS "3rdparty/windows/caffe3rdparty/include/boost-1_61")
+  # set(Boost_INCLUDE_DIRS "3rdparty/windows/caffe3rdparty/include/boost-1_61") # Added in WINDOWS_INCLUDE_DIRS
   set(WINDOWS_INCLUDE_DIRS "3rdparty/windows/caffe3rdparty/include")
   if (WITH_3D_RENDERER)
     set(GLUT_INCLUDE_DIRS "3rdparty/windows/freeglut/include")
@@ -555,8 +628,8 @@ if (WIN32)
   if (BUILD_PYTHON)
     if (NOT BUILD_BIN_FOLDER)
       message(FATAL_ERROR "BUILD_BIN_FOLDER must be turned on to as well to build python library")
-    endif ()
-  endif ()
+    endif (NOT BUILD_BIN_FOLDER)
+  endif (BUILD_PYTHON)
 
   # Auto copy DLLs
   if (BUILD_BIN_FOLDER)
@@ -572,7 +645,7 @@ if (WIN32)
     # Caffe 3rd-party DLLs
     file(GLOB CAFFE_3RD_PARTY_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/*.dll")
     # OpenCV DLLs
-    file(GLOB OPENCV_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv/x64/vc14/bin/*.dll")
+    file(GLOB OPENCV_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv/x64/vc${VS_VERSION}/bin/*.dll")
     # GLUT DLLs
     file(GLOB GLUT_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/freeglut/bin/*.dll")
     # Spinnaker DLLs and other files
@@ -613,7 +686,8 @@ if (UNIX OR APPLE)
       file(GLOB CAFFE_DIR_VALID ${CMAKE_SOURCE_DIR}/3rdparty/caffe/*)
       list(LENGTH CAFFE_DIR_VALID CAFFE_DIR_VALID_LENGTH)
       if (CAFFE_DIR_VALID_LENGTH EQUAL 0)
-        execute_process(COMMAND git submodule update --init --recursive)
+        execute_process(COMMAND git submodule update --init ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+        # execute_process(COMMAND git submodule update --init --recursive --remote) # This would initialize them all
       else (CAFFE_DIR_VALID_LENGTH EQUAL 0)
         message(STATUS "Caffe has already been downloaded.")
       endif (CAFFE_DIR_VALID_LENGTH EQUAL 0)
@@ -621,7 +695,8 @@ if (UNIX OR APPLE)
       # Build Process
       set(CAFFE_CPU_ONLY OFF)
       if (${GPU_MODE} MATCHES "CUDA")
-        execute_process(COMMAND git checkout master WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+        # execute_process(COMMAND git checkout master WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+        execute_process(COMMAND git checkout b5ede48 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
       elseif (${GPU_MODE} MATCHES "CPU_ONLY")
         if (USE_MKL)
           #execute_process(COMMAND git checkout intel WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
@@ -656,12 +731,13 @@ if (UNIX OR APPLE)
             "${CMAKE_BINARY_DIR}/caffe/lib/libmkldnn.so"
             )
         else (USE_MKL)
-          execute_process(COMMAND git checkout master WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+          # execute_process(COMMAND git checkout master WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+          execute_process(COMMAND git checkout b5ede48 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
         endif (USE_MKL)
         set(CAFFE_CPU_ONLY ON)
         set(USE_CUDNN OFF)
       elseif (${GPU_MODE} MATCHES "OPENCL")
-        execute_process(COMMAND git checkout opencl WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+        execute_process(COMMAND git checkout fe2a1102 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
         set(USE_CUDNN OFF)
       endif (${GPU_MODE} MATCHES "CUDA")
 
@@ -674,15 +750,17 @@ if (UNIX OR APPLE)
 
       # One for Intel Branch and one for Master
       if (USE_MKL)
-        ExternalProject_Add(openpose_caffe
+        ExternalProject_Add(openpose_lib
           SOURCE_DIR ${CAFFE_URL}
           PREFIX ${CAFFE_PREFIX}
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
           -DMKLDNN_INSTALL_DIR:PATH=<INSTALL_DIR>
-          -DUSE_CUDNN=${USE_CUDNN}
-          -DBUILD_python=OFF
-          -DCPU_ONLY=${CAFFE_CPU_ONLY}
           -DUSE_MKL2017_AS_DEFAULT_ENGINE=${CAFFE_CPU_ONLY}
+          -DUSE_CUDNN=${USE_CUDNN}
+          -DCUDA_ARCH_NAME=${CUDA_ARCH}
+          -DCUDA_ARCH_BIN=${CUDA_ARCH_BIN}
+          -DCUDA_ARCH_PTX=${CUDA_ARCH_PTX}
+          -DCPU_ONLY=${CAFFE_CPU_ONLY}
           -DCMAKE_BUILD_TYPE=Release
           -DBUILD_docs=OFF
           -DBUILD_python=OFF
@@ -692,11 +770,14 @@ if (UNIX OR APPLE)
           -DUSE_OPENCV=OFF)
           # -DOpenCV_DIR=${OpenCV_DIR})
       else (USE_MKL)
-        ExternalProject_Add(openpose_caffe
+        ExternalProject_Add(openpose_lib
           SOURCE_DIR ${CAFFE_URL}
           PREFIX ${CAFFE_PREFIX}
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
           -DUSE_CUDNN=${USE_CUDNN}
+          -DCUDA_ARCH_NAME=${CUDA_ARCH}
+          -DCUDA_ARCH_BIN=${CUDA_ARCH_BIN}
+          -DCUDA_ARCH_PTX=${CUDA_ARCH_PTX}
           -DCPU_ONLY=${CAFFE_CPU_ONLY}
           -DCMAKE_BUILD_TYPE=Release
           -DBUILD_docs=OFF
@@ -708,10 +789,10 @@ if (UNIX OR APPLE)
           # -DOpenCV_DIR=${OpenCV_DIR})
       endif (USE_MKL)
 
-      ExternalProject_Get_Property(openpose_caffe install_dir)
+      ExternalProject_Get_Property(openpose_lib install_dir)
 
       if (NOT Caffe_FOUND)
-        add_custom_command(TARGET openpose_caffe
+        add_custom_command(TARGET openpose_lib
             POST_BUILD
             COMMAND ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR}
             COMMAND $(MAKE)
@@ -734,6 +815,7 @@ endif (UNIX OR APPLE)
 # Specify the include directories
 include_directories(
   include
+  ${Protobuf_INCLUDE_DIRS}
   ${GFLAGS_INCLUDE_DIR}
   ${GLOG_INCLUDE_DIR}
   ${OpenCV_INCLUDE_DIRS})
@@ -783,10 +865,10 @@ if (WITH_CERES)
   include_directories(${CERES_INCLUDE_DIRS})
 endif (WITH_CERES)
 if (WITH_FLIR_CAMERA)
-  include_directories(${SPINNAKER_INCLUDE_DIRS})
+  include_directories(SYSTEM ${SPINNAKER_INCLUDE_DIRS}) # To remove its warnings, equiv. to -isystem
 endif (WITH_FLIR_CAMERA)
 if (WITH_3D_ADAM_MODEL)
-                                    include_directories(include/adam) # TEMPORARY - TO BE REMOVED IN THE FUTURE
+                                    include_directories(include/adam) # TODO: TEMPORARY - TO BE REMOVED IN THE FUTURE
   include_directories(${CERES_INCLUDE_DIRS})
   include_directories(${EIGEN3_INCLUDE_DIRS})
   set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} Eigen3::Eigen)
@@ -797,7 +879,7 @@ endif (WITH_3D_ADAM_MODEL)
 # Windows includes
 if (WIN32)
   include_directories(
-    ${Boost_INCLUDE_DIRS}
+    # ${Boost_INCLUDE_DIRS}
     ${WINDOWS_INCLUDE_DIRS})
 endif (WIN32)
 
@@ -837,7 +919,7 @@ if (WITH_3D_ADAM_MODEL)
       ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${GLEW_LIBRARY} ${FREE_IMAGE_LIBRARY})
 endif (WITH_3D_ADAM_MODEL)
 if (WITH_3D_RENDERER)
-  set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY})
+  set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${GLUT_LIBRARY} ${OPENGL_LIBRARIES})
 endif (WITH_3D_RENDERER)
 if (WITH_CERES)
   set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${CERES_LIBRARIES})
@@ -882,12 +964,25 @@ download_model("hand" ${DOWNLOAD_HAND_MODEL} hand/pose_iter_102000.caffemodel
 
 message(STATUS "Models Downloaded.")
 
+
 ### PYTHON
-if (Caffe_FOUND)
-  if(BUILD_PYTHON)
+if (BUILD_PYTHON)
+  if (WIN32)
+    execute_process(COMMAND cmd /c cd ${CMAKE_SOURCE_DIR} & git submodule update --init 3rdparty/pybind11/)
+    add_subdirectory(3rdparty/pybind11)
     add_subdirectory(python)
-  endif ()
-endif()
+  elseif (UNIX OR APPLE)
+    if (Caffe_FOUND)
+      execute_process(COMMAND git submodule update --init ${CMAKE_SOURCE_DIR}/3rdparty/pybind11/)
+      # execute_process(COMMAND git submodule update --init --recursive --remote) # This would initialize them all
+      add_subdirectory(3rdparty/pybind11)
+      add_subdirectory(python)
+    endif (Caffe_FOUND)
+  else (WIN32)
+    message(FATAL_ERROR "Unknown OS.")
+  endif (WIN32)
+endif (BUILD_PYTHON)
+
 
 ### GENERATE DOCUMENTATION
 if (UNIX OR APPLE)

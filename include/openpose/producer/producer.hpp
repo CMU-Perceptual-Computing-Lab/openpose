@@ -1,9 +1,9 @@
 #ifndef OPENPOSE_PRODUCER_PRODUCER_HPP
 #define OPENPOSE_PRODUCER_PRODUCER_HPP
 
-#include <chrono>
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <opencv2/highgui/highgui.hpp> // capProperties of OpenCV
+#include <openpose/3d/cameraParameterReader.hpp>
 #include <openpose/core/common.hpp>
 #include <openpose/producer/enumClasses.hpp>
 
@@ -11,17 +11,16 @@ namespace op
 {
     /**
      * Producer is an abstract class to extract frames from a source (image directory, video file,
-     * webcam stream, etc.). It has the basic and common functions (e.g. getFrame, release & isOpened).
+     * webcam stream, etc.). It has the basic and common functions (e.g., getFrame, release & isOpened).
      */
     class OP_API Producer
     {
     public:
         /**
          * Constructor of Producer.
-         * @param repeatWhenFinished bool indicating whether the producer must be restarted after
-         * it finishes.
          */
-        explicit Producer(const ProducerType type);
+        explicit Producer(const ProducerType type, const std::string& cameraParameterPath, const bool undistortImage,
+                          const int mNumberViews);
 
         /**
          * Destructor of Producer. It is virtual so that any children class can implement
@@ -43,24 +42,27 @@ namespace op
 
         /**
          * It retrieves and returns the camera matrixes from the frames producer.
+         * Virtual class because FlirReader implements their own.
          * @return std::vector<cv::Mat> with the camera matrices.
          */
-        virtual std::vector<cv::Mat> getCameraMatrices() = 0;
+        virtual std::vector<cv::Mat> getCameraMatrices();
 
         /**
          * It retrieves and returns the camera extrinsic parameters from the frames producer.
+         * Virtual class because FlirReader implements their own.
          * @return std::vector<cv::Mat> with the camera extrinsic parameters.
          */
-        virtual std::vector<cv::Mat> getCameraExtrinsics() = 0;
+        virtual std::vector<cv::Mat> getCameraExtrinsics();
 
         /**
          * It retrieves and returns the camera intrinsic parameters from the frames producer.
+         * Virtual class because FlirReader implements their own.
          * @return std::vector<cv::Mat> with the camera intrinsic parameters.
          */
-        virtual std::vector<cv::Mat> getCameraIntrinsics() = 0;
+        virtual std::vector<cv::Mat> getCameraIntrinsics();
 
         /**
-         * This function returns a unique frame name (e.g. the frame number for video, the
+         * This function returns a unique frame name (e.g., the frame number for video, the
          * frame counter for webcam, the image name for image directory reader, etc.).
          * @return std::string with an unique frame name.
          */
@@ -136,12 +138,6 @@ namespace op
         void checkFrameIntegrity(cv::Mat& frame);
 
         /**
-         * It performs flipping and rotation over the desired cv::Mat.
-         * @param cvMat cv::Mat with the frame matrix to be flipped and/or rotated.
-         */
-        void flipAndRotate(cv::Mat& cvMat) const;
-
-        /**
          * Protected function which checks that the frame producer has ended. If so, if resets
          * or releases the producer according to mRepeatWhenFinished.
          */
@@ -176,9 +172,20 @@ namespace op
         unsigned long long mNumberFramesTrackingFps;
         unsigned int mNumberSetPositionTrackingFps;
         std::chrono::high_resolution_clock::time_point mClockTrackingFps;
+        // Camera parameters
+        CameraParameterReader mCameraParameterReader;
 
         DELETE_COPY(Producer);
     };
+
+    /**
+     * This function returns the desired producer given the input parameters.
+     */
+    OP_API std::shared_ptr<Producer> createProducer(
+        const ProducerType producerType = ProducerType::None, const std::string& producerString = "",
+        const Point<int>& cameraResolution = Point<int>{-1,-1},
+        const std::string& cameraParameterPath = "models/cameraParameters/", const bool undistortImage = true,
+        const int numberViews = -1);
 }
 
 #endif // OPENPOSE_PRODUCER_PRODUCER_HPP

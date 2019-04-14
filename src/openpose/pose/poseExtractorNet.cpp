@@ -1,5 +1,6 @@
 #ifdef USE_CUDA
     #include <cuda_runtime_api.h>
+    #include <openpose/gpu/cuda.hpp>
 #endif
 #include <openpose/core/enumClasses.hpp>
 #include <openpose/utilities/fastMath.hpp>
@@ -44,11 +45,12 @@ namespace op
     }
 
     PoseExtractorNet::PoseExtractorNet(const PoseModel poseModel, const std::vector<HeatMapType>& heatMapTypes,
-                                       const ScaleMode heatMapScale, const bool addPartCandidates) :
+                                       const ScaleMode heatMapScaleMode, const bool addPartCandidates,
+                                       const bool maximizePositives) :
         mPoseModel{poseModel},
         mNetOutputSize{0,0},
         mHeatMapTypes{heatMapTypes},
-        mHeatMapScaleMode{heatMapScale},
+        mHeatMapScaleMode{heatMapScaleMode},
         mAddPartCandidates{addPartCandidates}
     {
         try
@@ -56,18 +58,21 @@ namespace op
             // Error check
             if (mHeatMapScaleMode != ScaleMode::ZeroToOne && mHeatMapScaleMode != ScaleMode::PlusMinusOne
                 && mHeatMapScaleMode != ScaleMode::UnsignedChar && mHeatMapScaleMode != ScaleMode::NoScale)
-                error("The ScaleMode heatMapScale must be ZeroToOne, PlusMinusOne, UnsignedChar, or NoScale.",
+                error("The ScaleMode heatMapScaleMode must be ZeroToOne, PlusMinusOne, UnsignedChar, or NoScale.",
                       __LINE__, __FUNCTION__, __FILE__);
 
-            // Properties
+            // Properties - Init to 0
             for (auto& property : mProperties)
                 property = 0.;
-            mProperties[(int)PoseProperty::NMSThreshold] = getPoseDefaultNmsThreshold(mPoseModel);
+            // Properties - Fill default values
+            mProperties[(int)PoseProperty::NMSThreshold] = getPoseDefaultNmsThreshold(mPoseModel, maximizePositives);
             mProperties[(int)PoseProperty::ConnectInterMinAboveThreshold]
-                = getPoseDefaultConnectInterMinAboveThreshold(mPoseModel);
-            mProperties[(int)PoseProperty::ConnectInterThreshold] = getPoseDefaultConnectInterThreshold(mPoseModel);
-            mProperties[(int)PoseProperty::ConnectMinSubsetCnt] = getPoseDefaultMinSubsetCnt(mPoseModel);
-            mProperties[(int)PoseProperty::ConnectMinSubsetScore] = getPoseDefaultConnectMinSubsetScore(mPoseModel);
+                = getPoseDefaultConnectInterMinAboveThreshold(maximizePositives);
+            mProperties[(int)PoseProperty::ConnectInterThreshold] = getPoseDefaultConnectInterThreshold(
+                mPoseModel, maximizePositives);
+            mProperties[(int)PoseProperty::ConnectMinSubsetCnt] = getPoseDefaultMinSubsetCnt(maximizePositives);
+            mProperties[(int)PoseProperty::ConnectMinSubsetScore] = getPoseDefaultConnectMinSubsetScore(
+                maximizePositives);
         }
         catch (const std::exception& e)
         {
@@ -102,6 +107,9 @@ namespace op
             Array<float> heatMaps;
             if (!mHeatMapTypes.empty())
             {
+                #ifdef USE_CUDA
+                    cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                #endif
                 // Get heatmaps size
                 const auto heatMapSize = getHeatMapSize();
 
@@ -133,7 +141,7 @@ namespace op
                         // [0, 255]
                         else if (mHeatMapScaleMode == ScaleMode::UnsignedChar)
                             for (auto i = 0u ; i < volumeBodyParts ; i++)
-                                heatMaps[i] = (float)intRound(fastTruncate(heatMaps[i]) * 255.f);
+                                heatMaps[i] = (float)positiveIntRound(fastTruncate(heatMaps[i]) * 255.f);
                         // Avoid values outside original range
                         else
                             for (auto i = 0u ; i < volumeBodyParts ; i++)
@@ -144,31 +152,40 @@ namespace op
                 // Background
                 if (heatMapTypesHas(mHeatMapTypes, HeatMapType::Background))
                 {
-                    auto* heatMapsPtr = heatMaps.getPtr() + totalOffset;
-                    #ifdef USE_CUDA
-                        cudaMemcpy(heatMapsPtr, getHeatMapGpuConstPtr() + volumeBodyParts,
-                                   channelOffset * sizeof(float), cudaMemcpyDeviceToHost);
-                    #else
-                        const auto* heatMapCpuPtr = getHeatMapCpuConstPtr();
-                        std::copy(heatMapCpuPtr + volumeBodyParts, heatMapCpuPtr + volumeBodyParts + channelOffset,
-                                  heatMapsPtr);
-                    #endif
-                    if (mHeatMapScaleMode != ScaleMode::NoScale)
+                    if (addBkgChannel(mPoseModel))
                     {
-                        // Change from [0,1] to [-1,1]
-                        if (mHeatMapScaleMode == ScaleMode::PlusMinusOne)
-                            for (auto i = 0u ; i < channelOffset ; i++)
-                                heatMapsPtr[i] = fastTruncate(heatMapsPtr[i]) * 2.f - 1.f;
-                        // [0, 255]
-                        else if (mHeatMapScaleMode == ScaleMode::UnsignedChar)
-                            for (auto i = 0u ; i < channelOffset ; i++)
-                                heatMapsPtr[i] = (float)intRound(fastTruncate(heatMapsPtr[i]) * 255.f);
-                        // Avoid values outside original range
-                        else
-                            for (auto i = 0u ; i < channelOffset ; i++)
-                                heatMapsPtr[i] = fastTruncate(heatMapsPtr[i]);
+                        auto* heatMapsPtr = heatMaps.getPtr() + totalOffset;
+                        #ifdef USE_CUDA
+                            cudaMemcpy(heatMapsPtr, getHeatMapGpuConstPtr() + volumeBodyParts,
+                                       channelOffset * sizeof(float), cudaMemcpyDeviceToHost);
+                        #else
+                            const auto* heatMapCpuPtr = getHeatMapCpuConstPtr();
+                            std::copy(
+                                heatMapCpuPtr + volumeBodyParts, heatMapCpuPtr + volumeBodyParts + channelOffset,
+                                heatMapsPtr);
+                        #endif
+                        if (mHeatMapScaleMode != ScaleMode::NoScale)
+                        {
+                            // Change from [0,1] to [-1,1]
+                            if (mHeatMapScaleMode == ScaleMode::PlusMinusOne)
+                                for (auto i = 0u ; i < channelOffset ; i++)
+                                    heatMapsPtr[i] = fastTruncate(heatMapsPtr[i]) * 2.f - 1.f;
+                            // [0, 255]
+                            else if (mHeatMapScaleMode == ScaleMode::UnsignedChar)
+                                for (auto i = 0u ; i < channelOffset ; i++)
+                                    heatMapsPtr[i] = (float)positiveIntRound(fastTruncate(heatMapsPtr[i]) * 255.f);
+                            // Avoid values outside original range
+                            else
+                                for (auto i = 0u ; i < channelOffset ; i++)
+                                    heatMapsPtr[i] = fastTruncate(heatMapsPtr[i]);
+                        }
+                        totalOffset += (unsigned int)channelOffset;
                     }
-                    totalOffset += (unsigned int)channelOffset;
+                    else
+                    {
+                        error("You enabled `--heatmaps_add_bkg` for a model that does not contain one. Please,"
+                              " remove this flag for this model.", __LINE__, __FUNCTION__, __FILE__);
+                    }
                 }
                 // PAFs
                 if (heatMapTypesHas(mHeatMapTypes, HeatMapType::PAFs))
@@ -176,12 +193,12 @@ namespace op
                     auto* heatMapsPtr = heatMaps.getPtr() + totalOffset;
                     #ifdef USE_CUDA
                         cudaMemcpy(heatMapsPtr,
-                                   getHeatMapGpuConstPtr() + volumeBodyParts + channelOffset,
+                                   getHeatMapGpuConstPtr() + volumeBodyParts + (addBkgChannel(mPoseModel) ? channelOffset : 0),
                                    volumePAFs * sizeof(float), cudaMemcpyDeviceToHost);
                     #else
                         const auto* heatMapCpuPtr = getHeatMapCpuConstPtr();
-                        std::copy(heatMapCpuPtr + volumeBodyParts + channelOffset,
-                                  heatMapCpuPtr + volumeBodyParts + channelOffset + volumePAFs,
+                        std::copy(heatMapCpuPtr + volumeBodyParts + (addBkgChannel(mPoseModel) ? channelOffset : 0),
+                                  heatMapCpuPtr + volumeBodyParts + (addBkgChannel(mPoseModel) ? channelOffset : 0) + volumePAFs,
                                   heatMapsPtr);
                     #endif
                     if (mHeatMapScaleMode != ScaleMode::NoScale)
@@ -193,7 +210,7 @@ namespace op
                         // [0, 255]
                         else if (mHeatMapScaleMode == ScaleMode::UnsignedChar)
                             for (auto i = 0u ; i < volumePAFs ; i++)
-                                heatMapsPtr[i] = (float)intRound(
+                                heatMapsPtr[i] = (float)positiveIntRound(
                                     fastTruncate(heatMapsPtr[i], -1.f) * 128.5f + 128.5f
                                 );
                         // Avoid values outside original range
@@ -207,6 +224,9 @@ namespace op
                 // cudaMemcpy(heatMaps.getPtr(), getHeatMapGpuConstPtr(), heatMaps.getVolume() * sizeof(float),
                 //            cudaMemcpyDeviceToHost);
             }
+            #ifdef USE_CUDA
+                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+            #endif
             return heatMaps;
         }
         catch (const std::exception& e)
@@ -220,7 +240,7 @@ namespace op
     {
         try
         {
-            // Security check
+            // Sanity check
             checkThread();
             // Initialization
             std::vector<std::vector<std::array<float,3>>> candidates;
@@ -234,13 +254,14 @@ namespace op
                 const auto* candidatesCpuPtr = getCandidatesCpuConstPtr();
                 for (auto part = 0u ; part < numberBodyParts ; part++)
                 {
-                    const auto numberPartCandidates = candidatesCpuPtr[part*peaksArea];
+                    const auto numberPartCandidates = (int)std::round(candidatesCpuPtr[part*peaksArea]);
                     candidates[part].resize(numberPartCandidates);
                     const auto* partCandidatesPtr = &candidatesCpuPtr[part*peaksArea+3];
                     for (auto candidate = 0 ; candidate < numberPartCandidates ; candidate++)
-                        candidates[part][candidate] = {partCandidatesPtr[3*candidate] * mScaleNetToOutput,
-                                                       partCandidatesPtr[3*candidate+1] * mScaleNetToOutput,
-                                                       partCandidatesPtr[3*candidate+2]};
+                        candidates[part][candidate] = {
+                            partCandidatesPtr[3*candidate] * mScaleNetToOutput,
+                            partCandidatesPtr[3*candidate+1] * mScaleNetToOutput,
+                            partCandidatesPtr[3*candidate+2]};
                 }
             }
             // Return

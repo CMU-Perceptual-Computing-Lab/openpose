@@ -5,19 +5,138 @@ branches:
   only:
     - master
 
-# OS
-dist: trusty 
-sudo: required
+# Environment variables + OS + other parameters
+global:
+  - GH_REPO_NAME: openpose
+  - DOXYFILE: $TRAVIS_BUILD_DIR/doc/doc_autogeneration.doxygen
+  # Set this in Environment Variables on travis-ci.org
+  # - GH_REPO_REF: github.com/<user_name>/openpose.git
+matrix:
+  # Use a build matrix to test many builds in parallel
+  # envvar defaults:
+  #   WITH_CMAKE: true
+  #   WITH_PYTHON: false
+  #   WITH_CUDA: true
+  #   WITH_CUDNN: true
+  #   WITH_OPEN_CL: false
+  #   WITH_MKL: false
+  include:
+  # Ubuntu 16.04
+  # Ubuntu 16.04 - Default - CMake - CUDA
+  - os: linux
+    dist: xenial
+    env: NAME="U16-default-cmake-cuda8"
+    sudo: required
+  # Ubuntu 16.04 - Python - CMake - CUDA
+  - os: linux
+    dist: xenial
+    env: NAME="U16-python-cmake-cuda8" WITH_PYTHON=true
+    sudo: required
+    # Generate and deploy documentation
+    after_success:
+      - cd $TRAVIS_BUILD_DIR
+      - chmod +x scripts/generate_gh_pages.sh
+      - ./scripts/generate_gh_pages.sh
+  # Ubuntu 16.04 - Python - CMake - CPU
+  - os: linux
+    dist: xenial
+    env: NAME="U16-python-cmake-cpu" WITH_PYTHON=true WITH_CUDA=false
+    sudo: required
+  # Ubuntu 16.04 - Python - CMake - OpenCL
+  - os: linux
+    dist: xenial
+    env: NAME="U16-python-cmake-opencl" WITH_PYTHON=true WITH_CUDA=false WITH_OPEN_CL=true
+    sudo: required
+  # Ubuntu 16.04 - Python - CMake - CPU - Debug
+  - os: linux
+    dist: xenial
+    env: NAME="U16-python-cmake-cpu-debug" WITH_PYTHON=true WITH_CUDA=false WITH_DEBUG=true
+    sudo: required
+  # Ubuntu 16.04 - Python - CMake - CPU - Unity
+  - os: linux
+    dist: xenial
+    env: NAME="U16-python-cmake-cpu-unity" WITH_PYTHON=true WITH_UNITY=true WITH_CUDA=false
+    sudo: required
 
-# Environment variables
-env:
-  global:
-    - GH_REPO_NAME: openpose
-    - DOXYFILE: $TRAVIS_BUILD_DIR/doc/doc_autogeneration.doxygen
-    # Set this in Environment Variables on travis-ci.org
-    # - GH_REPO_REF: github.com/<user_name>/openpose.git
+  # Mac OSX
+  # Mac OSX - Python - CMake - CPU
+  - os: osx
+    osx_image: xcode9.4 # xcode10.1 does not work with Python # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
+    env: NAME="OSX-python-cmake-cpu" WITH_CUDA=false WITH_PYTHON=true
+    sudo: required
+  # Mac OSX - Python - CMake - OpenCL
+  - os: osx
+    osx_image: xcode10.1 # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
+    env: NAME="OSX-default-cmake-opencl" WITH_CUDA=false WITH_OPEN_CL=true
+    sudo: required
+  # Mac OSX - Python - CMake - CPU - Debug
+  - os: osx
+    osx_image: xcode9.4 # xcode10.1 does not work with Python # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
+    env: NAME="OSX-python-cmake-cpu-debug" WITH_CUDA=false WITH_PYTHON=true WITH_DEBUG=true
+    sudo: required
+  # Mac OSX - Python - CMake - CPU - Unity
+  - os: osx
+    osx_image: xcode9.4 # xcode10.1 does not work with Python # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
+    env: NAME="OSX-python-cmake-cpu-unity" WITH_CUDA=false WITH_PYTHON=true WITH_UNITY=true
+    sudo: required
+  # Mac OSX - Default - CMake - CPU
+  - os: osx
+    osx_image: xcode10.1 # Versions: https://docs.travis-ci.com/user/languages/objective-c#supported-xcode-versions
+    env: NAME="OSX-default-cmake-cpu" WITH_CUDA=false
+    sudo: required
 
-# Install dependencies
+  # # TO-DO: To be implemented
+  # # Windows
+  # # Windows - Default - CMake - CUDA
+  # - os: windows
+  #   env: NAME="W10-default-cmake-cuda8"
+
+  # Ubuntu (others)
+  # Ubuntu 16.04 - Default - CMake - CPU
+  - os: linux
+    dist: xenial
+    env: NAME="U16-default-cmake-cpu" WITH_CUDA=false
+    sudo: required
+  # Ubuntu 16.04 - Default - Make - CUDA
+  - os: linux
+    dist: xenial
+    env: NAME="U16-default-make-cuda8" WITH_CMAKE=false
+    sudo: required
+  # # TO-DO: To be implemented
+  # # Ubuntu 16.04 - Default - CMake - CPU MKL
+  # - os: linux
+  #   dist: xenial
+  #   env: NAME="U16-default-cmake-cpu-mkl" WITH_CUDA=false WITH_MKL=true
+  #   sudo: required
+  # # Ubuntu 16.04 - Python - CMake - OpenCL
+  # - os: linux
+  #   dist: xenial
+  #   env: NAME="U16-python-cmake-opencl" WITH_PYTHON=true WITH_CUDA=false WITH_OPEN_CL=true
+  #   sudo: required
+  # # Unnecessary/redundant ones
+  # # Ubuntu 16.04 - Default - CMake - CUDA - no cuDNN
+  # - os: linux
+  #   dist: xenial
+  #   env: NAME="U16-default-cmake-cuda8-nocudnn" WITH_CUDNN=false
+  #   sudo: required
+  # Ubuntu 14.04 - Default - CMake - CPU
+  - os: linux
+    dist: trusty
+    env: NAME="U14-default-cmake-cpu" WITH_CUDA=false
+    sudo: required
+  # Ubuntu 14.04 - Default - Make - CUDA
+  - os: linux
+    dist: trusty
+    env: NAME="U14-default-make-cuda8" WITH_CMAKE=false
+    sudo: required
+  # # Unnecessary/redundant ones
+  # # Ubuntu 14.04 - Default - CMake - CUDA
+  # - os: linux
+  #   dist: trusty
+  #   env: NAME="U14-default-cmake-cuda8"
+  #   sudo: required
+
+# Install apt dependencies
 addons:
   apt:
     packages:
@@ -27,20 +146,17 @@ addons:
       - doxygen-gui
       - graphviz
 
-# Build your code e.g. by calling make
-script:
-  - ./ubuntu/install_cmake.sh
-  - sudo apt-get -y install libatlas-base-dev
-  - sudo apt-get -y install libopencv-dev
-  - pip install --upgrade numpy
-  - mkdir build
-  - cd build
-  - cmake -DBUILD_CAFFE=ON -DDOWNLOAD_BODY_25_MODEL=OFF -DDOWNLOAD_BODY_COCO_MODEL=OFF -DDOWNLOAD_FACE_MODEL=OFF -DDOWNLOAD_HAND_MODEL=OFF -DDOWNLOAD_BODY_MPI_MODEL=OFF ..
-  - no_cores=`cat /proc/cpuinfo | grep processor | wc -l`
-  - make -j${no_cores}
+# Install Caffe and OP dependencies
+install:
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo bash scripts/travis/install_deps_ubuntu.sh ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then bash scripts/travis/install_deps_osx.sh ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then exit 99 ; fi
 
-# Generate and deploy documentation
-after_success:
-  - cd $TRAVIS_BUILD_DIR
-  - chmod +x .github/generate_gh_pages.sh
-  - ./.github/generate_gh_pages.sh
+# Running CMake
+before_script:
+  - bash scripts/travis/configure.sh
+
+# Build your code e.g., by calling make
+script:
+  - bash scripts/travis/run_make.sh
+  - bash scripts/travis/run_tests.sh

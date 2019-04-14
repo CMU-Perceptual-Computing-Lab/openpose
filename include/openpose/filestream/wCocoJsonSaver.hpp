@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WCocoJsonSaver(const std::shared_ptr<CocoJsonSaver>& cocoJsonSaver);
 
+        virtual ~WCocoJsonSaver();
+
         void initializationOnThread();
 
         void workConsumer(const TDatums& tDatums);
@@ -39,6 +41,11 @@ namespace op
     }
 
     template<typename TDatums>
+    WCocoJsonSaver<TDatums>::~WCocoJsonSaver()
+    {
+    }
+
+    template<typename TDatums>
     void WCocoJsonSaver<TDatums>::initializationOnThread()
     {
     }
@@ -58,9 +65,10 @@ namespace op
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // T* to T
-                const auto& tDatum = tDatums->at(0);
+                const auto& tDatumPtr = tDatums->at(0);
                 // Record json in COCO format
-                spCocoJsonSaver->record(tDatum.poseKeypoints, tDatum.poseScores, tDatum.name);
+                spCocoJsonSaver->record(
+                    tDatumPtr->poseKeypoints, tDatumPtr->poseScores, tDatumPtr->name, tDatumPtr->frameNumber);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);

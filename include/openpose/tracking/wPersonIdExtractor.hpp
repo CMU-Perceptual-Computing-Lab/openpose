@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WPersonIdExtractor(const std::shared_ptr<PersonIdExtractor>& personIdExtractor);
 
+        virtual ~WPersonIdExtractor();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -39,6 +41,11 @@ namespace op
     }
 
     template<typename TDatums>
+    WPersonIdExtractor<TDatums>::~WPersonIdExtractor()
+    {
+    }
+
+    template<typename TDatums>
     void WPersonIdExtractor<TDatums>::initializationOnThread()
     {
     }
@@ -55,8 +62,9 @@ namespace op
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Render people pose
-                for (auto& tDatum : *tDatums)
-                    tDatum.poseIds = spPersonIdExtractor->extractIds(tDatum.poseKeypoints, tDatum.cvInputData);
+                for (auto& tDatumPtr : *tDatums)
+                    tDatumPtr->poseIds = spPersonIdExtractor->extractIds(
+                        tDatumPtr->poseKeypoints, tDatumPtr->cvInputData);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);

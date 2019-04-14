@@ -58,7 +58,7 @@ namespace op
                 for (auto& datum : *tDatums)
                     // THIS IS THE ONLY LINE THAT THE USER MUST MODIFY ON THIS HPP FILE, by using the proper function
                     // and datum elements
-                    spUserPostProcessing->doSomething(datum.cvOutputData, datum.cvOutputData);
+                    spUserPostProcessing->doSomething(datum->cvOutputData, datum->cvOutputData);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);

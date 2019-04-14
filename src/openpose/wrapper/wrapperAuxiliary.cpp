@@ -4,15 +4,13 @@
 
 namespace op
 {
-    void wrapperConfigureSecurityChecks(WrapperStructPose& wrapperStructPose,
-                                        const WrapperStructFace& wrapperStructFace,
-                                        const WrapperStructHand& wrapperStructHand,
-                                        const WrapperStructExtra& wrapperStructExtra,
-                                        const WrapperStructInput& wrapperStructInput,
-                                        const WrapperStructOutput& wrapperStructOutput,
-                                        const bool renderOutput,
-                                        const bool userOutputWsEmpty,
-                                        const ThreadManagerMode threadManagerMode)
+    void wrapperConfigureSanityChecks(
+        WrapperStructPose& wrapperStructPose, const WrapperStructFace& wrapperStructFace,
+        const WrapperStructHand& wrapperStructHand, const WrapperStructExtra& wrapperStructExtra,
+        const WrapperStructInput& wrapperStructInput, const WrapperStructOutput& wrapperStructOutput,
+        const WrapperStructGui& wrapperStructGui, const bool renderOutput,
+        const bool userInputAndPreprocessingWsEmpty, const bool userOutputWsEmpty,
+        const std::shared_ptr<Producer>& producerSharedPtr, const ThreadManagerMode threadManagerMode)
     {
         try
         {
@@ -40,13 +38,13 @@ namespace op
                 error(message, __LINE__, __FUNCTION__, __FILE__);
             }
             if (!wrapperStructOutput.writeHeatMaps.empty()
-                && (wrapperStructPose.heatMapScale != ScaleMode::UnsignedChar &&
+                && (wrapperStructPose.heatMapScaleMode != ScaleMode::UnsignedChar &&
                         wrapperStructOutput.writeHeatMapsFormat != "float"))
             {
                 const auto message = "In order to save the heatmaps, you must either set"
-                                     " wrapperStructPose.heatMapScale to ScaleMode::UnsignedChar (i.e. range [0, 255])"
-                                     " or `--write_heatmaps_format` to `float` to storage floating numbers in binary"
-                                     " mode.";
+                                     " wrapperStructPose.heatMapScaleMode to ScaleMode::UnsignedChar (i.e., range"
+                                     " [0, 255]) or `--write_heatmaps_format` to `float` to storage floating numbers"
+                                     " in binary mode.";
                 error(message, __LINE__, __FUNCTION__, __FILE__);
             }
             if (userOutputWsEmpty && threadManagerMode != ThreadManagerMode::Asynchronous
@@ -60,12 +58,11 @@ namespace op
                     !wrapperStructOutput.writeImages.empty() || !wrapperStructOutput.writeVideo.empty()
                         || !wrapperStructOutput.writeKeypoint.empty() || !wrapperStructOutput.writeJson.empty()
                         || !wrapperStructOutput.writeCocoJson.empty() || !wrapperStructOutput.writeHeatMaps.empty()
-                        || !wrapperStructOutput.writeCocoFootJson.empty()
                 );
                 const auto savingCvOutput = (
                     !wrapperStructOutput.writeImages.empty() || !wrapperStructOutput.writeVideo.empty()
                 );
-                const bool guiEnabled = (wrapperStructOutput.displayMode != DisplayMode::NoDisplay);
+                const bool guiEnabled = (wrapperStructGui.displayMode != DisplayMode::NoDisplay);
                 if (!guiEnabled && !savingCvOutput && renderOutput)
                 {
                     const auto message = "GUI is not enabled and you are not saving the output frames. You should then"
@@ -88,9 +85,9 @@ namespace op
                     error(message, __LINE__, __FUNCTION__, __FILE__);
                 }
                 // Warnings
-                if (guiEnabled && wrapperStructOutput.guiVerbose && !renderOutput)
+                if (guiEnabled && wrapperStructGui.guiVerbose && !renderOutput)
                 {
-                    const auto message = "No render is enabled (e.g. `--render_pose 0`), so you might also want to"
+                    const auto message = "No render is enabled (e.g., `--render_pose 0`), so you might also want to"
                                          " remove the display (set `--display 0` or `--no_gui_verbose`). If you"
                                          " simply want to use OpenPose to record video/images without keypoints, you"
                                          " only need to set `--num_gpu 0`." + additionalMessage;
@@ -104,18 +101,33 @@ namespace op
                     log(message, Priority::High);
                 }
             }
-            if (!wrapperStructOutput.writeVideo.empty() && wrapperStructInput.producerSharedPtr == nullptr)
+            if (!wrapperStructOutput.writeVideo.empty() && producerSharedPtr == nullptr)
                 error("Writting video is only available if the OpenPose producer is used (i.e."
-                      " wrapperStructInput.producerSharedPtr cannot be a nullptr).",
+                      " producerSharedPtr cannot be a nullptr).",
                       __LINE__, __FUNCTION__, __FILE__);
-            if (!wrapperStructPose.enable)
-            {
-                if (!wrapperStructFace.enable)
-                    error("Body keypoint detection must be enabled.", __LINE__, __FUNCTION__, __FILE__);
-                if (wrapperStructHand.enable)
-                    error("Body keypoint detection must be enabled in order to run hand keypoint detection.",
-                          __LINE__, __FUNCTION__, __FILE__);
-            }
+            if (wrapperStructPose.poseMode == PoseMode::Disabled && !wrapperStructFace.enable
+                && !wrapperStructHand.enable)
+                error("Body, face, and hand keypoint detectors are disabled. You must enable at least one (i.e,"
+                      " unselect `--body 0`, select `--face`, or select `--hand`.",
+                      __LINE__, __FUNCTION__, __FILE__);
+            const auto ownDetectorProvided = (wrapperStructFace.detector == Detector::Provided
+                                              || wrapperStructHand.detector == Detector::Provided);
+            if (ownDetectorProvided && userInputAndPreprocessingWsEmpty
+                && threadManagerMode != ThreadManagerMode::Asynchronous
+                && threadManagerMode != ThreadManagerMode::AsynchronousIn)
+                error("You have selected to provide your own face and/or hand rectangle detections (`face_detector 2`"
+                      " and/or `hand_detector 2`), thus OpenPose will not detect face and/or hand keypoints based on"
+                      " the body keypoints. However, you are not providing any information about the location of the"
+                      " faces and/or hands. Either provide the location of the face and/or hands (e.g., see the"
+                      " `examples/tutorial_api_cpp/` examples, or change the value of `--face_detector` and/or"
+                      " `--hand_detector`.", __LINE__, __FUNCTION__, __FILE__);
+            // Warning
+            if (ownDetectorProvided && wrapperStructPose.poseMode != PoseMode::Disabled)
+                log("Warning: Body keypoint estimation is enabled while you have also selected to provide your own"
+                    " face and/or hand rectangle detections (`face_detector 2` and/or `hand_detector 2`). Therefore,"
+                    " OpenPose will not detect face and/or hand keypoints based on the body keypoints. Are you sure"
+                    " you want to keep enabled the body keypoint detector? (disable it with `--body 0`).",
+                    Priority::High);
             // If 3-D module, 1 person is the maximum
             if (wrapperStructExtra.reconstruct3d && wrapperStructPose.numberPeopleMax != 1)
             {
@@ -135,10 +147,6 @@ namespace op
                       + std::to_string(wrapperStructPose.outputSize.x) + "x"
                       + std::to_string(wrapperStructPose.outputSize.y) + ").",
                       __LINE__, __FUNCTION__, __FILE__);
-            if (wrapperStructOutput.writeVideoFps <= 0
-                && wrapperStructInput.producerSharedPtr->get(CV_CAP_PROP_FPS) > 0)
-                error("Set `--camera_fps` for this producer, as its frame rate is unknown.",
-                      __LINE__, __FUNCTION__, __FILE__);
             #ifdef USE_CPU_ONLY
                 if (wrapperStructPose.scalesNumber > 1)
                     error("Temporarily, the number of scales (`--scale_number`) cannot be greater than 1 for"
@@ -147,8 +155,8 @@ namespace op
             // Net input resolution cannot be reshaped for Caffe OpenCL and MKL versions, only for CUDA version
             #if defined USE_MKL || defined USE_OPENCL
                 // If image_dir and netInputSize == -1 --> error
-                if ((wrapperStructInput.producerSharedPtr == nullptr
-                     || wrapperStructInput.producerSharedPtr->getType() == ProducerType::ImageDirectory)
+                if ((producerSharedPtr == nullptr
+                     || producerSharedPtr->getType() == ProducerType::ImageDirectory)
                     // If netInputSize is -1
                     && (wrapperStructPose.netInputSize.x == -1 || wrapperStructPose.netInputSize.y == -1))
                 {
@@ -161,8 +169,32 @@ namespace op
                         " to 656x368.", Priority::High);
                 }
             #endif
+            #ifndef USE_CUDA
+                log("---------------------------------- WARNING ----------------------------------\n"
+                    "We have introduced an additional boost in accuracy of about 0.5% with respect to the official"
+                    " OpenPose 1.4.0 (using default settings). Currently, this increase is only applicable to CUDA"
+                    " version, but will eventually be ported to CPU and OpenCL versions. Therefore, CPU and OpenCL"
+                    " results might vary. Nevertheless, this accuracy boost is almost insignificant so CPU and"
+                    " OpenCL versions can be safely used, they will simply provide the exact same accuracy than"
+                    " OpenPose 1.4.0."
+                    "\n-------------------------------- END WARNING --------------------------------",
+                    Priority::High);
+            #endif
 
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    void threadIdPP(unsigned long long& threadId, const bool multiThreadEnabled)
+    {
+        try
+        {
+            if (multiThreadEnabled)
+                threadId++;
         }
         catch (const std::exception& e)
         {

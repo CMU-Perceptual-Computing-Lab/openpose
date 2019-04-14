@@ -39,7 +39,7 @@ namespace op
                 }
                 catch (const std::exception& e)
                 {
-                    error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                    errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
                 }
             }
 
@@ -105,6 +105,10 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
+    }
+
+    UdpSender::~UdpSender()
+    {
     }
 
     void UdpSender::sendJointAngles(const double* const adamPosePtr, const int adamPoseRows,

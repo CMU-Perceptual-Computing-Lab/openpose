@@ -27,6 +27,12 @@ namespace op
         Max = 4,
         NoOutput = 255,
     };
+
+    enum class Extensions : unsigned char
+    {
+        Images, // jpg, png, ...
+        Size
+    };
 }
 
 #endif // OPENPOSE_UTILITIES_ENUM_CLASSES_HPP

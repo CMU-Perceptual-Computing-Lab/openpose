@@ -1,4 +1,3 @@
-// #include <opencv2/opencv.hpp> // cv::imshow, cv::waitKey, cv::namedWindow, cv::setWindowProperty
 #include <opencv2/highgui/highgui.hpp> // cv::imshow, cv::waitKey, cv::namedWindow, cv::setWindowProperty
 #include <openpose/gui/frameDisplayer.hpp>
 
@@ -20,6 +19,10 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
+    }
+
+    FrameDisplayer::~FrameDisplayer()
+    {
     }
 
     void FrameDisplayer::initializationOnThread()
@@ -91,7 +94,7 @@ namespace op
     {
         try
         {
-            // Security check
+            // Sanity check
             if (frame.empty())
                 error("Empty frame introduced.", __LINE__, __FUNCTION__, __FILE__);
             // If frame > window size --> Resize window

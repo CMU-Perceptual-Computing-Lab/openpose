@@ -24,4 +24,3 @@ if (UNIX OR APPLE)
       LIBRARY DESTINATION lib
       ARCHIVE DESTINATION lib/openpose)
 endif (UNIX OR APPLE)
-

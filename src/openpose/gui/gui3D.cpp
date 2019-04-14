@@ -17,6 +17,8 @@ namespace op
 {
     #ifdef USE_3D_RENDERER
         const bool LOG_VERBOSE_3D_RENDERER = false;
+        const auto WINDOW_WIDTH = 1280;
+        const auto WINDOW_HEIGHT = 720;
         std::atomic<bool> sConstructorSet{false};
 
         struct Keypoints3D
@@ -384,7 +386,7 @@ namespace op
                 int my_argc = 0;
                 glutInit(&my_argc, my_argv);
                 // Setup the size, position, and display mode for new windows
-                glutInitWindowSize(1280, 720);
+                glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
                 glutInitWindowPosition(200, 0);
                 // glutSetOption(GLUT_MULTISAMPLE,8);
                 // Ideally adding also GLUT_BORDERLESS | GLUT_CAPTIONLESS should fix the problem of disabling the `x`
@@ -421,9 +423,10 @@ namespace op
                  const std::vector<std::shared_ptr<FaceExtractorNet>>& faceExtractorNets,
                  const std::vector<std::shared_ptr<HandExtractorNet>>& handExtractorNets,
                  const std::vector<std::shared_ptr<Renderer>>& renderers, const PoseModel poseModel,
-                 const DisplayMode displayMode) :
+                 const DisplayMode displayMode, const bool copyGlToCvMat) :
         Gui{outputSize, fullScreen, isRunningSharedPtr, videoSeekSharedPtr, poseExtractorNets, faceExtractorNets,
-            handExtractorNets, renderers, displayMode}
+            handExtractorNets, renderers, displayMode},
+        mCopyGlToCvMat{copyGlToCvMat}
     {
         try
         {
@@ -455,7 +458,7 @@ namespace op
             }
             catch (const std::exception& e)
             {
-                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
             }
         #endif
     }
@@ -498,10 +501,10 @@ namespace op
                         gKeypoints3D.rightHandKeypoints = rightHandKeypoints3D;
                         gKeypoints3D.validKeypoints = true;
                         // From m to mm
-                        scaleKeypoints(gKeypoints3D.poseKeypoints, 1e3);
-                        scaleKeypoints(gKeypoints3D.faceKeypoints, 1e3);
-                        scaleKeypoints(gKeypoints3D.leftHandKeypoints, 1e3);
-                        scaleKeypoints(gKeypoints3D.rightHandKeypoints, 1e3);
+                        scaleKeypoints(gKeypoints3D.poseKeypoints, 1e3f);
+                        scaleKeypoints(gKeypoints3D.faceKeypoints, 1e3f);
+                        scaleKeypoints(gKeypoints3D.leftHandKeypoints, 1e3f);
+                        scaleKeypoints(gKeypoints3D.rightHandKeypoints, 1e3f);
                         // Unlock mutex
                         lock.unlock();
                     }
@@ -522,7 +525,7 @@ namespace op
     void Gui3D::update()
     {
         try
-        {   
+        {
             // 2-D rendering
             // Display all 2-D views
             if (mDisplayMode == DisplayMode::DisplayAll || mDisplayMode == DisplayMode::Display2D)
@@ -550,6 +553,33 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    cv::Mat Gui3D::readCvMat()
+    {
+        try
+        {
+            // 3-D rendering
+            cv::Mat image;
+            #ifdef USE_3D_RENDERER
+                if (mDisplayMode == DisplayMode::DisplayAll || mDisplayMode == DisplayMode::Display3D)
+                {
+                    // Save/display 3D display in OpenCV window
+                    if (mCopyGlToCvMat)
+                    {
+                        image = cv::Mat(WINDOW_HEIGHT, WINDOW_WIDTH, CV_8UC3);
+                        glReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_BGR, GL_UNSIGNED_BYTE, image.data);
+                        cv::flip(image, image, 0);
+                    }
+                }
+            #endif
+            return image;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return cv::Mat();
         }
     }
 }

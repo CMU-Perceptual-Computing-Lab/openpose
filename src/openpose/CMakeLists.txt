@@ -62,7 +62,7 @@ if (UNIX OR APPLE)
   target_link_libraries(openpose caffe ${Boost_SYSTEM_LIBRARY} ${OpenCL_LIBRARIES})
 
   if (BUILD_CAFFE)
-    add_dependencies(openpose openpose_caffe)
+    add_dependencies(openpose openpose)
   endif (BUILD_CAFFE)
 
   set_property(TARGET openpose PROPERTY VERSION ${OpenPose_VERSION})

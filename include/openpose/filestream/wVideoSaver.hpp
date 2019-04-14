@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WVideoSaver(const std::shared_ptr<VideoSaver>& videoSaver);
 
+        virtual ~WVideoSaver();
+
         void initializationOnThread();
 
         void workConsumer(const TDatums& tDatums);
@@ -39,6 +41,11 @@ namespace op
     }
 
     template<typename TDatums>
+    WVideoSaver<TDatums>::~WVideoSaver()
+    {
+    }
+
+    template<typename TDatums>
     void WVideoSaver<TDatums>::initializationOnThread()
     {
     }
@@ -59,7 +66,7 @@ namespace op
                 // Record video(s)
                 std::vector<cv::Mat> cvOutputDatas(tDatumsNoPtr.size());
                 for (auto i = 0u ; i < cvOutputDatas.size() ; i++)
-                    cvOutputDatas[i] = tDatumsNoPtr[i].cvOutputData;
+                    cvOutputDatas[i] = tDatumsNoPtr[i]->cvOutputData;
                 spVideoSaver->write(cvOutputDatas);
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

@@ -1,0 +1,10 @@
+### Add Python Test
+configure_file(01_body_from_image.py 01_body_from_image.py)
+configure_file(02_whole_body_from_image.py 02_whole_body_from_image.py)
+configure_file(04_keypoints_from_images.py 04_keypoints_from_images.py)
+configure_file(05_keypoints_from_images_multi_gpu.py 05_keypoints_from_images_multi_gpu.py)
+configure_file(06_face_from_image.py 06_face_from_image.py)
+configure_file(07_hand_from_image.py 07_hand_from_image.py)
+configure_file(08_heatmaps_from_image.py 08_heatmaps_from_image.py)
+configure_file(09_keypoints_from_heatmaps.py 09_keypoints_from_heatmaps.py)
+configure_file(openpose_python.py openpose_python.py)

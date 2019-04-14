@@ -8,7 +8,7 @@ namespace op
     {
         try
         {
-            // Security checks
+            // Sanity checks
             if (cvInputData.empty())
                 error("Wrong input element (empty cvInputData).", __LINE__, __FUNCTION__, __FILE__);
             if (cvInputData.channels() != 3)
@@ -18,8 +18,8 @@ namespace op
             if (outputResolution.x <= 0 || outputResolution.y <= 0)
                 error("Output resolution has 0 area.", __LINE__, __FUNCTION__, __FILE__);
             // outputData - Reescale keeping aspect ratio and transform to float the output image
-            const cv::Mat frameWithOutputSize = resizeFixedAspectRatio(cvInputData, scaleInputToOutput,
-                                                                       outputResolution);
+            cv::Mat frameWithOutputSize;
+            resizeFixedAspectRatio(frameWithOutputSize, cvInputData, scaleInputToOutput, outputResolution);
             Array<float> outputData({outputResolution.y, outputResolution.x, 3});
             frameWithOutputSize.convertTo(outputData.getCvMat(), CV_32FC3);
             // Return result

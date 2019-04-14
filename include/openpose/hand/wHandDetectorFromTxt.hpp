@@ -13,6 +13,8 @@ namespace op
     public:
         explicit WHandDetectorFromTxt(const std::shared_ptr<HandDetectorFromTxt>& handDetectorFromTxt);
 
+        virtual ~WHandDetectorFromTxt();
+
         void initializationOnThread();
 
         void work(TDatums& tDatums);
@@ -39,6 +41,11 @@ namespace op
     }
 
     template<typename TDatums>
+    WHandDetectorFromTxt<TDatums>::~WHandDetectorFromTxt()
+    {
+    }
+
+    template<typename TDatums>
     void WHandDetectorFromTxt<TDatums>::initializationOnThread()
     {
     }
@@ -55,8 +62,8 @@ namespace op
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Detect people hand
-                for (auto& tDatum : *tDatums)
-                    tDatum.handRectangles = spHandDetectorFromTxt->detectHands();
+                for (auto& tDatumPtr : *tDatums)
+                    tDatumPtr->handRectangles = spHandDetectorFromTxt->detectHands();
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);

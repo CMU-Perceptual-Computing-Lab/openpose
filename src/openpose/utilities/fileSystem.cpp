@@ -13,6 +13,39 @@
 
 namespace op
 {
+    bool compareNat(const std::string& a, const std::string& b)
+    {
+        if (a.empty())
+            return true;
+        else if (b.empty())
+            return false;
+        else if (std::isdigit(a[0]) && !std::isdigit(b[0]))
+            return true;
+        else if (!std::isdigit(a[0]) && std::isdigit(b[0]))
+            return false;
+        else if (!std::isdigit(a[0]) && !std::isdigit(b[0]))
+        {
+            if (std::toupper(a[0]) == std::toupper(b[0]))
+                return compareNat(a.substr(1), b.substr(1));
+            return (std::toupper(a[0]) < std::toupper(b[0]));
+        }
+
+        // Both strings begin with digit --> parse both numbers
+        std::istringstream issa(a);
+        std::istringstream issb(b);
+        int ia, ib;
+        issa >> ia;
+        issb >> ib;
+        if (ia != ib)
+            return ia < ib;
+
+        // Numbers are the same --> remove numbers and recurse
+        std::string anew, bnew;
+        std::getline(issa, anew);
+        std::getline(issb, bnew);
+        return (compareNat(anew, bnew));
+    }
+
     void makeDirectory(const std::string& directoryPath)
     {
         try
@@ -321,8 +354,10 @@ namespace op
                         specificExtensionPaths.emplace_back(filePath);
                 std::swap(filePaths, specificExtensionPaths);
             }
-            // Sort alphabetically
-            std::sort(filePaths.begin(), filePaths.end());
+            // // Sort alphabetically
+            // std::sort(filePaths.begin(), filePaths.end());
+            // Natural sort
+            std::sort(filePaths.begin(), filePaths.end(), compareNat);
             // Return result
             return filePaths;
         }
@@ -338,6 +373,35 @@ namespace op
         try
         {
             return getFilesOnDirectory(directoryPath, std::vector<std::string>{extension});
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
+    std::vector<std::string> getFilesOnDirectory(const std::string& directoryPath, const Extensions extensions)
+    {
+        try
+        {
+            // Get files on directory with the desired extensions
+            if (extensions == Extensions::Images)
+            {
+                const std::vector<std::string> extensions{
+                    // Completely supported by OpenCV
+                    "bmp", "dib", "pbm", "pgm", "ppm", "sr", "ras",
+                    // Most of them supported by OpenCV
+                    "jpg", "jpeg", "png"};
+                return getFilesOnDirectory(directoryPath, extensions);
+            }
+            // Unknown kind of extensions
+            else
+            {
+                error("Unknown kind of extensions (id = " + std::to_string(int(extensions))
+                      + "). Notify us of this error.", __LINE__, __FUNCTION__, __FILE__);
+                return {};
+            }
         }
         catch (const std::exception& e)
         {

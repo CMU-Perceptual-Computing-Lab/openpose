@@ -18,14 +18,14 @@ namespace op
     {
         try
         {
-            // Free CUDA pointers - Note that if pointers are 0 (i.e. nullptr), no operation is performed.
+            // Free CUDA pointers - Note that if pointers are 0 (i.e., nullptr), no operation is performed.
             #ifdef USE_CUDA
                 cudaFree(pGpuFace);
             #endif
         }
         catch (const std::exception& e)
         {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 
@@ -52,7 +52,7 @@ namespace op
         {
             // GPU rendering
             #ifdef USE_CUDA
-                // I prefer std::round(T&) over intRound(T) for std::atomic
+                // I prefer std::round(T&) over positiveIntRound(T) for std::atomic
                 const auto elementRendered = spElementToRender->load();
                 const auto numberPeople = faceKeypoints.getSize(0);
                 const Point<int> frameSize{outputData.getSize(1), outputData.getSize(0)};

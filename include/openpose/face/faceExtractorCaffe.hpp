@@ -22,7 +22,7 @@ namespace op
         FaceExtractorCaffe(const Point<int>& netInputSize, const Point<int>& netOutputSize,
                            const std::string& modelFolder, const int gpuId,
                            const std::vector<HeatMapType>& heatMapTypes = {},
-                           const ScaleMode heatMapScale = ScaleMode::ZeroToOne,
+                           const ScaleMode heatMapScaleMode = ScaleMode::ZeroToOne,
                            const bool enableGoogleLogging = true);
 
         virtual ~FaceExtractorCaffe();
@@ -38,7 +38,7 @@ namespace op
          * @param faceRectangles location of the faces in the image. It is a length-variable std::vector, where
          * each index corresponds to a different person in the image. Internally, a op::Rectangle<float>
          * (similar to cv::Rect for floating values) with the position of that face (or 0,0,0,0 if
-         * some face is missing, e.g. if a specific person has only half of the body inside the image).
+         * some face is missing, e.g., if a specific person has only half of the body inside the image).
          * @param cvInputData Original image in cv::Mat format and BGR format.
          */
         void forwardPass(const std::vector<Rectangle<float>>& faceRectangles, const cv::Mat& cvInputData);

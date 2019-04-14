@@ -2,7 +2,6 @@
 #define OPENPOSE_POSE_POSE_EXTRACTOR_NET_HPP
 
 #include <atomic>
-#include <thread>
 #include <openpose/core/common.hpp>
 #include <openpose/core/enumClasses.hpp>
 #include <openpose/pose/poseParameters.hpp>
@@ -14,15 +13,17 @@ namespace op
     public:
         PoseExtractorNet(const PoseModel poseModel,
                          const std::vector<HeatMapType>& heatMapTypes = {},
-                         const ScaleMode heatMapScale = ScaleMode::ZeroToOne,
-                         const bool addPartCandidates = false);
+                         const ScaleMode heatMapScaleMode = ScaleMode::ZeroToOne,
+                         const bool addPartCandidates = false,
+                         const bool maximizePositives = false);
 
         virtual ~PoseExtractorNet();
 
         void initializationOnThread();
 
-        virtual void forwardPass(const std::vector<Array<float>>& inputNetData, const Point<int>& inputDataSize,
-                                 const std::vector<double>& scaleRatios = {1.f}) = 0;
+        virtual void forwardPass(
+            const std::vector<Array<float>>& inputNetData, const Point<int>& inputDataSize,
+            const std::vector<double>& scaleRatios = {1.f}, const Array<float>& poseNetOutput = Array<float>{}) = 0;
 
         virtual const float* getCandidatesCpuConstPtr() const = 0;
 

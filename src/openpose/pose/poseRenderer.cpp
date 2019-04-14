@@ -10,12 +10,20 @@ namespace op
     {
         try
         {
+            // Variables
             auto partToName = getPoseBodyPartMapping(poseModel);
             const auto& bodyPartPairs = getPosePartPairs(poseModel);
             const auto& mapIdx = getPoseMapIndex(poseModel);
             const auto numberBodyParts = getPoseNumberBodyParts(poseModel);
-            const auto numberBodyPartsPlusBkg = numberBodyParts+1;
-
+            const auto numberBodyPartsPlusBkg = numberBodyParts+(addBkgChannel(poseModel) ? 1 : 0);
+            // Sanity checks
+            if (bodyPartPairs.size() != mapIdx.size())
+                error("The variables bodyPartPairs and mapIdx should have the same size ("
+                      + std::to_string(bodyPartPairs.size()) + " vs. "
+                      + std::to_string(mapIdx.size()) + ").",
+                      __LINE__, __FUNCTION__, __FILE__);
+            if (partToName.empty())
+                error("Variable partToName is empty.", __LINE__, __FUNCTION__, __FILE__);
             // PAFs
             for (auto bodyPart = 0u; bodyPart < bodyPartPairs.size(); bodyPart+=2)
             {
@@ -34,15 +42,15 @@ namespace op
                 {
                     if (bodyPart != 1u)
                     {
-                        const auto mapIdx = numberBodyPartsPlusBkg + bodyPartPairs.size() + 2*bodyPart
-                                          - (bodyPart > 0 ? 2 : 0);
+                        const auto mapIdxD = (unsigned int)
+                            (numberBodyPartsPlusBkg + bodyPartPairs.size() + 2*bodyPart - (bodyPart > 0 ? 2 : 0));
                         const auto baseLine = partToName.at(1) + "->" + partToName.at(bodyPart);
-                        partToName[mapIdx] = baseLine + "(X)";
-                        partToName[mapIdx+1] = baseLine + "(Y)";
+                        partToName[mapIdxD] = baseLine + "(X)";
+                        partToName[mapIdxD+1] = baseLine + "(Y)";
                     }
                 }
             }
-
+            // Return result
             return partToName;
         }
         catch (const std::exception& e)
@@ -55,6 +63,10 @@ namespace op
     PoseRenderer::PoseRenderer(const PoseModel poseModel) :
         mPoseModel{poseModel},
         mPartIndexToName{createPartToName(poseModel)}
+    {
+    }
+
+    PoseRenderer::~PoseRenderer()
     {
     }
 }
