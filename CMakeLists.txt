@@ -276,11 +276,11 @@ option(WITH_OPENCV_WITH_OPENGL "Much faster GUI display, but you must also enabl
 
 # Set the acceleration library
 if (WIN32 OR APPLE)
-  set(WITH_EIGEN NONE CACHE STRING "Select the Eigen mode (NONE if not required, FIND to leave to CMake to find it e.g. if you installed it manually or BUILD to let OpenPose download it).")
-  set_property(CACHE WITH_EIGEN PROPERTY STRINGS NONE FIND BUILD)
+  set(WITH_EIGEN NONE CACHE STRING "Select the Eigen mode: NONE if not required, BUILD to let OpenPose download it, or FIND to let CMake find it (e.g., if you installed it manually).")
+  set_property(CACHE WITH_EIGEN PROPERTY STRINGS NONE BUILD FIND)
 elseif (UNIX AND NOT APPLE)
-  set(WITH_EIGEN NONE CACHE STRING "Select the Eigen mode (NONE if not required, FIND to leave to CMake to find it e.g. if you installed it manually or used `sudo apt-get install libeigen3-dev` or BUILD to let OpenPose download it).")
-  set_property(CACHE WITH_EIGEN PROPERTY STRINGS NONE FIND BUILD)
+  set(WITH_EIGEN NONE CACHE STRING "Select the Eigen mode: NONE if not required, BUILD to let OpenPose download it, or FIND to let CMake find it (e.g., if you installed it manually or used `sudo apt-get install libeigen3-dev`).")
+  set_property(CACHE WITH_EIGEN PROPERTY STRINGS NONE BUILD FIND)
 endif (WIN32 OR APPLE)
 
 # # Suboptions for OpenPose tracking
@@ -392,6 +392,10 @@ else (${WITH_EIGEN} MATCHES "NONE")
   # Leave to CMake to find it
   elseif (${WITH_EIGEN} MATCHES "FIND")
     # Eigen
+    # # Option a) apt-get
+    # find_package(PkgConfig)
+    # pkg_check_modules(EIGEN3 REQUIRED eigen3)
+    # # Option b) Find it (including apt-get)
     if (CUDA_VERSION_STRING STRGREATER "9.0")
       find_package(Eigen3 3.3.5 REQUIRED NO_MODULE)
     else (CUDA_VERSION_STRING STRGREATER "9.0")
@@ -424,7 +428,7 @@ if (UNIX OR APPLE)
   # 3D
   if (WITH_3D_RENDERER)
     # OpenGL
-	find_package(OpenGL REQUIRED)
+    find_package(OpenGL REQUIRED)
     # GLUT
     find_package(GLUT REQUIRED)
     # OpenGL
@@ -446,8 +450,11 @@ if (UNIX OR APPLE)
     if (NOT WITH_3D_RENDERER)
       message(FATAL_ERROR "WITH_3D_RENDERER is required if WITH_3D_ADAM_MODEL is enabled.")
     endif (NOT WITH_3D_RENDERER)
+    # Eigen
+    # # Option a) apt-get
     # find_package(PkgConfig)
     # pkg_check_modules(EIGEN3 REQUIRED eigen3)
+    # # Option b) Find it (including apt-get)
     if (CUDA_VERSION_STRING STRGREATER "9.0")
       find_package(Eigen3 3.3.5 REQUIRED NO_MODULE)
     else (CUDA_VERSION_STRING STRGREATER "9.0")
