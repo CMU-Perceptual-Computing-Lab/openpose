@@ -117,15 +117,17 @@ namespace op
         OP_API void setErrorModes(const std::vector<ErrorMode>& errorModes);
     }
 
-    // This class is thread-safe
+    // This class is not fully thread-safe
     namespace ConfigureLog
     {
         OP_API Priority getPriorityThreshold();
 
         OP_API const std::vector<LogMode>& getLogModes();
 
+        // This function is not thread-safe. It must be run at the beginning
         OP_API void setPriorityThreshold(const Priority priorityThreshold);
 
+        // This function is not thread-safe. It must be run at the beginning
         OP_API void setLogModes(const std::vector<LogMode>& loggingModes);
     }
 }

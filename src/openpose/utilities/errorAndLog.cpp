@@ -348,10 +348,10 @@ namespace op
     namespace ConfigureLog
     {
         // ConfigureLog - Private variables
-        std::atomic<Priority> sPriorityThreshold        {Priority::High};
-        // std::atomic<Priority> sPriorityThreshold        {Priority::None};
-        std::vector<LogMode> sLoggingModes              {LogMode::StdCout};
-        std::mutex sConfigureLogMutex                   {};
+        std::atomic<Priority> sPriorityThreshold    {Priority::High};
+        // std::atomic<Priority> sPriorityThreshold   {Priority::None};
+        std::vector<LogMode> sLoggingModes          {LogMode::StdCout};
+        // std::mutex sConfigureLogMutex              {}; // In addition, getLogModes() should return copy (no ref)
 
         Priority getPriorityThreshold()
         {
@@ -360,7 +360,7 @@ namespace op
 
         const std::vector<LogMode>& getLogModes()
         {
-            const std::lock_guard<std::mutex> lock{sConfigureLogMutex};
+            // const std::lock_guard<std::mutex> lock{sConfigureLogMutex};
             return sLoggingModes;
         }
 
@@ -371,7 +371,7 @@ namespace op
 
         void setLogModes(const std::vector<LogMode>& loggingModes)
         {
-            const std::lock_guard<std::mutex> lock{sConfigureLogMutex};
+            // const std::lock_guard<std::mutex> lock{sConfigureLogMutex};
             sLoggingModes = loggingModes;
         }
     }

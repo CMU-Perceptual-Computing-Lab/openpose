@@ -321,7 +321,7 @@ After installation, check the [doc/modules/3d_reconstruction_module.md](./module
 
 
 #### Calibration Module
-The calibration module is included by default, but you must also enable `WITH_EIGEN` if you intend to use the extrinsic camera parameter estimation tool. You can set that flag to 2 different values: `APT_GET` or `BUILD`, check [Requirements and Dependencies](#requirements-and-dependencies) for more information.
+The calibration module is included by default, but you must also enable `WITH_EIGEN` if you intend to use the extrinsic camera parameter estimation tool. You can set that flag to 2 different values: `BUILD` or `FIND`, check [Requirements and Dependencies](#requirements-and-dependencies) for more information.
 
 After installation, check the [doc/modules/calibration_module.md](./modules/calibration_module.md) instructions.
 
