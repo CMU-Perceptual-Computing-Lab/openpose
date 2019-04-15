@@ -375,23 +375,31 @@ template <> struct type_caster<op::Array<float>> {
         // Cast numpy to op::Array<float>
         bool load(handle src, bool imp)
         {
-            // array b(src, true);
-            array b = reinterpret_borrow<array>(src);
-            buffer_info info = b.request();
+            try
+            {
+                // array b(src, true);
+                array b = reinterpret_borrow<array>(src);
+                buffer_info info = b.request();
 
-            if (info.format != format_descriptor<float>::format())
-                throw std::runtime_error("op::Array only supports float32 now");
+                if (info.format != format_descriptor<float>::format())
+                    op::error("op::Array only supports float32 now", __LINE__, __FUNCTION__, __FILE__);
 
-            //std::vector<int> a(info.shape);
-            std::vector<int> shape(std::begin(info.shape), std::end(info.shape));
+                //std::vector<int> a(info.shape);
+                std::vector<int> shape(std::begin(info.shape), std::end(info.shape));
 
-            // No copy
-            value = op::Array<float>(shape, (float*)info.ptr);
-            // Copy
-            //value = op::Array<float>(shape);
-            //memcpy(value.getPtr(), info.ptr, value.getVolume()*sizeof(float));
+                // No copy
+                value = op::Array<float>(shape, (float*)info.ptr);
+                // Copy
+                //value = op::Array<float>(shape);
+                //memcpy(value.getPtr(), info.ptr, value.getVolume()*sizeof(float));
 
-            return true;
+                return true;
+            }
+            catch (const std::exception& e)
+            {
+                op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                return {};
+            }
         }
 
         // Cast op::Array<float> to numpy
