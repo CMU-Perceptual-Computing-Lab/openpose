@@ -55,52 +55,56 @@ for i in range(0, len(args[1])):
 # op.init_argv(args[1])
 # oppython = op.OpenposePython()
 
-# Starting OpenPose
-opWrapper = op.WrapperPython()
-opWrapper.configure(params)
-opWrapper.start()
+try:
+    # Starting OpenPose
+    opWrapper = op.WrapperPython()
+    opWrapper.configure(params)
+    opWrapper.start()
 
-# Read frames on directory
-imagePaths = op.get_images_on_directory(args[0].image_dir);
+    # Read frames on directory
+    imagePaths = op.get_images_on_directory(args[0].image_dir);
 
-# Read number of GPUs in your system
-start = time.time()
+    # Read number of GPUs in your system
+    start = time.time()
 
-# Process and display images
-for imageBaseId in range(0, len(imagePaths), numberGPUs):
+    # Process and display images
+    for imageBaseId in range(0, len(imagePaths), numberGPUs):
 
-    # Create datums
-    datums = []
-    images = []
+        # Create datums
+        datums = []
+        images = []
 
-    # Read and push images into OpenPose wrapper
-    for gpuId in range(0, numberGPUs):
+        # Read and push images into OpenPose wrapper
+        for gpuId in range(0, numberGPUs):
 
-        imageId = imageBaseId+gpuId
-        if imageId < len(imagePaths):
+            imageId = imageBaseId+gpuId
+            if imageId < len(imagePaths):
 
-            imagePath = imagePaths[imageBaseId+gpuId]
-            datum = op.Datum()
-            images.append(cv2.imread(imagePath))
-            datum.cvInputData = images[-1]
-            datums.append(datum)
-            opWrapper.waitAndEmplace([datums[-1]])
+                imagePath = imagePaths[imageBaseId+gpuId]
+                datum = op.Datum()
+                images.append(cv2.imread(imagePath))
+                datum.cvInputData = images[-1]
+                datums.append(datum)
+                opWrapper.waitAndEmplace([datums[-1]])
 
-    # Retrieve processed results from OpenPose wrapper
-    for gpuId in range(0, numberGPUs):
+        # Retrieve processed results from OpenPose wrapper
+        for gpuId in range(0, numberGPUs):
 
-        imageId = imageBaseId+gpuId
-        if imageId < len(imagePaths):
+            imageId = imageBaseId+gpuId
+            if imageId < len(imagePaths):
 
-            datum = datums[gpuId]
-            opWrapper.waitAndPop([datum])
+                datum = datums[gpuId]
+                opWrapper.waitAndPop([datum])
 
-            print("Body keypoints: \n" + str(datum.poseKeypoints))
+                print("Body keypoints: \n" + str(datum.poseKeypoints))
 
-            if not args[0].no_display:
-                cv2.imshow("OpenPose 1.4.0 - Tutorial Python API", datum.cvOutputData)
-                key = cv2.waitKey(15)
-                if key == 27: break
+                if not args[0].no_display:
+                    cv2.imshow("OpenPose 1.4.0 - Tutorial Python API", datum.cvOutputData)
+                    key = cv2.waitKey(15)
+                    if key == 27: break
 
-end = time.time()
-print("OpenPose demo successfully finished. Total time: " + str(end - start) + " seconds")
+    end = time.time()
+    print("OpenPose demo successfully finished. Total time: " + str(end - start) + " seconds")
+except Exception as e:
+    # print(e)
+    sys.exit(-1)
