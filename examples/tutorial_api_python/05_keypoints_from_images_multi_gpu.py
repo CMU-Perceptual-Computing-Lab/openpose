@@ -30,7 +30,7 @@ except ImportError as e:
 parser = argparse.ArgumentParser()
 parser.add_argument("--image_dir", default="../../../examples/media/", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
 parser.add_argument("--no_display", default=False, help="Enable to disable the visual display.")
-parser.add_argument("--num_gpu", default=op.get_gpu_number(), help="Num of GPU.")
+parser.add_argument("--num_gpu", default=op.get_gpu_number(), help="Number of GPUs.")
 args = parser.parse_known_args()
 
 # Custom Params (refer to include/openpose/flags.hpp for more parameters)
