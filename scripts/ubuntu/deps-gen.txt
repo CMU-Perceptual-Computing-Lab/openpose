@@ -1,0 +1,7 @@
+libatlas-base-dev 
+libprotobuf-dev 
+libleveldb-dev 
+libsnappy-dev 
+libhdf5-serial-dev 
+protobuf-compiler
+libboost-all-dev

@@ -1,0 +1,3 @@
+opencl-headers 
+ocl-icd-opencl-dev
+libviennacl-dev

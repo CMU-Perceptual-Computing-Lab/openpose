@@ -2,24 +2,22 @@
 
 ### INSTALL PREREQUISITES
 
-# Basic
-sudo apt-get --assume-yes update
-sudo apt-get --assume-yes install build-essential
+sudo apt-get -y update
+
+# Core
+cat deps-core.txt | xargs sudo apt-get -y --no-install-recommends install
 # General dependencies
-sudo apt-get --assume-yes install libatlas-base-dev libprotobuf-dev libleveldb-dev libsnappy-dev libhdf5-serial-dev protobuf-compiler
-sudo apt-get --assume-yes install --no-install-recommends libboost-all-dev
+cat deps-gen.txt | xargs sudo apt-get -y --no-install-recommends install
 # Remaining dependencies, 14.04
-sudo apt-get --assume-yes install libgflags-dev libgoogle-glog-dev liblmdb-dev
+cat deps-rem.txt | xargs sudo apt-get -y --no-install-recommends install
 # Python2 libs
-sudo apt-get --assume-yes install python-setuptools python-dev build-essential
+cat deps-python2.txt | xargs sudo apt-get -y --no-install-recommends install
 sudo easy_install pip
-sudo -H pip install --upgrade numpy protobuf opencv-python
+sudo -H pip install --upgrade -r python-requirements.txt
 # Python3 libs
-sudo apt-get --assume-yes install python3-setuptools python3-dev build-essential
-sudo apt-get --assume-yes install python3-pip
-sudo -H pip3 install --upgrade numpy protobuf opencv-python
+cat deps-python3.txt | xargs sudo apt-get -y --no-install-recommends install
+sudo -H pip3 install --upgrade -r python-requirements.txt
 # OpenCV 2.4 -> Added as option
-# # sudo apt-get --assume-yes install libopencv-dev
+# # sudo apt-get -y install libopencv-dev
 # OpenCL Generic
-sudo apt-get --assume-yes install opencl-headers ocl-icd-opencl-dev
-sudo apt-get --assume-yes install libviennacl-dev
+cat deps-opencl.txt | xargs sudo apt-get -y --no-install-recommends install

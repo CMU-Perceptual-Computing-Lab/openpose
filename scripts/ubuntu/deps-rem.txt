@@ -1,0 +1,3 @@
+libgflags-dev 
+libgoogle-glog-dev 
+liblmdb-dev
