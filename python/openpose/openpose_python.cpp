@@ -173,7 +173,8 @@ public:
         }
     }
 
-    void start(){
+    void start()
+    {
         try
         {
             opWrapper->start();
@@ -184,7 +185,8 @@ public:
         }
     }
 
-    void stop(){
+    void stop()
+    {
         try
         {
             opWrapper->stop();
@@ -195,7 +197,8 @@ public:
         }
     }
 
-    void exec(){
+    void exec()
+    {
         try
         {
             const auto cameraSize = flagsToPoint(FLAGS_camera_resolution, "-1x-1");
