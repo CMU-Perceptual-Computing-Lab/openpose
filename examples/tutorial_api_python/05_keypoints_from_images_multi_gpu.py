@@ -30,11 +30,14 @@ except ImportError as e:
 parser = argparse.ArgumentParser()
 parser.add_argument("--image_dir", default="../../../examples/media/", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
 parser.add_argument("--no_display", default=False, help="Enable to disable the visual display.")
+parser.add_argument("--num_gpu", default=op.get_gpu_number(), help="Num of GPU.")
 args = parser.parse_known_args()
 
 # Custom Params (refer to include/openpose/flags.hpp for more parameters)
 params = dict()
 params["model_folder"] = "../../../models/"
+params["num_gpu"] = int(vars(args[0])["num_gpu"])
+numberGPUs = int(params["num_gpu"])
 
 # Add others in path?
 for i in range(0, len(args[1])):
@@ -61,7 +64,6 @@ opWrapper.start()
 imagePaths = op.get_images_on_directory(args[0].image_dir);
 
 # Read number of GPUs in your system
-numberGPUs = op.get_gpu_number()
 start = time.time()
 
 # Process and display images
@@ -69,6 +71,7 @@ for imageBaseId in range(0, len(imagePaths), numberGPUs):
 
     # Create datums
     datums = []
+    images = []
 
     # Read and push images into OpenPose wrapper
     for gpuId in range(0, numberGPUs):
@@ -78,8 +81,8 @@ for imageBaseId in range(0, len(imagePaths), numberGPUs):
 
             imagePath = imagePaths[imageBaseId+gpuId]
             datum = op.Datum()
-            imageToProcess = cv2.imread(imagePath)
-            datum.cvInputData = imageToProcess
+            images.append(cv2.imread(imagePath))
+            datum.cvInputData = images[-1]
             datums.append(datum)
             opWrapper.waitAndEmplace([datums[-1]])
 

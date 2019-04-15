@@ -66,6 +66,7 @@ poseHeatMaps = get_sample_heatmaps()
 params = dict()
 params["model_folder"] = "../../../models/"
 params["body"] = 2  # Disable OP Network
+params["upsampling_ratio"] = 0
 opWrapper = op.WrapperPython()
 opWrapper.configure(params)
 opWrapper.start()
