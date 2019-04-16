@@ -10,5 +10,4 @@ brew install hdf5 opencv
 brew install protobuf boost
 brew install cmake
 brew install viennacl
-sudo pip install numpy
-sudo pip install opencv-python
+sudo pip install -r scripts/osx/python-requirements.txt
