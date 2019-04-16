@@ -1,0 +1,9 @@
+openblas
+snappy 
+leveldb 
+gflags 
+glog 
+szip 
+lmdb
+hdf5 
+opencv
