@@ -249,14 +249,9 @@ namespace op
         try
         {
             // Body: to auto-pick CPU/GPU depending on CPU_ONLY/CUDA
+            // Auto auto-picks CPU/CUDA depending on the compiled version (CPU_ONLY/CUDA)
             if (renderFlag == -1 && renderPoseFlag == -2)
-            {
-                #ifdef USE_CUDA
-                    return (gpuBuggy ? RenderMode::Cpu : RenderMode::Gpu);
-                #else
-                    return RenderMode::Cpu;
-                #endif
-            }
+                return (gpuBuggy ? RenderMode::Cpu : RenderMode::Auto);
             // Face and hand: to pick same than body
             else if (renderFlag == -1 && renderPoseFlag != -2)
                 return flagsToRenderMode(renderPoseFlag, gpuBuggy, -2);

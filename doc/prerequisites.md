@@ -57,7 +57,7 @@ In addition, CMake automatically downloads all the OpenPose models. However, **s
     - If you enable the `WITH_EIGEN` flag when running CMake. You can either:
         1. Do not do anything if you set the `WITH_EIGEN` flag to `BUILD`, CMake will automatically download Eigen. Alternatively, you might prefer to download it manually:
             - [Eigen3](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/eigen_2018_05_23.zip): Unzip as `3rdparty/eigen/`.
-        2. Run `sudo apt-get install libeigen3-dev` if you prefer to set `WITH_EIGEN` to `APT_GET`.
+        2. Run `sudo apt-get install libeigen3-dev` if you prefer to set `WITH_EIGEN` to `FIND`.
         3. Use your own version of Eigen by setting `WITH_EIGEN` to `BUILD`, run CMake so that OpenPose downloads the zip file, and then replace the contents of `3rdparty/eigen/` by your own version.
 
 
