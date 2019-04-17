@@ -30,4 +30,4 @@ make -j`nproc`
 ```
 
 ### BODY_135
---moel_pose BODY_135
+--model_pose BODY_135
