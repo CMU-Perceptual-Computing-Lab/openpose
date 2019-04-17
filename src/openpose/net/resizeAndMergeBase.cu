@@ -8,16 +8,22 @@ namespace op
 
     template <typename T>
     __global__ void resizeKernel(T* targetPtr, const T* const sourcePtr, const int sourceWidth, const int sourceHeight,
-                                 const int targetWidth, const int targetHeight)
+                                 const int targetWidth, const int targetHeight, const int channels)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+        const auto channel = (blockIdx.z * blockDim.z) + threadIdx.z;
 
-        if (x < targetWidth && y < targetHeight)
+        const auto sourceArea = sourceWidth * sourceHeight;
+        const auto targetArea = targetWidth * targetHeight;
+
+        if (x < targetWidth && y < targetHeight && channel < channels)
         {
             const T xSource = (x + T(0.5f)) * sourceWidth / T(targetWidth) - T(0.5f);
             const T ySource = (y + T(0.5f)) * sourceHeight / T(targetHeight) - T(0.5f);
-            targetPtr[y*targetWidth+x] = bicubicInterpolate(sourcePtr, xSource, ySource, sourceWidth, sourceHeight,
+            const T* sourcePtrChannel = sourcePtr + channel * sourceArea;
+            targetPtr[channel * targetArea + y*targetWidth+x] = bicubicInterpolate(sourcePtrChannel, 
+                                                            xSource, ySource, sourceWidth, sourceHeight,
                                                             sourceWidth);
         }
     }
@@ -77,7 +83,7 @@ namespace op
             const auto channels = targetSize[1];
             const auto targetHeight = targetSize[2];
             const auto targetWidth = targetSize[3];
-            const dim3 threadsPerBlock{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D};
+            const dim3 threadsPerBlock{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D};
             const dim3 numBlocks{getNumberCudaBlocks(targetWidth, threadsPerBlock.x),
                                  getNumberCudaBlocks(targetHeight, threadsPerBlock.y)};
             const auto& sourceSize = sourceSizes[0];
@@ -88,22 +94,26 @@ namespace op
             if (sourceSizes.size() == 1)
             {
                 const auto num = sourceSize[0];
+                const dim3 threadsPerBlock{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D};
+                const dim3 numBlocks{getNumberCudaBlocks(targetWidth, threadsPerBlock.x),
+                                     getNumberCudaBlocks(targetHeight, threadsPerBlock.y),
+                                     getNumberCudaBlocks(num * channels, threadsPerBlock.z)};
                 if (targetSize[0] > 1 || num == 1)
                 {
-                    const auto sourceChannelOffset = sourceHeight * sourceWidth;
-                    const auto targetChannelOffset = targetWidth * targetHeight;
-                    for (auto n = 0; n < num; n++)
-                    {
-                        const auto offsetBase = n*channels;
-                        for (auto c = 0 ; c < channels ; c++)
-                        {
-                            const auto offset = offsetBase + c;
-                            resizeKernel<<<numBlocks, threadsPerBlock>>>(targetPtr + offset * targetChannelOffset,
-                                                                         sourcePtrs.at(0) + offset * sourceChannelOffset,
-                                                                         sourceWidth, sourceHeight, targetWidth,
-                                                                         targetHeight);
-                        }
-                    }
+                    // const auto sourceChannelOffset = sourceHeight * sourceWidth;
+                    // const auto targetChannelOffset = targetWidth * targetHeight;
+                    // for (auto n = 0; n < num; n++)
+                    // {
+                    //     const auto offsetBase = n*channels;
+                    //     for (auto c = 0 ; c < channels ; c++)
+                    //     {
+                    //         const auto offset = offsetBase + c;
+                    resizeKernel<<<numBlocks, threadsPerBlock>>>(targetPtr, //+ offset * targetChannelOffset,
+                                                                 sourcePtrs.at(0), //+ offset * sourceChannelOffset,
+                                                                 sourceWidth, sourceHeight, targetWidth,
+                                                                 targetHeight, num * channels);
+                    //     }
+                    // }
                 }
                 // Old inefficient multi-scale merging
                 else
