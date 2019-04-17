@@ -45,6 +45,32 @@ namespace op
         }
     }
 
+
+        template <typename T>
+    __global__ void resizeAllKernelShared(
+        T* targetPtr, const T* const sourcePtr, const int sourceWidth, const int sourceHeight, const int targetWidth,
+        const int targetHeight, const int channels)
+    {
+        const auto threadID = (blockIdx.x * blockDim.x) + threadIdx.x;
+        const auto channel = (blockIdx.y * blockDim.y) + threadIdx.y;
+
+        const auto sourceArea = sourceWidth * sourceHeight;
+        const auto targetArea = (unsigned int)(targetWidth * targetHeight);
+        const auto numPixelsPerThread = (unsigned int)ceilf((float)targetArea / (float)blockDim.x);
+
+        for (auto absolutePixel = threadID * numPixelsPerThread; absolutePixel < fastMinCuda((threadID + 1) * numPixelsPerThread, targetArea); ++absolutePixel)
+        // for (const auto i = numPixelsPerThread; i < (threadID + 1) * numPixelsPerThread; ++i)
+        {
+            const auto x = absolutePixel % targetWidth;
+            const auto y = absolutePixel / targetWidth;
+            const T xSource = (x + T(0.5f)) * sourceWidth / T(targetWidth) - T(0.5f);
+            const T ySource = (y + T(0.5f)) * sourceHeight / T(targetHeight) - T(0.5f);
+            const T* sourcePtrChannel = sourcePtr + channel * sourceArea;
+            targetPtr[channel * targetArea + y*targetWidth+x] = bicubicInterpolate(
+                sourcePtrChannel, xSource, ySource, sourceWidth, sourceHeight, sourceWidth);
+        }
+    }
+
     template <typename T>
     __global__ void resizeKernelAndAdd(T* targetPtr, const T* const sourcePtr, const T scaleWidth,
                                        const T scaleHeight, const int sourceWidth, const int sourceHeight,
@@ -113,13 +139,14 @@ namespace op
                 const auto num = sourceSize[0];
                 if (targetSize[0] > 1 || num == 1)
                 {
-const auto REPS = 50;
+const auto REPS = 1;
 // const auto REPS = 1;
 double timeNormalize0 = 0.;
 double timeNormalize1 = 0.;
 double timeNormalize2 = 0.;
 double timeNormalize3 = 0.;
 double timeNormalize4 = 0.;
+double timeNormalize5 = 0.;
 OP_CUDA_PROFILE_INIT(5);
                     // Option a)
                     const auto sourceChannelOffset = sourceHeight * sourceWidth;
@@ -186,7 +213,7 @@ OP_CUDA_PROFILE_INIT(REPS);
 OP_CUDA_PROFILE_END(timeNormalize3, 1e3, REPS);
 OP_CUDA_PROFILE_INIT(REPS);
                     // Option b)
-                    const dim3 threadsPerBlock{2*THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D, 1};
+                    const dim3 threadsPerBlock{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D, 1};
                     const dim3 numBlocks{getNumberCudaBlocks(targetWidth, threadsPerBlock.x),
                                          getNumberCudaBlocks(targetHeight, threadsPerBlock.y),
                                          getNumberCudaBlocks(num * channels, threadsPerBlock.z)};
@@ -194,10 +221,21 @@ OP_CUDA_PROFILE_INIT(REPS);
                         targetPtr, sourcePtrs.at(0), sourceWidth, sourceHeight, targetWidth, targetHeight,
                         num * channels);
 OP_CUDA_PROFILE_END(timeNormalize4, 1e3, REPS);
+OP_CUDA_PROFILE_INIT(REPS);
+                    // Option b)
+                    const dim3 threadsPerBlock{512, 1};
+                    const dim3 numBlocks{getNumberCudaBlocks(1, threadsPerBlock.x),
+                                         //getNumberCudaBlocks(1, threadsPerBlock.y),
+                                         getNumberCudaBlocks(num * channels, threadsPerBlock.y)};
+                    resizeAllKernelShared<<<numBlocks, threadsPerBlock>>>(
+                        targetPtr, sourcePtrs.at(0), sourceWidth, sourceHeight, targetWidth, targetHeight,
+                        num * channels);
+OP_CUDA_PROFILE_END(timeNormalize5, 1e3, REPS);
 log("  Res1(ori)=" + std::to_string(timeNormalize1) + "ms");
 log("  Res2(ori)=" + std::to_string(timeNormalize2) + "ms");
 log("  Res3(new)=" + std::to_string(timeNormalize3) + "ms");
-log("  Res3(new)=" + std::to_string(timeNormalize4) + "ms");
+log("  Res4(new)=" + std::to_string(timeNormalize4) + "ms");
+log("  Res5(new)=" + std::to_string(timeNormalize5) + "ms");
                 }
                 // Old inefficient multi-scale merging
                 else
