@@ -87,7 +87,7 @@ namespace op
         WrapperStructHand(
             const bool enable = false, const Detector detector = Detector::Body,
             const Point<int>& netInputSize = Point<int>{368, 368}, const int scalesNumber = 1,
-            const float scaleRange = 0.4f, const RenderMode renderMode = RenderMode::Gpu,
+            const float scaleRange = 0.4f, const RenderMode renderMode = RenderMode::Auto,
             const float alphaKeypoint = HAND_DEFAULT_ALPHA_KEYPOINT,
             const float alphaHeatMap = HAND_DEFAULT_ALPHA_HEAT_MAP, const float renderThreshold = 0.2f);
     };

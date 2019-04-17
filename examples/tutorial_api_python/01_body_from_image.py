@@ -50,18 +50,22 @@ for i in range(0, len(args[1])):
 # op.init_argv(args[1])
 # oppython = op.OpenposePython()
 
-# Starting OpenPose
-opWrapper = op.WrapperPython()
-opWrapper.configure(params)
-opWrapper.start()
+try:
+    # Starting OpenPose
+    opWrapper = op.WrapperPython()
+    opWrapper.configure(params)
+    opWrapper.start()
 
-# Process Image
-datum = op.Datum()
-imageToProcess = cv2.imread(args[0].image_path)
-datum.cvInputData = imageToProcess
-opWrapper.emplaceAndPop([datum])
+    # Process Image
+    datum = op.Datum()
+    imageToProcess = cv2.imread(args[0].image_path)
+    datum.cvInputData = imageToProcess
+    opWrapper.emplaceAndPop([datum])
 
-# Display Image
-print("Body keypoints: \n" + str(datum.poseKeypoints))
-cv2.imshow("OpenPose 1.4.0 - Tutorial Python API", datum.cvOutputData)
-cv2.waitKey(0)
+    # Display Image
+    print("Body keypoints: \n" + str(datum.poseKeypoints))
+    cv2.imshow("OpenPose 1.4.0 - Tutorial Python API", datum.cvOutputData)
+    cv2.waitKey(0)
+except Exception as e:
+    # print(e)
+    sys.exit(-1)

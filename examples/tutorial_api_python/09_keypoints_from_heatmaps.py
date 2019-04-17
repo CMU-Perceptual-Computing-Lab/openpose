@@ -35,6 +35,7 @@ args = parser.parse_known_args()
 imageToProcess = cv2.imread(args[0].image_path)
 
 def get_sample_heatmaps():
+    # These parameters are globally set. You need to unset variables set here if you have a new OpenPose object. See *
     params = dict()
     params["model_folder"] = "../../../models/"
     params["heatmaps_add_parts"] = True
@@ -59,24 +60,29 @@ def get_sample_heatmaps():
 
     return poseHeatMaps
 
-# Get Heatmap
-poseHeatMaps = get_sample_heatmaps()
+try:
+    # Get Heatmap
+    poseHeatMaps = get_sample_heatmaps()
 
-# Starting OpenPose
-params = dict()
-params["model_folder"] = "../../../models/"
-params["body"] = 2  # Disable OP Network
-opWrapper = op.WrapperPython()
-opWrapper.configure(params)
-opWrapper.start()
+    # Starting OpenPose
+    params = dict()
+    params["model_folder"] = "../../../models/"
+    params["body"] = 2  # Disable OP Network
+    params["upsampling_ratio"] = 0 # * Unset this variable
+    opWrapper = op.WrapperPython()
+    opWrapper.configure(params)
+    opWrapper.start()
 
-# Pass Heatmap and Run OP
-datum = op.Datum()
-datum.cvInputData = imageToProcess
-datum.poseNetOutput = poseHeatMaps
-opWrapper.emplaceAndPop([datum])
+    # Pass Heatmap and Run OP
+    datum = op.Datum()
+    datum.cvInputData = imageToProcess
+    datum.poseNetOutput = poseHeatMaps
+    opWrapper.emplaceAndPop([datum])
 
-# Display Image
-print("Body keypoints: \n" + str(datum.poseKeypoints))
-cv2.imshow("OpenPose 1.4.0 - Tutorial Python API", datum.cvOutputData)
-cv2.waitKey(0)
+    # Display Image
+    print("Body keypoints: \n" + str(datum.poseKeypoints))
+    cv2.imshow("OpenPose 1.4.0 - Tutorial Python API", datum.cvOutputData)
+    cv2.waitKey(0)
+except Exception as e:
+    # print(e)
+    sys.exit(-1)

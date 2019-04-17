@@ -111,8 +111,13 @@ namespace op
             {
                 log("JPG images temporarily generated in " + upImpl->mTempImageFolder + ".", op::Priority::High);
                 // FFmpeg command: Save video from images (override if video with same name exists)
-                const std::string imageToVideoCommand = "ffmpeg -y -i " + upImpl->mTempImageFolder + "/%12d_rendered.jpg"
-                    + " -c:v libx264 -framerate " + std::to_string(upImpl->mFps) + " -pix_fmt yuv420p "
+                // Framerate works with both `-r` and `-framerate` for an image folder. Source:
+                //     https://stackoverflow.com/questions/51143100/framerate-vs-r-vs-filter-fps
+                // Very important: Either FPS flag must go before `-i`!!! Otherwise, it would either not work (`-r`)
+                // or do a weird resample (`-framerate`)
+                const std::string imageToVideoCommand = "ffmpeg -y -framerate " + std::to_string(upImpl->mFps)
+                    + " -i " + upImpl->mTempImageFolder + "/%12d_rendered.jpg"
+                    + " -c:v libx264 -pix_fmt yuv420p "
                     + upImpl->mVideoSaverPath;
                 log("Creating MP4 video out of JPG images by running:\n" + imageToVideoCommand + "\n",
                     op::Priority::High);
