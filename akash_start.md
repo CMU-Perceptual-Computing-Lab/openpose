@@ -29,8 +29,11 @@ make -j`nproc`
 ./build/examples/openpose/openpose.bin --num_gpu 1 --frame_last 5 --display 0 --profile_speed 100 --video examples/media/video.avi
 ```
 
-### BODY_135
---model_pose BODY_135
+
+
+
+### Testing resize (BODY_135)
+clear && clear && cd build/ && make -j`nproc` && cd .. && ./build/examples/openpose/openpose.bin --video soccer.mp4 --profile_speed 100 --num_gpu_start 1 --model_pose BODY_135 --net_resolution -1x480
 
 
 
@@ -43,4 +46,5 @@ make -j`nproc`
 		- Reduce #kernels launch: +10%
 		- Shared memory:
 		- Only write once to memory at the end:
+		- Multi-scale? (e.g. write once + single kernel)
 - 2. AVX: Enable/disable AVX flag.

@@ -176,7 +176,7 @@ OP_CUDA_PROFILE_INIT(REPS);
 OP_CUDA_PROFILE_END(timeNormalize2, 1e3, REPS);
 OP_CUDA_PROFILE_INIT(REPS);
                     // Option b)
-                    const dim3 threadsPerBlock{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D, 1};
+                    const dim3 threadsPerBlock{512, 1, 1};
                     const dim3 numBlocks{getNumberCudaBlocks(targetWidth, threadsPerBlock.x),
                                          getNumberCudaBlocks(targetHeight, threadsPerBlock.y),
                                          getNumberCudaBlocks(num * channels, threadsPerBlock.z)};
@@ -186,7 +186,7 @@ OP_CUDA_PROFILE_INIT(REPS);
 OP_CUDA_PROFILE_END(timeNormalize3, 1e3, REPS);
 OP_CUDA_PROFILE_INIT(REPS);
                     // Option b)
-                    const dim3 threadsPerBlock{32, 8, 1};
+                    const dim3 threadsPerBlock{2*THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D, 1};
                     const dim3 numBlocks{getNumberCudaBlocks(targetWidth, threadsPerBlock.x),
                                          getNumberCudaBlocks(targetHeight, threadsPerBlock.y),
                                          getNumberCudaBlocks(num * channels, threadsPerBlock.z)};
