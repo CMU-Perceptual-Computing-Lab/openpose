@@ -51,18 +51,15 @@ namespace op
         T* targetPtr, const T* const sourcePtr, const int sourceWidth, const int sourceHeight, const int targetWidth,
         const int targetHeight, const int channels)
     {
-        const auto threadID = (blockIdx.x * blockDim.x) + threadIdx.x;
-        const auto channel = (blockIdx.y * blockDim.y) + threadIdx.y;
-
+        const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
+        const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+        const auto channel = (blockIdx.z * blockDim.z) + threadIdx.z;
+        //__shared__ float         
         const auto sourceArea = sourceWidth * sourceHeight;
-        const auto targetArea = (unsigned int)(targetWidth * targetHeight);
-        const auto numPixelsPerThread = (unsigned int)ceilf((float)targetArea / (float)blockDim.x);
+        const auto targetArea = targetWidth * targetHeight;
 
-        for (auto absolutePixel = threadID * numPixelsPerThread; absolutePixel < fastMinCuda((threadID + 1) * numPixelsPerThread, targetArea); ++absolutePixel)
-        // for (const auto i = numPixelsPerThread; i < (threadID + 1) * numPixelsPerThread; ++i)
+        if (x < targetWidth && y < targetHeight && channel < channels) 
         {
-            const auto x = absolutePixel % targetWidth;
-            const auto y = absolutePixel / targetWidth;
             const T xSource = (x + T(0.5f)) * sourceWidth / T(targetWidth) - T(0.5f);
             const T ySource = (y + T(0.5f)) * sourceHeight / T(targetHeight) - T(0.5f);
             const T* sourcePtrChannel = sourcePtr + channel * sourceArea;
@@ -223,10 +220,11 @@ OP_CUDA_PROFILE_INIT(REPS);
 OP_CUDA_PROFILE_END(timeNormalize4, 1e3, REPS);
 OP_CUDA_PROFILE_INIT(REPS);
                     // Option b)
-                    const dim3 threadsPerBlock{512, 1};
-                    const dim3 numBlocks{getNumberCudaBlocks(1, threadsPerBlock.x),
-                                         //getNumberCudaBlocks(1, threadsPerBlock.y),
-                                         getNumberCudaBlocks(num * channels, threadsPerBlock.y)};
+                    const auto rescaleFactor = (int) std::ceil((float)(targetHeight) / (float)(sourceHeight));
+                    const dim3 threadsPerBlock{rescaleFactor, rescaleFactor, 1};
+                    const dim3 numBlocks{getNumberCudaBlocks(targetWidth, threadsPerBlock.x),
+                                         getNumberCudaBlocks(targetHeight, threadsPerBlock.y),
+                                         getNumberCudaBlocks(num * channels, threadsPerBlock.z)};
                     resizeAllKernelShared<<<numBlocks, threadsPerBlock>>>(
                         targetPtr, sourcePtrs.at(0), sourceWidth, sourceHeight, targetWidth, targetHeight,
                         num * channels);
