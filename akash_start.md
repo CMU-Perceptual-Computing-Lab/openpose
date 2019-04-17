@@ -39,5 +39,8 @@ make -j`nproc`
 
 ### Notes for final report:
 - 1. CUDA test: All optimized code in joker repo. Compare speed with original one in official OP.
-	- Image resize: Reduce #kernels launch + shared memory?
+	- Image resize:
+		- Reduce #kernels launch: +10%
+		- Shared memory:
+		- Only write once to memory at the end:
 - 2. AVX: Enable/disable AVX flag.
