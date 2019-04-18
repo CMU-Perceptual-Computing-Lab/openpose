@@ -72,7 +72,7 @@ namespace op
         const auto sourceArea = sourceWidth * sourceHeight;
         const auto targetArea = targetWidth * targetHeight;
 
-        if (threadIdx.x == 0) 
+        if (x == 0 && y == 0 && channel == 0)
         {
             //printf("minX, minY: %f, %f | maxX, maxY: %f, %d\f", minSourceX, minSourceY, maxSourceX, maxSourceY);
             if (maxSourceX - minSourceX != 7) {
@@ -81,6 +81,10 @@ namespace op
             if (maxSourceY - minSourceY != 7) {
                 printf("blaaah");
             }
+        }
+
+        if (threadIdx.x == 0) 
+        {
             // for (auto ySource = minTargetY; ySource < maxSourceY; ySource++)
             // {
             //     for (auto xSource = minTargetX; xSource < maxSourceX; xSource++) 
