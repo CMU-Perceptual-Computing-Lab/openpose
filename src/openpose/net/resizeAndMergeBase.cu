@@ -104,21 +104,29 @@ namespace op
         //     // }
         // }
         const T* sourcePtrChannel = sourcePtr + channel * sourceArea;
-        if (threadIdx.x == 0) 
+        // if resize >= 5, then #threads per block >= # elements of shared memory
+        const auto sharedLoadId = threadIdx.x + rescaleFactor*threadIdx.y;
+        if (sharedLoadId < 25) 
         {   
-            auto index = 0;
-            for (auto ySource = minSourceYInt; ySource <= maxSourceYInt; ySource++)
-            {
-                const auto yClean = fastTruncateCuda(int(ySource + 1e-5), 0, sourceHeight - 1);
-                for (auto xSource = minSourceXInt; xSource <= maxSourceXInt; xSource++) 
-                {
-                    const auto xClean = fastTruncateCuda(int(xSource + 1e-5), 0, sourceWidth - 1);
-                    //const T* sourcePtrChannel = sourcePtr + channel * sourceArea;
-                    sourcePtrShared[index] = sourcePtrChannel[yClean * sourceWidth + xClean];
-                    index ++;
-                }   
-            }
+            const auto yClean = fastTruncateCuda(int(minSourceYInt+sharedLoadId/5 + 1e-5), 0, sourceHeight - 1);
+            const auto xClean = fastTruncateCuda(int(minSourceXInt+sharedLoadId%5 + 1e-5), 0, sourceWidth - 1);
+            sourcePtrShared[sharedLoadId] = sourcePtrChannel[yClean * sourceWidth + xClean];
         }
+        // if (threadIdx.x == 0) 
+        // {   
+        //     auto index = 0;
+        //     for (auto ySource = minSourceYInt; ySource <= maxSourceYInt; ySource++)
+        //     {
+        //         const auto yClean = fastTruncateCuda(int(ySource + 1e-5), 0, sourceHeight - 1);
+        //         for (auto xSource = minSourceXInt; xSource <= maxSourceXInt; xSource++) 
+        //         {
+        //             const auto xClean = fastTruncateCuda(int(xSource + 1e-5), 0, sourceWidth - 1);
+        //             //const T* sourcePtrChannel = sourcePtr + channel * sourceArea;
+        //             sourcePtrShared[index] = sourcePtrChannel[yClean * sourceWidth + xClean];
+        //             index ++;
+        //         }   
+        //     }
+        // }
         // wait here until shared memory has been loaded
         __syncthreads();
 
