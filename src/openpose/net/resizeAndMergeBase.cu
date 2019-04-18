@@ -56,53 +56,20 @@ namespace op
         const auto channel = (blockIdx.z * blockDim.z) + threadIdx.z;
         
         const auto minTargetX = blockIdx.x * rescaleFactor;
-        const auto maxTargetX = ((blockIdx.x + 1) * rescaleFactor) - 1;
+        const auto minSourceX = (minTargetX + T(0.5f)) * sourceWidth / T(targetWidth) - T(0.5f);
+        const auto minSourceXInt_1 = int(minSourceX+ 1e-5);
+        const auto minSourceXInt = minSourceXInt_1 - 1;
 
         const auto minTargetY = blockIdx.y * rescaleFactor;
-        const auto maxTargetY = ((blockIdx.y + 1) * rescaleFactor) - 1;
-       
-        auto minSourceX = (minTargetX + T(0.5f)) * sourceWidth / T(targetWidth) - T(0.5f);
-        
-        auto minSourceXInt_1 = int(minSourceX+ 1e-5);
-        auto minSourceXInt = minSourceXInt_1 - 1;
-
-        auto minSourceY = (minTargetY + T(0.5f)) * sourceHeight / T(targetHeight) - T(0.5f);
-        
-        auto minSourceYInt_1 = int(minSourceY  + 1e-5);
-        // auto minSourceYInt = fastMaxCuda(0, minSourceYInt_1 - 1);
-        auto minSourceYInt = minSourceYInt_1 - 1;
-        //xIntArray[2] = fastMinCuda(sourceWidth - 1, xIntArray[1] + 1);
-
-        auto maxSourceX = (maxTargetX + T(0.5f)) * sourceWidth / T(targetWidth) - T(0.5f);
-        // auto maxSourceXInt_1 = fastTruncateCuda(int(maxSourceX + 1e-5), 0, sourceWidth - 1);
-        auto maxSourceXInt_1 = int(maxSourceX + 1e-5);
-        // auto maxSourceXInt = fastMinCuda(sourceWidth - 1, maxSourceXInt_1 + 2);
-        auto maxSourceXInt = maxSourceXInt_1 + 2;
-
-        auto maxSourceY = (maxTargetY + T(0.5f)) * sourceHeight / T(targetHeight) - T(0.5f);
-        // auto maxSourceYInt_1 = fastTruncateCuda(int(maxSourceY + 1e-5), 0, sourceHeight - 1);
-        auto maxSourceYInt_1 = int(maxSourceY + 1e-5);
-        // auto maxSourceYInt = fastMinCuda(sourceHeight - 1, maxSourceYInt_1 + 2);
-        auto maxSourceYInt = maxSourceYInt_1 + 2;
+        const auto minSourceY = (minTargetY + T(0.5f)) * sourceHeight / T(targetHeight) - T(0.5f);
+        const auto minSourceYInt_1 = int(minSourceY  + 1e-5);
+        const auto minSourceYInt = minSourceYInt_1 - 1;
 
         __shared__ T sourcePtrShared[25]; 
 
         const auto sourceArea = sourceWidth * sourceHeight;
         const auto targetArea = targetWidth * targetHeight;
 
-        // if (x == 16 && (y == 8) && channel == 0)
-        // {
-            
-        //     printf("minTarX, minTarY: %d, %d | maxTarX, maxTarY: %d, %d\n", minTargetX, minTargetY, maxTargetX, maxTargetY);
-        //     printf("minSourceXInt_1, minSourceY_Int1: %d, %d\n", minSourceXInt_1, minSourceYInt_1);
-        //     printf("minX, minY: %d, %d | maxX, maxY: %d, %d\n", minSourceXInt, minSourceYInt, maxSourceXInt, maxSourceYInt);
-        //     // if (maxSourceX - minSourceX != 7) {
-        //     //     printf("wahooo");
-        //     // }
-        //     // if (maxSourceY - minSourceY != 7) {
-        //     //     printf("blaaah");
-        //     // }
-        // }
         const T* sourcePtrChannel = sourcePtr + channel * sourceArea;
         // if resize >= 5, then #threads per block >= # elements of shared memory
         const auto sharedLoadId = threadIdx.x + rescaleFactor*threadIdx.y;
@@ -127,7 +94,7 @@ namespace op
         //         }   
         //     }
         // }
-        // wait here until shared memory has been loaded
+        // Wait here until shared memory has been loaded
         __syncthreads();
 
         if (x < targetWidth && y < targetHeight) 
@@ -207,48 +174,48 @@ namespace op
                 const auto num = sourceSize[0];
                 if (targetSize[0] > 1 || num == 1)
                 {
+// const auto REPS = 200;
 const auto REPS = 1;
-// const auto REPS = 1;
 double timeNormalize0 = 0.;
 double timeNormalize1 = 0.;
 double timeNormalize2 = 0.;
 double timeNormalize3 = 0.;
 double timeNormalize4 = 0.;
 double timeNormalize5 = 0.;
-// OP_CUDA_PROFILE_INIT(5);
-//                     // Option a)
-//                     const auto sourceChannelOffset = sourceHeight * sourceWidth;
-//                     const auto targetChannelOffset = targetWidth * targetHeight;
-//                     for (auto n = 0; n < num; n++)
-//                     {
-//                         const auto offsetBase = n*channels;
-//                         for (auto c = 0 ; c < channels ; c++)
-//                         {
-//                             const auto offset = offsetBase + c;
-//                             resizeKernel<<<numBlocks, threadsPerBlock>>>(targetPtr + offset * targetChannelOffset,
-//                                                                          sourcePtrs.at(0) + offset * sourceChannelOffset,
-//                                                                          sourceWidth, sourceHeight, targetWidth,
-//                                                                          targetHeight);
-//                         }
-//                     }
-// OP_CUDA_PROFILE_END(timeNormalize0, 1e3, 5);
-// OP_CUDA_PROFILE_INIT(REPS);
-//                     // Option a)
-//                     const auto sourceChannelOffset = sourceHeight * sourceWidth;
-//                     const auto targetChannelOffset = targetWidth * targetHeight;
-//                     for (auto n = 0; n < num; n++)
-//                     {
-//                         const auto offsetBase = n*channels;
-//                         for (auto c = 0 ; c < channels ; c++)
-//                         {
-//                             const auto offset = offsetBase + c;
-//                             resizeKernel<<<numBlocks, threadsPerBlock>>>(targetPtr + offset * targetChannelOffset,
-//                                                                          sourcePtrs.at(0) + offset * sourceChannelOffset,
-//                                                                          sourceWidth, sourceHeight, targetWidth,
-//                                                                          targetHeight);
-//                         }
-//                     }
-// OP_CUDA_PROFILE_END(timeNormalize1, 1e3, REPS);
+OP_CUDA_PROFILE_INIT(5);
+                    // Option a)
+                    const auto sourceChannelOffset = sourceHeight * sourceWidth;
+                    const auto targetChannelOffset = targetWidth * targetHeight;
+                    for (auto n = 0; n < num; n++)
+                    {
+                        const auto offsetBase = n*channels;
+                        for (auto c = 0 ; c < channels ; c++)
+                        {
+                            const auto offset = offsetBase + c;
+                            resizeKernel<<<numBlocks, threadsPerBlock>>>(targetPtr + offset * targetChannelOffset,
+                                                                         sourcePtrs.at(0) + offset * sourceChannelOffset,
+                                                                         sourceWidth, sourceHeight, targetWidth,
+                                                                         targetHeight);
+                        }
+                    }
+OP_CUDA_PROFILE_END(timeNormalize0, 1e3, 5);
+OP_CUDA_PROFILE_INIT(REPS);
+                    // Option a)
+                    const auto sourceChannelOffset = sourceHeight * sourceWidth;
+                    const auto targetChannelOffset = targetWidth * targetHeight;
+                    for (auto n = 0; n < num; n++)
+                    {
+                        const auto offsetBase = n*channels;
+                        for (auto c = 0 ; c < channels ; c++)
+                        {
+                            const auto offset = offsetBase + c;
+                            resizeKernel<<<numBlocks, threadsPerBlock>>>(targetPtr + offset * targetChannelOffset,
+                                                                         sourcePtrs.at(0) + offset * sourceChannelOffset,
+                                                                         sourceWidth, sourceHeight, targetWidth,
+                                                                         targetHeight);
+                        }
+                    }
+OP_CUDA_PROFILE_END(timeNormalize1, 1e3, REPS);
 // OP_CUDA_PROFILE_INIT(REPS);
 //                     // Option a)
 //                     const dim3 threadsPerBlock{512, 1};
@@ -279,16 +246,16 @@ double timeNormalize5 = 0.;
 //                         targetPtr, sourcePtrs.at(0), sourceWidth, sourceHeight, targetWidth, targetHeight,
 //                         num * channels);
 // OP_CUDA_PROFILE_END(timeNormalize3, 1e3, REPS);
-// OP_CUDA_PROFILE_INIT(REPS);
-//                     // Option b)
-//                     const dim3 threadsPerBlock{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D, 1};
-//                     const dim3 numBlocks{getNumberCudaBlocks(targetWidth, threadsPerBlock.x),
-//                                          getNumberCudaBlocks(targetHeight, threadsPerBlock.y),
-//                                          getNumberCudaBlocks(num * channels, threadsPerBlock.z)};
-//                     resizeAllKernel<<<numBlocks, threadsPerBlock>>>(
-//                         targetPtr, sourcePtrs.at(0), sourceWidth, sourceHeight, targetWidth, targetHeight,
-//                         num * channels);
-// OP_CUDA_PROFILE_END(timeNormalize4, 1e3, REPS);
+OP_CUDA_PROFILE_INIT(REPS);
+                    // Option b)
+                    const dim3 threadsPerBlock{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D, 1};
+                    const dim3 numBlocks{getNumberCudaBlocks(targetWidth, threadsPerBlock.x),
+                                         getNumberCudaBlocks(targetHeight, threadsPerBlock.y),
+                                         getNumberCudaBlocks(num * channels, threadsPerBlock.z)};
+                    resizeAllKernel<<<numBlocks, threadsPerBlock>>>(
+                        targetPtr, sourcePtrs.at(0), sourceWidth, sourceHeight, targetWidth, targetHeight,
+                        num * channels);
+OP_CUDA_PROFILE_END(timeNormalize4, 1e3, REPS);
 OP_CUDA_PROFILE_INIT(REPS);
                     // Option b)
                     const auto rescaleFactor = (unsigned int) std::ceil((float)(targetHeight) / (float)(sourceHeight));
