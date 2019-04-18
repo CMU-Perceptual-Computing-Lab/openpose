@@ -146,7 +146,13 @@ namespace op
         int yIntArray[4];
         T dx;
         T dy;
-        cubicSequentialDataShared(xIntArray, yIntArray, dx, dy, xSource, ySource, widthSource, heightSource);
+        //fastTruncateCuda(int(xSource + 1e-5), 0, width - 1);
+        // Now we only need dx and dy
+        xIntArray[1] = fastTruncateCuda(int(xSource + 1e-5), 0, widthSource - 1);
+        yIntArray[1] = fastTruncateCuda(int(ySource + 1e-5), 0, heightSource - 1);
+        dx = xSource - xIntArray[1];
+        dy = ySource - yIntArray[1];
+        //cubicSequentialDataShared(xIntArray, yIntArray, dx, dy, xSource, ySource, widthSource, heightSource);
 
         T temp[4];
         for (unsigned char i = 0; i < 4; i++)
