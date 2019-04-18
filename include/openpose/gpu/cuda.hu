@@ -87,6 +87,23 @@ namespace op
         return fastMinCuda(max, fastMaxCuda(min, value));
     }
 
+    template <typename T>
+    inline __device__ void cubicSequentialDataShared(int* xIntArray, int* yIntArray, T& dx, T& dy, const T xSource, const T ySource,
+                                               const int width, const int height)
+    {
+        xIntArray[1] = fastTruncateCuda(int(xSource + 1e-5), 0, width - 1);
+        xIntArray[0] = fastMaxCuda(0, xIntArray[1] - 1);
+        xIntArray[2] = fastMinCuda(width - 1, xIntArray[1] + 1);
+        xIntArray[3] = fastMinCuda(width - 1, xIntArray[2] + 1);
+        dx = xSource - xIntArray[1];
+
+        yIntArray[1] = fastTruncateCuda(int(ySource + 1e-5), 0, height - 1);
+        yIntArray[0] = fastMaxCuda(0, yIntArray[1] - 1);
+        yIntArray[2] = fastMinCuda(height - 1, yIntArray[1] + 1);
+        yIntArray[3] = fastMinCuda(height - 1, yIntArray[2] + 1);
+        dy = ySource - yIntArray[1];
+    }
+
     // Cubic interpolation
     template <typename T>
     inline __device__ void cubicSequentialData(int* xIntArray, int* yIntArray, T& dx, T& dy, const T xSource, const T ySource,
@@ -118,6 +135,29 @@ namespace op
                 - 0.5f * (v0 - v2) * dx // + (-0.5f * v0 + 0.5f * v2) * dx
                 + v1;
         // return v1 + 0.5f * dx * (v2 - v0 + dx * (2.f * v0 - 5.f * v1 + 4.f * v2 - v3 + dx * (3.f * (v1 - v2) + v3 - v0)));
+    }
+
+    template <typename T>
+    inline __device__ T bicubicInterpolateShared(const T* const sourcePtrShared, const T xSource, const T ySource, const int widthSource,
+                                           const int heightSource, const int widthSourcePtr, 
+                                           const int threadIdxX, const int threadIdxY)
+    {
+        int xIntArray[4];
+        int yIntArray[4];
+        T dx;
+        T dy;
+        cubicSequentialDataShared(xIntArray, yIntArray, dx, dy, xSource, ySource, widthSource, heightSource);
+
+        T temp[4];
+        for (unsigned char i = 0; i < 4; i++)
+        {
+            // const auto offset = yIntArray[i]*5;
+            const auto offset = 5 * (i + (threadIdxY > 3 ? 1 : 0)) + (threadIdxX > 3 ? 1 : 0);
+            //const auto offset = sourcePtrShared[]
+            temp[i] = cubicInterpolate(sourcePtrShared[offset + 0], sourcePtrShared[offset + 1],
+                                       sourcePtrShared[offset + 2], sourcePtrShared[offset + 3], dx);
+        }
+        return cubicInterpolate(temp[0], temp[1], temp[2], temp[3], dy);
     }
 
     template <typename T>

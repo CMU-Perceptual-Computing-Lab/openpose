@@ -60,50 +60,74 @@ namespace op
 
         const auto minTargetY = blockIdx.y * rescaleFactor;
         const auto maxTargetY = ((blockIdx.y + 1) * rescaleFactor) - 1;
-
-        const auto minSourceX = (minTargetY + T(0.5f)) * sourceWidth / T(targetWidth) - T(0.5f);;
-        const auto minSourceY = (minTargetY + T(0.5f)) * sourceHeight / T(targetHeight) - T(0.5f);
-
-        const auto maxSourceX = (maxTargetX + T(0.5f)) * sourceWidth / T(targetWidth) - T(0.5f);
-        const auto maxSourceY = (maxTargetY + T(0.5f)) * sourceHeight / T(targetHeight) - T(0.5f);
        
-        //__shared__ sourcePtrsShared float[49]; 
+        auto minSourceX = (minTargetX + T(0.5f)) * sourceWidth / T(targetWidth) - T(0.5f);
+        
+        auto minSourceXInt_1 = int(minSourceX+ 1e-5);
+        auto minSourceXInt = minSourceXInt_1 - 1;
+
+        auto minSourceY = (minTargetY + T(0.5f)) * sourceHeight / T(targetHeight) - T(0.5f);
+        
+        auto minSourceYInt_1 = int(minSourceY  + 1e-5);
+        // auto minSourceYInt = fastMaxCuda(0, minSourceYInt_1 - 1);
+        auto minSourceYInt = minSourceYInt_1 - 1;
+        //xIntArray[2] = fastMinCuda(sourceWidth - 1, xIntArray[1] + 1);
+
+        auto maxSourceX = (maxTargetX + T(0.5f)) * sourceWidth / T(targetWidth) - T(0.5f);
+        // auto maxSourceXInt_1 = fastTruncateCuda(int(maxSourceX + 1e-5), 0, sourceWidth - 1);
+        auto maxSourceXInt_1 = int(maxSourceX + 1e-5);
+        // auto maxSourceXInt = fastMinCuda(sourceWidth - 1, maxSourceXInt_1 + 2);
+        auto maxSourceXInt = maxSourceXInt_1 + 2;
+
+        auto maxSourceY = (maxTargetY + T(0.5f)) * sourceHeight / T(targetHeight) - T(0.5f);
+        // auto maxSourceYInt_1 = fastTruncateCuda(int(maxSourceY + 1e-5), 0, sourceHeight - 1);
+        auto maxSourceYInt_1 = int(maxSourceY + 1e-5);
+        // auto maxSourceYInt = fastMinCuda(sourceHeight - 1, maxSourceYInt_1 + 2);
+        auto maxSourceYInt = maxSourceYInt_1 + 2;
+
+        __shared__ T sourcePtrShared[25]; 
 
         const auto sourceArea = sourceWidth * sourceHeight;
         const auto targetArea = targetWidth * targetHeight;
 
-        if (x == 0 && y == 0 && channel == 0)
-        {
-            //printf("minX, minY: %f, %f | maxX, maxY: %f, %d\f", minSourceX, minSourceY, maxSourceX, maxSourceY);
-            if (maxSourceX - minSourceX != 7) {
-                printf("wahooo");
-            }
-            if (maxSourceY - minSourceY != 7) {
-                printf("blaaah");
-            }
-        }
-
-        if (threadIdx.x == 0) 
-        {
-            // for (auto ySource = minTargetY; ySource < maxSourceY; ySource++)
-            // {
-            //     for (auto xSource = minTargetX; xSource < maxSourceX; xSource++) 
-            //     }
-            //         sourcePtrsShared[rescaleFactor * ySource]
-            //     }   
-            // }
+        // if (x == 16 && (y == 8) && channel == 0)
+        // {
             
+        //     printf("minTarX, minTarY: %d, %d | maxTarX, maxTarY: %d, %d\n", minTargetX, minTargetY, maxTargetX, maxTargetY);
+        //     printf("minSourceXInt_1, minSourceY_Int1: %d, %d\n", minSourceXInt_1, minSourceYInt_1);
+        //     printf("minX, minY: %d, %d | maxX, maxY: %d, %d\n", minSourceXInt, minSourceYInt, maxSourceXInt, maxSourceYInt);
+        //     // if (maxSourceX - minSourceX != 7) {
+        //     //     printf("wahooo");
+        //     // }
+        //     // if (maxSourceY - minSourceY != 7) {
+        //     //     printf("blaaah");
+        //     // }
+        // }
+        const T* sourcePtrChannel = sourcePtr + channel * sourceArea;
+        if (threadIdx.x == 0) 
+        {   
+            auto index = 0;
+            for (auto ySource = minSourceYInt; ySource <= maxSourceYInt; ySource++)
+            {
+                const auto yClean = fastTruncateCuda(int(ySource + 1e-5), 0, sourceHeight - 1);
+                for (auto xSource = minSourceXInt; xSource <= maxSourceXInt; xSource++) 
+                {
+                    const auto xClean = fastTruncateCuda(int(xSource + 1e-5), 0, sourceWidth - 1);
+                    //const T* sourcePtrChannel = sourcePtr + channel * sourceArea;
+                    sourcePtrShared[index] = sourcePtrChannel[yClean * sourceWidth + xClean];
+                    index ++;
+                }   
+            }
         }
         // wait here until shared memory has been loaded
-        //__syncthreads();
+        __syncthreads();
 
-        if (x < targetWidth && y < targetHeight && channel < channels) 
+        if (x < targetWidth && y < targetHeight) 
         {
             const T xSource = (x + T(0.5f)) * sourceWidth / T(targetWidth) - T(0.5f);
             const T ySource = (y + T(0.5f)) * sourceHeight / T(targetHeight) - T(0.5f);
-            const T* sourcePtrChannel = sourcePtr + channel * sourceArea;
-            targetPtr[channel * targetArea + y*targetWidth+x] = bicubicInterpolate(
-                sourcePtrChannel, xSource, ySource, sourceWidth, sourceHeight, sourceWidth);
+            targetPtr[channel * targetArea + y*targetWidth+x] = bicubicInterpolateShared(
+                sourcePtrShared, xSource, ySource, sourceWidth, sourceHeight, sourceWidth, threadIdx.x, threadIdx.y);
         }
     }
 
