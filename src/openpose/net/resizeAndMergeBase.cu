@@ -61,21 +61,37 @@ namespace op
         const auto minTargetY = blockIdx.y * rescaleFactor;
         const auto maxTargetY = ((blockIdx.y + 1) * rescaleFactor) - 1;
 
-        // // Calculate min(x,y) and max(x,y) in source for the row in output
-        // const T xSource = (x + T(0.5f)) * sourceWidth / T(targetWidth) - T(0.5f);
-        // const T ySource = (y + T(0.5f)) * sourceHeight / T(targetHeight) - T(0.5f);
+        const auto minSourceX = (minTargetY + T(0.5f)) * sourceWidth / T(targetWidth) - T(0.5f);;
+        const auto minSourceY = (minTargetY + T(0.5f)) * sourceHeight / T(targetHeight) - T(0.5f);
 
-
-
-        // const auto minSourceX = fastTruncateCuda(int(xSource + 1e-5) - 1, 0, width - 1);
-        // const auto minSourceY = fastTruncateCuda(int(ySource + 1e-5) - 1, 0, height - 1);
-            
-        // const auto MaxSourceX
-
-        //__shared__ float[49]     
+        const auto maxSourceX = (maxTargetX + T(0.5f)) * sourceWidth / T(targetWidth) - T(0.5f);
+        const auto maxSourceY = (maxTargetY + T(0.5f)) * sourceHeight / T(targetHeight) - T(0.5f);
+       
+        //__shared__ sourcePtrsShared float[49]; 
 
         const auto sourceArea = sourceWidth * sourceHeight;
         const auto targetArea = targetWidth * targetHeight;
+
+        if (threadIdx.x == 0) 
+        {
+            //printf("minX, minY: %f, %f | maxX, maxY: %f, %d\f", minSourceX, minSourceY, maxSourceX, maxSourceY);
+            if (maxSourceX - minSourceX != 7) {
+                printf("wahooo");
+            }
+            if (maxSourceY - minSourceY != 7) {
+                printf("blaaah");
+            }
+            // for (auto ySource = minTargetY; ySource < maxSourceY; ySource++)
+            // {
+            //     for (auto xSource = minTargetX; xSource < maxSourceX; xSource++) 
+            //     }
+            //         sourcePtrsShared[rescaleFactor * ySource]
+            //     }   
+            // }
+            
+        }
+        // wait here until shared memory has been loaded
+        //__syncthreads();
 
         if (x < targetWidth && y < targetHeight && channel < channels) 
         {
