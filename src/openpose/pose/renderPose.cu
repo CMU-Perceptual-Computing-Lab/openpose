@@ -236,6 +236,35 @@ namespace op
                         blendOriginalFrame, (googlyEyes ? 15 : -1), (googlyEyes ? 16 : -1));
     }
 
+
+    __global__ void renderPoseBody25Naive(
+        float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
+        const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
+        const float alphaColorToAdd)
+    {
+        const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
+        const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+        const auto globalIdx = threadIdx.y * blockDim.x + threadIdx.x;
+
+        // Shared parameters
+        __shared__ float2 sharedMins[POSE_MAX_PEOPLE];
+        __shared__ float2 sharedMaxs[POSE_MAX_PEOPLE];
+        __shared__ float sharedScaleF[POSE_MAX_PEOPLE];
+
+        // Other parameters
+        const auto numberPartPairs = sizeof(BODY_25_PAIRS_GPU) / (2*sizeof(BODY_25_PAIRS_GPU[0]));
+        const auto numberScales = sizeof(BODY_25_SCALES) / sizeof(BODY_25_SCALES[0]);
+        const auto numberColors = sizeof(BODY_25_COLORS) / (3*sizeof(BODY_25_COLORS[0]));
+        const auto radius = fastMinCuda(targetWidth, targetHeight) / 100.f;
+        const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
+
+        // Render key points
+        renderKeypointsNaive(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
+                        posePtr, BODY_25_PAIRS_GPU, numberPeople, 25, numberPartPairs, BODY_25_COLORS, numberColors,
+                        radius, lineWidth, BODY_25_SCALES, numberScales, threshold, alphaColorToAdd,
+                        blendOriginalFrame, (googlyEyes ? 15 : -1), (googlyEyes ? 16 : -1));
+    }
+
     __global__ void renderPoseBody25b(
         float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
         const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
@@ -347,6 +376,147 @@ namespace op
                         radius, lineWidth, BODY_135_SCALES, numberScales, threshold, alphaColorToAdd,
                         blendOriginalFrame, (googlyEyes ? 1 : -1), (googlyEyes ? 2 : -1));
     }
+
+
+    __global__ void renderPoseBody135Naive(
+        float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
+        const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
+        const float alphaColorToAdd)
+    {
+        const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
+        const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+        const auto globalIdx = threadIdx.y * blockDim.x + threadIdx.x;
+
+        // Shared parameters
+        __shared__ float2 sharedMins[POSE_MAX_PEOPLE];
+        __shared__ float2 sharedMaxs[POSE_MAX_PEOPLE];
+        __shared__ float sharedScaleF[POSE_MAX_PEOPLE];
+
+        // Other parameters
+        const auto numberPartPairs = sizeof(BODY_135_PAIRS_GPU) / (2*sizeof(BODY_135_PAIRS_GPU[0]));
+        const auto numberScales = sizeof(BODY_135_SCALES) / sizeof(BODY_135_SCALES[0]);
+        const auto numberColors = sizeof(BODY_135_COLORS) / (3*sizeof(BODY_135_COLORS[0]));
+        const auto radius = fastMinCuda(targetWidth, targetHeight) / 100.f;
+        const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
+
+        // Render key points
+        renderKeypointsNaive(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
+                        posePtr, BODY_135_PAIRS_GPU, numberPeople, 135, numberPartPairs, BODY_135_COLORS, numberColors,
+                        radius, lineWidth, BODY_135_SCALES, numberScales, threshold, alphaColorToAdd,
+                        blendOriginalFrame, (googlyEyes ? 1 : -1), (googlyEyes ? 2 : -1));
+    }
+
+
+    __global__ void findBoundingBoxThing(float2* sharedMaxs, float2* sharedMins,
+               float* sharedScaleF,const int targetWidth, const int targetHeight,
+               const float* const keypointsPtr,
+               const int numberPeople, const int numberParts, const float threshold) 
+{
+        // const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
+        // const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+        // const auto globalIdx = threadIdx.y * blockDim.x + threadIdx.x;
+        const auto globalIdx = threadIdx.x;
+        
+        // Fill shared parameters
+        // if (globalIdx < numberPeople)
+        {
+            sharedMins[globalIdx].x = targetWidth;
+            //printf("did globalidx.x\n");
+            sharedMins[globalIdx].y = targetHeight;
+            sharedMaxs[globalIdx].x = 0.f;
+            sharedMaxs[globalIdx].y = 0.f;
+            //printf("did some indexing in shared ptrs\n");
+            for (auto part = 0 ; part < numberParts ; part++)
+            {
+                const auto index = 3 * (globalIdx*numberParts + part);
+                const auto x = keypointsPtr[index];
+                const auto y = keypointsPtr[index+1];
+                const auto score = keypointsPtr[index+2];
+                //printf("did some indexing in keypointsPtr\n");
+                if (score > threshold)
+                {
+                    if (x < sharedMins[globalIdx].x)
+                        sharedMins[globalIdx].x = x;
+                    if (x > sharedMaxs[globalIdx].x)
+                        sharedMaxs[globalIdx].x = x;
+                    if (y < sharedMins[globalIdx].y)
+                        sharedMins[globalIdx].y = y;
+                    if (y > sharedMaxs[globalIdx].y)
+                        sharedMaxs[globalIdx].y = y;
+                }
+            }
+            if (sharedMaxs[globalIdx].x != 0.f && sharedMaxs[globalIdx].y != 0.f)
+            {
+                const auto averageX = sharedMaxs[globalIdx].x - sharedMins[globalIdx].x;
+                const auto averageY = sharedMaxs[globalIdx].y - sharedMins[globalIdx].y;
+                // (averageX + averageY) / 2.f / 400.f
+                sharedScaleF[globalIdx] = fastTruncateCuda((averageX + averageY) / 400.f, 0.33f, 1.f);
+                const auto constantToAdd = 50.f;
+                sharedMaxs[globalIdx].x += constantToAdd;
+                sharedMaxs[globalIdx].y += constantToAdd;
+                sharedMins[globalIdx].x -= constantToAdd;
+                sharedMins[globalIdx].y -= constantToAdd;
+            }
+        }
+        //printf("Finished doing the thing!\n");
+    }
+
+    __global__ void renderPoseBody135NaiveNaive(
+        float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
+        const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
+        const float alphaColorToAdd, float2 *Mins, float2 *Maxs, float *ScaleF)
+    {
+        const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
+        const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+        const auto globalIdx = threadIdx.y * blockDim.x + threadIdx.x;
+        // Shared parameters
+        __shared__ float2 sharedMins[POSE_MAX_PEOPLE];
+        __shared__ float2 sharedMaxs[POSE_MAX_PEOPLE];
+        __shared__ float sharedScaleF[POSE_MAX_PEOPLE];
+
+        // Other parameters
+        const auto numberPartPairs = sizeof(BODY_135_PAIRS_GPU) / (2*sizeof(BODY_135_PAIRS_GPU[0]));
+        const auto numberScales = sizeof(BODY_135_SCALES) / sizeof(BODY_135_SCALES[0]);
+        const auto numberColors = sizeof(BODY_135_COLORS) / (3*sizeof(BODY_135_COLORS[0]));
+        const auto radius = fastMinCuda(targetWidth, targetHeight) / 100.f;
+        const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
+
+        // Render key points
+        renderKeypointsNaiveNaive(targetPtr, sharedMaxs, sharedMins, sharedScaleF, Mins, Maxs, ScaleF, 
+                        globalIdx, x, y, targetWidth, targetHeight,
+                        posePtr, BODY_135_PAIRS_GPU, numberPeople, 135, numberPartPairs, BODY_135_COLORS, numberColors,
+                        radius, lineWidth, BODY_135_SCALES, numberScales, threshold, alphaColorToAdd,
+                        blendOriginalFrame, (googlyEyes ? 1 : -1), (googlyEyes ? 2 : -1));
+    }
+
+    __global__ void renderPoseBody135SuperShared(
+        float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
+        const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
+        const float alphaColorToAdd, float2 *Mins, float2 *Maxs, float *ScaleF)
+    {
+        const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
+        const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+        const auto globalIdx = threadIdx.y * blockDim.x + threadIdx.x;
+        // Shared parameters
+        __shared__ float2 sharedMins[POSE_MAX_PEOPLE];
+        __shared__ float2 sharedMaxs[POSE_MAX_PEOPLE];
+        __shared__ float sharedScaleF[POSE_MAX_PEOPLE];
+        __shared__ float sharedScales[135];
+        // Other parameters
+        const auto numberPartPairs = sizeof(BODY_135_PAIRS_GPU) / (2*sizeof(BODY_135_PAIRS_GPU[0]));
+        const auto numberScales = sizeof(BODY_135_SCALES) / sizeof(BODY_135_SCALES[0]);
+        const auto numberColors = sizeof(BODY_135_COLORS) / (3*sizeof(BODY_135_COLORS[0]));
+        const auto radius = fastMinCuda(targetWidth, targetHeight) / 100.f;
+        const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
+
+        // Render key points
+        renderKeypointsSuperShared(targetPtr, sharedMaxs, sharedMins, sharedScaleF, sharedScales, Mins, Maxs, ScaleF, 
+                        globalIdx, x, y, targetWidth, targetHeight,
+                        posePtr, BODY_135_PAIRS_GPU, numberPeople, 135, numberPartPairs, BODY_135_COLORS, numberColors,
+                        radius, lineWidth, BODY_135_SCALES, numberScales, threshold, alphaColorToAdd,
+                        blendOriginalFrame, (googlyEyes ? 1 : -1), (googlyEyes ? 2 : -1));
+    }
+
 
     __global__ void renderPoseMpi29Parts(
         float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
@@ -623,6 +793,14 @@ namespace op
                                 const Point<int>& frameSize, const float* const posePtr, const float renderThreshold,
                                 const bool googlyEyes, const bool blendOriginalFrame, const float alphaBlending)
     {
+        cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+        float2 *sharedMaxs = 0;
+        float2 *sharedMins = 0;
+        float *sharedScaleF = 0;
+        cudaMalloc((void**)&sharedMaxs, sizeof(float2) * POSE_MAX_PEOPLE);
+        cudaMalloc((void**)&sharedMins, sizeof(float2) * POSE_MAX_PEOPLE);
+        cudaMalloc((void**)&sharedScaleF, sizeof(float) * POSE_MAX_PEOPLE);
+        cudaCheck(__LINE__, __FUNCTION__, __FILE__);
         try
         {
             if (numberPeople > 0 || !blendOriginalFrame)
@@ -644,10 +822,25 @@ namespace op
                 // Body pose
                 if (poseModel == PoseModel::BODY_25 || poseModel == PoseModel::BODY_25D
                     || poseModel == PoseModel::BODY_25E)
+                {
+                    const auto REPS = 100;
+                    double timeNormalize0 = 0.;
+                    double timeNormalize1 = 0.;
+                    OP_CUDA_PROFILE_INIT(REPS);
                     renderPoseBody25<<<threadsPerBlock, numBlocks>>>(
                         framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
                         blendOriginalFrame, alphaBlending
                     );
+                    OP_CUDA_PROFILE_END(timeNormalize0, 1e3, REPS);
+                    OP_CUDA_PROFILE_INIT(REPS);
+                    renderPoseBody25Naive<<<threadsPerBlock, numBlocks>>>(
+                        framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
+                        blendOriginalFrame, alphaBlending
+                    );
+                    OP_CUDA_PROFILE_END(timeNormalize1, 1e3, REPS);
+                    log("  renderOld=" + std::to_string(timeNormalize0) + "ms");
+                    log("  renderNew=" + std::to_string(timeNormalize1) + "ms");
+                }
                 else if (poseModel == PoseModel::COCO_18)
                     renderPoseCoco<<<threadsPerBlock, numBlocks>>>(
                         framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
@@ -680,10 +873,48 @@ namespace op
                         blendOriginalFrame, alphaBlending
                     );
                 else if (poseModel == PoseModel::BODY_135)
-                    renderPoseBody135<<<threadsPerBlock, numBlocks>>>(
+                {   
+                    // const auto REPS = 100;
+                    // double timeNormalize0a = 0.;
+                    // double timeNormalize0 = 0.;
+                    // double timeNormalize1 = 0.;
+                    // double timeNormalize2 = 0.;
+                    // double timeNormalize3 = 0.;
+                    // double timeNormalize4 = 0.;
+                    // double timeNormalize5 = 0.;
+                    // double timeNormalize6 = 0.;
+
+                    // OP_CUDA_PROFILE_INIT(5);
+                    // renderPoseBody135Naive<<<threadsPerBlock, numBlocks>>>(
+                    //     framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
+                    //     blendOriginalFrame, alphaBlending
+                    // );
+                    // OP_CUDA_PROFILE_END(timeNormalize0a, 1e3, REPS);
+                    // OP_CUDA_PROFILE_INIT(REPS);
+                    // renderPoseBody135<<<threadsPerBlock, numBlocks>>>(
+                    //     framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
+                    //     blendOriginalFrame, alphaBlending
+                    // );
+                    // OP_CUDA_PROFILE_END(timeNormalize0, 1e3, REPS);
+                    // OP_CUDA_PROFILE_INIT(REPS);
+                    // renderPoseBody135Naive<<<threadsPerBlock, numBlocks>>>(
+                    //     framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
+                    //     blendOriginalFrame, alphaBlending
+                    // );
+                    // OP_CUDA_PROFILE_END(timeNormalize1, 1e3, REPS);
+                    // OP_CUDA_PROFILE_INIT(REPS);
+                    dim3 threadsPerBlockBoundBox = {1, 1, 1};
+                    dim3 numBlocksBox = {POSE_MAX_PEOPLE, 1, 1};
+                    findBoundingBoxThing<<<threadsPerBlockBoundBox, numBlocksBox>>>(sharedMaxs,
+                        sharedMins,
+                       sharedScaleF, frameSize.x, frameSize.y,
+                       posePtr, numberPeople, 135, renderThreshold);
+                    
+                    renderPoseBody135NaiveNaive<<<threadsPerBlock, numBlocks>>>(
                         framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
-                        blendOriginalFrame, alphaBlending
+                        blendOriginalFrame, alphaBlending, sharedMins, sharedMaxs, sharedScaleF
                     );
+                }
                 else if (poseModel == PoseModel::MPI_15 || poseModel == PoseModel::MPI_15_4)
                     renderPoseMpi29Parts<<<threadsPerBlock, numBlocks>>>(
                         framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold,
@@ -705,11 +936,17 @@ namespace op
                     error("Invalid Model.", __LINE__, __FUNCTION__, __FILE__);
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
             }
+            cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+            cudaFree(sharedMins);
+            cudaFree(sharedMaxs);
+            cudaFree(sharedScaleF);
+            cudaCheck(__LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
+       
     }
 
     void renderPoseHeatMapGpu(float* framePtr, const Point<int>& frameSize, const float* const heatMapPtr,
