@@ -173,47 +173,47 @@ namespace op
                 if (targetSize[0] > 1 || num == 1)
                 {
 // const auto REPS = 200;
-const auto REPS = 1;
-double timeNormalize0 = 0.;
-double timeNormalize1 = 0.;
-double timeNormalize2 = 0.;
-double timeNormalize3 = 0.;
-double timeNormalize4 = 0.;
-double timeNormalize5 = 0.;
-OP_CUDA_PROFILE_INIT(5);
-                    // Option a)
-                    const auto sourceChannelOffset = sourceHeight * sourceWidth;
-                    const auto targetChannelOffset = targetWidth * targetHeight;
-                    for (auto n = 0; n < num; n++)
-                    {
-                        const auto offsetBase = n*channels;
-                        for (auto c = 0 ; c < channels ; c++)
-                        {
-                            const auto offset = offsetBase + c;
-                            resizeKernel<<<numBlocks, threadsPerBlock>>>(targetPtr + offset * targetChannelOffset,
-                                                                         sourcePtrs.at(0) + offset * sourceChannelOffset,
-                                                                         sourceWidth, sourceHeight, targetWidth,
-                                                                         targetHeight);
-                        }
-                    }
-OP_CUDA_PROFILE_END(timeNormalize0, 1e3, 5);
-OP_CUDA_PROFILE_INIT(REPS);
-                    // Option a)
-                    const auto sourceChannelOffset = sourceHeight * sourceWidth;
-                    const auto targetChannelOffset = targetWidth * targetHeight;
-                    for (auto n = 0; n < num; n++)
-                    {
-                        const auto offsetBase = n*channels;
-                        for (auto c = 0 ; c < channels ; c++)
-                        {
-                            const auto offset = offsetBase + c;
-                            resizeKernel<<<numBlocks, threadsPerBlock>>>(targetPtr + offset * targetChannelOffset,
-                                                                         sourcePtrs.at(0) + offset * sourceChannelOffset,
-                                                                         sourceWidth, sourceHeight, targetWidth,
-                                                                         targetHeight);
-                        }
-                    }
-OP_CUDA_PROFILE_END(timeNormalize1, 1e3, REPS);
+// const auto REPS = 1;
+// double timeNormalize0 = 0.;
+// double timeNormalize1 = 0.;
+// double timeNormalize2 = 0.;
+// double timeNormalize3 = 0.;
+// double timeNormalize4 = 0.;
+// double timeNormalize5 = 0.;
+// OP_CUDA_PROFILE_INIT(5);
+//                     // Option a)
+//                     const auto sourceChannelOffset = sourceHeight * sourceWidth;
+//                     const auto targetChannelOffset = targetWidth * targetHeight;
+//                     for (auto n = 0; n < num; n++)
+//                     {
+//                         const auto offsetBase = n*channels;
+//                         for (auto c = 0 ; c < channels ; c++)
+//                         {
+//                             const auto offset = offsetBase + c;
+//                             resizeKernel<<<numBlocks, threadsPerBlock>>>(targetPtr + offset * targetChannelOffset,
+//                                                                          sourcePtrs.at(0) + offset * sourceChannelOffset,
+//                                                                          sourceWidth, sourceHeight, targetWidth,
+//                                                                          targetHeight);
+//                         }
+//                     }
+// OP_CUDA_PROFILE_END(timeNormalize0, 1e3, 5);
+// OP_CUDA_PROFILE_INIT(REPS);
+//                     // Option a)
+//                     const auto sourceChannelOffset = sourceHeight * sourceWidth;
+//                     const auto targetChannelOffset = targetWidth * targetHeight;
+//                     for (auto n = 0; n < num; n++)
+//                     {
+//                         const auto offsetBase = n*channels;
+//                         for (auto c = 0 ; c < channels ; c++)
+//                         {
+//                             const auto offset = offsetBase + c;
+//                             resizeKernel<<<numBlocks, threadsPerBlock>>>(targetPtr + offset * targetChannelOffset,
+//                                                                          sourcePtrs.at(0) + offset * sourceChannelOffset,
+//                                                                          sourceWidth, sourceHeight, targetWidth,
+//                                                                          targetHeight);
+//                         }
+//                     }
+// OP_CUDA_PROFILE_END(timeNormalize1, 1e3, REPS);
 // OP_CUDA_PROFILE_INIT(REPS);
 //                     // Option a)
 //                     const dim3 threadsPerBlock{512, 1};
@@ -244,17 +244,17 @@ OP_CUDA_PROFILE_END(timeNormalize1, 1e3, REPS);
 //                         targetPtr, sourcePtrs.at(0), sourceWidth, sourceHeight, targetWidth, targetHeight,
 //                         num * channels);
 // OP_CUDA_PROFILE_END(timeNormalize3, 1e3, REPS);
-OP_CUDA_PROFILE_INIT(REPS);
-                    // Option b)
-                    const dim3 threadsPerBlock{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D, 1};
-                    const dim3 numBlocks{getNumberCudaBlocks(targetWidth, threadsPerBlock.x),
-                                         getNumberCudaBlocks(targetHeight, threadsPerBlock.y),
-                                         getNumberCudaBlocks(num * channels, threadsPerBlock.z)};
-                    resizeAllKernel<<<numBlocks, threadsPerBlock>>>(
-                        targetPtr, sourcePtrs.at(0), sourceWidth, sourceHeight, targetWidth, targetHeight,
-                        num * channels);
-OP_CUDA_PROFILE_END(timeNormalize4, 1e3, REPS);
-OP_CUDA_PROFILE_INIT(REPS);
+// OP_CUDA_PROFILE_INIT(REPS);
+//                     // Option b)
+//                     const dim3 threadsPerBlock{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D, 1};
+//                     const dim3 numBlocks{getNumberCudaBlocks(targetWidth, threadsPerBlock.x),
+//                                          getNumberCudaBlocks(targetHeight, threadsPerBlock.y),
+//                                          getNumberCudaBlocks(num * channels, threadsPerBlock.z)};
+//                     resizeAllKernel<<<numBlocks, threadsPerBlock>>>(
+//                         targetPtr, sourcePtrs.at(0), sourceWidth, sourceHeight, targetWidth, targetHeight,
+//                         num * channels);
+// OP_CUDA_PROFILE_END(timeNormalize4, 1e3, REPS);
+// OP_CUDA_PROFILE_INIT(REPS);
                     // Option b)
                     const auto rescaleFactor = (unsigned int) std::ceil((float)(targetHeight) / (float)(sourceHeight));
 
@@ -264,12 +264,12 @@ OP_CUDA_PROFILE_INIT(REPS);
                                          getNumberCudaBlocks(num * channels, threadsPerBlock.z)};
                     resizeAllKernelShared<<<numBlocks, threadsPerBlock>>>(
                         targetPtr, sourcePtrs.at(0), sourceWidth, sourceHeight, targetWidth, targetHeight, rescaleFactor);
-OP_CUDA_PROFILE_END(timeNormalize5, 1e3, REPS);
-log("  Res1(ori)=" + std::to_string(timeNormalize1) + "ms");
-log("  Res2(ori)=" + std::to_string(timeNormalize2) + "ms");
-log("  Res3(new)=" + std::to_string(timeNormalize3) + "ms");
-log("  Res4(new)=" + std::to_string(timeNormalize4) + "ms");
-log("  Res5(new)=" + std::to_string(timeNormalize5) + "ms");
+// OP_CUDA_PROFILE_END(timeNormalize5, 1e3, REPS);
+// log("  Res1(ori)=" + std::to_string(timeNormalize1) + "ms");
+// log("  Res2(ori)=" + std::to_string(timeNormalize2) + "ms");
+// log("  Res3(new)=" + std::to_string(timeNormalize3) + "ms");
+// log("  Res4(new)=" + std::to_string(timeNormalize4) + "ms");
+// log("  Res5(new)=" + std::to_string(timeNormalize5) + "ms");
                 }
                 // Old inefficient multi-scale merging
                 else
