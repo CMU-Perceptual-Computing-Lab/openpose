@@ -240,7 +240,7 @@ namespace op
     __global__ void renderPoseBody25Naive(
         float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
         const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
-        const float alphaColorToAdd)
+        const float alphaColorToAdd, float2 *Mins, float2 *Maxs, float *ScaleF)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -259,7 +259,8 @@ namespace op
         const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
-        renderKeypointsNaive(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
+        renderKeypointsNaiveNaive(targetPtr, sharedMaxs, sharedMins, sharedScaleF, Mins, Maxs, ScaleF, 
+                        globalIdx, x, y, targetWidth, targetHeight,
                         posePtr, BODY_25_PAIRS_GPU, numberPeople, 25, numberPartPairs, BODY_25_COLORS, numberColors,
                         radius, lineWidth, BODY_25_SCALES, numberScales, threshold, alphaColorToAdd,
                         blendOriginalFrame, (googlyEyes ? 15 : -1), (googlyEyes ? 16 : -1));
@@ -823,23 +824,29 @@ namespace op
                 if (poseModel == PoseModel::BODY_25 || poseModel == PoseModel::BODY_25D
                     || poseModel == PoseModel::BODY_25E)
                 {
-                    const auto REPS = 100;
-                    double timeNormalize0 = 0.;
-                    double timeNormalize1 = 0.;
-                    OP_CUDA_PROFILE_INIT(REPS);
-                    renderPoseBody25<<<threadsPerBlock, numBlocks>>>(
-                        framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
-                        blendOriginalFrame, alphaBlending
-                    );
-                    OP_CUDA_PROFILE_END(timeNormalize0, 1e3, REPS);
-                    OP_CUDA_PROFILE_INIT(REPS);
+                    // const auto REPS = 1;
+                    // double timeNormalize0 = 0.;
+                    // double timeNormalize1 = 0.;
+                    // OP_CUDA_PROFILE_INIT(REPS);
+                    // renderPoseBody25<<<threadsPerBlock, numBlocks>>>(
+                    //     framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
+                    //     blendOriginalFrame, alphaBlending
+                    // );
+                    // OP_CUDA_PROFILE_END(timeNormalize0, 1e3, REPS);
+                    // OP_CUDA_PROFILE_INIT(REPS);
+                    dim3 threadsPerBlockBoundBox = {1, 1, 1};
+                    dim3 numBlocksBox = {POSE_MAX_PEOPLE, 1, 1};
+                    findBoundingBoxThing<<<threadsPerBlockBoundBox, numBlocksBox>>>(sharedMaxs,
+                       sharedMins,
+                       sharedScaleF, frameSize.x, frameSize.y,
+                       posePtr, numberPeople, 25, renderThreshold);
                     renderPoseBody25Naive<<<threadsPerBlock, numBlocks>>>(
                         framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
-                        blendOriginalFrame, alphaBlending
+                        blendOriginalFrame, alphaBlending, sharedMins, sharedMaxs, sharedScaleF
                     );
-                    OP_CUDA_PROFILE_END(timeNormalize1, 1e3, REPS);
-                    log("  renderOld=" + std::to_string(timeNormalize0) + "ms");
-                    log("  renderNew=" + std::to_string(timeNormalize1) + "ms");
+                    // OP_CUDA_PROFILE_END(timeNormalize1, 1e3, REPS);
+                    // log("  renderOld=" + std::to_string(timeNormalize0) + "ms");
+                    // log("  renderNew=" + std::to_string(timeNormalize1) + "ms");
                 }
                 else if (poseModel == PoseModel::COCO_18)
                     renderPoseCoco<<<threadsPerBlock, numBlocks>>>(
@@ -874,7 +881,7 @@ namespace op
                     );
                 else if (poseModel == PoseModel::BODY_135)
                 {   
-                    // const auto REPS = 100;
+                    // const auto REPS = 1000;
                     // double timeNormalize0a = 0.;
                     // double timeNormalize0 = 0.;
                     // double timeNormalize1 = 0.;
@@ -886,14 +893,15 @@ namespace op
 
                     // OP_CUDA_PROFILE_INIT(5);
                     // renderPoseBody135Naive<<<threadsPerBlock, numBlocks>>>(
-                    //     framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
-                    //     blendOriginalFrame, alphaBlending
+                    //      framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
+                    //      blendOriginalFrame, alphaBlending
                     // );
                     // OP_CUDA_PROFILE_END(timeNormalize0a, 1e3, REPS);
+                    // // OG Code
                     // OP_CUDA_PROFILE_INIT(REPS);
-                    // renderPoseBody135<<<threadsPerBlock, numBlocks>>>(
-                    //     framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
-                    //     blendOriginalFrame, alphaBlending
+                    //  renderPoseBody135<<<threadsPerBlock, numBlocks>>>(
+                    //      framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
+                    //      blendOriginalFrame, alphaBlending
                     // );
                     // OP_CUDA_PROFILE_END(timeNormalize0, 1e3, REPS);
                     // OP_CUDA_PROFILE_INIT(REPS);
@@ -902,6 +910,8 @@ namespace op
                     //     blendOriginalFrame, alphaBlending
                     // );
                     // OP_CUDA_PROFILE_END(timeNormalize1, 1e3, REPS);
+
+                    // New code 
                     // OP_CUDA_PROFILE_INIT(REPS);
                     dim3 threadsPerBlockBoundBox = {1, 1, 1};
                     dim3 numBlocksBox = {POSE_MAX_PEOPLE, 1, 1};
@@ -914,6 +924,10 @@ namespace op
                         framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
                         blendOriginalFrame, alphaBlending, sharedMins, sharedMaxs, sharedScaleF
                     );
+                    // OP_CUDA_PROFILE_END(timeNormalize1, 1e3, REPS);
+                    // log("  OldRender=" + std::to_string(timeNormalize0) + "ms");
+                    // log("  newRender=" + std::to_string(timeNormalize1) + "ms");
+
                 }
                 else if (poseModel == PoseModel::MPI_15 || poseModel == PoseModel::MPI_15_4)
                     renderPoseMpi29Parts<<<threadsPerBlock, numBlocks>>>(
