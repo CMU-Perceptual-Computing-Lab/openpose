@@ -49,34 +49,31 @@ namespace op
         template <typename T>
     __global__ void resizeAllKernelShared(
         T* targetPtr, const T* const sourcePtr, const int sourceWidth, const int sourceHeight, const int targetWidth,
-        const int targetHeight, const int channels, const unsigned int rescaleFactor)
+        const int targetHeight, const unsigned int rescaleFactor)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
         const auto channel = (blockIdx.z * blockDim.z) + threadIdx.z;
-        
-        const auto minTargetX = blockIdx.x * rescaleFactor;
-        const auto minSourceX = (minTargetX + T(0.5f)) * sourceWidth / T(targetWidth) - T(0.5f);
-        const auto minSourceXInt_1 = int(minSourceX+ 1e-5);
-        const auto minSourceXInt = minSourceXInt_1 - 1;
 
-        const auto minTargetY = blockIdx.y * rescaleFactor;
-        const auto minSourceY = (minTargetY + T(0.5f)) * sourceHeight / T(targetHeight) - T(0.5f);
-        const auto minSourceYInt_1 = int(minSourceY  + 1e-5);
-        const auto minSourceYInt = minSourceYInt_1 - 1;
-
+        // Load shared memory
+        // If resize >= 5, then #threads per block >= # elements of shared memory
         __shared__ T sourcePtrShared[25]; 
-
-        const auto sourceArea = sourceWidth * sourceHeight;
-        const auto targetArea = targetWidth * targetHeight;
-
-        const T* sourcePtrChannel = sourcePtr + channel * sourceArea;
-        // if resize >= 5, then #threads per block >= # elements of shared memory
         const auto sharedLoadId = threadIdx.x + rescaleFactor*threadIdx.y;
         if (sharedLoadId < 25) 
-        {   
+        {
+            const auto minTargetX = blockIdx.x * rescaleFactor;
+            const auto minSourceX = (minTargetX + T(0.5f)) * sourceWidth / T(targetWidth) - T(0.5f);
+            const auto minSourceXInt_1 = int(minSourceX+ 1e-5);
+            const auto minSourceXInt = minSourceXInt_1 - 1;
+            const auto minTargetY = blockIdx.y * rescaleFactor;
+            const auto minSourceY = (minTargetY + T(0.5f)) * sourceHeight / T(targetHeight) - T(0.5f);
+            const auto minSourceYInt_1 = int(minSourceY  + 1e-5);
+            const auto minSourceYInt = minSourceYInt_1 - 1;
+
             const auto yClean = fastTruncateCuda(int(minSourceYInt+sharedLoadId/5 + 1e-5), 0, sourceHeight - 1);
             const auto xClean = fastTruncateCuda(int(minSourceXInt+sharedLoadId%5 + 1e-5), 0, sourceWidth - 1);
+            const auto sourceArea = sourceWidth * sourceHeight;
+            const T* sourcePtrChannel = sourcePtr + channel * sourceArea;
             sourcePtrShared[sharedLoadId] = sourcePtrChannel[yClean * sourceWidth + xClean];
         }
         // if (threadIdx.x == 0) 
@@ -99,6 +96,7 @@ namespace op
 
         if (x < targetWidth && y < targetHeight) 
         {
+            const auto targetArea = targetWidth * targetHeight;
             const T xSource = (x + T(0.5f)) * sourceWidth / T(targetWidth) - T(0.5f);
             const T ySource = (y + T(0.5f)) * sourceHeight / T(targetHeight) - T(0.5f);
             targetPtr[channel * targetArea + y*targetWidth+x] = bicubicInterpolateShared(
@@ -265,8 +263,7 @@ OP_CUDA_PROFILE_INIT(REPS);
                                          getNumberCudaBlocks(targetHeight, threadsPerBlock.y),
                                          getNumberCudaBlocks(num * channels, threadsPerBlock.z)};
                     resizeAllKernelShared<<<numBlocks, threadsPerBlock>>>(
-                        targetPtr, sourcePtrs.at(0), sourceWidth, sourceHeight, targetWidth, targetHeight,
-                        num * channels, rescaleFactor);
+                        targetPtr, sourcePtrs.at(0), sourceWidth, sourceHeight, targetWidth, targetHeight, rescaleFactor);
 OP_CUDA_PROFILE_END(timeNormalize5, 1e3, REPS);
 log("  Res1(ori)=" + std::to_string(timeNormalize1) + "ms");
 log("  Res2(ori)=" + std::to_string(timeNormalize2) + "ms");

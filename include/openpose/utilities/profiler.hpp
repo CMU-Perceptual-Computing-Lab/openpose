@@ -60,6 +60,7 @@ namespace op
         } \
         cudaDeviceSynchronize(); \
         (finalTime) = (factor)/(float)(REPS)*getTimeSeconds(timerInit); \
+        cudaCheck(__LINE__, __FUNCTION__, __FILE__); \
     }
 
     // Enable PROFILER_ENABLED on Makefile.config or CMake in order to use this function. Otherwise nothing will be outputted.
