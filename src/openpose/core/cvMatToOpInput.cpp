@@ -90,9 +90,11 @@ namespace op
                 //             sizeof(unsigned char) * 3 * input_image_size,
                 //             cudaMemcpyHostToDevice);
 
-                // reorderAndCast(CUDA_input_image, CUDA_input_image_reord, cvInputData.cols, cvInputData.rows);
+                // reorderAndCast(CUDA_input_image_reord, CUDA_input_image, cvInputData.cols, cvInputData.rows);
 
-                // resizeAndMergeRGBGPU(CUDA_input_image_reord, CUDA_output_image, cvInputData.cols, cvInputData.rows, netInputSizes[i].x, netInputSizes[i].y, scaleInputToNetInputs[i]);
+                // resizeAndMergeRGBGPU(
+                //     CUDA_output_image, CUDA_input_image_reord, cvInputData.cols, cvInputData.rows, netInputSizes[i].x,
+                //     netInputSizes[i].y, scaleInputToNetInputs[i]);
                 // // copy back to CPU
                 // inputNetData[i].reset({1, 3, netInputSizes.at(i).y, netInputSizes.at(i).x});
 

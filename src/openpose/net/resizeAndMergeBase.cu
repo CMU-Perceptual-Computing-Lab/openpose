@@ -151,7 +151,7 @@ namespace op
     }
 
     __global__ void reorderAndCastKernel(
-        const unsigned char * const srcPtr, float * targetPtr, const int width, const int height)
+        float* targetPtr, const unsigned char* const srcPtr, const int width, const int height)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -167,17 +167,18 @@ namespace op
         }
     }
 
-    void reorderAndCast(const unsigned char * const srcPtr, float * targetPtr, const int width, const int height)
+    void reorderAndCast(float* targetPtr, const unsigned char* const srcPtr, const int width, const int height)
     {
         const dim3 threadsPerBlock{32, 1, 1};
-        const dim3 numBlocks{getNumberCudaBlocks(width, threadsPerBlock.x),
-                        getNumberCudaBlocks(height, threadsPerBlock.y),
-                        getNumberCudaBlocks(3, threadsPerBlock.z)};
-        reorderAndCastKernel<<<numBlocks, threadsPerBlock>>>(srcPtr, targetPtr, width, height);
+        const dim3 numBlocks{
+            getNumberCudaBlocks(width, threadsPerBlock.x),
+            getNumberCudaBlocks(height, threadsPerBlock.y),
+            getNumberCudaBlocks(3, threadsPerBlock.z)};
+        reorderAndCastKernel<<<numBlocks, threadsPerBlock>>>(targetPtr, srcPtr, width, height);
     }
 
     void resizeAndMergeRGBGPU(
-        const float * const srcPtr, float * targetPtr, const int sourceWidth, const int sourceHeight,
+        float* targetPtr, const float* const srcPtr, const int sourceWidth, const int sourceHeight,
         const int targetWidth, const int targetHeight, const float scaleFactor)
 
     {
@@ -193,9 +194,9 @@ namespace op
     }
 
     template <typename T>
-    void resizeAndMergeGpu(T* targetPtr, const std::vector<const T*>& sourcePtrs, const std::array<int, 4>& targetSize,
-                           const std::vector<std::array<int, 4>>& sourceSizes,
-                           const std::vector<T>& scaleInputToNetInputs)
+    void resizeAndMergeGpu(
+        T* targetPtr, const std::vector<const T*>& sourcePtrs, const std::array<int, 4>& targetSize,
+        const std::vector<std::array<int, 4>>& sourceSizes, const std::vector<T>& scaleInputToNetInputs)
     {
         try
         {
@@ -224,58 +225,43 @@ namespace op
                 const auto num = sourceSize[0];
                 if (targetSize[0] > 1 || num == 1)
                 {
-// const auto REPS = 200;
-// const auto REPS = 1;
-// double timeNormalize0 = 0.;
-// double timeNormalize1 = 0.;
-// double timeNormalize2 = 0.;
-// double timeNormalize3 = 0.;
-// OP_CUDA_PROFILE_INIT(5);
-//                     // Option a)
-//                     const auto sourceChannelOffset = sourceHeight * sourceWidth;
-//                     const auto targetChannelOffset = targetWidth * targetHeight;
-//                     for (auto n = 0; n < num; n++)
-//                     {
-//                         const auto offsetBase = n*channels;
-//                         for (auto c = 0 ; c < channels ; c++)
-//                         {
-//                             const auto offset = offsetBase + c;
-//                             resizeKernelOld<<<numBlocks, threadsPerBlock>>>(targetPtr + offset * targetChannelOffset,
-//                                                                          sourcePtrs.at(0) + offset * sourceChannelOffset,
-//                                                                          sourceWidth, sourceHeight, targetWidth,
-//                                                                          targetHeight);
-//                         }
-//                     }
-// OP_CUDA_PROFILE_END(timeNormalize0, 1e3, 5);
-// OP_CUDA_PROFILE_INIT(REPS);
-//                     // Option a)
-//                     const auto sourceChannelOffset = sourceHeight * sourceWidth;
-//                     const auto targetChannelOffset = targetWidth * targetHeight;
-//                     for (auto n = 0; n < num; n++)
-//                     {
-//                         const auto offsetBase = n*channels;
-//                         for (auto c = 0 ; c < channels ; c++)
-//                         {
-//                             const auto offset = offsetBase + c;
-//                             resizeKernelOld<<<numBlocks, threadsPerBlock>>>(targetPtr + offset * targetChannelOffset,
-//                                                                          sourcePtrs.at(0) + offset * sourceChannelOffset,
-//                                                                          sourceWidth, sourceHeight, targetWidth,
-//                                                                          targetHeight);
-//                         }
-//                     }
-// OP_CUDA_PROFILE_END(timeNormalize1, 1e3, REPS);
-// OP_CUDA_PROFILE_INIT(REPS);
-//                     // Optimized function for any resize size (suboptimal for 8x resize)
-//                     const dim3 threadsPerBlock{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D, 1};
-//                     const dim3 numBlocks{getNumberCudaBlocks(targetWidth, threadsPerBlock.x),
-//                                          getNumberCudaBlocks(targetHeight, threadsPerBlock.y),
-//                                          getNumberCudaBlocks(num * channels, threadsPerBlock.z)};
-//                     resizeKernel<<<numBlocks, threadsPerBlock>>>(
-//                         targetPtr, sourcePtrs.at(0), sourceWidth, sourceHeight, targetWidth, targetHeight,
-//                         num * channels);
-// OP_CUDA_PROFILE_END(timeNormalize2, 1e3, REPS);
-// OP_CUDA_PROFILE_INIT(REPS);
+                    // // Profiling code
+                    // const auto REPS = 250;
+                    // double timeNormalize0 = 0.;
+                    // double timeNormalize1 = 0.;
+                    // double timeNormalize2 = 0.;
+                    // double timeNormalize3 = 0.;
+                    // // Non-optimized function
+                    // OP_CUDA_PROFILE_INIT(REPS);
+                    // const auto sourceChannelOffset = sourceHeight * sourceWidth;
+                    // const auto targetChannelOffset = targetWidth * targetHeight;
+                    // for (auto n = 0; n < num; n++)
+                    // {
+                    //     const auto offsetBase = n*channels;
+                    //     for (auto c = 0 ; c < channels ; c++)
+                    //     {
+                    //         const auto offset = offsetBase + c;
+                    //         resizeKernelOld<<<numBlocks, threadsPerBlock>>>(
+                    //             targetPtr + offset * targetChannelOffset,
+                    //             sourcePtrs.at(0) + offset * sourceChannelOffset,
+                    //             sourceWidth, sourceHeight, targetWidth, targetHeight);
+                    //     }
+                    // }
+                    // OP_CUDA_PROFILE_END(timeNormalize1, 1e3, REPS);
+
+                    // // Optimized function for any resize size (suboptimal for 8x resize)
+                    // OP_CUDA_PROFILE_INIT(REPS);
+                    // const dim3 threadsPerBlock{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D, 1};
+                    // const dim3 numBlocks{getNumberCudaBlocks(targetWidth, threadsPerBlock.x),
+                    //                      getNumberCudaBlocks(targetHeight, threadsPerBlock.y),
+                    //                      getNumberCudaBlocks(num * channels, threadsPerBlock.z)};
+                    // resizeKernel<<<numBlocks, threadsPerBlock>>>(
+                    //     targetPtr, sourcePtrs.at(0), sourceWidth, sourceHeight, targetWidth, targetHeight,
+                    //     num * channels);
+                    // OP_CUDA_PROFILE_END(timeNormalize2, 1e3, REPS);
+
                     // Optimized function for 8x resize
+                    // OP_CUDA_PROFILE_INIT(REPS);
                     if (targetWidth / sourceWidth != 8 || targetHeight / sourceHeight != 8)
                         error("Kernel only implemented for 8x resize. Notify us if this error appears.",
                             __LINE__, __FUNCTION__, __FILE__);
@@ -287,10 +273,12 @@ namespace op
                                          getNumberCudaBlocks(num * channels, threadsPerBlock.z)};
                     resize8TimesKernel<<<numBlocks, threadsPerBlock>>>(
                         targetPtr, sourcePtrs.at(0), sourceWidth, sourceHeight, targetWidth, targetHeight, rescaleFactor);
-// OP_CUDA_PROFILE_END(timeNormalize3, 1e3, REPS);
-// log("  Res1(ori)=" + std::to_string(timeNormalize1) + "ms");
-// log("  Res4(new)=" + std::to_string(timeNormalize2) + "ms");
-// log("  Res5(new)=" + std::to_string(timeNormalize3) + "ms");
+                    // OP_CUDA_PROFILE_END(timeNormalize3, 1e3, REPS);
+
+                    // Profiling code
+                    // log("  Res(ori)=" + std::to_string(timeNormalize1) + "ms");
+                    // log("  Res(new)=" + std::to_string(timeNormalize2) + "ms");
+                    // log("  Res(new8x)=" + std::to_string(timeNormalize3) + "ms");
                 }
                 // Old inefficient multi-scale merging
                 else
