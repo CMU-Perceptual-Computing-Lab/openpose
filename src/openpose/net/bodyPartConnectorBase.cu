@@ -68,7 +68,7 @@ namespace op
     }
 
     template <typename T>
-    __global__ void pafScoreKernel(
+    __global__ void pafScoreKernelOld(
         T* pairScoresPtr, const T* const heatMapPtr, const T* const peaksPtr, const unsigned int* const bodyPartPairsPtr,
         const unsigned int* const mapIdxPtr, const unsigned int maxPeaks, const int numberBodyPartPairs,
         const int heatmapWidth, const int heatmapHeight, const T interThreshold, const T interMinAboveThreshold)
@@ -106,7 +106,7 @@ namespace op
     }
 
     template <typename T>
-    __global__ void pafScoreKernelNew(
+    __global__ void pafScoreKernel(
         T* pairScoresPtr, const T* const heatMapPtr, const T* const peaksPtr, const unsigned int* const bodyPartPairsPtr,
         const unsigned int* const mapIdxPtr, const unsigned int maxPeaks, const int numberBodyPartPairs,
         const int heatmapWidth, const int heatmapHeight, const T interThreshold, const T interMinAboveThreshold)
@@ -188,7 +188,7 @@ namespace op
 //                 getNumberCudaBlocks(numberBodyPartPairs, THREADS_PER_BLOCK.x),
 //                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.y),
 //                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.z)};
-//             pafScoreKernel<<<numBlocks, THREADS_PER_BLOCK>>>(
+//             pafScoreKernelOld<<<numBlocks, THREADS_PER_BLOCK>>>(
 //                 pairScoresGpuPtr, heatMapGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr,
 //                 maxPeaks, (int)numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
 //                 interMinAboveThreshold);
@@ -201,7 +201,7 @@ namespace op
 //                 getNumberCudaBlocks(numberBodyPartPairs, THREADS_PER_BLOCK.x),
 //                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.y),
 //                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.z)};
-//             pafScoreKernel<<<numBlocks, THREADS_PER_BLOCK>>>(
+//             pafScoreKernelOld<<<numBlocks, THREADS_PER_BLOCK>>>(
 //                 pairScoresGpuPtr, heatMapGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr,
 //                 maxPeaks, (int)numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
 //                 interMinAboveThreshold);
@@ -215,7 +215,7 @@ namespace op
 //                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.x),
 //                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.y),
 //                 getNumberCudaBlocks(numberBodyPartPairs, THREADS_PER_BLOCK.z)};
-//             pafScoreKernelNew<<<numBlocks, THREADS_PER_BLOCK>>>(
+//             pafScoreKernel<<<numBlocks, THREADS_PER_BLOCK>>>(
 //                 pairScoresGpuPtr, heatMapGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr,
 //                 maxPeaks, (int)numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
 //                 interMinAboveThreshold);
@@ -229,7 +229,7 @@ namespace op
 //                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.x),
 //                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.y),
 //                 getNumberCudaBlocks(numberBodyPartPairs, THREADS_PER_BLOCK.z)};
-//             pafScoreKernelNew<<<numBlocks, THREADS_PER_BLOCK>>>(
+//             pafScoreKernel<<<numBlocks, THREADS_PER_BLOCK>>>(
 //                 pairScoresGpuPtr, heatMapGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr,
 //                 maxPeaks, (int)numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
 //                 interMinAboveThreshold);
@@ -290,7 +290,7 @@ namespace op
 //                 getNumberCudaBlocks(numberBodyPartPairs, THREADS_PER_BLOCK.x),
 //                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.y),
 //                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.z)};
-//             pafScoreKernel<<<numBlocks, THREADS_PER_BLOCK>>>(
+//             pafScoreKernelOld<<<numBlocks, THREADS_PER_BLOCK>>>(
 //                 pairScoresGpuPtr, heatMapGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr,
 //                 maxPeaks, (int)numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
 //                 interMinAboveThreshold);
@@ -335,7 +335,7 @@ namespace op
                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.x),
                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.y),
                 getNumberCudaBlocks(numberBodyPartPairs, THREADS_PER_BLOCK.z)};
-            pafScoreKernelNew<<<numBlocks, THREADS_PER_BLOCK>>>(
+            pafScoreKernel<<<numBlocks, THREADS_PER_BLOCK>>>(
                 pairScoresGpuPtr, heatMapGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr,
                 maxPeaks, (int)numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
                 interMinAboveThreshold);
