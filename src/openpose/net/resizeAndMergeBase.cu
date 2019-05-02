@@ -46,6 +46,32 @@ namespace op
     }
 
 
+    template <typename T>
+    __global__ void resizeAllKernelPad(
+        T* targetPtr, const T* const sourcePtr, const int sourceWidth, const int sourceHeight, const int targetWidth,
+        const int targetHeight, const float rescaleFactor, const int channels)
+    {
+        const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
+        const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+        const auto channel = (blockIdx.z * blockDim.z) + threadIdx.z;
+
+        const auto sourceArea = sourceWidth * sourceHeight;
+        const auto targetArea = targetWidth * targetHeight;
+
+        if (x < targetWidth && y < targetHeight && channel < channels)
+        {
+            const T xSource = (x + T(0.5f)) * 1.0 / T(rescaleFactor) - T(0.5f);
+            const T ySource = (y + T(0.5f)) * 1.0 / T(rescaleFactor) - T(0.5f);
+            const T* sourcePtrChannel = sourcePtr + channel * sourceArea;
+            if (x < sourceWidth * rescaleFactor && y < sourceHeight * rescaleFactor) 
+                targetPtr[channel * targetArea + y*targetWidth+x] = bicubicInterpolate(
+                    sourcePtrChannel, xSource, ySource, sourceWidth, sourceHeight, sourceWidth);
+            else 
+                targetPtr[channel * targetArea + y*targetWidth+x] = 0;
+        }
+    }
+
+
         template <typename T>
     __global__ void resizeAllKernelShared(
         T* targetPtr, const T* const sourcePtr, const int sourceWidth, const int sourceHeight, const int targetWidth,
@@ -139,6 +165,52 @@ namespace op
             targetPixel = (targetPixel + interpolated) / T(counter);
         }
     }
+
+    __global__ void reorderAndCastKernel(unsigned char* srcPtr, float *targetPtr, int width, int height) 
+    {
+        
+        const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
+        const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+        const auto c = (blockIdx.z * blockDim.z) + threadIdx.z;
+        if (x < width && y < height) {
+            const auto channels = 3;
+            const auto originFramePtrOffsetY = y * width;
+            const int channelOffset = c * width * height;
+            targetPtr[channelOffset + y * width + x] =  float (srcPtr[(originFramePtrOffsetY + x) * channels + c]) * (1/256.f) - 0.5f;// normalize something here
+        }
+    }
+
+    void reorderAndCast(unsigned char* srcPtr, float *targetPtr, int width, int height) 
+    {
+        const dim3 threadsPerBlock{32, 1, 1};
+        const dim3 numBlocks{getNumberCudaBlocks(width, threadsPerBlock.x),
+                        getNumberCudaBlocks(height, threadsPerBlock.y),
+                        getNumberCudaBlocks(3, threadsPerBlock.z)};
+                
+        reorderAndCastKernel<<<numBlocks, threadsPerBlock>>>(srcPtr, targetPtr, width, height);
+    }
+
+    void resizeAndMergeRGBGPU(
+                float *srcPtr, float *targetPtr, 
+                int sourceWidth, int sourceHeight,
+                int targetWidth, int targetHeight,
+                float scaleFactor)
+
+    {
+        const auto channels = 3;
+        const dim3 threadsPerBlock{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D, 1};
+        const dim3 numBlocks{getNumberCudaBlocks(targetWidth, threadsPerBlock.x),
+                                  getNumberCudaBlocks(targetHeight, threadsPerBlock.y),
+                                  getNumberCudaBlocks(channels, threadsPerBlock.z)};
+        
+        resizeAllKernelPad<<<numBlocks, threadsPerBlock>>>(
+                targetPtr, srcPtr, sourceWidth, sourceHeight, targetWidth, targetHeight, 
+                scaleFactor,
+                channels);
+       
+    }
+
+
 
     template <typename T>
     void resizeAndMergeGpu(T* targetPtr, const std::vector<const T*>& sourcePtrs, const std::array<int, 4>& targetSize,
