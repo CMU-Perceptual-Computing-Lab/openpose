@@ -6,22 +6,22 @@ namespace op
 {
     const auto THREADS_PER_BLOCK_1D = 16u;
 
-    template <typename T>
-    __global__ void resizeKernelOld(
-        T* targetPtr, const T* const sourcePtr, const int sourceWidth, const int sourceHeight, const int targetWidth,
-        const int targetHeight)
-    {
-        const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
-        const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+    // template <typename T>
+    // __global__ void resizeKernelOld(
+    //     T* targetPtr, const T* const sourcePtr, const int sourceWidth, const int sourceHeight, const int targetWidth,
+    //     const int targetHeight)
+    // {
+    //     const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
+    //     const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
 
-        if (x < targetWidth && y < targetHeight)
-        {
-            const T xSource = (x + T(0.5f)) * sourceWidth / T(targetWidth) - T(0.5f);
-            const T ySource = (y + T(0.5f)) * sourceHeight / T(targetHeight) - T(0.5f);
-            targetPtr[y*targetWidth+x] = bicubicInterpolate(
-                sourcePtr, xSource, ySource, sourceWidth, sourceHeight, sourceWidth);
-        }
-    }
+    //     if (x < targetWidth && y < targetHeight)
+    //     {
+    //         const T xSource = (x + T(0.5f)) * sourceWidth / T(targetWidth) - T(0.5f);
+    //         const T ySource = (y + T(0.5f)) * sourceHeight / T(targetHeight) - T(0.5f);
+    //         targetPtr[y*targetWidth+x] = bicubicInterpolate(
+    //             sourcePtr, xSource, ySource, sourceWidth, sourceHeight, sourceWidth);
+    //     }
+    // }
 
     template <typename T>
     __global__ void resizeKernel(
@@ -109,7 +109,7 @@ namespace op
             const auto targetArea = targetWidth * targetHeight;
             const T xSource = (x + T(0.5f)) * sourceWidth / T(targetWidth) - T(0.5f);
             const T ySource = (y + T(0.5f)) * sourceHeight / T(targetHeight) - T(0.5f);
-            targetPtr[channel * targetArea + y*targetWidth+x] = bicubicInterpolateShared(
+            targetPtr[channel * targetArea + y*targetWidth+x] = bicubicInterpolate8Times(
                 sourcePtrShared, xSource, ySource, sourceWidth, sourceHeight, sourceWidth, threadIdx.x, threadIdx.y);
         }
     }

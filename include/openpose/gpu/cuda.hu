@@ -138,37 +138,9 @@ namespace op
     }
 
     template <typename T>
-    inline __device__ T bicubicInterpolateShared(const T* const sourcePtrShared, const T xSource, const T ySource, const int widthSource,
-                                           const int heightSource, const int widthSourcePtr, 
-                                           const int threadIdxX, const int threadIdxY)
-    {
-        int xIntArray[4];
-        int yIntArray[4];
-        T dx;
-        T dy;
-        //fastTruncateCuda(int(xSource + 1e-5), 0, width - 1);
-        // Now we only need dx and dy
-        xIntArray[1] = fastTruncateCuda(int(xSource + 1e-5), 0, widthSource - 1);
-        yIntArray[1] = fastTruncateCuda(int(ySource + 1e-5), 0, heightSource - 1);
-        dx = xSource - xIntArray[1];
-        dy = ySource - yIntArray[1];
-        //cubicSequentialDataShared(xIntArray, yIntArray, dx, dy, xSource, ySource, widthSource, heightSource);
-
-        T temp[4];
-        for (unsigned char i = 0; i < 4; i++)
-        {
-            // const auto offset = yIntArray[i]*5;
-            const auto offset = 5 * (i + (threadIdxY > 3 ? 1 : 0)) + (threadIdxX > 3 ? 1 : 0);
-            //const auto offset = sourcePtrShared[]
-            temp[i] = cubicInterpolate(sourcePtrShared[offset + 0], sourcePtrShared[offset + 1],
-                                       sourcePtrShared[offset + 2], sourcePtrShared[offset + 3], dx);
-        }
-        return cubicInterpolate(temp[0], temp[1], temp[2], temp[3], dy);
-    }
-
-    template <typename T>
-    inline __device__ T bicubicInterpolate(const T* const sourcePtr, const T xSource, const T ySource, const int widthSource,
-                                           const int heightSource, const int widthSourcePtr)
+    inline __device__ T bicubicInterpolate(
+        const T* const sourcePtr, const T xSource, const T ySource, const int widthSource, const int heightSource,
+        const int widthSourcePtr)
     {
         int xIntArray[4];
         int yIntArray[4];
@@ -182,6 +154,25 @@ namespace op
             const auto offset = yIntArray[i]*widthSourcePtr;
             temp[i] = cubicInterpolate(sourcePtr[offset + xIntArray[0]], sourcePtr[offset + xIntArray[1]],
                                        sourcePtr[offset + xIntArray[2]], sourcePtr[offset + xIntArray[3]], dx);
+        }
+        return cubicInterpolate(temp[0], temp[1], temp[2], temp[3], dy);
+    }
+
+    template <typename T>
+    inline __device__ T bicubicInterpolate8Times(
+        const T* const sourcePtr, const T xSource, const T ySource, const int widthSource, const int heightSource,
+        const int widthSourcePtr, const int threadIdxX, const int threadIdxY)
+    {
+        // Now we only need dx and dy
+        const T dx = xSource - fastTruncateCuda(int(xSource + 1e-5), 0, widthSource - 1);
+        const T dy = ySource - fastTruncateCuda(int(ySource + 1e-5), 0, heightSource - 1);
+
+        T temp[4];
+        for (unsigned char i = 0; i < 4; i++)
+        {
+            const auto offset = 5 * (i + (threadIdxY > 3 ? 1 : 0)) + (threadIdxX > 3 ? 1 : 0);
+            temp[i] = cubicInterpolate(sourcePtr[offset + 0], sourcePtr[offset + 1],
+                                       sourcePtr[offset + 2], sourcePtr[offset + 3], dx);
         }
         return cubicInterpolate(temp[0], temp[1], temp[2], temp[3], dy);
     }
