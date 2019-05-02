@@ -39,6 +39,7 @@ Some speed tips to maximize the OpenPose runtime speed while preserving the accu
     2. Change GPU rendering by CPU rendering to get approximately +0.5 FPS (`--render_pose 1`).
     3. Use cuDNN 5.1 or 7.2 (cuDNN 6 is ~10% slower).
     4. Use the `BODY_25` model for simultaneously maximum speed and accuracy (both COCO and MPII models are slower and less accurate). But it does increase the GPU memory, so it might go out of memory more easily in low-memory GPUs.
+    5. Enable the AVX flag in CMake-GUI (if your computer supports it).
 
 
 
