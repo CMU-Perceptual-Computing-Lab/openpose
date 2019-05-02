@@ -1,3 +1,4 @@
+#include <set>
 #include <openpose/utilities/check.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/pose/poseParameters.hpp>
@@ -459,6 +460,7 @@ namespace op
             const auto peaksOffset = (maxPeaks+1);
             // Save which body parts have been already assigned
             std::vector<int> personAssigned(numberBodyParts*maxPeaks, -1);
+            std::set<int, std::greater<int>> indexesToRemoveSortedSet;
             // Iterate over each PAF pair connection detected
             // E.g., neck1-nose2, neck5-Lshoulder0, etc.
             for (const auto& pairConnection : pairConnections)
@@ -592,18 +594,23 @@ namespace op
                         // Update score
                         peopleVector[assigned1].second += peopleVector[assigned2].second + pafScore;
                         // Erase the non-merged person
-                        peopleVector.erase(peopleVector.begin()+assigned2);
+                        // peopleVector.erase(peopleVector.begin()+assigned2); // x2 slower when removing on-the-fly
+                        indexesToRemoveSortedSet.emplace(assigned2); // Add into set so we can remove them all at once
                         // Update associated personAssigned (person indexes have changed)
                         for (auto& element : personAssigned)
                         {
                             if (element == assigned2)
                                 element = assigned1;
-                            else if (element > assigned2)
-                                element--;
+                            // No need because I will only remove them at the very end
+                            // else if (element > assigned2)
+                            //     element--;
                         }
                     }
                 }
             }
+            // Remove unused people
+            for (const auto& index : indexesToRemoveSortedSet)
+                peopleVector.erase(peopleVector.begin()+index);
             // Return result
             return peopleVector;
         }
@@ -685,7 +692,7 @@ namespace op
                 poseKeypoints.reset();
                 poseScores.reset();
             }
-            const auto numberBodyPartsAndPAFs = numberBodyParts + numberBodyPartPairs;
+            const auto oneOverNumberBodyPartsAndPAFs = 1/T(numberBodyParts + numberBodyPartPairs);
             for (auto person = 0u ; person < validSubsetIndexes.size() ; person++)
             {
                 const auto& personPair = peopleVector[validSubsetIndexes[person]];
@@ -701,7 +708,7 @@ namespace op
                         poseKeypoints[baseOffset + 2] = peaksPtr[bodyPartIndex];
                     }
                 }
-                poseScores[person] = personPair.second / T(numberBodyPartsAndPAFs);
+                poseScores[person] = personPair.second * oneOverNumberBodyPartsAndPAFs;
             }
         }
         catch (const std::exception& e)
