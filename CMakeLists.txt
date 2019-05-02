@@ -78,7 +78,15 @@ if (WIN32)
   # /GL option causes the code to crash -- fix this
   # sdl flags causes error -- error : unknown attribute \"guard\"
 
-  set(CMAKE_CONFIGURATION_TYPES Release Debug CACHE TYPE INTERNAL FORCE)
+  # https://stackoverflow.com/questions/43697154/detect-current-cmake-version-using-cmake
+  message(STATUS "CMAKE_VERSION = ${CMAKE_VERSION}")
+  # Remove "minSizeRel" and "relWithDebInfo"
+  if (${CMAKE_VERSION} VERSION_LESS "3.14.0")
+    set(CMAKE_CONFIGURATION_TYPES Release Debug CACHE TYPE INTERNAL FORCE)
+  else (${CMAKE_VERSION} VERSION_LESS "3.14.0")
+    # But the above line gives warning on CMake >= 3.14, alternative
+    set(CMAKE_CONFIGURATION_TYPES Release Debug CACHE STRING "" FORCE)
+  endif (${CMAKE_VERSION} VERSION_LESS "3.14.0")
 
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
   string(REPLACE "/W3" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
@@ -127,7 +135,7 @@ if (WIN32)
 # Ubuntu
 else (WIN32) # if (CMAKE_COMPILER_IS_GNUCXX)
   if (${INSTRUCTION_SET} MATCHES "AVX2")
-    set(SIMD_FLAGS "${SIMD_FLAGS} -mavx")
+    set(SIMD_FLAGS "${SIMD_FLAGS} -mavx -march=native")
   endif (${INSTRUCTION_SET} MATCHES "AVX2")
   message(STATUS "GCC detected, adding compile flags")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMD_FLAGS}")
@@ -140,8 +148,8 @@ endif (WIN32)
 #   endif (${INSTRUCTION_SET} MATCHES "SSE4")
 #   if (${INSTRUCTION_SET} MATCHES "AVX2")
 #     add_definitions("-DWITH_AVX")
-#     set(SIMD_FLAGS "${SIMD_FLAGS} -mavx")
-#   endif (${INSTRUCTION_SET} MATCHES "AVX")
+#     set(SIMD_FLAGS "${SIMD_FLAGS} -mavx -march=native")
+#   endif (${INSTRUCTION_SET} MATCHES "AVX2")
 #   message(STATUS "GCC detected, adding compile flags")
 #   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMD_FLAGS}")
 # endif (CMAKE_COMPILER_IS_GNUCXX)

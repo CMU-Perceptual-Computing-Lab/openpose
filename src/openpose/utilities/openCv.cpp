@@ -105,10 +105,32 @@ namespace op
             if (normalize == 1)
             {
                 #ifdef WITH_AVX
-                    // // C++ code
+                    // // To check results are the same (norm(x1-x2) = 0)
+                    // cv::Mat floatPtrImageCvWrapper(height, width, CV_32FC3, floatPtrImage);
+                    // cv::Mat floatPtrImageCvWrapperTest = floatPtrImageCvWrapper*(1/256.f) - 0.5f;
+                    // // Speed profiling
+                    // const auto REPS = 2000;
+                    // double timeNormalize0 = 0.;
+                    // double timeNormalize1 = 0.;
+                    // double timeNormalize2 = 0.;
+                    // double timeNormalize3 = 0.;
+                    // // OpenCV wrapper
+                    // OP_PROFILE_INIT(REPS);
+                    // cv::Mat floatPtrImageCvWrapper(height, width, CV_32FC3, floatPtrImage);
+                    // floatPtrImageCvWrapper = floatPtrImageCvWrapper*(1/256.f) - 0.5f;
+                    // OP_PROFILE_END(timeNormalize0, 1e6, REPS);
+                    // // C++ sequential code
+                    // OP_PROFILE_INIT(REPS);
                     // const auto ratio = 1.f/256.f;
                     // for (auto pixel = 0 ; pixel < width*height*channels ; ++pixel)
                     //     floatPtrImage[pixel] = floatPtrImage[pixel]*ratio - 0.5f;
+                    // OP_PROFILE_END(timeNormalize1, 1e6, REPS);
+                    // // OpenCV wrapper
+                    // OP_PROFILE_INIT(REPS);
+                    // cv::Mat floatPtrImageCvWrapper(height, width, CV_32FC3, floatPtrImage);
+                    // floatPtrImageCvWrapper = floatPtrImageCvWrapper*(1/256.f) - 0.5f;
+                    // OP_PROFILE_END(timeNormalize2, 1e6, REPS);
+                    // OP_PROFILE_INIT(REPS);
                     // AVX code
                     const auto volume = width*height*channels;
                     int pixel;
@@ -125,6 +147,16 @@ namespace op
                     const auto ratio = 1.f/256.f;
                     for (; pixel < volume ; ++pixel)
                         floatPtrImage[pixel] = floatPtrImage[pixel]*ratio - 0.5f;
+                    // OP_PROFILE_END(timeNormalize3, 1e6, REPS);
+                    // std::cout
+                    //     << "TN1: " << timeNormalize0 << " us\n"
+                    //     << "TN1: " << timeNormalize1 << " us\n"
+                    //     << "TN2: " << timeNormalize2 << " us\n"
+                    //     << "TN3: " << timeNormalize3 << " us\n"
+                    //     << std::endl;
+                    // std::cout
+                    //     << "Norm: " << cv::norm(floatPtrImageCvWrapper-floatPtrImageCvWrapperTest) << "\n"
+                    //     << std::endl;
                 // Non optimized code
                 #else
                     // floatPtrImage wrapped as cv::Mat

@@ -70,19 +70,19 @@ namespace op
 
     // Max/min functions
     template<class T>
-    inline __device__ T fastMaxCuda(T a, T b)
+    inline __device__ T fastMaxCuda(const T a, const T b)
     {
         return (a > b ? a : b);
     }
 
     template<class T>
-    inline __device__ T fastMinCuda(T a, T b)
+    inline __device__ T fastMinCuda(const T a, const T b)
     {
         return (a < b ? a : b);
     }
 
     template<class T>
-    inline __device__ T fastTruncateCuda(T value, T min = 0, T max = 1)
+    inline __device__ T fastTruncateCuda(const T value, const T min = 0, const T max = 1)
     {
         return fastMinCuda(max, fastMaxCuda(min, value));
     }
