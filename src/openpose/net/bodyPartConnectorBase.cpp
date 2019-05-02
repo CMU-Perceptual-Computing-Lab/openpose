@@ -1,3 +1,4 @@
+#include <set>
 #include <openpose/utilities/check.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/pose/poseParameters.hpp>
@@ -615,6 +616,182 @@ namespace op
     }
 
     template <typename T>
+    std::vector<std::pair<std::vector<int>, T>> pafVectorIntoPeopleVectorNew(
+        const std::vector<std::tuple<T, T, int, int, int>>& pairConnections, const T* const peaksPtr,
+        const int maxPeaks, const std::vector<unsigned int>& bodyPartPairs, const unsigned int numberBodyParts)
+    {
+        try
+        {
+            // std::vector<std::pair<std::vector<int>, double>> refers to:
+            //     - std::vector<int>: [body parts locations, #body parts found]
+            //     - double: person subset score
+            std::vector<std::pair<std::vector<int>, T>> peopleVector;
+            const auto vectorSize = numberBodyParts+1;
+            const auto peaksOffset = (maxPeaks+1);
+            // Save which body parts have been already assigned
+            std::vector<int> personAssigned(numberBodyParts*maxPeaks, -1);
+            std::set<int, std::greater<int>> indexesToRemoveSortedSet;
+            // Iterate over each PAF pair connection detected
+            // E.g., neck1-nose2, neck5-Lshoulder0, etc.
+            for (const auto& pairConnection : pairConnections)
+            {
+                // Read pairConnection
+                // // Total score - only required for previous sort
+                // const auto totalScore = std::get<0>(pairConnection);
+                const auto pafScore = std::get<1>(pairConnection);
+                const auto pairIndex = std::get<2>(pairConnection);
+                const auto indexA = std::get<3>(pairConnection);
+                const auto indexB = std::get<4>(pairConnection);
+                // Derived data
+                const auto bodyPartA = bodyPartPairs[2*pairIndex];
+                const auto bodyPartB = bodyPartPairs[2*pairIndex+1];
+
+                const auto indexScoreA = (bodyPartA*peaksOffset + indexA)*3 + 2;
+                const auto indexScoreB = (bodyPartB*peaksOffset + indexB)*3 + 2;
+                // -1 because indexA and indexB are 1-based
+                auto& aAssigned = personAssigned[bodyPartA*maxPeaks+indexA-1];
+                auto& bAssigned = personAssigned[bodyPartB*maxPeaks+indexB-1];
+                // Debugging
+                #ifdef DEBUG
+                    if (indexA-1 > peaksOffset || indexA <= 0)
+                        error("Something is wrong: " + std::to_string(indexA)
+                              + " vs. " + std::to_string(peaksOffset) + ". Contact us.",
+                              __LINE__, __FUNCTION__, __FILE__);
+                    if (indexB-1 > peaksOffset || indexB <= 0)
+                        error("Something is wrong: " + std::to_string(indexB)
+                              + " vs. " + std::to_string(peaksOffset) + ". Contact us.",
+                              __LINE__, __FUNCTION__, __FILE__);
+                #endif
+
+                // Different cases:
+                //     1. A & B not assigned yet: Create new person
+                //     2. A assigned but not B: Add B to person with A (if no another B there)
+                //     3. B assigned but not A: Add A to person with B (if no another A there)
+                //     4. A & B already assigned to same person (circular/redundant PAF): Update person score
+                //     5. A & B already assigned to different people: Merge people if keypoint intersection is null
+                // 1. A & B not assigned yet: Create new person
+                if (aAssigned < 0 && bAssigned < 0)
+                {
+                    // Keypoint indexes
+                    std::vector<int> rowVector(vectorSize, 0);
+                    rowVector[bodyPartA] = indexScoreA;
+                    rowVector[bodyPartB] = indexScoreB;
+                    // Number keypoints
+                    rowVector.back() = 2;
+                    // Score
+                    const auto personScore = peaksPtr[indexScoreA] + peaksPtr[indexScoreB] + pafScore;
+                    // Set associated personAssigned as assigned
+                    aAssigned = (int)peopleVector.size();
+                    bAssigned = aAssigned;
+                    // Create new personVector
+                    peopleVector.emplace_back(std::make_pair(rowVector, personScore));
+                }
+                // 2. A assigned but not B: Add B to person with A (if no another B there)
+                // or
+                // 3. B assigned but not A: Add A to person with B (if no another A there)
+                else if ((aAssigned >= 0 && bAssigned < 0)
+                    || (aAssigned < 0 && bAssigned >= 0))
+                {
+                    // Assign person1 to one where xAssigned >= 0
+                    const auto assigned1 = (aAssigned >= 0 ? aAssigned : bAssigned);
+                    auto& assigned2 = (aAssigned >= 0 ? bAssigned : aAssigned);
+                    const auto bodyPart2 = (aAssigned >= 0 ? bodyPartB : bodyPartA);
+                    const auto indexScore2 = (aAssigned >= 0 ? indexScoreB : indexScoreA);
+                    // Person index
+                    auto& personVector = peopleVector[assigned1];
+                    // Debugging
+                    #ifdef DEBUG
+                        const auto bodyPart1 = (aAssigned >= 0 ? bodyPartA : bodyPartB);
+                        const auto indexScore1 = (aAssigned >= 0 ? indexScoreA : indexScoreB);
+                        const auto index1 = (aAssigned >= 0 ? indexA : indexB);
+                        if ((unsigned int)personVector.first.at(bodyPart1) != indexScore1)
+                            error("Something is wrong: "
+                                  + std::to_string((personVector.first[bodyPart1]-2)/3-bodyPart1*peaksOffset)
+                                  + " vs. " + std::to_string((indexScore1-2)/3-bodyPart1*peaksOffset) + " vs. "
+                                  + std::to_string(index1) + ". Contact us.",
+                                  __LINE__, __FUNCTION__, __FILE__);
+                    #endif
+                    // If person with 1 does not have a 2 yet
+                    if (personVector.first[bodyPart2] == 0)
+                    {
+                        // Update keypoint indexes
+                        personVector.first[bodyPart2] = indexScore2;
+                        // Update number keypoints
+                        personVector.first.back()++;
+                        // Update score
+                        personVector.second += peaksPtr[indexScore2] + pafScore;
+                        // Set associated personAssigned as assigned
+                        assigned2 = assigned1;
+                    }
+                    // Otherwise, ignore this B because the previous one came from a higher PAF-confident score
+                }
+                // 4. A & B already assigned to same person (circular/redundant PAF): Update person score
+                else if (aAssigned >=0 && bAssigned >=0 && aAssigned == bAssigned)
+                    peopleVector[aAssigned].second += pafScore;
+                // 5. A & B already assigned to different people: Merge people if keypoint intersection is null
+                // I.e., that the keypoints in person A and B do not overlap
+                else if (aAssigned >=0 && bAssigned >=0 && aAssigned != bAssigned)
+                {
+                    // Assign person1 to the one with lowest index for 2 reasons:
+                    //     1. Speed up: Removing an element from std::vector is cheaper for latest elements
+                    //     2. Avoid harder index update: Updated elements in person1ssigned would depend on
+                    //        whether person1 > person2 or not: element = aAssigned - (person2 > person1 ? 1 : 0)
+                    const auto assigned1 = (aAssigned < bAssigned ? aAssigned : bAssigned);
+                    const auto assigned2 = (aAssigned < bAssigned ? bAssigned : aAssigned);
+                    auto& person1 = peopleVector[assigned1].first;
+                    const auto& person2 = peopleVector[assigned2].first;
+                    // Check if complementary
+                    // Defining found keypoint indexes in personA as kA, and analogously kB
+                    // Complementary if and only if kA intersection kB = empty. I.e., no common keypoints
+                    bool complementary = true;
+                    for (auto part = 0u ; part < numberBodyParts ; part++)
+                    {
+                        if (person1[part] > 0 && person2[part] > 0)
+                        {
+                            complementary = false;
+                            break;
+                        }
+                    }
+                    // If complementary, merge both people into 1
+                    if (complementary)
+                    {
+                        // Update keypoint indexes
+                        for (auto part = 0u ; part < numberBodyParts ; part++)
+                            if (person1[part] == 0)
+                                person1[part] = person2[part];
+                        // Update number keypoints
+                        person1.back() += person2.back();
+                        // Update score
+                        peopleVector[assigned1].second += peopleVector[assigned2].second + pafScore;
+                        // Erase the non-merged person
+                        // peopleVector.erase(peopleVector.begin()+assigned2); // x2 slower when removing on-the-fly
+                        indexesToRemoveSortedSet.emplace(assigned2); // Add into set so we can remove them all at once
+                        // Update associated personAssigned (person indexes have changed)
+                        for (auto& element : personAssigned)
+                        {
+                            if (element == assigned2)
+                                element = assigned1;
+                            // No need because I will only remove them at the very end
+                            // else if (element > assigned2)
+                            //     element--;
+                        }
+                    }
+                }
+            }
+            // Remove unused people
+            for (const auto& index : indexesToRemoveSortedSet)
+                peopleVector.erase(peopleVector.begin()+index);
+            // Return result
+            return peopleVector;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return {};
+        }
+    }
+
+    template <typename T>
     void removePeopleBelowThresholds(
         std::vector<int>& validSubsetIndexes, int& numberPeople,
         const std::vector<std::pair<std::vector<int>, T>>& peopleVector, const unsigned int numberBodyParts,
@@ -685,7 +862,7 @@ namespace op
                 poseKeypoints.reset();
                 poseScores.reset();
             }
-            const auto numberBodyPartsAndPAFs = numberBodyParts + numberBodyPartPairs;
+            const auto oneOverNumberBodyPartsAndPAFs = 1/T(numberBodyParts + numberBodyPartPairs);
             for (auto person = 0u ; person < validSubsetIndexes.size() ; person++)
             {
                 const auto& personPair = peopleVector[validSubsetIndexes[person]];
@@ -701,7 +878,7 @@ namespace op
                         poseKeypoints[baseOffset + 2] = peaksPtr[bodyPartIndex];
                     }
                 }
-                poseScores[person] = personPair.second / T(numberBodyPartsAndPAFs);
+                poseScores[person] = personPair.second * oneOverNumberBodyPartsAndPAFs;
             }
         }
         catch (const std::exception& e)
@@ -1214,6 +1391,15 @@ namespace op
         const float* const peaksPtr, const int maxPeaks, const std::vector<unsigned int>& bodyPartPairs,
         const unsigned int numberBodyParts);
     template OP_API std::vector<std::pair<std::vector<int>, double>> pafVectorIntoPeopleVector(
+        const std::vector<std::tuple<double, double, int, int, int>>& pairConnections,
+        const double* const peaksPtr, const int maxPeaks, const std::vector<unsigned int>& bodyPartPairs,
+        const unsigned int numberBodyParts);
+
+    template OP_API std::vector<std::pair<std::vector<int>, float>> pafVectorIntoPeopleVectorNew(
+        const std::vector<std::tuple<float, float, int, int, int>>& pairConnections,
+        const float* const peaksPtr, const int maxPeaks, const std::vector<unsigned int>& bodyPartPairs,
+        const unsigned int numberBodyParts);
+    template OP_API std::vector<std::pair<std::vector<int>, double>> pafVectorIntoPeopleVectorNew(
         const std::vector<std::tuple<double, double, int, int, int>>& pairConnections,
         const double* const peaksPtr, const int maxPeaks, const std::vector<unsigned int>& bodyPartPairs,
         const unsigned int numberBodyParts);

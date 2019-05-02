@@ -62,6 +62,11 @@ namespace op
     std::vector<std::pair<std::vector<int>, T>> pafVectorIntoPeopleVector(
         const std::vector<std::tuple<T, T, int, int, int>>& pairScores, const T* const peaksPtr, const int maxPeaks,
         const std::vector<unsigned int>& bodyPartPairs, const unsigned int numberBodyParts);
+
+    template <typename T>
+    std::vector<std::pair<std::vector<int>, T>> pafVectorIntoPeopleVectorNew(
+        const std::vector<std::tuple<T, T, int, int, int>>& pairScores, const T* const peaksPtr, const int maxPeaks,
+        const std::vector<unsigned int>& bodyPartPairs, const unsigned int numberBodyParts);
 }
 
 #endif // OPENPOSE_POSE_BODY_PARTS_CONNECTOR_HPP
