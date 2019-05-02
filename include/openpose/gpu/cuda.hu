@@ -87,23 +87,6 @@ namespace op
         return fastMinCuda(max, fastMaxCuda(min, value));
     }
 
-    template <typename T>
-    inline __device__ void cubicSequentialDataShared(int* xIntArray, int* yIntArray, T& dx, T& dy, const T xSource, const T ySource,
-                                               const int width, const int height)
-    {
-        xIntArray[1] = fastTruncateCuda(int(xSource + 1e-5), 0, width - 1);
-        xIntArray[0] = fastMaxCuda(0, xIntArray[1] - 1);
-        xIntArray[2] = fastMinCuda(width - 1, xIntArray[1] + 1);
-        xIntArray[3] = fastMinCuda(width - 1, xIntArray[2] + 1);
-        dx = xSource - xIntArray[1];
-
-        yIntArray[1] = fastTruncateCuda(int(ySource + 1e-5), 0, height - 1);
-        yIntArray[0] = fastMaxCuda(0, yIntArray[1] - 1);
-        yIntArray[2] = fastMinCuda(height - 1, yIntArray[1] + 1);
-        yIntArray[3] = fastMinCuda(height - 1, yIntArray[2] + 1);
-        dy = ySource - yIntArray[1];
-    }
-
     // Cubic interpolation
     template <typename T>
     inline __device__ void cubicSequentialData(int* xIntArray, int* yIntArray, T& dx, T& dy, const T xSource, const T ySource,
