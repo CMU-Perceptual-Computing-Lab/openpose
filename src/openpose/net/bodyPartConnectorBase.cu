@@ -342,55 +342,11 @@ namespace op
 
 
 // OP_CUDA_PROFILE_INIT(REPS);
-//             const dim3 numBlocks{
-//                 getNumberCudaBlocks(numberBodyPartPairs, THREADS_PER_BLOCK.x),
-//                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.y),
-//                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.z)};
-//             pafScoreKernel<<<numBlocks, THREADS_PER_BLOCK>>>(
-//                 pairScoresGpuPtr, heatMapGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr,
-//                 maxPeaks, (int)numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
-//                 interMinAboveThreshold);
-//             // pairScoresCpu <-- pairScoresGpu
-//             cudaMemcpy(pairScoresCpu.getPtr(), pairScoresGpuPtr, totalComputations * sizeof(T),
-//                        cudaMemcpyDeviceToHost);
-
-//             // New code
-//             // Get pair connections and their scores
-//             const auto pairConnections = pafPtrIntoVector(
-//                 pairScoresCpu, peaksPtr, maxPeaks, bodyPartPairs, numberBodyPartPairs);
-//             const auto peopleVector = pafVectorIntoPeopleVector(
-//                 pairConnections, peaksPtr, maxPeaks, bodyPartPairs, numberBodyParts);
-
-//             // // Old code
-//             // // Get pair connections and their scores
-//             // // std::vector<std::pair<std::vector<int>, double>> refers to:
-//             // //     - std::vector<int>: [body parts locations, #body parts found]
-//             // //     - double: person subset score
-//             // const T* const tNullptr = nullptr;
-//             // const auto peopleVector = createPeopleVector(
-//             //     tNullptr, peaksPtr, poseModel, heatMapSize, maxPeaks, interThreshold, interMinAboveThreshold,
-//             //     bodyPartPairs, numberBodyParts, numberBodyPartPairs, pairScoresCpu);
-
-//             // Delete people below the following thresholds:
-//                 // a) minSubsetCnt: removed if less than minSubsetCnt body parts
-//                 // b) minSubsetScore: removed if global score smaller than this
-//                 // c) maxPeaks (POSE_MAX_PEOPLE): keep first maxPeaks people above thresholds
-//             int numberPeople;
-//             std::vector<int> validSubsetIndexes;
-//             validSubsetIndexes.reserve(fastMin((size_t)maxPeaks, peopleVector.size()));
-//             removePeopleBelowThresholds(validSubsetIndexes, numberPeople, peopleVector, numberBodyParts, minSubsetCnt,
-//                                         minSubsetScore, maxPeaks, maximizePositives);
-
-//             // Fill and return poseKeypoints
-//             peopleVectorToPeopleArray(poseKeypoints, poseScores, scaleFactor, peopleVector, validSubsetIndexes,
-//                                       peaksPtr, numberPeople, numberBodyParts, numberBodyPartPairs);
-// OP_PROFILE_END(timeNormalize8, 1e3, REPS);
-// OP_CUDA_PROFILE_INIT(REPS);
             const dim3 numBlocks{
                 getNumberCudaBlocks(numberBodyPartPairs, THREADS_PER_BLOCK.x),
                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.y),
                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.z)};
-            pafScoreKernelNew<<<numBlocks, THREADS_PER_BLOCK>>>(
+            pafScoreKernel<<<numBlocks, THREADS_PER_BLOCK>>>(
                 pairScoresGpuPtr, heatMapGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr,
                 maxPeaks, (int)numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
                 interMinAboveThreshold);
@@ -402,7 +358,7 @@ namespace op
             // Get pair connections and their scores
             const auto pairConnections = pafPtrIntoVector(
                 pairScoresCpu, peaksPtr, maxPeaks, bodyPartPairs, numberBodyPartPairs);
-            const auto peopleVector = pafVectorIntoPeopleVectorNew(
+            const auto peopleVector = pafVectorIntoPeopleVector(
                 pairConnections, peaksPtr, maxPeaks, bodyPartPairs, numberBodyParts);
 
             // // Old code
@@ -428,6 +384,50 @@ namespace op
             // Fill and return poseKeypoints
             peopleVectorToPeopleArray(poseKeypoints, poseScores, scaleFactor, peopleVector, validSubsetIndexes,
                                       peaksPtr, numberPeople, numberBodyParts, numberBodyPartPairs);
+// OP_PROFILE_END(timeNormalize8, 1e3, REPS);
+// OP_CUDA_PROFILE_INIT(REPS);
+            // const dim3 numBlocks{
+            //     getNumberCudaBlocks(numberBodyPartPairs, THREADS_PER_BLOCK.x),
+            //     getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.y),
+            //     getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.z)};
+            // pafScoreKernelNew<<<numBlocks, THREADS_PER_BLOCK>>>(
+            //     pairScoresGpuPtr, heatMapGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr,
+            //     maxPeaks, (int)numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
+            //     interMinAboveThreshold);
+            // // pairScoresCpu <-- pairScoresGpu
+            // cudaMemcpy(pairScoresCpu.getPtr(), pairScoresGpuPtr, totalComputations * sizeof(T),
+            //            cudaMemcpyDeviceToHost);
+
+            // // New code
+            // // Get pair connections and their scores
+            // const auto pairConnections = pafPtrIntoVector(
+            //     pairScoresCpu, peaksPtr, maxPeaks, bodyPartPairs, numberBodyPartPairs);
+            // const auto peopleVector = pafVectorIntoPeopleVectorNew(
+            //     pairConnections, peaksPtr, maxPeaks, bodyPartPairs, numberBodyParts);
+
+            // // // Old code
+            // // // Get pair connections and their scores
+            // // // std::vector<std::pair<std::vector<int>, double>> refers to:
+            // // //     - std::vector<int>: [body parts locations, #body parts found]
+            // // //     - double: person subset score
+            // // const T* const tNullptr = nullptr;
+            // // const auto peopleVector = createPeopleVector(
+            // //     tNullptr, peaksPtr, poseModel, heatMapSize, maxPeaks, interThreshold, interMinAboveThreshold,
+            // //     bodyPartPairs, numberBodyParts, numberBodyPartPairs, pairScoresCpu);
+
+            // // Delete people below the following thresholds:
+            //     // a) minSubsetCnt: removed if less than minSubsetCnt body parts
+            //     // b) minSubsetScore: removed if global score smaller than this
+            //     // c) maxPeaks (POSE_MAX_PEOPLE): keep first maxPeaks people above thresholds
+            // int numberPeople;
+            // std::vector<int> validSubsetIndexes;
+            // validSubsetIndexes.reserve(fastMin((size_t)maxPeaks, peopleVector.size()));
+            // removePeopleBelowThresholds(validSubsetIndexes, numberPeople, peopleVector, numberBodyParts, minSubsetCnt,
+            //                             minSubsetScore, maxPeaks, maximizePositives);
+
+            // // Fill and return poseKeypoints
+            // peopleVectorToPeopleArray(poseKeypoints, poseScores, scaleFactor, peopleVector, validSubsetIndexes,
+            //                           peaksPtr, numberPeople, numberBodyParts, numberBodyPartPairs);
 // OP_PROFILE_END(timeNormalize9, 1e3, REPS);
 
 // // Profiling code
