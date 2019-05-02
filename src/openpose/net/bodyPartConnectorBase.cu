@@ -234,51 +234,158 @@ namespace op
                       __LINE__, __FUNCTION__, __FILE__);
 
             // Run Kernel - pairScoresGpu
-// const auto REPS = 1;
-const auto REPS = 250;
-double timeNormalize0 = 0.;
-double timeNormalize1 = 0.;
-double timeNormalize2 = 0.;
-double timeNormalize4 = 0.;
-double timeNormalize5a = 0.;
-double timeNormalize5b = 0.;
-double timeNormalize6 = 0.;
-double timeNormalize7 = 0.;
-double timeNormalize8 = 0.;
-double timeNormalize9 = 0.;
-OP_CUDA_PROFILE_INIT(5);
-            const dim3 numBlocks{
-                getNumberCudaBlocks(numberBodyPartPairs, THREADS_PER_BLOCK.x),
-                getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.y),
-                getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.z)};
-            pafScoreKernel<<<numBlocks, THREADS_PER_BLOCK>>>(
-                pairScoresGpuPtr, heatMapGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr,
-                maxPeaks, (int)numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
-                interMinAboveThreshold);
-            // pairScoresCpu <-- pairScoresGpu
-            cudaMemcpy(pairScoresCpu.getPtr(), pairScoresGpuPtr, totalComputations * sizeof(T),
-                       cudaMemcpyDeviceToHost);
-OP_CUDA_PROFILE_END(timeNormalize0, 1e3, REPS);
-OP_CUDA_PROFILE_INIT(REPS);
-            const dim3 numBlocks{
-                getNumberCudaBlocks(numberBodyPartPairs, THREADS_PER_BLOCK.x),
-                getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.y),
-                getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.z)};
-            pafScoreKernel<<<numBlocks, THREADS_PER_BLOCK>>>(
-                pairScoresGpuPtr, heatMapGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr,
-                maxPeaks, (int)numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
-                interMinAboveThreshold);
-            // pairScoresCpu <-- pairScoresGpu
-            cudaMemcpy(pairScoresCpu.getPtr(), pairScoresGpuPtr, totalComputations * sizeof(T),
-                       cudaMemcpyDeviceToHost);
-OP_CUDA_PROFILE_END(timeNormalize1, 1e3, REPS);
-{
-const dim3 THREADS_PER_BLOCK{1, 1, 64};
-const dim3 numBlocks{
-    getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.x),
-    getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.y),
-    getNumberCudaBlocks(numberBodyPartPairs, THREADS_PER_BLOCK.z)};
-OP_CUDA_PROFILE_INIT(REPS);
+// // const auto REPS = 1;
+// const auto REPS = 250;
+// double timeNormalize0 = 0.;
+// double timeNormalize1 = 0.;
+// double timeNormalize2 = 0.;
+// double timeNormalize4 = 0.;
+// double timeNormalize5a = 0.;
+// double timeNormalize5b = 0.;
+// double timeNormalize6 = 0.;
+// double timeNormalize7 = 0.;
+// double timeNormalize8 = 0.;
+// double timeNormalize9 = 0.;
+// OP_CUDA_PROFILE_INIT(5);
+//             const dim3 numBlocks{
+//                 getNumberCudaBlocks(numberBodyPartPairs, THREADS_PER_BLOCK.x),
+//                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.y),
+//                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.z)};
+//             pafScoreKernel<<<numBlocks, THREADS_PER_BLOCK>>>(
+//                 pairScoresGpuPtr, heatMapGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr,
+//                 maxPeaks, (int)numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
+//                 interMinAboveThreshold);
+//             // pairScoresCpu <-- pairScoresGpu
+//             cudaMemcpy(pairScoresCpu.getPtr(), pairScoresGpuPtr, totalComputations * sizeof(T),
+//                        cudaMemcpyDeviceToHost);
+// OP_CUDA_PROFILE_END(timeNormalize0, 1e3, REPS);
+// OP_CUDA_PROFILE_INIT(REPS);
+//             const dim3 numBlocks{
+//                 getNumberCudaBlocks(numberBodyPartPairs, THREADS_PER_BLOCK.x),
+//                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.y),
+//                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.z)};
+//             pafScoreKernel<<<numBlocks, THREADS_PER_BLOCK>>>(
+//                 pairScoresGpuPtr, heatMapGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr,
+//                 maxPeaks, (int)numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
+//                 interMinAboveThreshold);
+//             // pairScoresCpu <-- pairScoresGpu
+//             cudaMemcpy(pairScoresCpu.getPtr(), pairScoresGpuPtr, totalComputations * sizeof(T),
+//                        cudaMemcpyDeviceToHost);
+// OP_CUDA_PROFILE_END(timeNormalize1, 1e3, REPS);
+// {
+// const dim3 THREADS_PER_BLOCK{1, 1, 64};
+// const dim3 numBlocks{
+//     getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.x),
+//     getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.y),
+//     getNumberCudaBlocks(numberBodyPartPairs, THREADS_PER_BLOCK.z)};
+// OP_CUDA_PROFILE_INIT(REPS);
+//             const dim3 numBlocks{
+//                 getNumberCudaBlocks(numberBodyPartPairs, THREADS_PER_BLOCK.x),
+//                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.y),
+//                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.z)};
+//             pafScoreKernelNew<<<numBlocks, THREADS_PER_BLOCK>>>(
+//                 pairScoresGpuPtr, heatMapGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr,
+//                 maxPeaks, (int)numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
+//                 interMinAboveThreshold);
+//             // pairScoresCpu <-- pairScoresGpu
+//             cudaMemcpy(pairScoresCpu.getPtr(), pairScoresGpuPtr, totalComputations * sizeof(T),
+//                        cudaMemcpyDeviceToHost);
+// OP_CUDA_PROFILE_END(timeNormalize2, 1e3, REPS);
+// }
+
+// OP_PROFILE_INIT(REPS);
+//             // New code
+//             // Get pair connections and their scores
+//             const auto pairConnections = pafPtrIntoVector(
+//                 pairScoresCpu, peaksPtr, maxPeaks, bodyPartPairs, numberBodyPartPairs);
+// OP_PROFILE_END(timeNormalize4, 1e3, REPS);
+//             const auto pairConnections = pafPtrIntoVector(
+//                 pairScoresCpu, peaksPtr, maxPeaks, bodyPartPairs, numberBodyPartPairs);
+// OP_PROFILE_INIT(REPS);
+//             const auto peopleVector = pafVectorIntoPeopleVector(
+//                 pairConnections, peaksPtr, maxPeaks, bodyPartPairs, numberBodyParts);
+// OP_PROFILE_END(timeNormalize5a, 1e3, REPS);
+// OP_PROFILE_INIT(REPS);
+//             const auto peopleVector = pafVectorIntoPeopleVectorNew(
+//                 pairConnections, peaksPtr, maxPeaks, bodyPartPairs, numberBodyParts);
+// OP_PROFILE_END(timeNormalize5b, 1e3, REPS);
+//             const auto peopleVector = pafVectorIntoPeopleVector(
+//                 pairConnections, peaksPtr, maxPeaks, bodyPartPairs, numberBodyParts);
+
+//             // // Old code
+//             // // Get pair connections and their scores
+//             // // std::vector<std::pair<std::vector<int>, double>> refers to:
+//             // //     - std::vector<int>: [body parts locations, #body parts found]
+//             // //     - double: person subset score
+//             // const T* const tNullptr = nullptr;
+//             // const auto peopleVector = createPeopleVector(
+//             //     tNullptr, peaksPtr, poseModel, heatMapSize, maxPeaks, interThreshold, interMinAboveThreshold,
+//             //     bodyPartPairs, numberBodyParts, numberBodyPartPairs, pairScoresCpu);
+
+//             // Delete people below the following thresholds:
+//                 // a) minSubsetCnt: removed if less than minSubsetCnt body parts
+//                 // b) minSubsetScore: removed if global score smaller than this
+//                 // c) maxPeaks (POSE_MAX_PEOPLE): keep first maxPeaks people above thresholds
+//             int numberPeople;
+//             std::vector<int> validSubsetIndexes;
+// OP_PROFILE_INIT(1);
+//             validSubsetIndexes.reserve(fastMin((size_t)maxPeaks, peopleVector.size()));
+//             removePeopleBelowThresholds(validSubsetIndexes, numberPeople, peopleVector, numberBodyParts, minSubsetCnt,
+//                                         minSubsetScore, maxPeaks, maximizePositives);
+// OP_PROFILE_END(timeNormalize6, 1e3, 1);
+
+//             // Fill and return poseKeypoints
+// OP_PROFILE_INIT(REPS);
+//             peopleVectorToPeopleArray(poseKeypoints, poseScores, scaleFactor, peopleVector, validSubsetIndexes,
+//                                       peaksPtr, numberPeople, numberBodyParts, numberBodyPartPairs);
+// OP_PROFILE_END(timeNormalize7, 1e3, REPS);
+
+
+// OP_CUDA_PROFILE_INIT(REPS);
+//             const dim3 numBlocks{
+//                 getNumberCudaBlocks(numberBodyPartPairs, THREADS_PER_BLOCK.x),
+//                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.y),
+//                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.z)};
+//             pafScoreKernel<<<numBlocks, THREADS_PER_BLOCK>>>(
+//                 pairScoresGpuPtr, heatMapGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr,
+//                 maxPeaks, (int)numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
+//                 interMinAboveThreshold);
+//             // pairScoresCpu <-- pairScoresGpu
+//             cudaMemcpy(pairScoresCpu.getPtr(), pairScoresGpuPtr, totalComputations * sizeof(T),
+//                        cudaMemcpyDeviceToHost);
+
+//             // New code
+//             // Get pair connections and their scores
+//             const auto pairConnections = pafPtrIntoVector(
+//                 pairScoresCpu, peaksPtr, maxPeaks, bodyPartPairs, numberBodyPartPairs);
+//             const auto peopleVector = pafVectorIntoPeopleVector(
+//                 pairConnections, peaksPtr, maxPeaks, bodyPartPairs, numberBodyParts);
+
+//             // // Old code
+//             // // Get pair connections and their scores
+//             // // std::vector<std::pair<std::vector<int>, double>> refers to:
+//             // //     - std::vector<int>: [body parts locations, #body parts found]
+//             // //     - double: person subset score
+//             // const T* const tNullptr = nullptr;
+//             // const auto peopleVector = createPeopleVector(
+//             //     tNullptr, peaksPtr, poseModel, heatMapSize, maxPeaks, interThreshold, interMinAboveThreshold,
+//             //     bodyPartPairs, numberBodyParts, numberBodyPartPairs, pairScoresCpu);
+
+//             // Delete people below the following thresholds:
+//                 // a) minSubsetCnt: removed if less than minSubsetCnt body parts
+//                 // b) minSubsetScore: removed if global score smaller than this
+//                 // c) maxPeaks (POSE_MAX_PEOPLE): keep first maxPeaks people above thresholds
+//             int numberPeople;
+//             std::vector<int> validSubsetIndexes;
+//             validSubsetIndexes.reserve(fastMin((size_t)maxPeaks, peopleVector.size()));
+//             removePeopleBelowThresholds(validSubsetIndexes, numberPeople, peopleVector, numberBodyParts, minSubsetCnt,
+//                                         minSubsetScore, maxPeaks, maximizePositives);
+
+//             // Fill and return poseKeypoints
+//             peopleVectorToPeopleArray(poseKeypoints, poseScores, scaleFactor, peopleVector, validSubsetIndexes,
+//                                       peaksPtr, numberPeople, numberBodyParts, numberBodyPartPairs);
+// OP_PROFILE_END(timeNormalize8, 1e3, REPS);
+// OP_CUDA_PROFILE_INIT(REPS);
             const dim3 numBlocks{
                 getNumberCudaBlocks(numberBodyPartPairs, THREADS_PER_BLOCK.x),
                 getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.y),
@@ -290,113 +397,6 @@ OP_CUDA_PROFILE_INIT(REPS);
             // pairScoresCpu <-- pairScoresGpu
             cudaMemcpy(pairScoresCpu.getPtr(), pairScoresGpuPtr, totalComputations * sizeof(T),
                        cudaMemcpyDeviceToHost);
-OP_CUDA_PROFILE_END(timeNormalize2, 1e3, REPS);
-}
-
-OP_PROFILE_INIT(REPS);
-            // New code
-            // Get pair connections and their scores
-            const auto pairConnections = pafPtrIntoVector(
-                pairScoresCpu, peaksPtr, maxPeaks, bodyPartPairs, numberBodyPartPairs);
-OP_PROFILE_END(timeNormalize4, 1e3, REPS);
-            const auto pairConnections = pafPtrIntoVector(
-                pairScoresCpu, peaksPtr, maxPeaks, bodyPartPairs, numberBodyPartPairs);
-OP_PROFILE_INIT(REPS);
-            const auto peopleVector = pafVectorIntoPeopleVector(
-                pairConnections, peaksPtr, maxPeaks, bodyPartPairs, numberBodyParts);
-OP_PROFILE_END(timeNormalize5a, 1e3, REPS);
-OP_PROFILE_INIT(REPS);
-            const auto peopleVector = pafVectorIntoPeopleVectorNew(
-                pairConnections, peaksPtr, maxPeaks, bodyPartPairs, numberBodyParts);
-OP_PROFILE_END(timeNormalize5b, 1e3, REPS);
-            const auto peopleVector = pafVectorIntoPeopleVector(
-                pairConnections, peaksPtr, maxPeaks, bodyPartPairs, numberBodyParts);
-
-            // // Old code
-            // // Get pair connections and their scores
-            // // std::vector<std::pair<std::vector<int>, double>> refers to:
-            // //     - std::vector<int>: [body parts locations, #body parts found]
-            // //     - double: person subset score
-            // const T* const tNullptr = nullptr;
-            // const auto peopleVector = createPeopleVector(
-            //     tNullptr, peaksPtr, poseModel, heatMapSize, maxPeaks, interThreshold, interMinAboveThreshold,
-            //     bodyPartPairs, numberBodyParts, numberBodyPartPairs, pairScoresCpu);
-
-            // Delete people below the following thresholds:
-                // a) minSubsetCnt: removed if less than minSubsetCnt body parts
-                // b) minSubsetScore: removed if global score smaller than this
-                // c) maxPeaks (POSE_MAX_PEOPLE): keep first maxPeaks people above thresholds
-            int numberPeople;
-            std::vector<int> validSubsetIndexes;
-OP_PROFILE_INIT(1);
-            validSubsetIndexes.reserve(fastMin((size_t)maxPeaks, peopleVector.size()));
-            removePeopleBelowThresholds(validSubsetIndexes, numberPeople, peopleVector, numberBodyParts, minSubsetCnt,
-                                        minSubsetScore, maxPeaks, maximizePositives);
-OP_PROFILE_END(timeNormalize6, 1e3, 1);
-
-            // Fill and return poseKeypoints
-OP_PROFILE_INIT(REPS);
-            peopleVectorToPeopleArray(poseKeypoints, poseScores, scaleFactor, peopleVector, validSubsetIndexes,
-                                      peaksPtr, numberPeople, numberBodyParts, numberBodyPartPairs);
-OP_PROFILE_END(timeNormalize7, 1e3, REPS);
-
-
-OP_CUDA_PROFILE_INIT(REPS);
-            const dim3 numBlocks{
-                getNumberCudaBlocks(numberBodyPartPairs, THREADS_PER_BLOCK.x),
-                getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.y),
-                getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.z)};
-            pafScoreKernel<<<numBlocks, THREADS_PER_BLOCK>>>(
-                pairScoresGpuPtr, heatMapGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr,
-                maxPeaks, (int)numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
-                interMinAboveThreshold);
-            // pairScoresCpu <-- pairScoresGpu
-            cudaMemcpy(pairScoresCpu.getPtr(), pairScoresGpuPtr, totalComputations * sizeof(T),
-                       cudaMemcpyDeviceToHost);
-
-            // New code
-            // Get pair connections and their scores
-            const auto pairConnections = pafPtrIntoVector(
-                pairScoresCpu, peaksPtr, maxPeaks, bodyPartPairs, numberBodyPartPairs);
-            const auto peopleVector = pafVectorIntoPeopleVector(
-                pairConnections, peaksPtr, maxPeaks, bodyPartPairs, numberBodyParts);
-
-            // // Old code
-            // // Get pair connections and their scores
-            // // std::vector<std::pair<std::vector<int>, double>> refers to:
-            // //     - std::vector<int>: [body parts locations, #body parts found]
-            // //     - double: person subset score
-            // const T* const tNullptr = nullptr;
-            // const auto peopleVector = createPeopleVector(
-            //     tNullptr, peaksPtr, poseModel, heatMapSize, maxPeaks, interThreshold, interMinAboveThreshold,
-            //     bodyPartPairs, numberBodyParts, numberBodyPartPairs, pairScoresCpu);
-
-            // Delete people below the following thresholds:
-                // a) minSubsetCnt: removed if less than minSubsetCnt body parts
-                // b) minSubsetScore: removed if global score smaller than this
-                // c) maxPeaks (POSE_MAX_PEOPLE): keep first maxPeaks people above thresholds
-            int numberPeople;
-            std::vector<int> validSubsetIndexes;
-            validSubsetIndexes.reserve(fastMin((size_t)maxPeaks, peopleVector.size()));
-            removePeopleBelowThresholds(validSubsetIndexes, numberPeople, peopleVector, numberBodyParts, minSubsetCnt,
-                                        minSubsetScore, maxPeaks, maximizePositives);
-
-            // Fill and return poseKeypoints
-            peopleVectorToPeopleArray(poseKeypoints, poseScores, scaleFactor, peopleVector, validSubsetIndexes,
-                                      peaksPtr, numberPeople, numberBodyParts, numberBodyPartPairs);
-OP_PROFILE_END(timeNormalize8, 1e3, REPS);
-OP_CUDA_PROFILE_INIT(REPS);
-            const dim3 numBlocks{
-                getNumberCudaBlocks(numberBodyPartPairs, THREADS_PER_BLOCK.x),
-                getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.y),
-                getNumberCudaBlocks(maxPeaks, THREADS_PER_BLOCK.z)};
-            pafScoreKernelNew<<<numBlocks, THREADS_PER_BLOCK>>>(
-                pairScoresGpuPtr, heatMapGpuPtr, peaksGpuPtr, bodyPartPairsGpuPtr, mapIdxGpuPtr,
-                maxPeaks, (int)numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
-                interMinAboveThreshold);
-            // pairScoresCpu <-- pairScoresGpu
-            cudaMemcpy(pairScoresCpu.getPtr(), pairScoresGpuPtr, totalComputations * sizeof(T),
-                       cudaMemcpyDeviceToHost);
 
             // New code
             // Get pair connections and their scores
@@ -428,18 +428,18 @@ OP_CUDA_PROFILE_INIT(REPS);
             // Fill and return poseKeypoints
             peopleVectorToPeopleArray(poseKeypoints, poseScores, scaleFactor, peopleVector, validSubsetIndexes,
                                       peaksPtr, numberPeople, numberBodyParts, numberBodyPartPairs);
-OP_PROFILE_END(timeNormalize9, 1e3, REPS);
+// OP_PROFILE_END(timeNormalize9, 1e3, REPS);
 
-// Profiling code
-log("  BPC(ori)=" + std::to_string(timeNormalize1) + "ms");
-log("  BPC(new)=" + std::to_string(timeNormalize2) + "ms");
-log("  BPC(rest4)=" + std::to_string(timeNormalize4) + "ms");
-log("  BPC(rest5a)=" + std::to_string(timeNormalize5a) + "ms");
-log("  BPC(rest5b)=" + std::to_string(timeNormalize5b) + "ms");
-log("  BPC(rest6)=" + std::to_string(timeNormalize6) + "ms");
-log("  BPC(rest7)=" + std::to_string(timeNormalize7) + "ms");
-log("  All(ori)=" + std::to_string(timeNormalize8) + "ms");
-log("  All(new)=" + std::to_string(timeNormalize9) + "ms");
+// // Profiling code
+// log("  BPC(ori)=" + std::to_string(timeNormalize1) + "ms");
+// log("  BPC(new)=" + std::to_string(timeNormalize2) + "ms");
+// log("  BPC(rest4)=" + std::to_string(timeNormalize4) + "ms");
+// log("  BPC(rest5a)=" + std::to_string(timeNormalize5a) + "ms");
+// log("  BPC(rest5b)=" + std::to_string(timeNormalize5b) + "ms");
+// log("  BPC(rest6)=" + std::to_string(timeNormalize6) + "ms");
+// log("  BPC(rest7)=" + std::to_string(timeNormalize7) + "ms");
+// log("  All(ori)=" + std::to_string(timeNormalize8) + "ms");
+// log("  All(new)=" + std::to_string(timeNormalize9) + "ms");
             // Sanity check
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);
         }
