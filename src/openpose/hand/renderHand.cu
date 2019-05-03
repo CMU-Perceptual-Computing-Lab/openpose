@@ -31,9 +31,10 @@ namespace op
         const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 80.f;
 
         // Render key points
-        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
-                        handsPtr, PART_PAIRS_GPU, numberHands, HAND_NUMBER_PARTS, numberPartPairs, COLORS,
-                        numberColors, radius, lineWidth, SCALES, numberScales, threshold, alphaColorToAdd);
+        renderKeypointsOld(
+            targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight, handsPtr,
+            PART_PAIRS_GPU, numberHands, HAND_NUMBER_PARTS, numberPartPairs, COLORS, numberColors, radius, lineWidth,
+            SCALES, numberScales, threshold, alphaColorToAdd);
     }
 
     void renderHandKeypointsGpu(float* framePtr, const Point<int>& frameSize, const float* const handsPtr,
@@ -46,8 +47,8 @@ namespace op
                 dim3 threadsPerBlock;
                 dim3 numBlocks;
                 getNumberCudaThreadsAndBlocks(threadsPerBlock, numBlocks, frameSize);
-                renderHandsParts<<<threadsPerBlock, numBlocks>>>(framePtr, frameSize.x, frameSize.y, handsPtr,
-                                                                 numberHands, renderThreshold, alphaColorToAdd);
+                renderHandsParts<<<threadsPerBlock, numBlocks>>>(
+                    framePtr, frameSize.x, frameSize.y, handsPtr, numberHands, renderThreshold, alphaColorToAdd);
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
             }
         }

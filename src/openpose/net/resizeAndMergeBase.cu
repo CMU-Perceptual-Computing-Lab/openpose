@@ -249,30 +249,30 @@ namespace op
                     // }
                     // OP_CUDA_PROFILE_END(timeNormalize1, 1e3, REPS);
 
-                    // // Optimized function for any resize size (suboptimal for 8x resize)
+                    // Optimized function for any resize size (suboptimal for 8x resize)
                     // OP_CUDA_PROFILE_INIT(REPS);
-                    // const dim3 threadsPerBlock{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D, 1};
-                    // const dim3 numBlocks{getNumberCudaBlocks(targetWidth, threadsPerBlock.x),
-                    //                      getNumberCudaBlocks(targetHeight, threadsPerBlock.y),
-                    //                      getNumberCudaBlocks(num * channels, threadsPerBlock.z)};
-                    // resizeKernel<<<numBlocks, threadsPerBlock>>>(
-                    //     targetPtr, sourcePtrs.at(0), sourceWidth, sourceHeight, targetWidth, targetHeight,
-                    //     num * channels);
-                    // OP_CUDA_PROFILE_END(timeNormalize2, 1e3, REPS);
-
-                    // Optimized function for 8x resize
-                    // OP_CUDA_PROFILE_INIT(REPS);
-                    if (targetWidth / sourceWidth != 8 || targetHeight / sourceHeight != 8)
-                        error("Kernel only implemented for 8x resize. Notify us if this error appears.",
-                            __LINE__, __FUNCTION__, __FILE__);
-                    const auto rescaleFactor = (unsigned int) std::ceil((float)(targetHeight) / (float)(sourceHeight));
-
-                    const dim3 threadsPerBlock{rescaleFactor, rescaleFactor, 1};
+                    const dim3 threadsPerBlock{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D, 1};
                     const dim3 numBlocks{getNumberCudaBlocks(targetWidth, threadsPerBlock.x),
                                          getNumberCudaBlocks(targetHeight, threadsPerBlock.y),
                                          getNumberCudaBlocks(num * channels, threadsPerBlock.z)};
-                    resize8TimesKernel<<<numBlocks, threadsPerBlock>>>(
-                        targetPtr, sourcePtrs.at(0), sourceWidth, sourceHeight, targetWidth, targetHeight, rescaleFactor);
+                    resizeKernel<<<numBlocks, threadsPerBlock>>>(
+                        targetPtr, sourcePtrs.at(0), sourceWidth, sourceHeight, targetWidth, targetHeight,
+                        num * channels);
+                    // OP_CUDA_PROFILE_END(timeNormalize2, 1e3, REPS);
+
+                    // // Optimized function for 8x resize
+                    // OP_CUDA_PROFILE_INIT(REPS);
+                    // if (targetWidth / sourceWidth != 8 || targetHeight / sourceHeight != 8)
+                    //     error("Kernel only implemented for 8x resize. Notify us if this error appears.",
+                    //         __LINE__, __FUNCTION__, __FILE__);
+                    // const auto rescaleFactor = (unsigned int) std::ceil((float)(targetHeight) / (float)(sourceHeight));
+
+                    // const dim3 threadsPerBlock{rescaleFactor, rescaleFactor, 1};
+                    // const dim3 numBlocks{getNumberCudaBlocks(targetWidth, threadsPerBlock.x),
+                    //                      getNumberCudaBlocks(targetHeight, threadsPerBlock.y),
+                    //                      getNumberCudaBlocks(num * channels, threadsPerBlock.z)};
+                    // resize8TimesKernel<<<numBlocks, threadsPerBlock>>>(
+                    //     targetPtr, sourcePtrs.at(0), sourceWidth, sourceHeight, targetWidth, targetHeight, rescaleFactor);
                     // OP_CUDA_PROFILE_END(timeNormalize3, 1e3, REPS);
 
                     // Profiling code

@@ -146,10 +146,11 @@ namespace op
         const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
-        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
-                        posePtr, COCO_PAIRS_GPU, numberPeople, 18, numberPartPairs, COCO_COLORS,
-                        numberColors, radius, lineWidth, COCO_SCALES, numberScales, threshold, alphaColorToAdd,
-                        blendOriginalFrame, (googlyEyes ? 14 : -1), (googlyEyes ? 15 : -1));
+        renderKeypointsOld(
+            targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight, posePtr,
+            COCO_PAIRS_GPU, numberPeople, 18, numberPartPairs, COCO_COLORS, numberColors, radius, lineWidth,
+            COCO_SCALES, numberScales, threshold, alphaColorToAdd, blendOriginalFrame, (googlyEyes ? 14 : -1),
+            (googlyEyes ? 15 : -1));
     }
 
     __global__ void renderPoseBody19(
@@ -174,10 +175,11 @@ namespace op
         const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
-        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
-                        posePtr, BODY_19_PAIRS_GPU, numberPeople, 19, numberPartPairs, BODY_19_COLORS, numberColors,
-                        radius, lineWidth, BODY_19_SCALES, numberScales, threshold, alphaColorToAdd,
-                        blendOriginalFrame, (googlyEyes ? 15 : -1), (googlyEyes ? 16 : -1));
+        renderKeypointsOld(
+            targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight, posePtr,
+            BODY_19_PAIRS_GPU, numberPeople, 19, numberPartPairs, BODY_19_COLORS, numberColors, radius, lineWidth,
+            BODY_19_SCALES, numberScales, threshold, alphaColorToAdd, blendOriginalFrame, (googlyEyes ? 15 : -1),
+            (googlyEyes ? 16 : -1));
     }
 
     __global__ void renderPoseBody23(
@@ -202,13 +204,14 @@ namespace op
         const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
-        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
-                        posePtr, BODY_23_PAIRS_GPU, numberPeople, 23, numberPartPairs, BODY_23_COLORS, numberColors,
-                        radius, lineWidth, BODY_23_SCALES, numberScales, threshold, alphaColorToAdd,
-                        blendOriginalFrame, (googlyEyes ? 13 : -1), (googlyEyes ? 14 : -1));
+        renderKeypointsOld(
+            targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight, posePtr,
+            BODY_23_PAIRS_GPU, numberPeople, 23, numberPartPairs, BODY_23_COLORS, numberColors, radius, lineWidth,
+            BODY_23_SCALES, numberScales, threshold, alphaColorToAdd, blendOriginalFrame, (googlyEyes ? 13 : -1),
+            (googlyEyes ? 14 : -1));
     }
 
-    __global__ void renderPoseBody25(
+    __global__ void renderPoseBody25Old(
         float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
         const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
         const float alphaColorToAdd)
@@ -230,17 +233,18 @@ namespace op
         const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
-        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
-                        posePtr, BODY_25_PAIRS_GPU, numberPeople, 25, numberPartPairs, BODY_25_COLORS, numberColors,
-                        radius, lineWidth, BODY_25_SCALES, numberScales, threshold, alphaColorToAdd,
-                        blendOriginalFrame, (googlyEyes ? 15 : -1), (googlyEyes ? 16 : -1));
+        renderKeypointsOld(
+            targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight, posePtr,
+            BODY_25_PAIRS_GPU, numberPeople, 25, numberPartPairs, BODY_25_COLORS, numberColors, radius, lineWidth,
+            BODY_25_SCALES, numberScales, threshold, alphaColorToAdd, blendOriginalFrame, (googlyEyes ? 15 : -1),
+            (googlyEyes ? 16 : -1));
     }
 
 
-    __global__ void renderPoseBody25Naive(
+    __global__ void renderPoseBody25(
         float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
         const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
-        const float alphaColorToAdd, float2 *Mins, float2 *Maxs, float *ScaleF)
+        const float alphaColorToAdd, float2* Mins, float2* Maxs, float * ScaleF)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -259,11 +263,12 @@ namespace op
         const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
-        renderKeypointsNaiveNaive(targetPtr, sharedMaxs, sharedMins, sharedScaleF, Mins, Maxs, ScaleF, 
-                        globalIdx, x, y, targetWidth, targetHeight,
-                        posePtr, BODY_25_PAIRS_GPU, numberPeople, 25, numberPartPairs, BODY_25_COLORS, numberColors,
-                        radius, lineWidth, BODY_25_SCALES, numberScales, threshold, alphaColorToAdd,
-                        blendOriginalFrame, (googlyEyes ? 15 : -1), (googlyEyes ? 16 : -1));
+        renderKeypoints(
+            targetPtr, sharedMaxs, sharedMins, sharedScaleF, Mins, Maxs, ScaleF,
+            globalIdx, x, y, targetWidth, targetHeight,
+            posePtr, BODY_25_PAIRS_GPU, numberPeople, 25, numberPartPairs, BODY_25_COLORS, numberColors,
+            radius, lineWidth, BODY_25_SCALES, numberScales, threshold, alphaColorToAdd,
+            blendOriginalFrame, (googlyEyes ? 15 : -1), (googlyEyes ? 16 : -1));
     }
 
     __global__ void renderPoseBody25b(
@@ -288,10 +293,11 @@ namespace op
         const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
-        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
-                        posePtr, BODY_25B_PAIRS_GPU, numberPeople, 25, numberPartPairs, BODY_25B_COLORS, numberColors,
-                        radius, lineWidth, BODY_25B_SCALES, numberScales, threshold, alphaColorToAdd,
-                        blendOriginalFrame, (googlyEyes ? 1 : -1), (googlyEyes ? 2 : -1));
+        renderKeypointsOld(
+            targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight, posePtr,
+            BODY_25B_PAIRS_GPU, numberPeople, 25, numberPartPairs, BODY_25B_COLORS, numberColors, radius, lineWidth,
+            BODY_25B_SCALES, numberScales, threshold, alphaColorToAdd, blendOriginalFrame, (googlyEyes ? 1 : -1),
+            (googlyEyes ? 2 : -1));
     }
 
     __global__ void renderPoseBody65(
@@ -316,10 +322,11 @@ namespace op
         const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
-        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
-                        posePtr, BODY_65_PAIRS_GPU, numberPeople, 65, numberPartPairs, BODY_65_COLORS, numberColors,
-                        radius, lineWidth, BODY_65_SCALES, numberScales, threshold, alphaColorToAdd,
-                        blendOriginalFrame, (googlyEyes ? 15 : -1), (googlyEyes ? 16 : -1));
+        renderKeypointsOld(
+            targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight, posePtr,
+            BODY_65_PAIRS_GPU, numberPeople, 65, numberPartPairs, BODY_65_COLORS, numberColors, radius, lineWidth,
+            BODY_65_SCALES, numberScales, threshold, alphaColorToAdd, blendOriginalFrame, (googlyEyes ? 15 : -1),
+            (googlyEyes ? 16 : -1));
     }
 
     __global__ void renderPoseBody95(
@@ -344,13 +351,14 @@ namespace op
         const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
-        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
-                        posePtr, BODY_95_PAIRS_GPU, numberPeople, 95, numberPartPairs, BODY_95_COLORS, numberColors,
-                        radius, lineWidth, BODY_95_SCALES, numberScales, threshold, alphaColorToAdd,
-                        blendOriginalFrame, (googlyEyes ? 1 : -1), (googlyEyes ? 2 : -1));
+        renderKeypointsOld(
+            targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight, posePtr,
+            BODY_95_PAIRS_GPU, numberPeople, 95, numberPartPairs, BODY_95_COLORS, numberColors, radius, lineWidth,
+            BODY_95_SCALES, numberScales, threshold, alphaColorToAdd, blendOriginalFrame, (googlyEyes ? 1 : -1),
+            (googlyEyes ? 2 : -1));
     }
 
-    __global__ void renderPoseBody135(
+    __global__ void renderPoseBody135Old(
         float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
         const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
         const float alphaColorToAdd)
@@ -372,14 +380,15 @@ namespace op
         const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
-        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
-                        posePtr, BODY_135_PAIRS_GPU, numberPeople, 135, numberPartPairs, BODY_135_COLORS, numberColors,
-                        radius, lineWidth, BODY_135_SCALES, numberScales, threshold, alphaColorToAdd,
-                        blendOriginalFrame, (googlyEyes ? 1 : -1), (googlyEyes ? 2 : -1));
+        renderKeypointsOld(
+            targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight, posePtr,
+            BODY_135_PAIRS_GPU, numberPeople, 135, numberPartPairs, BODY_135_COLORS, numberColors, radius, lineWidth,
+            BODY_135_SCALES, numberScales, threshold, alphaColorToAdd, blendOriginalFrame, (googlyEyes ? 1 : -1),
+            (googlyEyes ? 2 : -1));
     }
 
 
-    __global__ void renderPoseBody135Naive(
+    __global__ void renderPoseBody135SemiNew(
         float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
         const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
         const float alphaColorToAdd)
@@ -401,39 +410,32 @@ namespace op
         const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
-        renderKeypointsNaive(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
-                        posePtr, BODY_135_PAIRS_GPU, numberPeople, 135, numberPartPairs, BODY_135_COLORS, numberColors,
-                        radius, lineWidth, BODY_135_SCALES, numberScales, threshold, alphaColorToAdd,
-                        blendOriginalFrame, (googlyEyes ? 1 : -1), (googlyEyes ? 2 : -1));
+        renderKeypointsSemiNew(
+            targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
+            posePtr, BODY_135_PAIRS_GPU, numberPeople, 135, numberPartPairs, BODY_135_COLORS, numberColors,
+            radius, lineWidth, BODY_135_SCALES, numberScales, threshold, alphaColorToAdd,
+            blendOriginalFrame, (googlyEyes ? 1 : -1), (googlyEyes ? 2 : -1));
     }
 
-
-    __global__ void findBoundingBoxThing(float2* sharedMaxs, float2* sharedMins,
-               float* sharedScaleF,const int targetWidth, const int targetHeight,
-               const float* const keypointsPtr,
-               const int numberPeople, const int numberParts, const float threshold) 
-{
-        // const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
-        // const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
-        // const auto globalIdx = threadIdx.y * blockDim.x + threadIdx.x;
+    __global__ void getBoundingBoxPerPerson(
+        float2* sharedMaxs, float2* sharedMins, float* sharedScaleF,const int targetWidth, const int targetHeight,
+        const float* const keypointsPtr, const int numberPeople, const int numberParts, const float threshold)
+    {
         const auto globalIdx = threadIdx.x;
-        
+
         // Fill shared parameters
         // if (globalIdx < numberPeople)
         {
             sharedMins[globalIdx].x = targetWidth;
-            //printf("did globalidx.x\n");
             sharedMins[globalIdx].y = targetHeight;
             sharedMaxs[globalIdx].x = 0.f;
             sharedMaxs[globalIdx].y = 0.f;
-            //printf("did some indexing in shared ptrs\n");
             for (auto part = 0 ; part < numberParts ; part++)
             {
                 const auto index = 3 * (globalIdx*numberParts + part);
                 const auto x = keypointsPtr[index];
                 const auto y = keypointsPtr[index+1];
                 const auto score = keypointsPtr[index+2];
-                //printf("did some indexing in keypointsPtr\n");
                 if (score > threshold)
                 {
                     if (x < sharedMins[globalIdx].x)
@@ -459,10 +461,9 @@ namespace op
                 sharedMins[globalIdx].y -= constantToAdd;
             }
         }
-        //printf("Finished doing the thing!\n");
     }
 
-    __global__ void renderPoseBody135NaiveNaive(
+    __global__ void renderPoseBody135(
         float* targetPtr, const int targetWidth, const int targetHeight, const float* const posePtr,
         const int numberPeople, const float threshold, const bool googlyEyes, const bool blendOriginalFrame,
         const float alphaColorToAdd, float2 *Mins, float2 *Maxs, float *ScaleF)
@@ -483,7 +484,7 @@ namespace op
         const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
-        renderKeypointsNaiveNaive(targetPtr, sharedMaxs, sharedMins, sharedScaleF, Mins, Maxs, ScaleF, 
+        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, Mins, Maxs, ScaleF,
                         globalIdx, x, y, targetWidth, targetHeight,
                         posePtr, BODY_135_PAIRS_GPU, numberPeople, 135, numberPartPairs, BODY_135_COLORS, numberColors,
                         radius, lineWidth, BODY_135_SCALES, numberScales, threshold, alphaColorToAdd,
@@ -511,7 +512,7 @@ namespace op
         const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
-        renderKeypointsSuperShared(targetPtr, sharedMaxs, sharedMins, sharedScaleF, sharedScales, Mins, Maxs, ScaleF, 
+        renderKeypointsSuperShared(targetPtr, sharedMaxs, sharedMins, sharedScaleF, sharedScales, Mins, Maxs, ScaleF,
                         globalIdx, x, y, targetWidth, targetHeight,
                         posePtr, BODY_135_PAIRS_GPU, numberPeople, 135, numberPartPairs, BODY_135_COLORS, numberColors,
                         radius, lineWidth, BODY_135_SCALES, numberScales, threshold, alphaColorToAdd,
@@ -540,8 +541,9 @@ namespace op
         const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
-        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
-                        posePtr, MPI_PAIRS_GPU, numberPeople, 15, numberPartPairs, MPI_COLORS, numberColors,
+        renderKeypointsOld(
+            targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight, posePtr,
+                        MPI_PAIRS_GPU, numberPeople, 15, numberPartPairs, MPI_COLORS, numberColors,
                         radius, lineWidth, COCO_SCALES, numberScales, threshold, alphaColorToAdd, blendOriginalFrame);
     }
 
@@ -567,8 +569,9 @@ namespace op
         const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
-        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
-                        posePtr, CAR_12_PAIRS_GPU, numberPeople, 12, numberPartPairs, CAR_12_COLORS, numberColors,
+        renderKeypointsOld(
+            targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight, posePtr,
+                        CAR_12_PAIRS_GPU, numberPeople, 12, numberPartPairs, CAR_12_COLORS, numberColors,
                         radius, lineWidth, CAR_12_SCALES, numberScales, threshold, alphaColorToAdd,
                         blendOriginalFrame, (googlyEyes ? 4 : -1), (googlyEyes ? 5 : -1));
     }
@@ -595,8 +598,9 @@ namespace op
         const auto lineWidth = fastMinCuda(targetWidth, targetHeight) / 120.f;
 
         // Render key points
-        renderKeypoints(targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight,
-                        posePtr, CAR_22_PAIRS_GPU, numberPeople, 22, numberPartPairs, CAR_22_COLORS, numberColors,
+        renderKeypointsOld(
+            targetPtr, sharedMaxs, sharedMins, sharedScaleF, globalIdx, x, y, targetWidth, targetHeight, posePtr,
+                        CAR_22_PAIRS_GPU, numberPeople, 22, numberPartPairs, CAR_22_COLORS, numberColors,
                         radius, lineWidth, CAR_22_SCALES, numberScales, threshold, alphaColorToAdd,
                         blendOriginalFrame, (googlyEyes ? 6 : -1), (googlyEyes ? 7 : -1));
     }
@@ -824,27 +828,32 @@ namespace op
                 if (poseModel == PoseModel::BODY_25 || poseModel == PoseModel::BODY_25D
                     || poseModel == PoseModel::BODY_25E)
                 {
-                    // const auto REPS = 1;
+                    // const auto REPS = 500;
                     // double timeNormalize0 = 0.;
                     // double timeNormalize1 = 0.;
+
+                    // // Non-optimized code
                     // OP_CUDA_PROFILE_INIT(REPS);
-                    // renderPoseBody25<<<threadsPerBlock, numBlocks>>>(
+                    // renderPoseBody25Old<<<threadsPerBlock, numBlocks>>>(
                     //     framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
                     //     blendOriginalFrame, alphaBlending
                     // );
                     // OP_CUDA_PROFILE_END(timeNormalize0, 1e3, REPS);
+
+                    // Optimized code
                     // OP_CUDA_PROFILE_INIT(REPS);
-                    dim3 threadsPerBlockBoundBox = {1, 1, 1};
-                    dim3 numBlocksBox = {POSE_MAX_PEOPLE, 1, 1};
-                    findBoundingBoxThing<<<threadsPerBlockBoundBox, numBlocksBox>>>(sharedMaxs,
-                       sharedMins,
-                       sharedScaleF, frameSize.x, frameSize.y,
-                       posePtr, numberPeople, 25, renderThreshold);
-                    renderPoseBody25Naive<<<threadsPerBlock, numBlocks>>>(
+                    const dim3 threadsPerBlockBoundBox = {1, 1, 1};
+                    const dim3 numBlocksBox{getNumberCudaBlocks(POSE_MAX_PEOPLE, threadsPerBlockBoundBox.x)};
+                    getBoundingBoxPerPerson<<<threadsPerBlockBoundBox, numBlocksBox>>>(
+                        sharedMaxs, sharedMins, sharedScaleF, frameSize.x, frameSize.y, posePtr, numberPeople, 25,
+                        renderThreshold);
+                    renderPoseBody25<<<threadsPerBlock, numBlocks>>>(
                         framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
                         blendOriginalFrame, alphaBlending, sharedMins, sharedMaxs, sharedScaleF
                     );
                     // OP_CUDA_PROFILE_END(timeNormalize1, 1e3, REPS);
+
+                    // // Profiling code
                     // log("  renderOld=" + std::to_string(timeNormalize0) + "ms");
                     // log("  renderNew=" + std::to_string(timeNormalize1) + "ms");
                 }
@@ -880,54 +889,45 @@ namespace op
                         blendOriginalFrame, alphaBlending
                     );
                 else if (poseModel == PoseModel::BODY_135)
-                {   
-                    // const auto REPS = 1000;
-                    // double timeNormalize0a = 0.;
+                {
+                    // const auto REPS = 500;
                     // double timeNormalize0 = 0.;
                     // double timeNormalize1 = 0.;
                     // double timeNormalize2 = 0.;
-                    // double timeNormalize3 = 0.;
-                    // double timeNormalize4 = 0.;
-                    // double timeNormalize5 = 0.;
-                    // double timeNormalize6 = 0.;
 
-                    // OP_CUDA_PROFILE_INIT(5);
-                    // renderPoseBody135Naive<<<threadsPerBlock, numBlocks>>>(
-                    //      framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
-                    //      blendOriginalFrame, alphaBlending
-                    // );
-                    // OP_CUDA_PROFILE_END(timeNormalize0a, 1e3, REPS);
-                    // // OG Code
+                    // // Non-optimized code
                     // OP_CUDA_PROFILE_INIT(REPS);
-                    //  renderPoseBody135<<<threadsPerBlock, numBlocks>>>(
+                    //  renderPoseBody135Old<<<threadsPerBlock, numBlocks>>>(
                     //      framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
                     //      blendOriginalFrame, alphaBlending
                     // );
                     // OP_CUDA_PROFILE_END(timeNormalize0, 1e3, REPS);
+
+                    // // Semi-optimized code
                     // OP_CUDA_PROFILE_INIT(REPS);
-                    // renderPoseBody135Naive<<<threadsPerBlock, numBlocks>>>(
+                    // renderPoseBody135SemiNew<<<threadsPerBlock, numBlocks>>>(
                     //     framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
                     //     blendOriginalFrame, alphaBlending
                     // );
-                    // OP_CUDA_PROFILE_END(timeNormalize1, 1e3, REPS);
+                    // OP_CUDA_PROFILE_END(timeNormalize0, 1e3, REPS);
 
-                    // New code 
+                    // Optimized code
                     // OP_CUDA_PROFILE_INIT(REPS);
-                    dim3 threadsPerBlockBoundBox = {1, 1, 1};
-                    dim3 numBlocksBox = {POSE_MAX_PEOPLE, 1, 1};
-                    findBoundingBoxThing<<<threadsPerBlockBoundBox, numBlocksBox>>>(sharedMaxs,
-                        sharedMins,
-                       sharedScaleF, frameSize.x, frameSize.y,
-                       posePtr, numberPeople, 135, renderThreshold);
-                    
-                    renderPoseBody135NaiveNaive<<<threadsPerBlock, numBlocks>>>(
+                    const dim3 threadsPerBlockBoundBox = {1, 1, 1};
+                    const dim3 numBlocksBox{getNumberCudaBlocks(POSE_MAX_PEOPLE, threadsPerBlockBoundBox.x)};
+                    getBoundingBoxPerPerson<<<threadsPerBlockBoundBox, numBlocksBox>>>(
+                        sharedMaxs, sharedMins, sharedScaleF, frameSize.x, frameSize.y, posePtr, numberPeople, 135,
+                        renderThreshold);
+                    renderPoseBody135<<<threadsPerBlock, numBlocks>>>(
                         framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
                         blendOriginalFrame, alphaBlending, sharedMins, sharedMaxs, sharedScaleF
                     );
                     // OP_CUDA_PROFILE_END(timeNormalize1, 1e3, REPS);
-                    // log("  OldRender=" + std::to_string(timeNormalize0) + "ms");
-                    // log("  newRender=" + std::to_string(timeNormalize1) + "ms");
 
+                    // // Profiling code
+                    // log("  renderOld=" + std::to_string(timeNormalize0) + "ms");
+                    // log("  renderSemiNew=" + std::to_string(timeNormalize1) + "ms");
+                    // log("  renderNew=" + std::to_string(timeNormalize2) + "ms");
                 }
                 else if (poseModel == PoseModel::MPI_15 || poseModel == PoseModel::MPI_15_4)
                     renderPoseMpi29Parts<<<threadsPerBlock, numBlocks>>>(
@@ -960,7 +960,6 @@ namespace op
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
-       
     }
 
     void renderPoseHeatMapGpu(float* framePtr, const Point<int>& frameSize, const float* const heatMapPtr,
