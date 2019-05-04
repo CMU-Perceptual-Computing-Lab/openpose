@@ -720,17 +720,8 @@ namespace op
                 else if (poseModel == PoseModel::BODY_135)
                 {
                     // const auto REPS = 500;
-                    // double timeNormalize0 = 0.;
                     // double timeNormalize1 = 0.;
                     // double timeNormalize2 = 0.;
-
-                    // // Non-optimized code
-                    // OP_CUDA_PROFILE_INIT(5);
-                    //  renderPoseBody135Old<<<threadsPerBlock, numBlocks>>>(
-                    //      framePtr, frameSize.x, frameSize.y, posePtr, numberPeople, renderThreshold, googlyEyes,
-                    //      blendOriginalFrame, alphaBlending
-                    // );
-                    // OP_CUDA_PROFILE_END(timeNormalize0, 1e3, 5);
 
                     // // Non-optimized code
                     // OP_CUDA_PROFILE_INIT(REPS);
@@ -741,7 +732,7 @@ namespace op
                     // OP_CUDA_PROFILE_END(timeNormalize1, 1e3, REPS);
 
                     // Optimized code
-                    OP_CUDA_PROFILE_INIT(REPS);
+                    // OP_CUDA_PROFILE_INIT(REPS);
                     // const dim3 threadsPerBlockBoundBox = {1, 1, 1};
                     // const dim3 numBlocksBox{getNumberCudaBlocks(POSE_MAX_PEOPLE, threadsPerBlockBoundBox.x)};
                     // getBoundingBoxPerPersonPose<<<threadsPerBlockBoundBox, numBlocksBox>>>(
