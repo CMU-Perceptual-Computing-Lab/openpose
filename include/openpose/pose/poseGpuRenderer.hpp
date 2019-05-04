@@ -31,6 +31,9 @@ namespace op
         const std::shared_ptr<PoseExtractorNet> spPoseExtractorNet;
         // Init with thread
         float* pGpuPose; // GPU aux memory
+        float* pMaxPtr; // GPU aux memory
+        float* pMinPtr; // GPU aux memory
+        float* pScalePtr; // GPU aux memory
 
         DELETE_COPY(PoseGpuRenderer);
     };

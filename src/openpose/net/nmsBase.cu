@@ -251,7 +251,6 @@ namespace op
     {
         try
         {
-            //Forward_cpu(bottom, top);
             const auto num = sourceSize[0];
             const auto height = sourceSize[2];
             const auto width = sourceSize[3];
