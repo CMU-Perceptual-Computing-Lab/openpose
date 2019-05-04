@@ -1,8 +1,6 @@
 // #include <opencv2/opencv.hpp>
 #include <openpose/gpu/cuda.hpp>
 #include <openpose/gpu/cuda.hu>
-// #include <nppi_geometry_transforms.h>
-// #include <nppdefs.h>
 #include <openpose/net/resizeAndMergeBase.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/openCv.hpp>
