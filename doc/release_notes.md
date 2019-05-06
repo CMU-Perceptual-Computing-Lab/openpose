@@ -264,7 +264,9 @@ OpenPose Library - Release Notes
     2. Speed up of the CUDA functions of OpenPose:
         1. Greedy body part connector implemented in CUDA: +~30% speedup in Nvidia (CUDA) version with default flags and +~10% in maximum accuracy configuration. In addition, it provides a small 0.5% boost in accuracy (default flags).
         2. +5-30% additional speedup for the body part connector of point 1.
-        3. 2-4x speedup for NMS.
+        3. ~2-4x speedup for NMS.
+        4. ~2x speedup for image resize.
+        5. +25-30% speedup for rendering.
     3. Unity binding of OpenPose released. OpenPose adds the flag `BUILD_UNITY_SUPPORT` on CMake, which enables special Unity code so it can be built as a Unity plugin.
     4. If camera is unplugged, OpenPose GUI and command line will display a warning and try to reconnect it.
     5. Wrapper classes simplified and renamed. Wrapper renamed as WrapperT, and created Wrapper as the non-templated class equivalent.
@@ -330,6 +332,7 @@ OpenPose Library - Release Notes
     35. Windows updates:
         1. Upgraded OpenCV version for Windows from 3.1 to 4.0.1, which provides stable 30 FPS for webcams (vs. 10 FPS that OpenCV 3.1 provides by default on Windows).
         2. Upgrade VS2015 to VS2017, allowing CUDA 10 and 20XX Nvidia cards.
+    36. Output JSON updated to version 1.3, which now includes the person IDs (if any).
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.
