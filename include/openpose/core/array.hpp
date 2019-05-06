@@ -5,6 +5,7 @@
 #include <vector>
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/macros.hpp>
+#include <openpose/utilities/errorAndLog.hpp>
 
 namespace op
 {
@@ -86,6 +87,26 @@ namespace op
          * is {p,k,m}, the resulting Array<T> is {1,k,m}.
          */
         Array(const Array<T>& array, const int index, const bool noCopy = false);
+
+        /**
+         * Array constructor. It manually copies the Array<T2> into the new Array<T>
+         * @param array Array<T2> with a format T2 different to the current Array type T.
+         */
+        template<typename T2>
+        Array(const Array<T2>& array) :
+            Array{array.getSize()}
+        {
+            try
+            {
+                // Copy
+                for (auto i = 0u ; i < array.getVolume() ; i++)
+                    pData[i] = array[i];
+            }
+            catch (const std::exception& e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            }
+        }
 
         /**
          * Copy constructor.

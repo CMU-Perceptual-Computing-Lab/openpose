@@ -13,9 +13,10 @@ namespace op
 
         virtual ~PeopleJsonSaver();
 
-        void save(const std::vector<std::pair<Array<float>, std::string>>& keypointVector,
-                  const std::vector<std::vector<std::array<float,3>>>& candidates,
-                  const std::string& fileName, const bool humanReadable = true) const;
+        void save(
+            const std::vector<std::pair<Array<float>, std::string>>& keypointVector,
+            const std::vector<std::vector<std::array<float,3>>>& candidates, const std::string& fileName,
+            const bool humanReadable = true) const;
     };
 }
 

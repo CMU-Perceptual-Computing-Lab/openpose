@@ -1,7 +1,6 @@
 #include <typeinfo> // typeid
 #include <numeric> // std::accumulate
 #include <openpose/utilities/avx.hpp>
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/core/array.hpp>
 
 // Note: std::shared_ptr not (fully) supported for array pointers:
