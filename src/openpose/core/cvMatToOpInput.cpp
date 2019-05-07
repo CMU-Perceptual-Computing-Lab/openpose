@@ -114,8 +114,9 @@ namespace op
                             pInputImageCuda, cvInputData.data, sizeof(unsigned char) * inputImageSize,
                             cudaMemcpyHostToDevice);
                         // Resize image on GPU
-                        reorderAndCast(pInputImageReorderedCuda, pInputImageCuda, cvInputData.cols, cvInputData.rows, 3);
-                        resizeAndMergeRGBGPU(
+                        reorderAndNormalize(
+                            pInputImageReorderedCuda, pInputImageCuda, cvInputData.cols, cvInputData.rows, 3);
+                        resizeAndPadRbgGpu(
                             pOutputImageCuda, pInputImageReorderedCuda, cvInputData.cols, cvInputData.rows,
                             netInputSizes[i].x, netInputSizes[i].y, (float)scaleInputToNetInputs[i]);
                         // Copy back to CPU

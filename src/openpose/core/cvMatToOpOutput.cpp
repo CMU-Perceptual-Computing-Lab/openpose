@@ -45,7 +45,7 @@ namespace op
         }
         catch (const std::exception& e)
         {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 
@@ -78,7 +78,7 @@ namespace op
             if (outputResolution.x <= 0 || outputResolution.y <= 0)
                 error("Output resolution has 0 area.", __LINE__, __FUNCTION__, __FILE__);
             // outputData - Reescale keeping aspect ratio and transform to float the output image
-            Array<float> outputData({outputResolution.y, outputResolution.x, 3});
+            Array<float> outputData({outputResolution.y, outputResolution.x, 3}); // This size is used everywhere
             // CPU version (faster if #Gpus <= 3 and relatively small images)
             if (!mGpuResize)
             {
@@ -111,7 +111,7 @@ namespace op
                     cudaMemcpy(
                         pInputImageCuda, cvInputData.data, sizeof(unsigned char) * inputImageSize, cudaMemcpyHostToDevice);
                     // Resize output image on GPU
-                    resizeAndMergeRGBGPU(
+                    resizeAndPadRbgGpu(
                         *spOutputImageCuda, pInputImageCuda, cvInputData.cols, cvInputData.rows, outputResolution.x,
                         outputResolution.y, (float)scaleInputToOutput);
                     *spGpuMemoryAllocated = true;

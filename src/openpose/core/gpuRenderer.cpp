@@ -99,6 +99,7 @@ namespace op
         try
         {
             mIsFirstRenderer = false;
+            mIsLastRenderer = false;
             spGpuMemory = std::get<0>(tuple);
             spGpuMemoryAllocated = std::get<1>(tuple);
             spVolume = std::get<2>(tuple);

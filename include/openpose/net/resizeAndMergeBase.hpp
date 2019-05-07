@@ -25,16 +25,12 @@ namespace op
 
     // Functions for cvMatToOpInput/cvMatToOpOutput
     template <typename T>
-    void reorderAndCast(
-        T* targetPtr, const unsigned char* const srcPtr, const int width, const int height, const int channels);
-
-    template <typename T>
-    void resizeAndMergeRGBGPU(
+    void resizeAndPadRbgGpu(
         T* targetPtr, const T* const srcPtr, const int sourceWidth, const int sourceHeight,
         const int targetWidth, const int targetHeight, const T scaleFactor);
 
     template <typename T>
-    void resizeAndMergeRGBGPU(
+    void resizeAndPadRbgGpu(
         T* targetPtr, const unsigned char* const srcPtr, const int sourceWidth, const int sourceHeight,
         const int targetWidth, const int targetHeight, const T scaleFactor);
 }

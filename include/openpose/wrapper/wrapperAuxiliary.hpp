@@ -241,13 +241,16 @@ namespace op
             std::vector<std::shared_ptr<FaceExtractorNet>> faceExtractorNets;
             std::vector<std::shared_ptr<HandExtractorNet>> handExtractorNets;
             std::vector<std::shared_ptr<PoseGpuRenderer>> poseGpuRenderers;
+            // CUDA vs. CPU resize
             std::vector<std::shared_ptr<CvMatToOpOutput>> cvMatToOpOutputs;
+            std::vector<std::shared_ptr<OpOutputToCvMat>> opOutputToCvMats;
             std::shared_ptr<PoseCpuRenderer> poseCpuRenderer;
             // Workers
             TWorker scaleAndSizeExtractorW;
             TWorker cvMatToOpInputW;
             TWorker cvMatToOpOutputW;
-            const bool addCvMatToOpOutput = renderOutput;
+            bool addCvMatToOpOutput = renderOutput;
+            bool addCvMatToOpOutputInCpu = addCvMatToOpOutput;
             std::vector<std::vector<TWorker>> poseExtractorsWs;
             std::vector<std::vector<TWorker>> poseTriangulationsWs;
             std::vector<std::vector<TWorker>> jointAngleEstimationsWs;
@@ -263,8 +266,8 @@ namespace op
 
                 // Input cvMat to OpenPose input & output format
                 // Note: resize on GPU reduces accuracy about 0.1%
+                bool resizeOnCpu = true;
                 // const auto resizeOnCpu = (numberGpuThreads < 3);
-                auto resizeOnCpu = true;
                 if (resizeOnCpu)
                 {
                     const auto gpuResize = false;
@@ -274,7 +277,8 @@ namespace op
                 }
                 // Note: We realized that somehow doing it on GPU for any number of GPUs does speedup the whole OP
                 resizeOnCpu = false;
-                if (addCvMatToOpOutput && (resizeOnCpu || !renderOutputGpu))
+                addCvMatToOpOutputInCpu = addCvMatToOpOutput && (resizeOnCpu || !renderOutputGpu);
+                if (addCvMatToOpOutputInCpu)
                 {
                     const auto gpuResize = false;
                     const auto cvMatToOpOutput = std::make_shared<CvMatToOpOutput>(gpuResize);
@@ -545,7 +549,8 @@ namespace op
                             // Performance boost -> share spGpuMemory for all renderers
                             if (!poseGpuRenderers.empty())
                             {
-                                const bool isLastRenderer = !renderHandGpu;
+                                // const bool isLastRenderer = !renderHandGpu;
+                                const bool isLastRenderer = !renderHandGpu && !(addCvMatToOpOutput && !addCvMatToOpOutputInCpu);
                                 const auto renderer = std::static_pointer_cast<PoseGpuRenderer>(
                                     poseGpuRenderers.at(i));
                                 faceRenderer->setSharedParametersAndIfLast(
@@ -588,7 +593,8 @@ namespace op
                             // Performance boost -> share spGpuMemory for all renderers
                             if (!poseGpuRenderers.empty())
                             {
-                                const bool isLastRenderer = true;
+                                // const bool isLastRenderer = true;
+                                const bool isLastRenderer = !(addCvMatToOpOutput && !addCvMatToOpOutputInCpu);
                                 const auto renderer = std::static_pointer_cast<PoseGpuRenderer>(
                                     poseGpuRenderers.at(i));
                                 handRenderer->setSharedParametersAndIfLast(
@@ -601,6 +607,23 @@ namespace op
                     }
                     else
                         error("Unknown RenderMode.", __LINE__, __FUNCTION__, __FILE__);
+                }
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+
+                // Frames processor (OpenPose format -> cv::Mat format)
+                if (addCvMatToOpOutput && !addCvMatToOpOutputInCpu)
+                {
+                    // for (auto& poseExtractorsW : poseExtractorsWs)
+                    for (auto i = 0u ; i < poseExtractorsWs.size() ; ++i)
+                    {
+                        const auto gpuResize = true;
+                        opOutputToCvMats.emplace_back(std::make_shared<OpOutputToCvMat>(gpuResize));
+                        poseExtractorsWs[i].emplace_back(
+                            std::make_shared<WOpOutputToCvMat<TDatumsSP>>(opOutputToCvMats.back()));
+                        // Assign shared parameters
+                        opOutputToCvMats.back()->setSharedParameters(
+                            cvMatToOpOutputs.at(i)->getSharedParameters());
+                    }
                 }
                 log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
@@ -631,7 +654,7 @@ namespace op
                 //     );
                 // }
                 // Frames processor (OpenPose format -> cv::Mat format)
-                if (renderOutput)
+                if (addCvMatToOpOutputInCpu)
                 {
                     log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     postProcessingWs = mergeVectors(postProcessingWs, cpuRenderers);

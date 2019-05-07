@@ -191,24 +191,6 @@ namespace op
     }
 
     template <typename T>
-    __global__ void reorderAndCastKernel(
-        T* targetPtr, const unsigned char* const srcPtr, const int width, const int height)
-    {
-        const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
-        const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
-        const auto c = (blockIdx.z * blockDim.z) + threadIdx.z;
-        if (x < width && y < height)
-        {
-            const auto channels = 3;
-            const auto originFramePtrOffsetY = y * width;
-            const auto channelOffset = c * width * height;
-            const auto targetIndex = channelOffset + y * width + x;
-            const auto srcIndex = (originFramePtrOffsetY + x) * channels + c;
-            targetPtr[targetIndex] =  T(srcPtr[srcIndex]) * T(1/256.f) - T(0.5f);
-        }
-    }
-
-    template <typename T>
     void resizeAndMergeGpu(
         T* targetPtr, const std::vector<const T*>& sourcePtrs, const std::array<int, 4>& targetSize,
         const std::vector<std::array<int, 4>>& sourceSizes, const std::vector<T>& scaleInputToNetInputs)
@@ -350,49 +332,49 @@ namespace op
     }
 
     template <typename T>
-    void reorderAndCast(
-        T* targetPtr, const unsigned char* const srcPtr, const int width, const int height, const int channels)
-    {
-        const dim3 threadsPerBlock{32, 1, 1};
-        const dim3 numBlocks{
-            getNumberCudaBlocks(width, threadsPerBlock.x),
-            getNumberCudaBlocks(height, threadsPerBlock.y),
-            getNumberCudaBlocks(channels, threadsPerBlock.z)};
-        reorderAndCastKernel<<<numBlocks, threadsPerBlock>>>(targetPtr, srcPtr, width, height);
-    }
-
-    template <typename T>
-    void resizeAndMergeRGBGPU(
+    void resizeAndPadRbgGpu(
         T* targetPtr, const T* const srcPtr, const int widthSource, const int heightSource,
         const int widthTarget, const int heightTarget, const T scaleFactor)
 
     {
-        const auto channels = 3;
-        const dim3 threadsPerBlock{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D, 1};
-        const dim3 numBlocks{
-            getNumberCudaBlocks(widthTarget, threadsPerBlock.x),
-            getNumberCudaBlocks(heightTarget, threadsPerBlock.y),
-            getNumberCudaBlocks(channels, threadsPerBlock.z)};
-
-        resizeAndPadKernel<<<numBlocks, threadsPerBlock>>>(
-            targetPtr, srcPtr, widthSource, heightSource, widthTarget, heightTarget, scaleFactor);
+        try
+        {
+            const auto channels = 3;
+            const dim3 threadsPerBlock{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D, 1};
+            const dim3 numBlocks{
+                getNumberCudaBlocks(widthTarget, threadsPerBlock.x),
+                getNumberCudaBlocks(heightTarget, threadsPerBlock.y),
+                getNumberCudaBlocks(channels, threadsPerBlock.z)};
+            resizeAndPadKernel<<<numBlocks, threadsPerBlock>>>(
+                targetPtr, srcPtr, widthSource, heightSource, widthTarget, heightTarget, scaleFactor);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
     }
 
     template <typename T>
-    void resizeAndMergeRGBGPU(
+    void resizeAndPadRbgGpu(
         T* targetPtr, const unsigned char* const srcPtr, const int widthSource, const int heightSource,
         const int widthTarget, const int heightTarget, const T scaleFactor)
 
     {
-        const auto channels = 3;
-        const dim3 threadsPerBlock{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D, 1};
-        const dim3 numBlocks{
-            getNumberCudaBlocks(widthTarget, threadsPerBlock.x),
-            getNumberCudaBlocks(heightTarget, threadsPerBlock.y),
-            getNumberCudaBlocks(channels, threadsPerBlock.z)};
-
-        resizeAndPadKernel<<<numBlocks, threadsPerBlock>>>(
-            targetPtr, srcPtr, widthSource, heightSource, widthTarget, heightTarget, scaleFactor);
+        try
+        {
+            const auto channels = 3;
+            const dim3 threadsPerBlock{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D, 1};
+            const dim3 numBlocks{
+                getNumberCudaBlocks(widthTarget, threadsPerBlock.x),
+                getNumberCudaBlocks(heightTarget, threadsPerBlock.y),
+                getNumberCudaBlocks(channels, threadsPerBlock.z)};
+            resizeAndPadKernel<<<numBlocks, threadsPerBlock>>>(
+                targetPtr, srcPtr, widthSource, heightSource, widthTarget, heightTarget, scaleFactor);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
     }
 
     template void resizeAndMergeGpu(
@@ -402,22 +384,17 @@ namespace op
         double* targetPtr, const std::vector<const double*>& sourcePtrs, const std::array<int, 4>& targetSize,
         const std::vector<std::array<int, 4>>& sourceSizes, const std::vector<double>& scaleInputToNetInputs);
 
-    template void reorderAndCast(
-        float* targetPtr, const unsigned char* const srcPtr, const int width, const int height, const int channels);
-    template void reorderAndCast(
-        double* targetPtr, const unsigned char* const srcPtr, const int width, const int height, const int channels);
-
-    template void resizeAndMergeRGBGPU(
+    template void resizeAndPadRbgGpu(
         float* targetPtr, const float* const srcPtr, const int widthSource, const int heightSource,
         const int widthTarget, const int heightTarget, const float scaleFactor);
-    template void resizeAndMergeRGBGPU(
+    template void resizeAndPadRbgGpu(
         double* targetPtr, const double* const srcPtr, const int widthSource, const int heightSource,
         const int widthTarget, const int heightTarget, const double scaleFactor);
 
-    template void resizeAndMergeRGBGPU(
+    template void resizeAndPadRbgGpu(
         float* targetPtr, const unsigned char* const srcPtr, const int widthSource, const int heightSource,
         const int widthTarget, const int heightTarget, const float scaleFactor);
-    template void resizeAndMergeRGBGPU(
+    template void resizeAndPadRbgGpu(
         double* targetPtr, const unsigned char* const srcPtr, const int widthSource, const int heightSource,
         const int widthTarget, const int heightTarget, const double scaleFactor);
 }

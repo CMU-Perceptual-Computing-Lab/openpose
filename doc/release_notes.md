@@ -267,7 +267,7 @@ OpenPose Library - Release Notes
         3. ~2-4x speedup for NMS.
         4. ~2x speedup for image resize.
         5. +25-30% speedup for rendering.
-        6. Reduced latency and increased speed by moving the resize in cvMatToOpOutput to CUDA. It generalizes better to higher number of GPUs.
+        6. Reduced latency and increased speed by moving the resize in CvMatToOpOutput and OpOutputToCvMat to CUDA. The linear speedup generalizes better to higher number of GPUs.
     3. Unity binding of OpenPose released. OpenPose adds the flag `BUILD_UNITY_SUPPORT` on CMake, which enables special Unity code so it can be built as a Unity plugin.
     4. If camera is unplugged, OpenPose GUI and command line will display a warning and try to reconnect it.
     5. Wrapper classes simplified and renamed. Wrapper renamed as WrapperT, and created Wrapper as the non-templated class equivalent.
