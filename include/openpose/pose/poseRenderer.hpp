@@ -16,9 +16,9 @@ namespace op
 
         virtual void initializationOnThread(){};
 
-        virtual std::pair<int, std::string> renderPose(Array<float>& outputData, const Array<float>& poseKeypoints,
-                                                       const float scaleInputToOutput,
-                                                       const float scaleNetToOutput = -1.f) = 0;
+        virtual std::pair<int, std::string> renderPose(
+            Array<float>& outputData, const Array<float>& poseKeypoints, const float scaleInputToOutput,
+            const float scaleNetToOutput = -1.f) = 0;
 
     protected:
         const PoseModel mPoseModel;

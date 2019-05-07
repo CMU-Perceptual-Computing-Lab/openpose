@@ -23,6 +23,7 @@ OpenPose - Frequently Asked Question (FAQ)
     18. [Huge RAM Usage](#huge-ram-usage)
     19. [CUDA_cublas_device_LIBRARY Not Found](#cuda_cublas_device_library-not-found)
     20. [CMake-GUI Error While Getting Default Caffe](#cmake-gui-error-while-getting-default-caffe)
+    21. [Is Maximum Accuracy Configuration Possible on Lower End GPUs?](#is-maximum-accuracy-configuration-possible-on-lower-end-gpus)
 
 
 
@@ -191,3 +192,10 @@ cd openpose
 git submodule init
 git submodle update
 ```
+
+
+
+### Is Maximum Accuracy Configuration Possible on Lower End GPUs?
+**Q**: I've read that this command provides the most accurate results possible on Openpose so far: https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/quick_start.md#maximum-accuracy-configuration. However, a 8GB GPU (e.g., 1080 or 2080) will run out of memory, is there any method to achieve the same accuracy on GPU using less memory even if it meant sacrificing speed?
+
+**A**: Unfortunately no, there is no way at the moment. Caffe just takes so much memory doing that. You can try with `--scale_number 3` instead of 4, reducing a bit the `net_resolution` (e.g. `720` vs. `736`) and starting the computer without GUI (which also takes about 1GB of memory just to keep the computer GUI running).

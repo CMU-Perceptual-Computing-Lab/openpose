@@ -326,10 +326,10 @@ namespace op
                 spBodyPartConnectorCaffe->Forward(
                     {spHeatMapsBlob.get(), spPeaksBlob.get()}, mPoseKeypoints, mPoseScores);
                 // OP_CUDA_PROFILE_END(timeNormalize4, 1e3, REPS);
-                // log("1 = " + std::to_string(timeNormalize1) + " msecs.");
-                // log("2 = " + std::to_string(timeNormalize2) + " msecs.");
-                // log("3 = " + std::to_string(timeNormalize3) + " msecs.");
-                // log("4 = " + std::to_string(timeNormalize4) + " msecs.");
+                // log("1(caf)= " + std::to_string(timeNormalize1) + "ms");
+                // log("2(res) = " + std::to_string(timeNormalize2) + " ms");
+                // log("3(nms) = " + std::to_string(timeNormalize3) + " ms");
+                // log("4(bpp) = " + std::to_string(timeNormalize4) + " ms");
                 // Re-run on each person
                 if (TOP_DOWN_REFINEMENT)
                 {

@@ -69,6 +69,31 @@ namespace op
         }
     }
 
+    template <typename T>
+    __global__ void resizeAndPadKernel(
+        T* targetPtr, const unsigned char* const sourcePtr, const int widthSource, const int heightSource,
+        const int widthTarget, const int heightTarget, const float rescaleFactor)
+    {
+        const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
+        const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+        const auto channel = (blockIdx.z * blockDim.z) + threadIdx.z;
+
+        if (x < widthTarget && y < heightTarget)
+        {
+            const auto targetArea = widthTarget * heightTarget;
+            if (x < widthSource * rescaleFactor && y < heightSource * rescaleFactor)
+            {
+                const auto sourceArea = widthSource * heightSource;
+                const T xSource = (x + T(0.5f)) / T(rescaleFactor) - T(0.5f);
+                const T ySource = (y + T(0.5f)) / T(rescaleFactor) - T(0.5f);
+                const unsigned char* sourcePtrChannel = sourcePtr + channel * sourceArea;
+                targetPtr[channel * targetArea + y*widthTarget+x] = bicubicInterpolate(
+                    sourcePtrChannel, xSource, ySource, widthSource, heightSource, widthSource);
+            }
+            else
+                targetPtr[channel * targetArea + y*widthTarget+x] = 0;
+        }
+    }
 
     template <typename T>
     __global__ void resize8TimesKernel(
@@ -165,8 +190,9 @@ namespace op
         }
     }
 
+    template <typename T>
     __global__ void reorderAndCastKernel(
-        float* targetPtr, const unsigned char* const srcPtr, const int width, const int height)
+        T* targetPtr, const unsigned char* const srcPtr, const int width, const int height)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -178,34 +204,8 @@ namespace op
             const auto channelOffset = c * width * height;
             const auto targetIndex = channelOffset + y * width + x;
             const auto srcIndex = (originFramePtrOffsetY + x) * channels + c;
-            targetPtr[targetIndex] =  float(srcPtr[srcIndex]) * (1/256.f) - 0.5f;
+            targetPtr[targetIndex] =  T(srcPtr[srcIndex]) * T(1/256.f) - T(0.5f);
         }
-    }
-
-    void reorderAndCast(float* targetPtr, const unsigned char* const srcPtr, const int width, const int height)
-    {
-        const dim3 threadsPerBlock{32, 1, 1};
-        const dim3 numBlocks{
-            getNumberCudaBlocks(width, threadsPerBlock.x),
-            getNumberCudaBlocks(height, threadsPerBlock.y),
-            getNumberCudaBlocks(3, threadsPerBlock.z)};
-        reorderAndCastKernel<<<numBlocks, threadsPerBlock>>>(targetPtr, srcPtr, width, height);
-    }
-
-    void resizeAndMergeRGBGPU(
-        float* targetPtr, const float* const srcPtr, const int widthSource, const int heightSource,
-        const int widthTarget, const int heightTarget, const float scaleFactor)
-
-    {
-        const auto channels = 3;
-        const dim3 threadsPerBlock{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D, 1};
-        const dim3 numBlocks{
-            getNumberCudaBlocks(widthTarget, threadsPerBlock.x),
-            getNumberCudaBlocks(heightTarget, threadsPerBlock.y),
-            getNumberCudaBlocks(channels, threadsPerBlock.z)};
-
-        resizeAndPadKernel<<<numBlocks, threadsPerBlock>>>(
-            targetPtr, srcPtr, widthSource, heightSource, widthTarget, heightTarget, scaleFactor);
     }
 
     template <typename T>
@@ -349,10 +349,75 @@ namespace op
         }
     }
 
+    template <typename T>
+    void reorderAndCast(
+        T* targetPtr, const unsigned char* const srcPtr, const int width, const int height, const int channels)
+    {
+        const dim3 threadsPerBlock{32, 1, 1};
+        const dim3 numBlocks{
+            getNumberCudaBlocks(width, threadsPerBlock.x),
+            getNumberCudaBlocks(height, threadsPerBlock.y),
+            getNumberCudaBlocks(channels, threadsPerBlock.z)};
+        reorderAndCastKernel<<<numBlocks, threadsPerBlock>>>(targetPtr, srcPtr, width, height);
+    }
+
+    template <typename T>
+    void resizeAndMergeRGBGPU(
+        T* targetPtr, const T* const srcPtr, const int widthSource, const int heightSource,
+        const int widthTarget, const int heightTarget, const T scaleFactor)
+
+    {
+        const auto channels = 3;
+        const dim3 threadsPerBlock{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D, 1};
+        const dim3 numBlocks{
+            getNumberCudaBlocks(widthTarget, threadsPerBlock.x),
+            getNumberCudaBlocks(heightTarget, threadsPerBlock.y),
+            getNumberCudaBlocks(channels, threadsPerBlock.z)};
+
+        resizeAndPadKernel<<<numBlocks, threadsPerBlock>>>(
+            targetPtr, srcPtr, widthSource, heightSource, widthTarget, heightTarget, scaleFactor);
+    }
+
+    template <typename T>
+    void resizeAndMergeRGBGPU(
+        T* targetPtr, const unsigned char* const srcPtr, const int widthSource, const int heightSource,
+        const int widthTarget, const int heightTarget, const T scaleFactor)
+
+    {
+        const auto channels = 3;
+        const dim3 threadsPerBlock{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D, 1};
+        const dim3 numBlocks{
+            getNumberCudaBlocks(widthTarget, threadsPerBlock.x),
+            getNumberCudaBlocks(heightTarget, threadsPerBlock.y),
+            getNumberCudaBlocks(channels, threadsPerBlock.z)};
+
+        resizeAndPadKernel<<<numBlocks, threadsPerBlock>>>(
+            targetPtr, srcPtr, widthSource, heightSource, widthTarget, heightTarget, scaleFactor);
+    }
+
     template void resizeAndMergeGpu(
         float* targetPtr, const std::vector<const float*>& sourcePtrs, const std::array<int, 4>& targetSize,
         const std::vector<std::array<int, 4>>& sourceSizes, const std::vector<float>& scaleInputToNetInputs);
     template void resizeAndMergeGpu(
         double* targetPtr, const std::vector<const double*>& sourcePtrs, const std::array<int, 4>& targetSize,
         const std::vector<std::array<int, 4>>& sourceSizes, const std::vector<double>& scaleInputToNetInputs);
+
+    template void reorderAndCast(
+        float* targetPtr, const unsigned char* const srcPtr, const int width, const int height, const int channels);
+    template void reorderAndCast(
+        double* targetPtr, const unsigned char* const srcPtr, const int width, const int height, const int channels);
+
+    template void resizeAndMergeRGBGPU(
+        float* targetPtr, const float* const srcPtr, const int widthSource, const int heightSource,
+        const int widthTarget, const int heightTarget, const float scaleFactor);
+    template void resizeAndMergeRGBGPU(
+        double* targetPtr, const double* const srcPtr, const int widthSource, const int heightSource,
+        const int widthTarget, const int heightTarget, const double scaleFactor);
+
+    template void resizeAndMergeRGBGPU(
+        float* targetPtr, const unsigned char* const srcPtr, const int widthSource, const int heightSource,
+        const int widthTarget, const int heightTarget, const float scaleFactor);
+    template void resizeAndMergeRGBGPU(
+        double* targetPtr, const unsigned char* const srcPtr, const int widthSource, const int heightSource,
+        const int widthTarget, const int heightTarget, const double scaleFactor);
 }

@@ -13,11 +13,11 @@ namespace op
     class OP_API PoseGpuRenderer : public GpuRenderer, public PoseRenderer
     {
     public:
-        PoseGpuRenderer(const PoseModel poseModel, const std::shared_ptr<PoseExtractorNet>& poseExtractorNet,
-                        const float renderThreshold, const bool blendOriginalFrame = true,
-                        const float alphaKeypoint = POSE_DEFAULT_ALPHA_KEYPOINT,
-                        const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP,
-                        const unsigned int elementToRender = 0u);
+        PoseGpuRenderer(
+            const PoseModel poseModel, const std::shared_ptr<PoseExtractorNet>& poseExtractorNet,
+            const float renderThreshold, const bool blendOriginalFrame = true,
+            const float alphaKeypoint = POSE_DEFAULT_ALPHA_KEYPOINT,
+            const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP, const unsigned int elementToRender = 0u);
 
         virtual ~PoseGpuRenderer();
 

@@ -105,8 +105,7 @@ namespace op
                         else if (numberBodyParts == 18)
                             indexesInCocoOrder = std::vector<int>{
                                 0, 15,14,17,16,    5,2,6,3,7,    4,11,8,12, 9,    13,10};
-                        else if (mPoseModel == PoseModel::BODY_25B || mPoseModel == PoseModel::BODY_95
-                            || mPoseModel == PoseModel::BODY_135)
+                        else if (mPoseModel == PoseModel::BODY_25B || mPoseModel == PoseModel::BODY_135)
                         {
                             indexesInCocoOrder = std::vector<int>(17);
                             std::iota(indexesInCocoOrder.begin(), indexesInCocoOrder.end(), 0);

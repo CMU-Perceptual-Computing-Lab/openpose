@@ -188,6 +188,24 @@ namespace op
 
         /**
          * Data allocation function.
+         * Equivalent to default constructor, but it does not allocate memory, but rather use dataPtr.
+         * @param size Integer with the number of T element to be allocated. E.g., size = 5 is internally similar to
+         * `new T[5]`.
+         * @param dataPtr Pointer to the memory to be used by the Array.
+         */
+        void reset(const int size, T* const dataPtr);
+
+        /**
+         * Data allocation function.
+         * Equivalent to default constructor, but it does not allocate memory, but rather use dataPtr.
+         * @param sizes Vector with the size of each dimension. E.g., size = {3, 5, 2} is internally similar to:
+         * `new T[3*5*2]`.
+         * @param dataPtr Pointer to the memory to be used by the Array.
+         */
+        void reset(const std::vector<int>& sizes, T* const dataPtr);
+
+        /**
+         * Data allocation function.
          * It internally allocates memory and copies the data of the argument to the Array allocated memory.
          * @param cvMat cv::Mat to be copied.
          */
