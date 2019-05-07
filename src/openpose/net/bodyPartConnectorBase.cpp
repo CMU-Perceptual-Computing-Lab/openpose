@@ -684,7 +684,7 @@ namespace op
             if (numberPeople > 0)
             {
                 // Initialized to 0 for non-found keypoints in people
-                poseKeypoints.reset({numberPeople, (int)numberBodyParts, 3}, 0);
+                poseKeypoints.reset({numberPeople, (int)numberBodyParts, 3}, 0.f);
                 poseScores.reset(numberPeople);
             }
             else

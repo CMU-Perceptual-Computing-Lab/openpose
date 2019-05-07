@@ -23,13 +23,19 @@ namespace op
         const std::array<int, 4>& targetSize, const std::vector<std::array<int, 4>>& sourceSizes,
         const std::vector<T>& scaleInputToNetInputs = {1.f}, const int gpuID = 0);
 
-    // Functions for the files cvMatToOpInput/Output
-    void resizeAndMergeRGBGPU(
-        float* targetPtr, const float* const srcPtr, const int sourceWidth, const int sourceHeight,
-        const int targetWidth, const int targetHeight, const float scaleFactor);
-
+    // Functions for cvMatToOpInput/cvMatToOpOutput
+    template <typename T>
     void reorderAndCast(
-        float* targetPtr, const unsigned char* const srcPtr, const int width, const int height);
+        T* targetPtr, const unsigned char* const srcPtr, const int width, const int height, const int channels);
 
+    template <typename T>
+    void resizeAndMergeRGBGPU(
+        T* targetPtr, const T* const srcPtr, const int sourceWidth, const int sourceHeight,
+        const int targetWidth, const int targetHeight, const T scaleFactor);
+
+    template <typename T>
+    void resizeAndMergeRGBGPU(
+        T* targetPtr, const unsigned char* const srcPtr, const int sourceWidth, const int sourceHeight,
+        const int targetWidth, const int targetHeight, const T scaleFactor);
 }
 #endif // OPENPOSE_NET_RESIZE_AND_MERGE_BASE_HPP

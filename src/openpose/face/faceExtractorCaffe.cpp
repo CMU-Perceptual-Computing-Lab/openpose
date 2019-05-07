@@ -171,8 +171,8 @@ namespace op
         }
     }
 
-    void FaceExtractorCaffe::forwardPass(const std::vector<Rectangle<float>>& faceRectangles,
-                                         const cv::Mat& cvInputData)
+    void FaceExtractorCaffe::forwardPass(
+        const std::vector<Rectangle<float>>& faceRectangles, const cv::Mat& cvInputData)
     {
         try
         {
@@ -188,7 +188,7 @@ namespace op
 
                     // Set face size
                     const auto numberPeople = (int)faceRectangles.size();
-                    mFaceKeypoints.reset({numberPeople, (int)FACE_NUMBER_PARTS, 3}, 0);
+                    mFaceKeypoints.reset({numberPeople, (int)FACE_NUMBER_PARTS, 3}, 0.f);
 
                     // HeatMaps: define size
                     if (!mHeatMapTypes.empty())

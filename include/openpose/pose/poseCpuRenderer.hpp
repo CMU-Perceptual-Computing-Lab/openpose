@@ -12,16 +12,16 @@ namespace op
     class OP_API PoseCpuRenderer : public Renderer, public PoseRenderer
     {
     public:
-        PoseCpuRenderer(const PoseModel poseModel, const float renderThreshold, const bool blendOriginalFrame = true,
-                        const float alphaKeypoint = POSE_DEFAULT_ALPHA_KEYPOINT,
-                        const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP,
-                        const unsigned int elementToRender = 0u);
+        PoseCpuRenderer(
+            const PoseModel poseModel, const float renderThreshold, const bool blendOriginalFrame = true,
+            const float alphaKeypoint = POSE_DEFAULT_ALPHA_KEYPOINT,
+            const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP, const unsigned int elementToRender = 0u);
 
         virtual ~PoseCpuRenderer();
 
-        std::pair<int, std::string> renderPose(Array<float>& outputData, const Array<float>& poseKeypoints,
-                                               const float scaleInputToOutput,
-                                               const float scaleNetToOutput = -1.f);
+        std::pair<int, std::string> renderPose(
+            Array<float>& outputData, const Array<float>& poseKeypoints, const float scaleInputToOutput,
+            const float scaleNetToOutput = -1.f);
 
     private:
         DELETE_COPY(PoseCpuRenderer);

@@ -1,25 +1,54 @@
 // #include <opencv2/opencv.hpp>
-#include <openpose/gpu/cuda.hpp>
-#include <openpose/gpu/cuda.hu>
-#include <openpose/net/resizeAndMergeBase.hpp>
+#ifdef USE_CUDA
+    #include <openpose/gpu/cuda.hpp>
+    #include <openpose/gpu/cuda.hu>
+    #include <openpose/net/resizeAndMergeBase.hpp>
+#endif
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/openCv.hpp>
 #include <openpose/core/cvMatToOpInput.hpp>
 
 namespace op
 {
-    CvMatToOpInput::CvMatToOpInput(const PoseModel poseModel) :
-        mPoseModel{poseModel}
+    CvMatToOpInput::CvMatToOpInput(const PoseModel poseModel, const bool gpuResize) :
+        mPoseModel{poseModel},
+        mGpuResize{gpuResize},
+        pInputImageCuda{nullptr},
+        pInputImageReorderedCuda{nullptr},
+        pOutputImageCuda{nullptr},
+        pInputMaxSize{0ull},
+        pOutputMaxSize{0ull}
     {
+        #ifndef USE_CUDA
+            if (mGpuResize)
+                error("You need to compile OpenPose with CUDA support in order to use GPU resize.",
+                    __LINE__, __FUNCTION__, __FILE__);
+        #endif
     }
 
     CvMatToOpInput::~CvMatToOpInput()
     {
+        try
+        {
+            #ifdef USE_CUDA
+                if (mGpuResize)
+                {
+                    // Free temporary memory
+                    cudaFree(pInputImageCuda);
+                    cudaFree(pOutputImageCuda);
+                    cudaFree(pInputImageReorderedCuda);
+                }
+            #endif
+        }
+        catch (const std::exception& e)
+        {
+            errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
     }
 
     std::vector<Array<float>> CvMatToOpInput::createArray(
         const cv::Mat& cvInputData, const std::vector<double>& scaleInputToNetInputs,
-        const std::vector<Point<int>>& netInputSizes) const
+        const std::vector<Point<int>>& netInputSizes)
     {
         try
         {
@@ -33,89 +62,70 @@ namespace op
             // inputNetData - Reescale keeping aspect ratio and transform to float the input deep net image
             const auto numberScales = (int)scaleInputToNetInputs.size();
             std::vector<Array<float>> inputNetData(numberScales);
-
             for (auto i = 0u ; i < inputNetData.size() ; i++)
             {
-                // const auto REPS = 100;
-                // double timeNormalize0 = 0.;
-                // double timeNormalize1 = 0.;
-                // double timeNormalize2 = 0.;
-                // //// warm up code /////
-                // OP_PROFILE_INIT(5);
-                // cv::Mat frameWithNetSize;
-                // resizeFixedAspectRatio(frameWithNetSize, cvInputData, scaleInputToNetInputs[i], netInputSizes[i]);
-                // inputNetData[i].reset({1, 3, netInputSizes.at(i).y, netInputSizes.at(i).x});
-                // uCharCvMatToFloatPtr(inputNetData[i].getPtr(), frameWithNetSize,
-                //                      (mPoseModel == PoseModel::BODY_19N ? 2 : 1));
-                // OP_PROFILE_END(timeNormalize0, 1e3, 5);
+                // CPU version (faster if #Gpus <= 3 and relatively small images)
+                if (!mGpuResize)
+                {
+                    cv::Mat frameWithNetSize;
+                    resizeFixedAspectRatio(frameWithNetSize, cvInputData, scaleInputToNetInputs[i], netInputSizes[i]);
+                    // Fill inputNetData[i]
+                    inputNetData[i].reset({1, 3, netInputSizes.at(i).y, netInputSizes.at(i).x});
+                    uCharCvMatToFloatPtr(
+                        inputNetData[i].getPtr(), frameWithNetSize, (mPoseModel == PoseModel::BODY_19N ? 2 : 1));
 
-                // OP_PROFILE_INIT(REPS);
-                cv::Mat frameWithNetSize;
-                resizeFixedAspectRatio(frameWithNetSize, cvInputData, scaleInputToNetInputs[i], netInputSizes[i]);
-                // Fill inputNetData[i]
-                inputNetData[i].reset({1, 3, netInputSizes.at(i).y, netInputSizes.at(i).x});
-                uCharCvMatToFloatPtr(
-                    inputNetData[i].getPtr(), frameWithNetSize, (mPoseModel == PoseModel::BODY_19N ? 2 : 1));
-                // OP_PROFILE_END(timeNormalize1, 1e3, REPS);
-
-                // // 1) Allocate memory on GPU
-                // // 2) copy cvINPUTData to GPU
-                // // 3) resize image on GPU using Nvidia performance primatives
-                // // 4) Copy back to CPU
-                // // allocate memory on gpu
-                // unsigned char *CUDA_input_image = 0;
-                // float *CUDA_input_image_reord = 0;
-                // float *CUDA_output_image = 0;
-                // int input_image_size = cvInputData.rows * cvInputData.cols;
-                // int output_image_size = netInputSizes[i].x * netInputSizes[i].y;
-
-                // cudaMalloc((void**)&CUDA_input_image, sizeof(unsigned char) * input_image_size * 3);
-                // cudaMalloc((void**)&CUDA_input_image_reord, sizeof(float) * input_image_size * 3);
-                // cudaMalloc((void**)&CUDA_output_image, sizeof(float) * output_image_size * 3);
-
-                // // copy image to GPU
-                // cudaMemcpy(
-                //     CUDA_input_image, cvInputData.data, sizeof(unsigned char) * 3 * input_image_size,
-                //     cudaMemcpyHostToDevice);
-
-                // OP_CUDA_PROFILE_INIT(REPS);
-                // reorderAndCast(CUDA_input_image_reord, CUDA_input_image, cvInputData.cols, cvInputData.rows);
-                // resizeAndMergeRGBGPU(
-                //     CUDA_output_image, CUDA_input_image_reord, cvInputData.cols, cvInputData.rows, netInputSizes[i].x,
-                //     netInputSizes[i].y, scaleInputToNetInputs[i]);
-                // // copy back to CPU
-                // inputNetData[i].reset({1, 3, netInputSizes.at(i).y, netInputSizes.at(i).x});
-                // OP_CUDA_PROFILE_END(timeNormalize2, 1e3, REPS);
-
-                // // Final copy
-                // cudaMemcpy(inputNetData[i].getPtr(),
-                //            CUDA_output_image,
-                //            sizeof(float) * 3 * output_image_size,
-                //            cudaMemcpyDeviceToHost);
-                // cudaFree(CUDA_input_image);
-                // cudaFree(CUDA_output_image);
-                // cudaFree(CUDA_input_image_reord);
-
-                // log("  ResOri=" + std::to_string(timeNormalize1) + "ms");
-                // log("  ResNew=" + std::to_string(timeNormalize2) + "ms");
-
-                // Fill inputNetData[i]
-                // inputNetData[i].reset({1, 3, netInputSizes.at(i).y, netInputSizes.at(i).x});
-                // uCharCvMatToFloatPtr(inputNetData[i].getPtr(), frameWithNetSize,
-                //                      (mPoseModel == PoseModel::BODY_19N ? 2 : 1));
-                // // OpenCV equivalent
-                // const auto scale = 1/255.;
-                // const cv::Scalar mean{128,128,128};
-                // const cv::Size outputSize{netInputSizes[i].x, netInputSizes[i].y};
-                // // cv::Mat cvMat;
-                // cv::dnn::blobFromImage(
-                //     // frameWithNetSize, cvMat, scale, outputSize, mean);
-                //     frameWithNetSize, inputNetData[i].getCvMat(), scale, outputSize, mean);
-                // // log(cv::norm(cvMat - inputNetData[i].getCvMat())); // ~0.25
+                    // // OpenCV equivalent
+                    // const auto scale = 1/255.;
+                    // const cv::Scalar mean{128,128,128};
+                    // const cv::Size outputSize{netInputSizes[i].x, netInputSizes[i].y};
+                    // // cv::Mat cvMat;
+                    // cv::dnn::blobFromImage(
+                    //     // frameWithNetSize, cvMat, scale, outputSize, mean);
+                    //     frameWithNetSize, inputNetData[i].getCvMat(), scale, outputSize, mean);
+                    // // log(cv::norm(cvMat - inputNetData[i].getCvMat())); // ~0.25
+                }
+                // CUDA version (if #Gpus > n)
+                else
+                {
+                    // (Re)Allocate temporary memory
+                    const unsigned int inputImageSize = 3 * cvInputData.rows * cvInputData.cols;
+                    const unsigned int outputImageSize = 3 * netInputSizes[i].x * netInputSizes[i].y;
+                    if (pInputMaxSize < inputImageSize)
+                    {
+                        pInputMaxSize = inputImageSize;
+                        // Free temporary memory
+                        cudaFree(pInputImageCuda);
+                        cudaFree(pInputImageReorderedCuda);
+                        // Re-allocate memory
+                        cudaMalloc((void**)&pInputImageCuda, sizeof(unsigned char) * inputImageSize);
+                        cudaMalloc((void**)&pInputImageReorderedCuda, sizeof(float) * inputImageSize);
+                    }
+                    if (pOutputMaxSize < outputImageSize)
+                    {
+                        pOutputMaxSize = outputImageSize;
+                        // Free temporary memory
+                        cudaFree(pOutputImageCuda);
+                        // Re-allocate memory
+                        cudaMalloc((void**)&pOutputImageCuda, sizeof(float) * outputImageSize);
+                    }
+                    // Copy image to GPU
+                    cudaMemcpy(
+                        pInputImageCuda, cvInputData.data, sizeof(unsigned char) * inputImageSize,
+                        cudaMemcpyHostToDevice);
+                    // Resize image on GPU
+                    reorderAndCast(pInputImageReorderedCuda, pInputImageCuda, cvInputData.cols, cvInputData.rows, 3);
+                    resizeAndMergeRGBGPU(
+                        pOutputImageCuda, pInputImageReorderedCuda, cvInputData.cols, cvInputData.rows,
+                        netInputSizes[i].x, netInputSizes[i].y, (float)scaleInputToNetInputs[i]);
+                    // Copy back to CPU
+                    inputNetData[i].reset({1, 3, netInputSizes.at(i).y, netInputSizes.at(i).x});
+                    cudaMemcpy(
+                        inputNetData[i].getPtr(), pOutputImageCuda, sizeof(float) * outputImageSize,
+                        cudaMemcpyDeviceToHost);
+                }
             }
             return inputNetData;
         }
-
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);

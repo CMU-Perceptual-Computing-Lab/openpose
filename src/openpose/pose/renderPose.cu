@@ -41,44 +41,44 @@ namespace op
 
 
 
-    inline __device__ void getColorHeatMap(float* colorPtr, float v, const float vmin, const float vmax)
+    inline __device__ void getColorHeatMap(float* colorPtr, const float v, const float vmin, const float vmax)
     {
-        v = fastTruncateCuda(v, vmin, vmax);
+        const auto vTrunc = fastTruncateCuda(v, vmin, vmax);
         const auto dv = vmax - vmin;
 
-        if (v < (vmin + 0.125f * dv))
+        if (vTrunc < (vmin + 0.125f * dv))
         {
-            colorPtr[0] = 256.f * (0.5f + (v * 4.f)); //B: 0.5 ~ 1
+            colorPtr[0] = 256.f * (0.5f + (vTrunc * 4.f)); //B: 0.5 ~ 1
             colorPtr[1] = 0.f;
             colorPtr[2] = 0.f;
         }
-        else if (v < (vmin + 0.375f * dv))
+        else if (vTrunc < (vmin + 0.375f * dv))
         {
             colorPtr[0] = 255.f;
-            colorPtr[1] = 256.f * (v - 0.125f) * 4.f; //G: 0 ~ 1
+            colorPtr[1] = 256.f * (vTrunc - 0.125f) * 4.f; //G: 0 ~ 1
             colorPtr[2] = 0.f;
         }
-        else if (v < (vmin + 0.625f * dv))
+        else if (vTrunc < (vmin + 0.625f * dv))
         {
-            colorPtr[0] = 256.f * (-4.f * v + 2.5f); //B: 1 ~ 0
+            colorPtr[0] = 256.f * (-4.f * vTrunc + 2.5f); //B: 1 ~ 0
             colorPtr[1] = 255.f;
-            colorPtr[2] = 256.f * (4.f * (v - 0.375f)); // R: 0 ~ 1
+            colorPtr[2] = 256.f * (4.f * (vTrunc - 0.375f)); // R: 0 ~ 1
         }
-        else if (v < (vmin + 0.875f * dv))
+        else if (vTrunc < (vmin + 0.875f * dv))
         {
             colorPtr[0] = 0.f;
-            colorPtr[1] = 256.f * (-4.f * v + 3.5f); //G: 1 ~ 0
+            colorPtr[1] = 256.f * (-4.f * vTrunc + 3.5f); //G: 1 ~ 0
             colorPtr[2] = 255.f;
         }
         else
         {
             colorPtr[0] = 0.f;
             colorPtr[1] = 0.f;
-            colorPtr[2] = 256.f * (-4.f * v + 4.5f); //R: 1 ~ 0.5
+            colorPtr[2] = 256.f * (-4.f * vTrunc + 4.5f); //R: 1 ~ 0.5
         }
     }
 
-    inline __device__ void getColorAffinity(float3& colorPtr, float v, const float vmin, const float vmax)
+    inline __device__ void getColorAffinity(float3& colorPtr, const float v, const float vmin, const float vmax)
     {
         const auto RY = 15;
         const auto YG =  6;
@@ -87,22 +87,22 @@ namespace op
         const auto BM = 13;
         const auto MR =  6;
         const auto summed = RY+YG+GC+CB+BM+MR;       // 55
-        v = fastTruncateCuda(v, vmin, vmax) * summed;
+        const auto vTrunc = fastTruncateCuda(v, vmin, vmax) * summed;
 
-        if (v < RY)
-            colorPtr = {255.f,                        255.f*(v/(RY)),               0.f};
-        else if (v < RY+YG)
-            colorPtr = {255.f*(1-((v-RY)/(YG))),      255.f,                        0.f};
-        else if (v < RY+YG+GC)
-            colorPtr = {0.f * (1-((v-RY)/(YG))),      255.f,                        255.f*((v-RY-YG)/(GC))};
-        else if (v < RY+YG+GC+CB)
-            colorPtr = {0.f,                          255.f*(1-((v-RY-YG-GC)/(CB))),255.f};
-        else if (v < summed-MR)
-            colorPtr = {255.f*((v-RY-YG-GC-CB)/(BM)), 0.f,                          255.f};
-        else if (v < summed)
-            colorPtr = {255.f,                        0.f,                          255.f*(1-((v-RY-YG-GC-CB-BM)/(MR)))};
+        if (vTrunc < RY)
+            colorPtr = {255.f,                              255.f*(vTrunc/(RY)),                0.f};
+        else if (vTrunc < RY+YG)
+            colorPtr = {255.f*(1-((vTrunc-RY)/(YG))),       255.f,                              0.f};
+        else if (vTrunc < RY+YG+GC)
+            colorPtr = {0.f * (1-((vTrunc-RY)/(YG))),       255.f,                              255.f*((vTrunc-RY-YG)/(GC))};
+        else if (vTrunc < RY+YG+GC+CB)
+            colorPtr = {0.f,                                255.f*(1-((vTrunc-RY-YG-GC)/(CB))), 255.f};
+        else if (vTrunc < summed-MR)
+            colorPtr = {255.f*((vTrunc-RY-YG-GC-CB)/(BM)),  0.f,                                255.f};
+        else if (vTrunc < summed)
+            colorPtr = {255.f,                              0.f,                                255.f*(1-((vTrunc-RY-YG-GC-CB-BM)/(MR)))};
         else
-            colorPtr = {255.f,                        0.f,                          0.f};
+            colorPtr = {255.f,                              0.f,                                0.f};
     }
 
     inline __device__ void getColorXYAffinity(float3& colorPtr, const float x, const float y)

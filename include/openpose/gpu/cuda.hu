@@ -144,6 +144,28 @@ namespace op
     }
 
     template <typename T>
+    inline __device__ T bicubicInterpolate(
+        const unsigned char* const sourcePtr, const T xSource, const T ySource, const int widthSource,
+        const int heightSource, const int widthSourcePtr)
+    {
+        int xIntArray[4];
+        int yIntArray[4];
+        T dx;
+        T dy;
+        cubicSequentialData(xIntArray, yIntArray, dx, dy, xSource, ySource, widthSource, heightSource);
+
+        T temp[4];
+        for (unsigned char i = 0; i < 4; i++)
+        {
+            const auto offset = yIntArray[i]*widthSourcePtr;
+            temp[i] = cubicInterpolate(
+                T(sourcePtr[offset + xIntArray[0]]), T(sourcePtr[offset + xIntArray[1]]),
+                T(sourcePtr[offset + xIntArray[2]]), T(sourcePtr[offset + xIntArray[3]]), dx);
+        }
+        return cubicInterpolate(temp[0], temp[1], temp[2], temp[3], dy);
+    }
+
+    template <typename T>
     inline __device__ T bicubicInterpolate8Times(
         const T* const sourcePtr, const T xSource, const T ySource, const int widthSource, const int heightSource,
         const int threadIdxX, const int threadIdxY)
