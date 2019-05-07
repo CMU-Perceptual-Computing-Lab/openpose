@@ -273,8 +273,7 @@ namespace op
                     cvMatToOpInputW = std::make_shared<WCvMatToOpInput<TDatumsSP>>(cvMatToOpInput);
                 }
                 // Note: We realized that somehow doing it on GPU for any number of GPUs does speedup the whole OP
-                resizeOnCpu = true;
-                // resizeOnCpu = (numberGpuThreads < 3);
+                resizeOnCpu = false;
                 if (addCvMatToOpOutput && (resizeOnCpu || !renderOutputGpu))
                 {
                     const auto gpuResize = false;

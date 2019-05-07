@@ -89,35 +89,40 @@ namespace op
             // CUDA version (if #Gpus > 3)
             else
             {
+                #ifdef USE_CUDA
 // Input image can be shared between this one and cvMatToOpInput.hpp
-                // (Free and re-)Allocate temporary memory
-                const unsigned int inputImageSize = 3 * cvInputData.rows * cvInputData.cols;
-                if (pInputMaxSize < inputImageSize)
-                {
-                    pInputMaxSize = inputImageSize;
-                    cudaFree(pInputImageCuda);
-                    cudaMalloc((void**)&pInputImageCuda, sizeof(unsigned char) * inputImageSize);
-                }
-                // (Free and re-)Allocate temporary memory
-                const unsigned int outputImageSize = 3 * outputResolution.x * outputResolution.y;
-                if (*spOutputMaxSize < outputImageSize)
-                {
-                    *spOutputMaxSize = outputImageSize;
-                    cudaFree(*spOutputImageCuda);
-                    cudaMalloc((void**)spOutputImageCuda.get(), sizeof(float) * outputImageSize);
-                }
-                // Copy original image to GPU
-                cudaMemcpy(
-                    pInputImageCuda, cvInputData.data, sizeof(unsigned char) * inputImageSize, cudaMemcpyHostToDevice);
-                // Resize output image on GPU
-                resizeAndMergeRGBGPU(
-                    *spOutputImageCuda, pInputImageCuda, cvInputData.cols, cvInputData.rows, outputResolution.x,
-                    outputResolution.y, (float)scaleInputToOutput);
-                *spGpuMemoryAllocated = true;
-                // // No need to copy output image back to CPU
-                // cudaMemcpy(
-                //     outputData.getPtr(), *spOutputImageCuda, sizeof(float) * outputImageSize,
-                //     cudaMemcpyDeviceToHost);
+                    // (Free and re-)Allocate temporary memory
+                    const unsigned int inputImageSize = 3 * cvInputData.rows * cvInputData.cols;
+                    if (pInputMaxSize < inputImageSize)
+                    {
+                        pInputMaxSize = inputImageSize;
+                        cudaFree(pInputImageCuda);
+                        cudaMalloc((void**)&pInputImageCuda, sizeof(unsigned char) * inputImageSize);
+                    }
+                    // (Free and re-)Allocate temporary memory
+                    const unsigned int outputImageSize = 3 * outputResolution.x * outputResolution.y;
+                    if (*spOutputMaxSize < outputImageSize)
+                    {
+                        *spOutputMaxSize = outputImageSize;
+                        cudaFree(*spOutputImageCuda);
+                        cudaMalloc((void**)spOutputImageCuda.get(), sizeof(float) * outputImageSize);
+                    }
+                    // Copy original image to GPU
+                    cudaMemcpy(
+                        pInputImageCuda, cvInputData.data, sizeof(unsigned char) * inputImageSize, cudaMemcpyHostToDevice);
+                    // Resize output image on GPU
+                    resizeAndMergeRGBGPU(
+                        *spOutputImageCuda, pInputImageCuda, cvInputData.cols, cvInputData.rows, outputResolution.x,
+                        outputResolution.y, (float)scaleInputToOutput);
+                    *spGpuMemoryAllocated = true;
+                    // // No need to copy output image back to CPU
+                    // cudaMemcpy(
+                    //     outputData.getPtr(), *spOutputImageCuda, sizeof(float) * outputImageSize,
+                    //     cudaMemcpyDeviceToHost);
+                #else
+                    error("You need to compile OpenPose with CUDA support in order to use GPU resize.",
+                        __LINE__, __FUNCTION__, __FILE__);
+                #endif
             }
             // Return result
             return outputData;

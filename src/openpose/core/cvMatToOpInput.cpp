@@ -87,41 +87,46 @@ namespace op
                 // CUDA version (if #Gpus > n)
                 else
                 {
-                    // (Re)Allocate temporary memory
-                    const unsigned int inputImageSize = 3 * cvInputData.rows * cvInputData.cols;
-                    const unsigned int outputImageSize = 3 * netInputSizes[i].x * netInputSizes[i].y;
-                    if (pInputMaxSize < inputImageSize)
-                    {
-                        pInputMaxSize = inputImageSize;
-                        // Free temporary memory
-                        cudaFree(pInputImageCuda);
-                        cudaFree(pInputImageReorderedCuda);
-                        // Re-allocate memory
-                        cudaMalloc((void**)&pInputImageCuda, sizeof(unsigned char) * inputImageSize);
-                        cudaMalloc((void**)&pInputImageReorderedCuda, sizeof(float) * inputImageSize);
-                    }
-                    if (pOutputMaxSize < outputImageSize)
-                    {
-                        pOutputMaxSize = outputImageSize;
-                        // Free temporary memory
-                        cudaFree(pOutputImageCuda);
-                        // Re-allocate memory
-                        cudaMalloc((void**)&pOutputImageCuda, sizeof(float) * outputImageSize);
-                    }
-                    // Copy image to GPU
-                    cudaMemcpy(
-                        pInputImageCuda, cvInputData.data, sizeof(unsigned char) * inputImageSize,
-                        cudaMemcpyHostToDevice);
-                    // Resize image on GPU
-                    reorderAndCast(pInputImageReorderedCuda, pInputImageCuda, cvInputData.cols, cvInputData.rows, 3);
-                    resizeAndMergeRGBGPU(
-                        pOutputImageCuda, pInputImageReorderedCuda, cvInputData.cols, cvInputData.rows,
-                        netInputSizes[i].x, netInputSizes[i].y, (float)scaleInputToNetInputs[i]);
-                    // Copy back to CPU
-                    inputNetData[i].reset({1, 3, netInputSizes.at(i).y, netInputSizes.at(i).x});
-                    cudaMemcpy(
-                        inputNetData[i].getPtr(), pOutputImageCuda, sizeof(float) * outputImageSize,
-                        cudaMemcpyDeviceToHost);
+                    #ifdef USE_CUDA
+                        // (Re)Allocate temporary memory
+                        const unsigned int inputImageSize = 3 * cvInputData.rows * cvInputData.cols;
+                        const unsigned int outputImageSize = 3 * netInputSizes[i].x * netInputSizes[i].y;
+                        if (pInputMaxSize < inputImageSize)
+                        {
+                            pInputMaxSize = inputImageSize;
+                            // Free temporary memory
+                            cudaFree(pInputImageCuda);
+                            cudaFree(pInputImageReorderedCuda);
+                            // Re-allocate memory
+                            cudaMalloc((void**)&pInputImageCuda, sizeof(unsigned char) * inputImageSize);
+                            cudaMalloc((void**)&pInputImageReorderedCuda, sizeof(float) * inputImageSize);
+                        }
+                        if (pOutputMaxSize < outputImageSize)
+                        {
+                            pOutputMaxSize = outputImageSize;
+                            // Free temporary memory
+                            cudaFree(pOutputImageCuda);
+                            // Re-allocate memory
+                            cudaMalloc((void**)&pOutputImageCuda, sizeof(float) * outputImageSize);
+                        }
+                        // Copy image to GPU
+                        cudaMemcpy(
+                            pInputImageCuda, cvInputData.data, sizeof(unsigned char) * inputImageSize,
+                            cudaMemcpyHostToDevice);
+                        // Resize image on GPU
+                        reorderAndCast(pInputImageReorderedCuda, pInputImageCuda, cvInputData.cols, cvInputData.rows, 3);
+                        resizeAndMergeRGBGPU(
+                            pOutputImageCuda, pInputImageReorderedCuda, cvInputData.cols, cvInputData.rows,
+                            netInputSizes[i].x, netInputSizes[i].y, (float)scaleInputToNetInputs[i]);
+                        // Copy back to CPU
+                        inputNetData[i].reset({1, 3, netInputSizes.at(i).y, netInputSizes.at(i).x});
+                        cudaMemcpy(
+                            inputNetData[i].getPtr(), pOutputImageCuda, sizeof(float) * outputImageSize,
+                            cudaMemcpyDeviceToHost);
+                    #else
+                        error("You need to compile OpenPose with CUDA support in order to use GPU resize.",
+                            __LINE__, __FUNCTION__, __FILE__);
+                    #endif
                 }
             }
             return inputNetData;
