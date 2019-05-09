@@ -264,9 +264,9 @@ OpenPose Library - Release Notes
     2. Speed up of the CUDA functions of OpenPose:
         1. Greedy body part connector implemented in CUDA: +~30% speedup in Nvidia (CUDA) version with default flags and +~10% in maximum accuracy configuration. In addition, it provides a small 0.5% boost in accuracy (default flags).
         2. +5-30% additional speedup for the body part connector of point 1.
-        3. ~2-4x speedup for NMS.
-        4. ~2x speedup for image resize.
-        5. +25-30% speedup for rendering.
+        3. About 2-4x speedup for NMS.
+        4. About 2x speedup for image resize and about 2x speedup for multi-scale resize.
+        5. About 25-30% speedup for rendering.
         6. Reduced latency and increased speed by moving the resize in CvMatToOpOutput and OpOutputToCvMat to CUDA. The linear speedup generalizes better to higher number of GPUs.
     3. Unity binding of OpenPose released. OpenPose adds the flag `BUILD_UNITY_SUPPORT` on CMake, which enables special Unity code so it can be built as a Unity plugin.
     4. If camera is unplugged, OpenPose GUI and command line will display a warning and try to reconnect it.
