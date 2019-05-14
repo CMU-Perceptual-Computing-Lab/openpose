@@ -192,8 +192,9 @@ cd openpose
 git submodule init
 git submodle update
 ```
-
-
+If you have compilled caffe from source you can add entries 
+`Caffe_INCLUDE_DIRS`  /path-to-caffe/include/caffe and 
+`Caffe_LIBS`  /path-to-caffe/build/lib/libcaffe.so
 
 ### Is Maximum Accuracy Configuration Possible on Lower End GPUs?
 **Q**: I've read that this command provides the most accurate results possible on Openpose so far: https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/quick_start.md#maximum-accuracy-configuration. However, a 8GB GPU (e.g., 1080 or 2080) will run out of memory, is there any method to achieve the same accuracy on GPU using less memory even if it meant sacrificing speed?
