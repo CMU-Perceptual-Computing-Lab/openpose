@@ -90,7 +90,8 @@ namespace op
             else
             {
                 #ifdef USE_CUDA
-// Input image can be shared between this one and cvMatToOpInput.hpp
+                    // Input image can be shared between this one and cvMatToOpInput.hpp
+                    // However, that version reduces the global accuracy a bit
                     // (Free and re-)Allocate temporary memory
                     const unsigned int inputImageSize = 3 * cvInputData.rows * cvInputData.cols;
                     if (pInputMaxSize < inputImageSize)

@@ -87,6 +87,9 @@ namespace op
                 // CUDA version (if #Gpus > n)
                 else
                 {
+                    // Note: This version reduces the global accuracy about 0.1%, so it is disabled for now
+                    error("This version reduces the global accuracy about 0.1%, so it is disabled for now.",
+                        __LINE__, __FUNCTION__, __FILE__);
                     #ifdef USE_CUDA
                         // (Re)Allocate temporary memory
                         const unsigned int inputImageSize = 3 * cvInputData.rows * cvInputData.cols;

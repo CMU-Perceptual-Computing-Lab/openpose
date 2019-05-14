@@ -152,48 +152,6 @@ namespace op
     }
 
     template <typename T>
-    __global__ void resizeAndAddKernel(
-        T* targetPtr, const T* const sourcePtr, const T scaleWidth, const T scaleHeight, const int widthSource,
-        const int heightSource, const int widthTarget, const int heightTarget)
-    {
-        const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
-        const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
-        const auto channel = (blockIdx.z * blockDim.z) + threadIdx.z;
-        if (x < widthTarget && y < heightTarget)
-        {
-            const auto sourceArea = widthSource * heightSource;
-            const auto targetArea = widthTarget * heightTarget;
-            const T xSource = (x + T(0.5f)) * widthSource / T(widthTarget) - T(0.5f);
-            const T ySource = (y + T(0.5f)) * heightSource / T(heightTarget) - T(0.5f);
-            const T* const sourcePtrChannel = sourcePtr + channel * sourceArea;
-            targetPtr[channel * targetArea + y*widthTarget+x] += bicubicInterpolate(
-                sourcePtrChannel, xSource, ySource, widthSource, heightSource, widthSource);
-        }
-    }
-
-    template <typename T>
-    __global__ void resizeAndAverageKernel(
-        T* targetPtr, const T* const sourcePtr, const T scaleWidth, const T scaleHeight, const int widthSource,
-        const int heightSource, const int widthTarget, const int heightTarget, const int counter)
-    {
-        const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
-        const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
-        const auto channel = (blockIdx.z * blockDim.z) + threadIdx.z;
-        if (x < widthTarget && y < heightTarget)
-        {
-            const auto sourceArea = widthSource * heightSource;
-            const auto targetArea = widthTarget * heightTarget;
-            const T xSource = (x + T(0.5f)) / scaleWidth - T(0.5f);
-            const T ySource = (y + T(0.5f)) / scaleHeight - T(0.5f);
-            const T* const sourcePtrChannel = sourcePtr + channel * sourceArea;
-            const auto interpolated = bicubicInterpolate(
-                sourcePtrChannel, xSource, ySource, widthSource, heightSource, widthSource);
-            auto& targetPixel = targetPtr[channel * targetArea + y*widthTarget+x];
-            targetPixel = (targetPixel + interpolated) / T(counter);
-        }
-    }
-
-    template <typename T>
     __global__ void resizeAndAddAndAverageKernel(
         T* targetPtr, const int counter, const T* const scaleWidths, const T* const scaleHeights,
         const int* const widthSources, const int* const heightSources, const int widthTarget, const int heightTarget,
@@ -227,39 +185,81 @@ namespace op
         }
     }
 
-    template <typename T>
-    __global__ void resizeAndAddKernelOld(
-        T* targetPtr, const T* const sourcePtr, const T scaleWidth, const T scaleHeight, const int widthSource,
-        const int heightSource, const int widthTarget, const int heightTarget)
-    {
-        const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
-        const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
-        if (x < widthTarget && y < heightTarget)
-        {
-            const T xSource = (x + T(0.5f)) / scaleWidth - T(0.5f);
-            const T ySource = (y + T(0.5f)) / scaleHeight - T(0.5f);
-            targetPtr[y*widthTarget+x] += bicubicInterpolate(
-                sourcePtr, xSource, ySource, widthSource, heightSource, widthSource);
-        }
-    }
+    // template <typename T>
+    // __global__ void resizeAndAddKernel(
+    //     T* targetPtr, const T* const sourcePtr, const T scaleWidth, const T scaleHeight, const int widthSource,
+    //     const int heightSource, const int widthTarget, const int heightTarget)
+    // {
+    //     const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
+    //     const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+    //     const auto channel = (blockIdx.z * blockDim.z) + threadIdx.z;
+    //     if (x < widthTarget && y < heightTarget)
+    //     {
+    //         const auto sourceArea = widthSource * heightSource;
+    //         const auto targetArea = widthTarget * heightTarget;
+    //         const T xSource = (x + T(0.5f)) * widthSource / T(widthTarget) - T(0.5f);
+    //         const T ySource = (y + T(0.5f)) * heightSource / T(heightTarget) - T(0.5f);
+    //         const T* const sourcePtrChannel = sourcePtr + channel * sourceArea;
+    //         targetPtr[channel * targetArea + y*widthTarget+x] += bicubicInterpolate(
+    //             sourcePtrChannel, xSource, ySource, widthSource, heightSource, widthSource);
+    //     }
+    // }
 
-    template <typename T>
-    __global__ void resizeAndAverageKernelOld(
-        T* targetPtr, const T* const sourcePtr, const T scaleWidth, const T scaleHeight, const int widthSource,
-        const int heightSource, const int widthTarget, const int heightTarget, const int counter)
-    {
-        const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
-        const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
-        if (x < widthTarget && y < heightTarget)
-        {
-            const T xSource = (x + T(0.5f)) / scaleWidth - T(0.5f);
-            const T ySource = (y + T(0.5f)) / scaleHeight - T(0.5f);
-            const auto interpolated = bicubicInterpolate(
-                sourcePtr, xSource, ySource, widthSource, heightSource, widthSource);
-            auto& targetPixel = targetPtr[y*widthTarget+x];
-            targetPixel = (targetPixel + interpolated) / T(counter);
-        }
-    }
+    // template <typename T>
+    // __global__ void resizeAndAverageKernel(
+    //     T* targetPtr, const T* const sourcePtr, const T scaleWidth, const T scaleHeight, const int widthSource,
+    //     const int heightSource, const int widthTarget, const int heightTarget, const int counter)
+    // {
+    //     const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
+    //     const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+    //     const auto channel = (blockIdx.z * blockDim.z) + threadIdx.z;
+    //     if (x < widthTarget && y < heightTarget)
+    //     {
+    //         const auto sourceArea = widthSource * heightSource;
+    //         const auto targetArea = widthTarget * heightTarget;
+    //         const T xSource = (x + T(0.5f)) / scaleWidth - T(0.5f);
+    //         const T ySource = (y + T(0.5f)) / scaleHeight - T(0.5f);
+    //         const T* const sourcePtrChannel = sourcePtr + channel * sourceArea;
+    //         const auto interpolated = bicubicInterpolate(
+    //             sourcePtrChannel, xSource, ySource, widthSource, heightSource, widthSource);
+    //         auto& targetPixel = targetPtr[channel * targetArea + y*widthTarget+x];
+    //         targetPixel = (targetPixel + interpolated) / T(counter);
+    //     }
+    // }
+
+    // template <typename T>
+    // __global__ void resizeAndAddKernelOld(
+    //     T* targetPtr, const T* const sourcePtr, const T scaleWidth, const T scaleHeight, const int widthSource,
+    //     const int heightSource, const int widthTarget, const int heightTarget)
+    // {
+    //     const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
+    //     const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+    //     if (x < widthTarget && y < heightTarget)
+    //     {
+    //         const T xSource = (x + T(0.5f)) / scaleWidth - T(0.5f);
+    //         const T ySource = (y + T(0.5f)) / scaleHeight - T(0.5f);
+    //         targetPtr[y*widthTarget+x] += bicubicInterpolate(
+    //             sourcePtr, xSource, ySource, widthSource, heightSource, widthSource);
+    //     }
+    // }
+
+    // template <typename T>
+    // __global__ void resizeAndAverageKernelOld(
+    //     T* targetPtr, const T* const sourcePtr, const T scaleWidth, const T scaleHeight, const int widthSource,
+    //     const int heightSource, const int widthTarget, const int heightTarget, const int counter)
+    // {
+    //     const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
+    //     const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
+    //     if (x < widthTarget && y < heightTarget)
+    //     {
+    //         const T xSource = (x + T(0.5f)) / scaleWidth - T(0.5f);
+    //         const T ySource = (y + T(0.5f)) / scaleHeight - T(0.5f);
+    //         const auto interpolated = bicubicInterpolate(
+    //             sourcePtr, xSource, ySource, widthSource, heightSource, widthSource);
+    //         auto& targetPixel = targetPtr[y*widthTarget+x];
+    //         targetPixel = (targetPixel + interpolated) / T(counter);
+    //     }
+    // }
 
     template <typename T>
     void resizeAndMergeGpu(

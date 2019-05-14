@@ -103,10 +103,9 @@ namespace op
                         scaleKeypoints(poseKeypointsRescaled, scaleInputToOutput);
                         // Render keypoints
                         if (!poseKeypoints.empty())
-                            cudaMemcpy(pGpuPose,
-                                       poseKeypointsRescaled.getConstPtr(),
-                                       numberPeople * numberBodyParts * 3 * sizeof(float),
-                                       cudaMemcpyHostToDevice);
+                            cudaMemcpy(
+                                pGpuPose, poseKeypointsRescaled.getConstPtr(),
+                                numberPeople * numberBodyParts * 3 * sizeof(float), cudaMemcpyHostToDevice);
                         renderPoseKeypointsGpu(
                             *spGpuMemory, pMaxPtr, pMinPtr, pScalePtr, mPoseModel, numberPeople, frameSize, pGpuPose,
                             mRenderThreshold, mShowGooglyEyes, mBlendOriginalFrame, getAlphaKeypoint());

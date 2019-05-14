@@ -21,8 +21,8 @@ OpenPose - Installation
     7. [3D Reconstruction Module](#3d-reconstruction-module)
     8. [Calibration Module](#calibration-module)
     9. [Compiling without cuDNN](#compiling-without-cudnn)
-    10. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
-    11. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
+    10. [Custom Caffe](#custom-caffe)
+    11. [Custom OpenCV](#custom-opencv)
     12. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
     13. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
 
@@ -353,18 +353,20 @@ Then, you would have to reduce the `--net_resolution` flag to fit the model into
 
 
 
-#### Custom Caffe (Ubuntu Only)
-Note that OpenPose uses a [custom fork of Caffe](https://github.com/CMU-Perceptual-Computing-Lab/caffe) (rather than the official Caffe master). Our custom fork is only updated if it works on our machines, but we try to keep it updated with the latest Caffe version. This version works on a newly formatted machine (Ubuntu 16.04 LTS) and in all our machines (CUDA 8 and 10 tested). The default GPU version is the master branch, which it is also compatible with CUDA 10 without changes (official Caffe version might require some changes for it). We also use the OpenCL and CPU tags if their CMake flags are selected.
+#### Custom Caffe
+OpenPose uses a [custom fork of Caffe](https://github.com/CMU-Perceptual-Computing-Lab/caffe) (rather than the official Caffe master). Our custom fork is only updated if it works on our machines, but we try to keep it updated with the latest Caffe version. This version works on a newly formatted machine (Ubuntu 16.04 LTS) and in all our machines (CUDA 8 and 10 tested). The default GPU version is the master branch, which it is also compatible with CUDA 10 without changes (official Caffe version might require some changes for it). We also use the OpenCL and CPU tags if their CMake flags are selected. We only modified some Caffe compilation flags and minor details.
 
-We only modified some Caffe compilation flags and minor details. You can use your own Caffe distribution, simply specify the Caffe include path and the library as shown below. You will also need to turn off the `BUILD_CAFFE` variable. Note that cuDNN is required in order to get the maximum possible accuracy in OpenPose.
+Alternatively, you can use your own Caffe distribution on Ubuntu/Mac by 1) disabling `BUILD_CAFFE`, 2) setting `Caffe_INCLUDE_DIRS` to `{CAFFE_PATH}/include/caffe`, and 3) setting `Caffe_LIBS` to `{CAFFE_PATH}/build/lib/libcaffe.so`, as shown in the image below. Note that cuDNN-compatible Caffe version is required in order to get the maximum possible accuracy in OpenPose.
 <p align="center">
     <img src="media/cmake_installation/im_5.png", width="480">
 </p>
 
+For Windows, simply replace the OpenCV DLLs and include folder for your custom one.
 
 
-#### Custom OpenCV (Ubuntu Only)
-If you have built OpenCV from source and OpenPose cannot find it automatically, you can set the `OPENCV_DIR` variable to the directory where you build OpenCV.
+
+#### Custom OpenCV
+If you have built OpenCV from source and OpenPose cannot find it automatically, you can set the `OPENCV_DIR` variable to the directory where you build OpenCV (Ubuntu and Mac). For Windows, simply replace the OpenCV DLLs and include folder for your custom one.
 
 
 

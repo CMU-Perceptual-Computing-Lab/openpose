@@ -96,7 +96,7 @@ namespace op
                     cvMat = cv::Mat(outputData.getSize(0), outputData.getSize(1), CV_8UC3);
                     // CUDA --> CPU: Copy output image back to CPU
                     cudaMemcpy(
-                        cvMat.data, pOutputImageUCharCuda, sizeof(unsigned char) * mOutputMaxSizeUChar,
+                        cvMat.data, pOutputImageUCharCuda, sizeof(unsigned char) * volume,
                         cudaMemcpyDeviceToHost);
                     // Indicate memory was copied out
                     *spGpuMemoryAllocated = false;
