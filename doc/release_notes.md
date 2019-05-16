@@ -258,7 +258,7 @@ OpenPose Library - Release Notes
 
 
 
-## Current version - future OpenPose 1.5.0
+## OpenPose 1.5.0 (May 16, 2019)
 1. Main improvements:
     1. Added initial single-person tracker for further speed up or visual smoothing (`--tracking` flag).
     2. Speed up of the CUDA functions of OpenPose:
@@ -362,6 +362,13 @@ OpenPose Library - Release Notes
     8. OpenCL fixes.
     9. If manual CUDA architectures are set in CMake, they are also set for Caffe rather than only for OpenPose.
     10. Fixed flag `--hand_alpha_pose`.
+
+
+
+## Current version - future OpenPose 1.5.1
+1. Main improvements:
+2. Functions or parameters renamed:
+3. Main bugs fixed:
 
 
 
