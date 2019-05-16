@@ -367,8 +367,12 @@ OpenPose Library - Release Notes
 
 ## Current version - future OpenPose 1.5.1
 1. Main improvements:
+    1. Highly improved 3D triangulation for >3 cameras by fixing some small bugs.
 2. Functions or parameters renamed:
+    1. `--3d_min_views` default value (-1) no longer means that all camera views are required. Instead, it will be equal to max(2, min(4, #cameras-1)). This should provide a good trade-off between recall and precission.
 3. Main bugs fixed:
+    1. Windows: Added back support for OpenGL and Spinnaker, as well as DLLs for debug compilation.
+4. Changes/additions that affect the compatibility with the OpenPose Unity Plugin:
 
 
 

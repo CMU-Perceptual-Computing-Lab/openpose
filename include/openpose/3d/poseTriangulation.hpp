@@ -33,13 +33,13 @@ namespace op
 
         void initializationOnThread();
 
-        Array<float> reconstructArray(const std::vector<Array<float>>& keypointsVector,
-                                      const std::vector<cv::Mat>& cameraMatrices,
-                                      const std::vector<Point<int>>& imageSizes) const;
+        Array<float> reconstructArray(
+            const std::vector<Array<float>>& keypointsVector, const std::vector<cv::Mat>& cameraMatrices,
+            const std::vector<Point<int>>& imageSizes) const;
 
-        std::vector<Array<float>> reconstructArray(const std::vector<std::vector<Array<float>>>& keypointsVector,
-                                                   const std::vector<cv::Mat>& cameraMatrices,
-                                                   const std::vector<Point<int>>& imageSizes) const;
+        std::vector<Array<float>> reconstructArray(
+            const std::vector<std::vector<Array<float>>>& keypointsVector, const std::vector<cv::Mat>& cameraMatrices,
+            const std::vector<Point<int>>& imageSizes) const;
 
     private:
         const int mMinViews3d;

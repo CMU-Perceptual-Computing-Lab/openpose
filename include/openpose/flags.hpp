@@ -160,7 +160,8 @@ DEFINE_bool(3d,                         false,          "Running OpenPose 3-D re
                                                         " results. Note that it will only display 1 person. If multiple people is present, it will"
                                                         " fail.");
 DEFINE_int32(3d_min_views,              -1,             "Minimum number of views required to reconstruct each keypoint. By default (-1), it will"
-                                                        " require all the cameras to see the keypoint in order to reconstruct it.");
+                                                        " require max(2, min(4, #cameras-1)) cameras to see the keypoint in order to reconstruct"
+                                                        " it.");
 DEFINE_int32(3d_views,                  -1,             "Complementary option for `--image_dir` or `--video`. OpenPose will read as many images per"
                                                         " iteration, allowing tasks such as stereo camera processing (`--3d`). Note that"
                                                         " `--camera_parameter_path` must be set. OpenPose must find as many `xml` files in the"

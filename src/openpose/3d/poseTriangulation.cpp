@@ -4,6 +4,7 @@
     #include <ceres/rotation.h>
 #endif
 #include <opencv2/calib3d/calib3d.hpp>
+#include <openpose/utilities/fastMath.hpp>
 #include <openpose/3d/poseTriangulation.hpp>
 
 namespace op
@@ -159,6 +160,16 @@ namespace op
     {
         try
         {
+            // Warning
+            if (cameraMatrices.size() >= 8)
+            {
+                error("We did not have that many camera views to test the 3D triangulation code, so it might not"
+                      " give the desired results here. But we would love to help! Please, share your video/images"
+                      " so we can test our code with them and guarantee the desired results even for >= 8"
+                      " cameras! Feel free to email them to gines@alumni.cmu.edu.",
+                      __LINE__, __FUNCTION__, __FILE__);
+            }
+
             // Information for 3 cameras:
             //     - Speed: triangulate ~0.01 ms vs. optimization ~0.2 ms
             //     - Accuracy: initial reprojection error ~14-21, reduced ~5% with non-linear optimization
@@ -178,8 +189,10 @@ namespace op
                 && projectionError > 0.5 * reprojectionMaxAcceptable
                 /*&& projectionError < 1.5 * reprojectionMaxAcceptable*/)
             {
+                // Find best projection
                 auto bestReprojection = projectionError;
                 auto bestReprojectionIndex = -1; // -1 means with all camera views
+                cv::Mat bestReconstructedPoint;
                 for (auto i = 0u; i < cameraMatrices.size(); ++i)
                 {
                     // Set initial values
@@ -188,31 +201,29 @@ namespace op
                     // Remove camera i
                     cameraMatricesSubset.erase(cameraMatricesSubset.begin() + i);
                     pointsOnEachCameraSubset.erase(pointsOnEachCameraSubset.begin() + i);
-                    // Remove camera i
+                    // Get new triangulation results
+                    cv::Mat reconstructedPointSubset;
                     const auto projectionErrorSubset = triangulate(
-                        reconstructedPoint, cameraMatricesSubset, pointsOnEachCameraSubset);
-                    // If projection doesn't change much, it usually means all points are bad.
-                    if (projectionErrorSubset > 0.9 * projectionError
-                        && projectionErrorSubset < 1.1 * projectionError)
-                    {
-                        bestReprojectionIndex = -1;
-                        continue;
-                    }
-                    // Save maximum
-                    if (bestReprojection > projectionErrorSubset)
+                        reconstructedPointSubset, cameraMatricesSubset, pointsOnEachCameraSubset);
+                    // If projection doesn't change much, this point is inlier (or all points are bad)
+                    // Thus, save new best results only if considerably better
+                    if (bestReprojection > projectionErrorSubset && projectionErrorSubset < 0.9*projectionError)
                     {
                         bestReprojection = projectionErrorSubset;
                         bestReprojectionIndex = i;
+                        bestReconstructedPoint = reconstructedPointSubset;
                     }
                 }
-
-                if (bestReprojectionIndex != -1 && bestReprojection < 0.5 * reprojectionMaxAcceptable)
+                // Remove noisy camera
+                if (bestReprojectionIndex != -1) // && bestReprojection < 0.5 * reprojectionMaxAcceptable)
                 {
                     // Remove camera i
                     cameraMatricesFinal.erase(cameraMatricesFinal.begin() + bestReprojectionIndex);
                     pointsOnEachCameraFinal.erase(pointsOnEachCameraFinal.begin() + bestReprojectionIndex);
+                    // Update reconstructedPoint & projectionError
+                    reconstructedPoint = bestReconstructedPoint;
+                    projectionError = bestReprojection;
                 }
-		projectionError = bestReprojection; // updates the projection error with the best found after camera removal
             }
 
             #ifdef USE_CERES
@@ -324,11 +335,9 @@ namespace op
         }
     }
 
-    void reconstructArrayThread(Array<float>* keypoints3DPtr,
-                                const std::vector<Array<float>>& keypointsVector,
-                                const std::vector<cv::Mat>& cameraMatrices,
-                                const std::vector<Point<int>>& imageSizes,
-                                const int minViews3d)
+    bool reconstructArrayThread(
+        Array<float>* keypoints3DPtr, const std::vector<Array<float>>& keypointsVector,
+        const std::vector<cv::Mat>& cameraMatrices, const std::vector<Point<int>>& imageSizes, const int minViews3d)
     {
         try
         {
@@ -339,21 +348,26 @@ namespace op
                 error("Only 1 camera detected. The 3-D reconstruction module can only be used with > 1 cameras"
                       " simultaneously. E.g., using FLIR stereo cameras (`--flir_camera`).",
                       __LINE__, __FUNCTION__, __FILE__);
-            // Get number body parts
-            auto detectionMissed = false;
-            for (auto& keypoints : keypointsVector)
+            // Get number body parts and whether at least 2 cameras have keypoints
+            auto detectionMissed = 0;
+            auto numberBodyParts = 0;
+            auto channel0Length = 0;
+            for (const auto& keypoints : keypointsVector)
             {
-                if (keypoints.empty())
+                if (!keypoints.empty())
                 {
-                    detectionMissed = true;
-                    break;
+                    detectionMissed++;
+                    if (detectionMissed > 1)
+                    {
+                        numberBodyParts = keypoints.getSize(1);
+                        channel0Length = keypoints.getSize(2);
+                        break;
+                    }
                 }
             }
-            // If at least one keypoints element not empty
-            if (!detectionMissed)
+            // If at least 2 set of keypoints not empty
+            if (numberBodyParts > 0)
             {
-                const auto numberBodyParts = keypointsVector.at(0).getSize(1);
-                const auto channel0Length = keypointsVector.at(0).getSize(2);
                 // Create x-y vector from high score results
                 std::vector<int> indexesUsed;
                 std::vector<std::vector<cv::Point2d>> xyPoints;
@@ -371,15 +385,19 @@ namespace op
                         const auto& keypoints = keypointsVector[i];
                         if (isValidKeypoint(&keypoints[baseIndex], imageSizes[i]))
                         {
-                            xyPointsElement.emplace_back(cv::Point2d{keypoints[baseIndex],
-                                                                     keypoints[baseIndex+1]});
+                            xyPointsElement.emplace_back(
+                                cv::Point2d{keypoints[baseIndex], keypoints[baseIndex+1]});
                             cameraMatricesElement.emplace_back(cameraMatrices[i]);
                         }
                     }
-                    // If visible from all views (minViews3d < 0)
-                    // or if visible for at least minViews3d views
-                    if ((minViews3d < 0 && cameraMatricesElement.size() == cameraMatrices.size())
-                        || (minViews3d > 1 && minViews3d <= (int)xyPointsElement.size()))
+                    const auto minViews3dValue = (minViews3d > 0 ? minViews3d
+                        : fastMax(2u, fastMin(4u, (unsigned int)cameraMatrices.size()-1u)));
+                    // If visible for at least minViews3dValue views
+                    if (minViews3dValue <= xyPointsElement.size())
+                    // Old code
+                    // // If visible from all views (minViews3d < 0) or if visible for at least minViews3d views
+                    // if ((minViews3d < 0 && cameraMatricesElement.size() == cameraMatrices.size())
+                    //     || (minViews3d > 1 && minViews3d <= (int)xyPointsElement.size()))
                     {
                         indexesUsed.emplace_back(part);
                         xyPoints.emplace_back(xyPointsElement);
@@ -432,7 +450,8 @@ namespace op
                             atLeastOnePointProjected = true;
                         }
                     }
-                    if (!atLeastOnePointProjected || reprojectionErrorTotal > 60)
+                    // Warning
+                    if (reprojectionErrorTotal > 60)
                         log("Unusual high re-projection error (averaged over #keypoints) of value "
                             + std::to_string(reprojectionErrorTotal) + " pixels, while the average for a good OpenPose"
                             " detection from 4 cameras is about 2-3 pixels. It might be simply a wrong OpenPose"
@@ -441,12 +460,18 @@ namespace op
                             " upper triangular matrix (as specified in the OpenPose doc/modules/calibration_module.md"
                             " and 3d_reconstruction_module.md)?", Priority::High);
                     // log("Reprojection error: " + std::to_string(reprojectionErrorTotal)); // To debug reprojection error
+                    return atLeastOnePointProjected;
                 }
+                return false;
             }
+            // Keypoints in < 2 images
+            else
+                return true; // True because it is not a 3D problem but rather it is e.g., a scene without people on it
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return false;
         }
     }
 
@@ -474,9 +499,9 @@ namespace op
     {
     }
 
-    Array<float> PoseTriangulation::reconstructArray(const std::vector<Array<float>>& keypointsVector,
-                                                     const std::vector<cv::Mat>& cameraMatrices,
-                                                     const std::vector<Point<int>>& imageSizes) const
+    Array<float> PoseTriangulation::reconstructArray(
+        const std::vector<Array<float>>& keypointsVector, const std::vector<cv::Mat>& cameraMatrices,
+        const std::vector<Point<int>>& imageSizes) const
     {
         try
         {
@@ -497,6 +522,7 @@ namespace op
     {
         try
         {
+            bool keypointsReconstructed = false;
             std::vector<Array<float>> keypoints3Ds(keypointsVectors.size());
             // std::vector<std::thread> threads(keypointsVectors.size()-1);
             for (auto i = 0u; i < keypointsVectors.size()-1; i++)
@@ -507,15 +533,22 @@ namespace op
                 //                             &keypoints3Ds[i], keypointsVectors[i], cameraMatrices,
                 //                             imageSizes, mMinViews3d};
                 // Single-thread option
-                reconstructArrayThread(&keypoints3Ds[i], keypointsVectors[i], cameraMatrices,
-                                       imageSizes, mMinViews3d);
+                keypointsReconstructed |= reconstructArrayThread(
+                    &keypoints3Ds[i], keypointsVectors[i], cameraMatrices, imageSizes, mMinViews3d);
             }
-            reconstructArrayThread(&keypoints3Ds.back(), keypointsVectors.back(), cameraMatrices,
-                                   imageSizes, mMinViews3d);
+            keypointsReconstructed |= reconstructArrayThread(
+                &keypoints3Ds.back(), keypointsVectors.back(), cameraMatrices, imageSizes, mMinViews3d);
             // // Close threads
             // for (auto& thread : threads)
             //     if (thread.joinable())
             //         thread.join();
+            // Warning
+            if (!keypointsReconstructed)
+                log("No keypoints were reconstructed on this frame. It might be simply a challenging frame."
+                    " However, if this message appears frequently, OpenPose is facing some unknown issue,"
+                    " mabe the calibration parameters are not accurate. Feel free to open a GitHub issue"
+                    " (remember to fill all the required information detailed in the GitHub issue template"
+                    " when it is created).", Priority::High);
             // Return results
             return keypoints3Ds;
         }

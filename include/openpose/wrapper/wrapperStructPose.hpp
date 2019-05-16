@@ -209,15 +209,15 @@ namespace op
          * Since all the elements of the struct are public, they can also be manually filled.
          */
         WrapperStructPose(
-            const PoseMode poseMode = PoseMode::Enabled, const Point<int>& netInputSize = Point<int>{656, 368},
+            const PoseMode poseMode = PoseMode::Enabled, const Point<int>& netInputSize = Point<int>{-1, 368},
             const Point<int>& outputSize = Point<int>{-1, -1},
             const ScaleMode keypointScaleMode = ScaleMode::InputResolution, const int gpuNumber = -1,
-            const int gpuNumberStart = 0, const int scalesNumber = 1, const float scaleGap = 0.15f,
+            const int gpuNumberStart = 0, const int scalesNumber = 1, const float scaleGap = 0.25f,
             const RenderMode renderMode = RenderMode::Auto, const PoseModel poseModel = PoseModel::BODY_25,
             const bool blendOriginalFrame = true, const float alphaKeypoint = POSE_DEFAULT_ALPHA_KEYPOINT,
             const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP, const int defaultPartToRender = 0,
             const std::string& modelFolder = "models/", const std::vector<HeatMapType>& heatMapTypes = {},
-            const ScaleMode heatMapScaleMode = ScaleMode::ZeroToOne, const bool addPartCandidates = false,
+            const ScaleMode heatMapScaleMode = ScaleMode::UnsignedChar, const bool addPartCandidates = false,
             const float renderThreshold = 0.05f, const int numberPeopleMax = -1, const bool maximizePositives = false,
             const double fpsMax = -1., const std::string& protoTxtPath = "", const std::string& caffeModelPath = "",
             const float upsamplingRatio = 0.f, const bool enableGoogleLogging = true);
