@@ -1,5 +1,6 @@
 set(SOURCES_OP_GPU
     cuda.cpp
+    cuda.cu
     gpu.cpp
     opencl.cpp)
 

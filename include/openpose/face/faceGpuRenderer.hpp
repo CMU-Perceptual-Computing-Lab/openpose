@@ -23,6 +23,9 @@ namespace op
 
     private:
         float* pGpuFace; // GPU aux memory
+        float* pMaxPtr; // GPU aux memory
+        float* pMinPtr; // GPU aux memory
+        float* pScalePtr; // GPU aux memory
 
         DELETE_COPY(FaceGpuRenderer);
     };

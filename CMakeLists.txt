@@ -1,6 +1,6 @@
 ### VERSION INFO
 set(OpenPose_VERSION_MAJOR 1)
-set(OpenPose_VERSION_MINOR 4)
+set(OpenPose_VERSION_MINOR 5)
 set(OpenPose_VERSION_PATCH 0)
 set(OpenPose_VERSION ${OpenPose_VERSION_MAJOR}.${OpenPose_VERSION_MINOR}.${OpenPose_VERSION_PATCH})
 
@@ -31,7 +31,8 @@ elseif (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
 else (${CMAKE_VERSION} VERSION_GREATER 3.9.0)
   project(OpenPose)
 endif (${CMAKE_VERSION} VERSION_GREATER 3.9.0)
-cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommended by Caffe
+cmake_minimum_required(VERSION 3.0 FATAL_ERROR) # required by cmake eigen finder to find locally installed versions (e.g., CUDA 9.2 support was added in eigen 3.3.5)
+# cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommended by Caffe
 
 
 ### Extra functionality
@@ -77,7 +78,15 @@ if (WIN32)
   # /GL option causes the code to crash -- fix this
   # sdl flags causes error -- error : unknown attribute \"guard\"
 
-  set(CMAKE_CONFIGURATION_TYPES Release Debug CACHE TYPE INTERNAL FORCE)
+  # https://stackoverflow.com/questions/43697154/detect-current-cmake-version-using-cmake
+  message(STATUS "CMAKE_VERSION = ${CMAKE_VERSION}")
+  # Remove "minSizeRel" and "relWithDebInfo"
+  if (${CMAKE_VERSION} VERSION_LESS "3.14.0")
+    set(CMAKE_CONFIGURATION_TYPES Release Debug CACHE TYPE INTERNAL FORCE)
+  else (${CMAKE_VERSION} VERSION_LESS "3.14.0")
+    # But the above line gives warning on CMake >= 3.14, alternative
+    set(CMAKE_CONFIGURATION_TYPES Release Debug CACHE STRING "" FORCE)
+  endif (${CMAKE_VERSION} VERSION_LESS "3.14.0")
 
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
   string(REPLACE "/W3" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
@@ -104,24 +113,61 @@ endif (WIN32)
 
 # C++ additional flags
 if (CMAKE_COMPILER_IS_GNUCXX)
-
-  # Select the Enhanced Instruction Set
-  set(INSTRUCTION_SET NONE CACHE STRING "Enable Enhanced Instruction Set")
-  set_property(CACHE INSTRUCTION_SET PROPERTY STRINGS NONE SSE4 AVX)
-
-  if (${INSTRUCTION_SET} MATCHES "SSE4")
-    add_definitions("-DWITH_SSE4")
-    set(SIMD_FLAGS "${SIMD_FLAGS} -msse4.1")
-  endif (${INSTRUCTION_SET} MATCHES "SSE4")
-
-  if (${INSTRUCTION_SET} MATCHES "AVX")
-    add_definitions("-DWITH_AVX")
-    set(SIMD_FLAGS "${SIMD_FLAGS} -mavx")
-  endif (${INSTRUCTION_SET} MATCHES "AVX")
-
   message(STATUS "GCC detected, adding compile flags")
-  set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMD_FLAGS} -fopenmp -Wpedantic -Wall -Wextra -Wfatal-errors")
+  # set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -Wpedantic -Wall -Wextra -Wfatal-errors")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+  set(OP_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpedantic -Wall -Wextra -Wfatal-errors")
+  # set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -Wpedantic -Wall -Wextra -Wfatal-errors")
 endif (CMAKE_COMPILER_IS_GNUCXX)
+
+# Select the Enhanced Instruction Set
+set(INSTRUCTION_SET NONE CACHE STRING "Enable Enhanced Instruction Set")
+set_property(CACHE INSTRUCTION_SET PROPERTY STRINGS NONE AVX2)
+if (${INSTRUCTION_SET} MATCHES "AVX2")
+  add_definitions("-DWITH_AVX")
+endif (${INSTRUCTION_SET} MATCHES "AVX2")
+# Windows
+if (WIN32)
+  # Suboptions for Enhanced Instruction Set
+  if (${INSTRUCTION_SET} MATCHES "AVX2")
+    add_definitions("/arch:AVX2")
+  endif (${INSTRUCTION_SET} MATCHES "AVX2")
+# Ubuntu
+else (WIN32) # if (CMAKE_COMPILER_IS_GNUCXX)
+  if (${INSTRUCTION_SET} MATCHES "AVX2")
+    set(SIMD_FLAGS "${SIMD_FLAGS} -mavx -march=native")
+  endif (${INSTRUCTION_SET} MATCHES "AVX2")
+  message(STATUS "GCC detected, adding compile flags")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMD_FLAGS}")
+endif (WIN32)
+# if (CMAKE_COMPILER_IS_GNUCXX)
+#   set_property(CACHE INSTRUCTION_SET PROPERTY STRINGS NONE SSE4 AVX)
+#   if (${INSTRUCTION_SET} MATCHES "SSE4")
+#     add_definitions("-DWITH_SSE4")
+#     set(SIMD_FLAGS "${SIMD_FLAGS} -msse4.1")
+#   endif (${INSTRUCTION_SET} MATCHES "SSE4")
+#   if (${INSTRUCTION_SET} MATCHES "AVX2")
+#     add_definitions("-DWITH_AVX")
+#     set(SIMD_FLAGS "${SIMD_FLAGS} -mavx -march=native")
+#   endif (${INSTRUCTION_SET} MATCHES "AVX2")
+#   message(STATUS "GCC detected, adding compile flags")
+#   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMD_FLAGS}")
+# endif (CMAKE_COMPILER_IS_GNUCXX)
+# if (WIN32)
+#   # set_property(CACHE INSTRUCTION_SET PROPERTY STRINGS NONE SSE SSE2 AVX AVX2 IA32)
+#   # Suboptions for Enhanced Instruction Set
+#   if (${INSTRUCTION_SET} MATCHES "SSE")
+#     add_definitions("/arch:SSE")
+#   elseif (${INSTRUCTION_SET} MATCHES "SSE2")
+#     add_definitions("/arch:SSE2")
+#   elseif (${INSTRUCTION_SET} MATCHES "AVX")
+#     add_definitions("/arch:AVX")
+#   elseif (${INSTRUCTION_SET} MATCHES "AVX2")
+#     add_definitions("/arch:AVX2")
+#   elseif (${INSTRUCTION_SET} MATCHES "IA32")
+#     add_definitions("/arch:IA32")
+#   endif (${INSTRUCTION_SET} MATCHES "SSE")
+# endif (WIN32)
 
 
 ### PROJECT OPTIONS
@@ -144,25 +190,6 @@ if (NV_CAFFE)
     MESSAGE("-- Using NVIDIA NVCaffe")
     add_definitions(-DNV_CAFFE)
 endif (NV_CAFFE)
-
-if (WIN32)
-  # Select the Enhanced Instruction Set
-  set(INSTRUCTION_SET NONE CACHE STRING "Enable Enhanced Instruction Set")
-  set_property(CACHE INSTRUCTION_SET PROPERTY STRINGS NONE SSE SSE2 AVX AVX2 IA32)
-
-  # Suboptions for Enhanced Instruction Set
-  if (${INSTRUCTION_SET} MATCHES "SSE")
-    add_definitions("/arch:SSE")
-  elseif (${INSTRUCTION_SET} MATCHES "SSE2")
-    add_definitions("/arch:SSE2")
-  elseif (${INSTRUCTION_SET} MATCHES "AVX")
-    add_definitions("/arch:AVX")
-  elseif (${INSTRUCTION_SET} MATCHES "AVX2")
-    add_definitions("/arch:AVX2")
-  elseif (${INSTRUCTION_SET} MATCHES "IA32")
-    add_definitions("/arch:IA32")
-  endif (${INSTRUCTION_SET} MATCHES "SSE")
-endif (WIN32)
 
 # Set the acceleration library
 if (APPLE)
@@ -263,11 +290,11 @@ option(WITH_OPENCV_WITH_OPENGL "Much faster GUI display, but you must also enabl
 
 # Set the acceleration library
 if (WIN32 OR APPLE)
-  set(WITH_EIGEN NONE CACHE STRING "Select the Eigen mode (NONE if not required or DOWNLOAD to let OpenPose download it).")
-  set_property(CACHE WITH_EIGEN PROPERTY STRINGS NONE BUILD)
+  set(WITH_EIGEN NONE CACHE STRING "Select the Eigen mode: NONE if not required, BUILD to let OpenPose download it, or FIND to let CMake find it (e.g., if you installed it manually).")
+  set_property(CACHE WITH_EIGEN PROPERTY STRINGS NONE BUILD FIND)
 elseif (UNIX AND NOT APPLE)
-  set(WITH_EIGEN NONE CACHE STRING "Select the Eigen mode (NONE if not required, APT_GET if you used `sudo apt-get install libeigen3-dev`, BUILD to let OpenPose download it).")
-  set_property(CACHE WITH_EIGEN PROPERTY STRINGS NONE APT_GET BUILD)
+  set(WITH_EIGEN NONE CACHE STRING "Select the Eigen mode: NONE if not required, BUILD to let OpenPose download it, or FIND to let CMake find it (e.g., if you installed it manually or used `sudo apt-get install libeigen3-dev`).")
+  set_property(CACHE WITH_EIGEN PROPERTY STRINGS NONE BUILD FIND)
 endif (WIN32 OR APPLE)
 
 # # Suboptions for OpenPose tracking
@@ -376,11 +403,18 @@ else (${WITH_EIGEN} MATCHES "NONE")
     download_zip("eigen_2018_05_23.zip" ${OP_URL} ${FIND_LIB_PREFIX} 29B9B2FD4679D587BB67467F09EE8365)
     # Set path
     set(EIGEN3_INCLUDE_DIRS "3rdparty/eigen/include/")
-  # Alread installed with apt-get
-  elseif (${WITH_EIGEN} MATCHES "APT_GET")
+  # Leave to CMake to find it
+  elseif (${WITH_EIGEN} MATCHES "FIND")
     # Eigen
-    find_package(PkgConfig)
-    pkg_check_modules(EIGEN3 REQUIRED eigen3)
+    # # Option a) apt-get
+    # find_package(PkgConfig)
+    # pkg_check_modules(EIGEN3 REQUIRED eigen3)
+    # # Option b) Find it (including apt-get)
+    if (CUDA_VERSION_STRING STRGREATER "9.0")
+      find_package(Eigen3 3.3.5 REQUIRED NO_MODULE)
+    else (CUDA_VERSION_STRING STRGREATER "9.0")
+      find_package(Eigen3 3 REQUIRED NO_MODULE)
+    endif (CUDA_VERSION_STRING STRGREATER "9.0")
   endif (${WITH_EIGEN} MATCHES "BUILD")
 endif (${WITH_EIGEN} MATCHES "NONE")
 
@@ -407,6 +441,8 @@ if (UNIX OR APPLE)
 
   # 3D
   if (WITH_3D_RENDERER)
+    # OpenGL
+    find_package(OpenGL REQUIRED)
     # GLUT
     find_package(GLUT REQUIRED)
     # OpenGL
@@ -428,8 +464,16 @@ if (UNIX OR APPLE)
     if (NOT WITH_3D_RENDERER)
       message(FATAL_ERROR "WITH_3D_RENDERER is required if WITH_3D_ADAM_MODEL is enabled.")
     endif (NOT WITH_3D_RENDERER)
-    find_package(PkgConfig)
-    pkg_check_modules(EIGEN3 REQUIRED eigen3)
+    # Eigen
+    # # Option a) apt-get
+    # find_package(PkgConfig)
+    # pkg_check_modules(EIGEN3 REQUIRED eigen3)
+    # # Option b) Find it (including apt-get)
+    if (CUDA_VERSION_STRING STRGREATER "9.0")
+      find_package(Eigen3 3.3.5 REQUIRED NO_MODULE)
+    else (CUDA_VERSION_STRING STRGREATER "9.0")
+      find_package(Eigen3 3 REQUIRED NO_MODULE)
+    endif (CUDA_VERSION_STRING STRGREATER "9.0")
     # Others: sudo apt-get install libglm-dev
     # http://ceres-solver.org
     find_package(Ceres REQUIRED COMPONENTS SuiteSparse)
@@ -516,7 +560,7 @@ if (WIN32)
     download_zip("caffe_cpu_2018_05_27.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 87E8401B6DFBAC5B8E909DD20E3B3390)
   else (${GPU_MODE} MATCHES "OPENCL")
     # download_zip("caffe_2019_03_12.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 859a592310f0928fd4f40da1456a217f)
-    download_zip("caffe_15_2019_03_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} f2d8beee9e4959fa419dcb54d507107c)
+    download_zip("caffe_15_2019_05_16.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 12F7A675A3276CD33C76B37D21C2F421)
   endif (${GPU_MODE} MATCHES "OPENCL")
   if (WITH_3D_RENDERER)
     download_zip("freeglut_2018_01_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} BB182187285E06880F0EDE3A39530091)
@@ -809,6 +853,7 @@ endif (USE_ASIO)
 if (NOT ${WITH_EIGEN} MATCHES "NONE")
   include_directories(
       ${EIGEN3_INCLUDE_DIRS})
+  set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} Eigen3::Eigen)
 endif (NOT ${WITH_EIGEN} MATCHES "NONE")
 
 if (APPLE)
@@ -847,9 +892,10 @@ if (WITH_3D_ADAM_MODEL)
                                     include_directories(include/adam) # TODO: TEMPORARY - TO BE REMOVED IN THE FUTURE
   include_directories(${CERES_INCLUDE_DIRS})
   include_directories(${EIGEN3_INCLUDE_DIRS})
+  set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} Eigen3::Eigen)
   include_directories(${IGL_INCLUDE_DIRS})
   include_directories(${LIBIGL_INCLUDE_DIRS})
-  include_directories(${GLUT_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIR})
+  include_directories(${OPENGL_INCLUDE_DIR} ${GLUT_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS})
 endif (WITH_3D_ADAM_MODEL)
 # Windows includes
 if (WIN32)

@@ -10,7 +10,11 @@ namespace op
 {
     FaceGpuRenderer::FaceGpuRenderer(const float renderThreshold, const float alphaKeypoint,
                                      const float alphaHeatMap) :
-        GpuRenderer{renderThreshold, alphaKeypoint, alphaHeatMap}
+        GpuRenderer{renderThreshold, alphaKeypoint, alphaHeatMap},
+        pGpuFace{nullptr},
+        pMaxPtr{nullptr},
+        pMinPtr{nullptr},
+        pScalePtr{nullptr}
     {
     }
 
@@ -20,7 +24,14 @@ namespace op
         {
             // Free CUDA pointers - Note that if pointers are 0 (i.e., nullptr), no operation is performed.
             #ifdef USE_CUDA
-                cudaFree(pGpuFace);
+                if (pGpuFace != nullptr)
+                    cudaFree(pGpuFace);
+                if (pMaxPtr != nullptr)
+                    cudaFree(pMaxPtr);
+                if (pMinPtr != nullptr)
+                    cudaFree(pMinPtr);
+                if (pScalePtr != nullptr)
+                    cudaFree(pScalePtr);
             #endif
         }
         catch (const std::exception& e)
@@ -37,6 +48,9 @@ namespace op
             // GPU memory allocation for rendering
             #ifdef USE_CUDA
                 cudaMalloc((void**)(&pGpuFace), POSE_MAX_PEOPLE * FACE_NUMBER_PARTS * 3 * sizeof(float));
+                cudaMalloc((void**)&pMaxPtr, sizeof(float) * 2 * FACE_NUMBER_PARTS);
+                cudaMalloc((void**)&pMinPtr, sizeof(float) * 2 * FACE_NUMBER_PARTS);
+                cudaMalloc((void**)&pScalePtr, sizeof(float) * FACE_NUMBER_PARTS);
             #endif
             log("Finished initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         }
@@ -63,8 +77,9 @@ namespace op
                     cudaMemcpy(pGpuFace, faceKeypoints.getConstPtr(),
                                faceKeypoints.getSize(0) * FACE_NUMBER_PARTS * 3 * sizeof(float),
                                cudaMemcpyHostToDevice);
-                    renderFaceKeypointsGpu(*spGpuMemory, frameSize, pGpuFace, faceKeypoints.getSize(0),
-                                           mRenderThreshold, getAlphaKeypoint());
+                    renderFaceKeypointsGpu(
+                        *spGpuMemory, pMaxPtr, pMinPtr, pScalePtr, frameSize, pGpuFace, faceKeypoints.getSize(0),
+                        mRenderThreshold, getAlphaKeypoint());
                     // CUDA check
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 }

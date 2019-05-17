@@ -1,6 +1,10 @@
+#include <openpose/core/macros.hpp> // OPEN_CV_IS_4_OR_HIGHER
 #include <atomic>
 #include <mutex>
 #include <opencv2/imgproc/imgproc.hpp> // cv::undistort, cv::initUndistortRectifyMap
+#ifdef OPEN_CV_IS_4_OR_HIGHER
+    #include <opencv2/calib3d.hpp> // cv::initUndistortRectifyMap for OpenCV 4
+#endif
 #ifdef USE_FLIR_CAMERA
     #include <Spinnaker.h>
 #endif

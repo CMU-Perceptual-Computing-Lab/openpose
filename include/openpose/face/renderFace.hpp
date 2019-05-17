@@ -6,10 +6,13 @@
 
 namespace op
 {
-    OP_API void renderFaceKeypointsCpu(Array<float>& frameArray, const Array<float>& faceKeypoints, const float renderThreshold);
+    OP_API void renderFaceKeypointsCpu(
+        Array<float>& frameArray, const Array<float>& faceKeypoints, const float renderThreshold);
 
-    void renderFaceKeypointsGpu(float* framePtr, const Point<int>& frameSize, const float* const facePtr, const int numberPeople,
-                                const float renderThreshold, const float alphaColorToAdd = FACE_DEFAULT_ALPHA_KEYPOINT);
+    void renderFaceKeypointsGpu(
+        float* framePtr, float* maxPtr, float* minPtr, float* scalePtr, const Point<int>& frameSize,
+        const float* const facePtr, const int numberPeople, const float renderThreshold,
+        const float alphaColorToAdd = FACE_DEFAULT_ALPHA_KEYPOINT);
 }
 
 #endif // OPENPOSE_FACE_RENDER_FACE_HPP

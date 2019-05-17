@@ -4,13 +4,14 @@ OpenPose - Installation
 ## Contents
 1. [Windows Portable Demo](#windows-portable-demo)
 2. [Operating Systems](#operating-systems)
-3. [Requirements and Dependencies](#requirements-and-dependencies)
-4. [Clone OpenPose](#clone-openpose)
-5. [Update OpenPose](#update-openpose)
-6. [Installation](#installation)
-7. [Reinstallation](#reinstallation)
-8. [Uninstallation](#uninstallation)
-9. [Optional Settings](#optional-settings)
+3. [Community-Based Work](#community-based-work)
+4. [Requirements and Dependencies](#requirements-and-dependencies)
+5. [Clone OpenPose](#clone-openpose)
+6. [Update OpenPose](#update-openpose)
+7. [Installation](#installation)
+8. [Reinstallation](#reinstallation)
+9. [Uninstallation](#uninstallation)
+10. [Optional Settings](#optional-settings)
     1. [Maximum Speed](#maximum-speed)
     2. [COCO and MPI Models](#coco-and-mpi-models)
     3. [Python API](#python-api)
@@ -20,10 +21,11 @@ OpenPose - Installation
     7. [3D Reconstruction Module](#3d-reconstruction-module)
     8. [Calibration Module](#calibration-module)
     9. [Compiling without cuDNN](#compiling-without-cudnn)
-    10. [Custom Caffe (Ubuntu Only)](#custom-caffe-ubuntu-only)
-    11. [Custom OpenCV (Ubuntu Only)](#custom-opencv-ubuntu-only)
-    12. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
-    13. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
+    10. [Custom Caffe](#custom-caffe)
+    11. [Custom NVIDIA NVCaffe](#custom-nvidia-nvcaffe)
+    12. [Custom OpenCV](#custom-opencv)
+    13. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
+    14. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
 
 
 
@@ -38,8 +40,25 @@ This installation section is only intended if you plan to modify the OpenPose co
 - **Ubuntu** 14, 16, 18.
 - **Windows** 7, 8, 10.
 - **Mac OSX** Mavericks and above.
+- **Nvidia Jetson TX1** (for JetPack 3.1), installation instructions in [doc/installation_jetson_tx1.md](./installation_jetson_tx1.md).
 - **Nvidia Jetson TX2** (for JetPack 3.1 or 3.3), installation instructions in [doc/installation_jetson_tx2_jetpack3.1.md](./installation_jetson_tx2_jetpack3.1.md) and [doc/installation_jetson_tx2_jetpack3.3.md](./installation_jetson_tx2_jetpack3.3.md) respectively.
 - OpenPose has also been used on **Windows 7**, **CentOS**, and **Nvidia Jetson (TK1 and TX1)** embedded systems. However, we do not officially support them at the moment.
+
+
+
+
+
+## Community-Based Work
+We add links to some community-based work based on OpenPose. Note: We do not support them, and we will remove GitHub issues opened asking about them as well as block those users from posting again. If you face any issue, comment only in the comment IDs especified below and/or on their respective GitHubs.
+
+- [ROS example](https://github.com/firephinx/openpose_ros) (based on a very old OpenPose version). For questions and more details, read and post ONLY on [issue thread #51](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/51).
+
+- Docker Images. For questions and more details, read and post ONLY on [issue thread #347](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/347).
+    - Dockerfile working with CUDA 10: [link 1](https://github.com/ExSidius/openpose-docker/blob/master/Dockerfile) and [link 2](https://cloud.docker.com/repository/docker/exsidius/openpose/general).
+    - [Dockerfile - OpenPose v1.4.0, OpenCV, CUDA 8, CuDNN 6, Python2.7](https://gist.github.com/moiseevigor/11c02c694fc0c22fccd59521793aeaa6).
+    - [Dockerfile - OpenPose v1.2.1](https://gist.github.com/sberryman/6770363f02336af82cb175a83b79de33).
+
+- [Google Colab helper script](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/949#issue-387855863): Script to install OpenPose on Google Colab. Really useful when access to a computer powerful enough to run OpenPose is not possible, so one possible way to use OpenPose is to build it on a GPU-enabled Colab runtime and then run the programs there. For questions and more details, read and post ONLY on [issue thread #949](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/949).
 
 
 
@@ -121,10 +140,11 @@ Make sure to download and install the prerequisites for your particular operatin
     <img src="media/cmake_installation/im_1_windows.png", width="480">
 </p>
 
-2. Press the `Configure` button, keep the generator in `Unix Makefile` (Ubuntu) or set it to `Visual Studio 14 2015 Win64` (Windows), and press `Finish`.
+2. Press the `Configure` button, keep the generator in `Unix Makefile` (Ubuntu) or set it to your 64-bit Visual Studio version (Windows), and press `Finish`. Note for Windows users: CMake-GUI has changed their design after version 14. For versions older than 14, you usually select `Visual Studio XX 20XX Win64` as the generator (`X` depends on your VS version), while the `Optional toolset to use` must be empty. However, new CMake versions require you to select only the VS version as the generator, e.g., `Visual Studio 15 2017`, and then you must manually choose `x64` for the `Optional platform for generator`. See the following images as example.
 <p align="center">
     <img src="media/cmake_installation/im_2.png", width="240">
     <img src="media/cmake_installation/im_2_windows.png", width="240">
+    <img src="media/cmake_installation/im_2_windows_new.png", width="240">
 </p>
 
 3. If this step is successful, the `Configuring done` text will appear in the bottom box in the last line. Otherwise, some red text will appear in that same bottom box.
@@ -321,7 +341,7 @@ After installation, check the [doc/modules/3d_reconstruction_module.md](./module
 
 
 #### Calibration Module
-The calibration module is included by default, but you must also enable `WITH_EIGEN` if you intend to use the extrinsic camera parameter estimation tool. You can set that flag to 2 different values: `APT_GET` or `BUILD`, check [Requirements and Dependencies](#requirements-and-dependencies) for more information.
+The calibration module is included by default, but you must also enable `WITH_EIGEN` if you intend to use the extrinsic camera parameter estimation tool. You can set that flag to 2 different values: `BUILD` or `FIND`, check [Requirements and Dependencies](#requirements-and-dependencies) for more information.
 
 After installation, check the [doc/modules/calibration_module.md](./modules/calibration_module.md) instructions.
 
@@ -334,21 +354,27 @@ Then, you would have to reduce the `--net_resolution` flag to fit the model into
 
 
 
-#### Custom Caffe (Ubuntu Only)
-Note that OpenPose uses a [custom fork of Caffe](https://github.com/CMU-Perceptual-Computing-Lab/caffe) (rather than the official Caffe master). Our custom fork is only updated if it works on our machines, but we try to keep it updated with the latest Caffe version. This version works on a newly formatted machine (Ubuntu 16.04 LTS) and in all our machines (CUDA 8 and 10 tested). The default GPU version is the master branch, which it is also compatible with CUDA 10 without changes (official Caffe version might require some changes for it). We also use the OpenCL and CPU tags if their CMake flags are selected.
+#### Custom Caffe
+OpenPose uses a [custom fork of Caffe](https://github.com/CMU-Perceptual-Computing-Lab/caffe) (rather than the official Caffe master). Our custom fork is only updated if it works on our machines, but we try to keep it updated with the latest Caffe version. This version works on a newly formatted machine (Ubuntu 16.04 LTS) and in all our machines (CUDA 8 and 10 tested). The default GPU version is the master branch, which it is also compatible with CUDA 10 without changes (official Caffe version might require some changes for it). We also use the OpenCL and CPU tags if their CMake flags are selected. We only modified some Caffe compilation flags and minor details.
 
-We only modified some Caffe compilation flags and minor details. You can use your own Caffe distribution, simply specify the Caffe include path and the library as shown below. You will also need to turn off the `BUILD_CAFFE` variable. Note that cuDNN is required in order to get the maximum possible accuracy in OpenPose.
+Alternatively, you can use your own Caffe distribution on Ubuntu/Mac by 1) disabling `BUILD_CAFFE`, 2) setting `Caffe_INCLUDE_DIRS` to `{CAFFE_PATH}/include/caffe`, and 3) setting `Caffe_LIBS` to `{CAFFE_PATH}/build/lib/libcaffe.so`, as shown in the image below. Note that cuDNN-compatible Caffe version is required in order to get the maximum possible accuracy in OpenPose.
 <p align="center">
     <img src="media/cmake_installation/im_5.png", width="480">
 </p>
 
-#### Using NVIDIA NVCaffe
+For Windows, simply replace the OpenCV DLLs and include folder for your custom one.
+
+
+
+#### Custom NVIDIA NVCaffe
 To use NVIDIA's NVCaffe instead of the standard Caffe, you can use the `NV_CAFFE` build variable.
 When using a NVCaffe docker image, this should be used togehter with `BUILD_CAFFE=OFF`
 and setting the correct `Caffe_INCLUDE_DIRS` and `Caffe_LIBS` paths.
 
-#### Custom OpenCV (Ubuntu Only)
-If you have built OpenCV from source and OpenPose cannot find it automatically, you can set the `OPENCV_DIR` variable to the directory where you build OpenCV.
+
+
+#### Custom OpenCV
+If you have built OpenCV from source and OpenPose cannot find it automatically, you can set the `OPENCV_DIR` variable to the directory where you build OpenCV (Ubuntu and Mac). For Windows, simply replace the OpenCV DLLs and include folder for your custom one.
 
 
 

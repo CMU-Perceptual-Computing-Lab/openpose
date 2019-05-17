@@ -14,7 +14,7 @@ OpenPose - Quick Start
 
 
 ## Quick Start
-Check that the library is working properly by running any of the following commands. Make sure that you are in the **root directory of the project** (i.e., in the OpenPose folder, not inside `build/` nor `windows/` nor `bin/`). In addition, `examples/media/video.avi` and `examples/media` do exist, no need to change the paths.
+Check that the library is working properly by running any of the following commands on any command-line interface program. In Ubuntu, Mac, and other Unix systems, use any command-line interface, such as `Terminal` or `Terminator`. In Windows, open the `PowerShell` (recommended) or Windows Command Prompt (CMD). They can be open by pressing the Windows button + X, and then A. Feel free to watch any Youtube video tutorial if you are not familiar with these non-GUI tools. Make sure that you are in the **root directory of the project** (i.e., in the OpenPose folder, not inside `build/` nor `windows/` nor `bin/`). In addition, `examples/media/video.avi` and `examples/media` do exist, no need to change the paths.
 
 ### Running on Video
 ```
@@ -165,11 +165,13 @@ build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --fa
 ./build/examples/openpose/openpose.bin --image_dir output_folder_path/ --3d_views 3 --3d --number_people_max 1 --output_resolution {desired_output_resolution}
 ```
 
-5. Reconstruction when at least n visible views
+5. Reconstruction when the keypoint is visible in at least `x` camera views out of the total `n` cameras
 ```
 # Ubuntu and Mac (same flags for Windows version)
-# Assuming >=2 cameras and reconstruction when at least 2 visible views
+# Reconstruction when a keypoint is visible in at least 2 camera views (assuming `n` >= 2)
 ./build/examples/openpose/openpose.bin --flir_camera --3d --number_people_max 1 --3d_min_views 2 --output_resolution {desired_output_resolution}
+# Reconstruction when a keypoint is visible in at least max(2, min(4, n-1)) camera views
+./build/examples/openpose/openpose.bin --flir_camera --3d --number_people_max 1 --output_resolution {desired_output_resolution}
 ```
 
 

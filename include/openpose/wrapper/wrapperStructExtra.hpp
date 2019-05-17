@@ -22,7 +22,8 @@ namespace op
 
         /**
          * Minimum number of views required to reconstruct each keypoint.
-         * By default (-1), it will require all the cameras to see the keypoint in order to reconstruct it.
+         * By default (-1), it will require max(2, min(4, #cameras-1)) cameras to see the keypoint in order to
+         * reconstruct it.
          */
         int minViews3d;
 

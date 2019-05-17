@@ -55,10 +55,6 @@ namespace op
                 return PoseModel::BODY_25D;
             else if (poseModeString == "BODY_25E")
                 return PoseModel::BODY_25E;
-            else if (poseModeString == "BODY_65")
-                return PoseModel::BODY_65;
-            else if (poseModeString == "BODY_95")
-                return PoseModel::BODY_95;
             else if (poseModeString == "BODY_135")
                 return PoseModel::BODY_135;
             // Car pose
@@ -249,14 +245,9 @@ namespace op
         try
         {
             // Body: to auto-pick CPU/GPU depending on CPU_ONLY/CUDA
+            // Auto auto-picks CPU/CUDA depending on the compiled version (CPU_ONLY/CUDA)
             if (renderFlag == -1 && renderPoseFlag == -2)
-            {
-                #ifdef USE_CUDA
-                    return (gpuBuggy ? RenderMode::Cpu : RenderMode::Gpu);
-                #else
-                    return RenderMode::Cpu;
-                #endif
-            }
+                return (gpuBuggy ? RenderMode::Cpu : RenderMode::Auto);
             // Face and hand: to pick same than body
             else if (renderFlag == -1 && renderPoseFlag != -2)
                 return flagsToRenderMode(renderPoseFlag, gpuBuggy, -2);

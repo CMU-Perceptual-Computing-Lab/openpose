@@ -1,6 +1,6 @@
 #include <typeinfo> // typeid
 #include <numeric> // std::accumulate
-#include <openpose/utilities/errorAndLog.hpp>
+#include <openpose/utilities/avx.hpp>
 #include <openpose/core/array.hpp>
 
 // Note: std::shared_ptr not (fully) supported for array pointers:
@@ -133,10 +133,7 @@ namespace op
     {
         try
         {
-            if (size > 0)
-                resetAuxiliary(std::vector<int>{size}, dataPtr);
-            else
-                error("Size cannot be less than 1.", __LINE__, __FUNCTION__, __FILE__);
+            reset(size, dataPtr);
         }
         catch (const std::exception& e)
         {
@@ -149,10 +146,7 @@ namespace op
     {
         try
         {
-            if (!sizes.empty())
-                resetAuxiliary(sizes, dataPtr);
-            else
-                error("Size cannot be empty or less than 1.", __LINE__, __FUNCTION__, __FILE__);
+            reset(sizes, dataPtr);
         }
         catch (const std::exception& e)
         {
@@ -328,6 +322,38 @@ namespace op
         {
             reset(sizes);
             setTo(value);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename T>
+    void Array<T>::reset(const int size, T* const dataPtr)
+    {
+        try
+        {
+            if (size > 0)
+                resetAuxiliary(std::vector<int>{size}, dataPtr);
+            else
+                error("Size cannot be less than 1.", __LINE__, __FUNCTION__, __FILE__);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename T>
+    void Array<T>::reset(const std::vector<int>& sizes, T* const dataPtr)
+    {
+        try
+        {
+            if (!sizes.empty())
+                resetAuxiliary(sizes, dataPtr);
+            else
+                error("Size cannot be empty or less than 1.", __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
         {
@@ -637,8 +663,16 @@ namespace op
                 // Prepare shared_ptr
                 if (dataPtr == nullptr)
                 {
-                    spData.reset(new T[mVolume], std::default_delete<T[]>());
+                    #ifdef WITH_AVX
+                        spData = aligned_shared_ptr<T>(mVolume);
+                    #else
+                        spData.reset(new T[mVolume], std::default_delete<T[]>());
+                    #endif
                     pData = spData.get();
+                    // Sanity check
+                    if (pData == nullptr)
+                        error("Shared pointer could not be allocated for Array data storage.",
+                              __LINE__, __FUNCTION__, __FILE__);
                 }
                 else
                 {

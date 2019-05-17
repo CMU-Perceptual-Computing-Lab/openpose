@@ -3,16 +3,217 @@
 
 namespace op
 {
-    inline __device__ void renderKeypoints(float* targetPtr, float2* sharedMaxs, float2* sharedMins,
-                                           float* sharedScaleF, const int globalIdx, const int x, const int y,
-                                           const int targetWidth, const int targetHeight,
-                                           const float* const keypointsPtr, const unsigned int* const partPairsPtr,
-                                           const int numberPeople, const int numberParts, const int numberPartPairs,
-                                           const float* const rgbColorsPtr, const int numberColors, const float radius,
-                                           const float lineWidth, const float* const keypointScalePtr,
-                                           const int numberScales, const float threshold,
-                                           const float alphaColorToAdd, const bool blendOriginalFrame = true,
-                                           const int googlyEye1 = -1, const int googlyEye2 = -1)
+    __inline__ __device__ void getBoundingBoxPerPerson(
+        float* maxPtr, float* minPtr, float* scalePtr,const int targetWidth, const int targetHeight,
+        const float* const keypointsPtr, const int numberPeople, const int numberParts, const float threshold)
+    {
+        const auto globalIdx = threadIdx.x;
+        // const auto xIndex = 2*globalIdx;
+        // const auto yIndex = xIndex+1;
+        const auto xIndex = globalIdx;
+        const auto yIndex = numberPeople+globalIdx;
+
+        // Fill shared parameters
+        // if (globalIdx < numberPeople)
+        {
+            auto minValueX = (float)targetWidth;
+            auto minValueY = (float)targetHeight;
+            auto maxValueX = 0.f;
+            auto maxValueY = 0.f;
+            for (auto part = 0 ; part < numberParts ; part++)
+            {
+                const auto index = 3 * (globalIdx*numberParts + part);
+                const auto x = keypointsPtr[index];
+                const auto y = keypointsPtr[index+1];
+                const auto score = keypointsPtr[index+2];
+                if (score > threshold)
+                {
+                    if (x < minValueX)
+                        minValueX = x;
+                    if (x > maxValueX)
+                        maxValueX = x;
+                    if (y < minValueY)
+                        minValueY = y;
+                    if (y > maxValueY)
+                        maxValueY = y;
+                }
+            }
+            if (maxValueX != 0.f && maxValueY != 0.f)
+            {
+                const auto averageX = maxValueX - minValueX;
+                const auto averageY = maxValueY - minValueY;
+                // (averageX + averageY) / 2.f / 400.f
+                scalePtr[globalIdx] = fastTruncateCuda((averageX + averageY) / 400.f, 0.33f, 1.f);
+                const auto constantToAdd = 50.f;
+                maxValueX += constantToAdd;
+                maxValueY += constantToAdd;
+                minValueX -= constantToAdd;
+                minValueY -= constantToAdd;
+            }
+
+            minPtr[xIndex] = minValueX;
+            minPtr[yIndex] = minValueY;
+            maxPtr[xIndex] = maxValueX;
+            maxPtr[yIndex] = maxValueY;
+        }
+    }
+
+    __inline__ __device__ void renderKeypoints(
+        float* targetPtr, float* sharedMaxs, float* sharedMins, float* sharedScaleF, const float* const maxPtr,
+        const float* const minPtr, const float* const scalePtr, const int globalIdx, const int x, const int y,
+        const int targetWidth, const int targetHeight, const float* const keypointsPtr,
+        const unsigned int* const partPairsPtr, const int numberPeople, const int numberParts,
+        const int numberPartPairs, const float* const rgbColorsPtr, const int numberColors, const float radius,
+        const float lineWidth, const float* const keypointScalePtr, const int numberScales, const float threshold,
+        const float alphaColorToAdd, const bool blendOriginalFrame = true, const int googlyEye1 = -1,
+        const int googlyEye2 = -1)
+    {
+        // Load shared memory
+        if (globalIdx < 2*numberPeople)
+        {
+            sharedMins[globalIdx] = minPtr[globalIdx];
+            sharedMaxs[globalIdx] = maxPtr[globalIdx];
+            if (globalIdx < numberPeople)
+                sharedScaleF[globalIdx] = scalePtr[globalIdx];
+        }
+        __syncthreads();
+
+        // Fill each (x,y) target pixel
+        if (x < targetWidth && y < targetHeight)
+        {
+            const auto baseIndex = 3*(y * targetWidth + x);
+            auto b = targetPtr[baseIndex];
+            auto g = targetPtr[baseIndex+1];
+            auto r = targetPtr[baseIndex+2];
+            if (!blendOriginalFrame)
+            {
+                b = 0.f;
+                g = 0.f;
+                r = 0.f;
+            }
+
+            const auto lineWidthSquared = lineWidth * lineWidth;
+            const auto radiusSquared = radius * radius;
+            for (auto person = 0; person < numberPeople; person++)
+            {
+                // Make sure person x,y in the limits
+                // Make sure person is not empty. Assume all joints are below threshold. Then
+                // maxs = 0 and mins = width/height. So if statement would be false
+                // const auto xIndex = 2*person;
+                // const auto yIndex = xIndex+1;
+                const auto xIndex = person;
+                const auto yIndex = numberPeople+person;
+                if (x <= sharedMaxs[xIndex] && x >= sharedMins[xIndex]
+                     && y <= sharedMaxs[yIndex] && y >= sharedMins[yIndex])
+                {
+                    // Part pair connections
+                    for (auto partPair = 0; partPair < numberPartPairs; partPair++)
+                    {
+                        const auto partA = partPairsPtr[2*partPair];
+                        const auto partB = partPairsPtr[2*partPair+1];
+                        const auto indexA = person*numberParts*3 + partA*3;
+                        const auto xA = keypointsPtr[indexA];
+                        const auto yA = keypointsPtr[indexA + 1];
+                        const auto scoreA = keypointsPtr[indexA + 2];
+                        const auto indexB = person*numberParts*3 + partB*3;
+                        const auto xB = keypointsPtr[indexB];
+                        const auto yB = keypointsPtr[indexB + 1];
+                        const auto scoreB = keypointsPtr[indexB + 2];
+
+                        if (scoreA > threshold && scoreB > threshold)
+                        {
+                            const auto keypointScale = keypointScalePtr[partB%numberScales]
+                                                     * keypointScalePtr[partB%numberScales]
+                                                     * keypointScalePtr[partB%numberScales];
+                            const auto lineWidthScaled = lineWidthSquared * keypointScale;
+                            const auto bSqrt = sharedScaleF[person] * sharedScaleF[person] * lineWidthScaled;
+
+                            const auto xP = (xA + xB) / 2.f;
+                            const auto yP = (yA + yB) / 2.f;
+                            const auto aSqrt = (xA - xP) * (xA - xP) + (yA - yP) * (yA - yP);
+
+                            const auto angle = atan2f(yB - yA, xB - xA);
+                            const auto sine = sinf(angle);
+                            const auto cosine = cosf(angle);
+                            const auto A = cosine * (x - xP) + sine * (y - yP);
+                            const auto B = sine * (x - xP) - cosine * (y - yP);
+
+                            const auto judge = A * A / aSqrt + B * B / bSqrt;
+                            const auto minV = 0.f;
+                            const auto maxV = 1.f;
+                            if (minV <= judge && judge <= maxV)
+                                // Before used partPair vs partB
+                                addColorWeighted(r, g, b, &rgbColorsPtr[(partB%numberColors)*3], alphaColorToAdd);
+                        }
+                    }
+
+                    // Part circles
+                    for (auto part = 0u; part < numberParts; part++)
+                    {
+                        const auto index = 3 * (person*numberParts + part);
+                        const auto localX = keypointsPtr[index];
+                        const auto localY = keypointsPtr[index + 1];
+                        const auto score = keypointsPtr[index + 2];
+
+                        if (score > threshold)
+                        {
+                            const auto keypointScale = keypointScalePtr[part%numberScales]
+                                                     * keypointScalePtr[part%numberScales]
+                                                     * keypointScalePtr[part%numberScales];
+                            const auto radiusScaled = radiusSquared * keypointScale;
+                            const auto dist2 = (x - localX) * (x - localX) + (y - localY) * (y - localY);
+                            // Googly eyes
+                            if (googlyEye1 == part || googlyEye2 == part)
+                            {
+                                const auto eyeRatio = 2.5f * sqrt(radiusScaled);
+                                const auto minr2 = sharedScaleF[person] * sharedScaleF[person]
+                                                 * (eyeRatio - 2) * (eyeRatio - 2);
+                                const auto maxr2 = sharedScaleF[person] * sharedScaleF[person] * eyeRatio * eyeRatio;
+                                if (dist2 <= maxr2)
+                                {
+                                    float colorToAdd [3] = {0., 0., 0.};
+                                    if (dist2 <= minr2)
+                                        for (auto& color : colorToAdd)
+                                            color = {255.f};
+                                    if (dist2 <= minr2*0.6f)
+                                    {
+                                        const auto dist3 = (x-4 - localX)
+                                                         * (x-4 - localX) + (y - localY+4) * (y - localY+4);
+                                        if (dist3 > 14.0625f) // 3.75f^2
+                                            for (auto& color : colorToAdd)
+                                                color = {0.f};
+                                    }
+                                    const auto alphaColorToAdd = 0.9f;
+                                    addColorWeighted(r, g, b, colorToAdd, alphaColorToAdd);
+                                }
+                            }
+                            // Other parts
+                            else
+                            {
+                                const auto minr2 = 0.f;
+                                const auto maxr2 = sharedScaleF[person] * sharedScaleF[person] * radiusScaled;
+                                if (minr2 <= dist2 && dist2 <= maxr2)
+                                    addColorWeighted(r, g, b, &rgbColorsPtr[(part%numberColors)*3], alphaColorToAdd);
+                            }
+
+                        }
+                    }
+                }
+            }
+            targetPtr[baseIndex] = b;
+            targetPtr[baseIndex+1] = g;
+            targetPtr[baseIndex+2] = r;
+        }
+    }
+
+    __inline__ __device__ void renderKeypointsOld(
+        float* targetPtr, float2* sharedMaxs, float2* sharedMins, float* sharedScaleF, const int globalIdx,
+        const int x, const int y, const int targetWidth, const int targetHeight, const float* const keypointsPtr,
+        const unsigned int* const partPairsPtr, const int numberPeople, const int numberParts,
+        const int numberPartPairs, const float* const rgbColorsPtr, const int numberColors, const float radius,
+        const float lineWidth, const float* const keypointScalePtr, const int numberScales, const float threshold,
+        const float alphaColorToAdd, const bool blendOriginalFrame = true, const int googlyEye1 = -1,
+        const int googlyEye2 = -1)
     {
         // Fill shared parameters
         if (globalIdx < numberPeople)
@@ -44,7 +245,7 @@ namespace op
                 const auto averageX = sharedMaxs[globalIdx].x - sharedMins[globalIdx].x;
                 const auto averageY = sharedMaxs[globalIdx].y - sharedMins[globalIdx].y;
                 // (averageX + averageY) / 2.f / 400.f
-                sharedScaleF[globalIdx] = fastTruncate((averageX + averageY) / 400.f, 0.33f, 1.f);
+                sharedScaleF[globalIdx] = fastTruncateCuda((averageX + averageY) / 400.f, 0.33f, 1.f);
                 const auto constantToAdd = 50.f;
                 sharedMaxs[globalIdx].x += constantToAdd;
                 sharedMaxs[globalIdx].y += constantToAdd;
@@ -52,7 +253,6 @@ namespace op
                 sharedMins[globalIdx].y -= constantToAdd;
             }
         }
-
         __syncthreads();
 
         // Fill each (x,y) target pixel
@@ -175,5 +375,6 @@ namespace op
         }
     }
 }
+
 
 #endif // OPENPOSE_UTILITIES_RENDER_HU

@@ -569,7 +569,11 @@ namespace op
                     if (mCopyGlToCvMat)
                     {
                         image = cv::Mat(WINDOW_HEIGHT, WINDOW_WIDTH, CV_8UC3);
-                        glReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_BGR, GL_UNSIGNED_BYTE, image.data);
+                        #ifdef _WIN32
+                            glReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_BGR_EXT, GL_UNSIGNED_BYTE, image.data);
+                        #else
+                            glReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_BGR, GL_UNSIGNED_BYTE, image.data);
+                        #endif
                         cv::flip(image, image, 0);
                     }
                 }

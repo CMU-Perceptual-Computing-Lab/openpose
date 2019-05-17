@@ -22,7 +22,10 @@ namespace op
                     getNumberElementsToRender(poseModel)}, // mNumberElementsToRender
         PoseRenderer{poseModel},
         spPoseExtractorNet{poseExtractorNet},
-        pGpuPose{nullptr}
+        pGpuPose{nullptr},
+        pMaxPtr{nullptr},
+        pMinPtr{nullptr},
+        pScalePtr{nullptr}
     {
     }
 
@@ -32,7 +35,14 @@ namespace op
         {
             // Free CUDA pointers - Note that if pointers are 0 (i.e., nullptr), no operation is performed.
             #ifdef USE_CUDA
-                cudaFree(pGpuPose);
+                if (pGpuPose != nullptr)
+                    cudaFree(pGpuPose);
+                if (pMaxPtr != nullptr)
+                    cudaFree(pMaxPtr);
+                if (pMinPtr != nullptr)
+                    cudaFree(pMinPtr);
+                if (pScalePtr != nullptr)
+                    cudaFree(pScalePtr);
             #endif
         }
         catch (const std::exception& e)
@@ -49,7 +59,10 @@ namespace op
             // GPU memory allocation for rendering
             #ifdef USE_CUDA
                 cudaMalloc((void**)(&pGpuPose),
-                           POSE_MAX_PEOPLE * getPoseNumberBodyParts(mPoseModel) * 3 * sizeof(float));
+                    POSE_MAX_PEOPLE * getPoseNumberBodyParts(mPoseModel) * 3 * sizeof(float));
+                cudaMalloc((void**)&pMaxPtr, sizeof(float) * 2 * POSE_MAX_PEOPLE);
+                cudaMalloc((void**)&pMinPtr, sizeof(float) * 2 * POSE_MAX_PEOPLE);
+                cudaMalloc((void**)&pScalePtr, sizeof(float) * POSE_MAX_PEOPLE);
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
             #endif
             log("Finished initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
@@ -60,10 +73,9 @@ namespace op
         }
     }
 
-    std::pair<int, std::string> PoseGpuRenderer::renderPose(Array<float>& outputData,
-                                                            const Array<float>& poseKeypoints,
-                                                            const float scaleInputToOutput,
-                                                            const float scaleNetToOutput)
+    std::pair<int, std::string> PoseGpuRenderer::renderPose(
+        Array<float>& outputData, const Array<float>& poseKeypoints, const float scaleInputToOutput,
+        const float scaleNetToOutput)
     {
         try
         {
@@ -78,7 +90,6 @@ namespace op
                 if (numberPeople > 0 || elementRendered != 0 || !mBlendOriginalFrame)
                 {
                     cpuToGpuMemoryIfNotCopiedYet(outputData.getPtr(), outputData.getVolume());
-                    cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                     const auto numberBodyParts = getPoseNumberBodyParts(mPoseModel);
                     const auto hasBkg = addBkgChannel(mPoseModel);
                     const auto numberBodyPartsPlusBkg = numberBodyParts + (hasBkg ? 1 : 0);
@@ -92,13 +103,12 @@ namespace op
                         scaleKeypoints(poseKeypointsRescaled, scaleInputToOutput);
                         // Render keypoints
                         if (!poseKeypoints.empty())
-                            cudaMemcpy(pGpuPose,
-                                       poseKeypointsRescaled.getConstPtr(),
-                                       numberPeople * numberBodyParts * 3 * sizeof(float),
-                                       cudaMemcpyHostToDevice);
-                        renderPoseKeypointsGpu(*spGpuMemory, mPoseModel, numberPeople, frameSize, pGpuPose,
-                                               mRenderThreshold, mShowGooglyEyes, mBlendOriginalFrame,
-                                               getAlphaKeypoint());
+                            cudaMemcpy(
+                                pGpuPose, poseKeypointsRescaled.getConstPtr(),
+                                numberPeople * numberBodyParts * 3 * sizeof(float), cudaMemcpyHostToDevice);
+                        renderPoseKeypointsGpu(
+                            *spGpuMemory, pMaxPtr, pMinPtr, pScalePtr, mPoseModel, numberPeople, frameSize, pGpuPose,
+                            mRenderThreshold, mShowGooglyEyes, mBlendOriginalFrame, getAlphaKeypoint());
                     }
                     else
                     {
@@ -116,20 +126,20 @@ namespace op
                         // if (elementRendered == numberBodyPartsPlusBkg+1)
                         {
                             elementRenderedName = "Heatmaps";
-                            renderPoseHeatMapsGpu(*spGpuMemory, mPoseModel, frameSize,
-                                                  spPoseExtractorNet->getHeatMapGpuConstPtr(),
-                                                  heatMapSize, scaleNetToOutput * scaleInputToOutput,
-                                                  (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
+                            renderPoseHeatMapsGpu(
+                                *spGpuMemory, mPoseModel, frameSize, spPoseExtractorNet->getHeatMapGpuConstPtr(),
+                                heatMapSize, scaleNetToOutput * scaleInputToOutput,
+                                (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
                         }
                         // Draw PAFs (Part Affinity Fields)
                         else if (elementRendered == 3)
                         // else if (elementRendered == numberBodyPartsPlusBkg+2)
                         {
                             elementRenderedName = "PAFs (Part Affinity Fields)";
-                            renderPosePAFsGpu(*spGpuMemory, mPoseModel, frameSize,
-                                              spPoseExtractorNet->getHeatMapGpuConstPtr(),
-                                              heatMapSize, scaleNetToOutput * scaleInputToOutput,
-                                              (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
+                            renderPosePAFsGpu(
+                                *spGpuMemory, mPoseModel, frameSize, spPoseExtractorNet->getHeatMapGpuConstPtr(),
+                                heatMapSize, scaleNetToOutput * scaleInputToOutput,
+                                (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
                         }
                         // Draw specific body part or background
                         else if (elementRendered <= numberBodyPartsPlusBkg+2)
@@ -151,10 +161,10 @@ namespace op
                                                           + getPoseMapIndex(mPoseModel).at(affinityPart);
                             elementRenderedName = mPartIndexToName.at(affinityPartMapped);
                             elementRenderedName = elementRenderedName.substr(0, elementRenderedName.find("("));
-                            renderPosePAFGpu(*spGpuMemory, mPoseModel, frameSize,
-                                             spPoseExtractorNet->getHeatMapGpuConstPtr(),
-                                             heatMapSize, scaleNetToOutput * scaleInputToOutput, affinityPartMapped,
-                                             (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
+                            renderPosePAFGpu(
+                                *spGpuMemory, mPoseModel, frameSize, spPoseExtractorNet->getHeatMapGpuConstPtr(),
+                                heatMapSize, scaleNetToOutput * scaleInputToOutput, affinityPartMapped,
+                                (mBlendOriginalFrame ? getAlphaHeatMap() : 1.f));
                         }
                         // Draw neck-part distance channel
                         else

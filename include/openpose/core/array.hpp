@@ -5,6 +5,7 @@
 #include <vector>
 #include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/macros.hpp>
+#include <openpose/utilities/errorAndLog.hpp>
 
 namespace op
 {
@@ -88,6 +89,26 @@ namespace op
         Array(const Array<T>& array, const int index, const bool noCopy = false);
 
         /**
+         * Array constructor. It manually copies the Array<T2> into the new Array<T>
+         * @param array Array<T2> with a format T2 different to the current Array type T.
+         */
+        template<typename T2>
+        Array(const Array<T2>& array) :
+            Array{array.getSize()}
+        {
+            try
+            {
+                // Copy
+                for (auto i = 0u ; i < array.getVolume() ; i++)
+                    pData[i] = array[i];
+            }
+            catch (const std::exception& e)
+            {
+                error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            }
+        }
+
+        /**
          * Copy constructor.
          * It performs `fast copy`: For performance purpose, copying a Array<T> or Datum or cv::Mat just copies the
          * reference, it still shares the same internal data.
@@ -164,6 +185,24 @@ namespace op
          * @param value Initial value for each component of the Array.
          */
         void reset(const std::vector<int>& sizes, const T value);
+
+        /**
+         * Data allocation function.
+         * Equivalent to default constructor, but it does not allocate memory, but rather use dataPtr.
+         * @param size Integer with the number of T element to be allocated. E.g., size = 5 is internally similar to
+         * `new T[5]`.
+         * @param dataPtr Pointer to the memory to be used by the Array.
+         */
+        void reset(const int size, T* const dataPtr);
+
+        /**
+         * Data allocation function.
+         * Equivalent to default constructor, but it does not allocate memory, but rather use dataPtr.
+         * @param sizes Vector with the size of each dimension. E.g., size = {3, 5, 2} is internally similar to:
+         * `new T[3*5*2]`.
+         * @param dataPtr Pointer to the memory to be used by the Array.
+         */
+        void reset(const std::vector<int>& sizes, T* const dataPtr);
 
         /**
          * Data allocation function.

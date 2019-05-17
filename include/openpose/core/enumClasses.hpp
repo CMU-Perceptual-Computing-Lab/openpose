@@ -24,6 +24,7 @@ namespace op
     enum class RenderMode : unsigned char
     {
         None,
+        Auto, // It will select Gpu if CUDA verison, or Cpu otherwise
         Cpu,
         Gpu,
     };

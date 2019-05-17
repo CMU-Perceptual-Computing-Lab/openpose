@@ -255,8 +255,8 @@ namespace op
         }
     }
 
-    void HandExtractorCaffe::forwardPass(const std::vector<std::array<Rectangle<float>, 2>> handRectangles,
-                                         const cv::Mat& cvInputData)
+    void HandExtractorCaffe::forwardPass(
+        const std::vector<std::array<Rectangle<float>, 2>> handRectangles, const cv::Mat& cvInputData)
     {
         try
         {
@@ -272,8 +272,8 @@ namespace op
 
                     // Set hand size
                     const auto numberPeople = (int)handRectangles.size();
-                    mHandKeypoints[0].reset({numberPeople, (int)HAND_NUMBER_PARTS, 3}, 0);
-                    mHandKeypoints[1].reset(mHandKeypoints[0].getSize(), 0);
+                    mHandKeypoints[0].reset({numberPeople, (int)HAND_NUMBER_PARTS, 3}, 0.f);
+                    mHandKeypoints[1].reset(mHandKeypoints[0].getSize(), 0.f);
 
                     // HeatMaps: define size
                     if (!mHeatMapTypes.empty())

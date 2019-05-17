@@ -25,33 +25,37 @@ namespace op
     OP_API void saveFloatArray(const Array<float>& array, const std::string& fullFilePath);
 
     // Save/load json, xml, yaml, yml
-    OP_API void saveData(const std::vector<cv::Mat>& cvMats, const std::vector<std::string>& cvMatNames,
-                         const std::string& fileNameNoExtension, const DataFormat dataFormat);
+    OP_API void saveData(
+        const std::vector<cv::Mat>& cvMats, const std::vector<std::string>& cvMatNames,
+        const std::string& fileNameNoExtension, const DataFormat dataFormat);
 
-    OP_API void saveData(const cv::Mat& cvMat, const std::string cvMatName, const std::string& fileNameNoExtension,
-                         const DataFormat dataFormat);
+    OP_API void saveData(
+        const cv::Mat& cvMat, const std::string cvMatName, const std::string& fileNameNoExtension,
+        const DataFormat dataFormat);
 
-    OP_API std::vector<cv::Mat> loadData(const std::vector<std::string>& cvMatNames,
-                                         const std::string& fileNameNoExtension, const DataFormat dataFormat);
+    OP_API std::vector<cv::Mat> loadData(
+        const std::vector<std::string>& cvMatNames, const std::string& fileNameNoExtension,
+        const DataFormat dataFormat);
 
-    OP_API cv::Mat loadData(const std::string& cvMatName, const std::string& fileNameNoExtension,
-                            const DataFormat dataFormat);
+    OP_API cv::Mat loadData(
+        const std::string& cvMatName, const std::string& fileNameNoExtension, const DataFormat dataFormat);
 
     // Json - Saving as *.json not available in OpenCV verions < 3.0, this function is a quick fix
-    OP_API void savePeopleJson(const Array<float>& keypoints,
-                               const std::vector<std::vector<std::array<float,3>>>& candidates,
-                               const std::string& keypointName, const std::string& fileName,
-                               const bool humanReadable);
+    OP_API void savePeopleJson(
+        const Array<float>& keypoints, const std::vector<std::vector<std::array<float,3>>>& candidates,
+        const std::string& keypointName, const std::string& fileName, const bool humanReadable);
 
     // It will save a bunch of Array<float> elements
-    OP_API void savePeopleJson(const std::vector<std::pair<Array<float>, std::string>>& keypointVector,
-                               const std::vector<std::vector<std::array<float,3>>>& candidates,
-                               const std::string& fileName, const bool humanReadable);
+    OP_API void savePeopleJson(
+        const std::vector<std::pair<Array<float>, std::string>>& keypointVector,
+        const std::vector<std::vector<std::array<float,3>>>& candidates, const std::string& fileName,
+        const bool humanReadable);
 
     // Save/load image
-    OP_API void saveImage(const cv::Mat& cvMat, const std::string& fullFilePath,
-                          const std::vector<int>& openCvCompressionParams
-                            = {CV_IMWRITE_JPEG_QUALITY, 100, CV_IMWRITE_PNG_COMPRESSION, 9});
+    OP_API void saveImage(
+        const cv::Mat& cvMat, const std::string& fullFilePath,
+        const std::vector<int>& openCvCompressionParams
+            = {CV_IMWRITE_JPEG_QUALITY, 100, CV_IMWRITE_PNG_COMPRESSION, 9});
 
     OP_API cv::Mat loadImage(const std::string& fullFilePath, const int openCvFlags = CV_LOAD_IMAGE_ANYDEPTH);
 

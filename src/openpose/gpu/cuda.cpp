@@ -8,11 +8,16 @@
 namespace op
 {
     #ifdef USE_CUDA
-        const dim3 THREADS_PER_BLOCK_TINY{32, 32, 1};
-        const dim3 THREADS_PER_BLOCK_SMALL{64, 64, 1};
-        const dim3 THREADS_PER_BLOCK_MEDIUM{128, 128, 1};
-        const dim3 THREADS_PER_BLOCK_BIG{256, 256, 1};
-        const dim3 THREADS_PER_BLOCK_HUGE{512, 512, 1};
+        #ifdef DNDEBUG
+            #define base 32
+        #else
+            #define base 64
+        #endif
+        const dim3 THREADS_PER_BLOCK_TINY{base, base, 1};       // 32 |64
+        const dim3 THREADS_PER_BLOCK_SMALL{2*base, 2*base, 1};  // 64 |128
+        const dim3 THREADS_PER_BLOCK_MEDIUM{4*base, 4*base, 1}; // 128|256
+        const dim3 THREADS_PER_BLOCK_BIG{8*base, 8*base, 1};    // 256|512
+        const dim3 THREADS_PER_BLOCK_HUGE{16*base, 16*base, 1}; // 512|1024
     #endif
 
     void cudaCheck(const int line, const std::string& function, const std::string& file)

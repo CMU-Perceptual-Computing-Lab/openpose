@@ -30,5 +30,15 @@ namespace op
         udpHost{udpHost_},
         udpPort{udpPort_}
     {
+        try
+        {
+            if (!writeBvh.empty())
+                error("BVH writing is experimental and not available yet (flag `--write_bvh`). Please, disable this"
+                      " flag and do not open a GitHub issue asking for it.", __LINE__, __FUNCTION__, __FILE__);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
     }
 }

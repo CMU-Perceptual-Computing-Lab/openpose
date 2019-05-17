@@ -152,12 +152,12 @@ namespace op
             const DataFormat writeKeypointFormat = DataFormat::Xml, const std::string& writeJson = "",
             const std::string& writeCocoJson = "", const int writeCocoJsonVariants = 1,
             const int writeCocoJsonVariant = 1, const std::string& writeImages = "",
-            const std::string& writeImagesFormat = "", const std::string& writeVideo = "",
+            const std::string& writeImagesFormat = "png", const std::string& writeVideo = "",
             const double writeVideoFps = -1., const bool writeVideoWithAudio = false,
-            const std::string& writeHeatMaps = "", const std::string& writeHeatMapsFormat = "",
+            const std::string& writeHeatMaps = "", const std::string& writeHeatMapsFormat = "png",
             const std::string& writeVideo3D = "", const std::string& writeVideoAdam = "",
             const std::string& writeBvh = "", const std::string& udpHost = "",
-            const std::string& udpPort = "");
+            const std::string& udpPort = "8051");
     };
 }
 

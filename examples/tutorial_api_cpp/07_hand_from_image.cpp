@@ -3,7 +3,7 @@
 // it includes all the OpenPose configuration flags.
 // Input: An image and the hand rectangle locations.
 // Output: OpenPose hand keypoint detection.
-// NOTE: This demo is auto-selecting the following flags: `--body_disable --hand --hand_detector 2`
+// NOTE: This demo is auto-selecting the following flags: `--body 0 --hand --hand_detector 2`
 
 // Command-line user intraface
 #define OPENPOSE_FLAGS_DISABLE_PRODUCER
@@ -211,7 +211,7 @@ int tutorialApiCpp()
 
         // Info
         op::log("NOTE: In addition with the user flags, this demo has auto-selected the following flags:\n"
-                "\t`--body_disable --hand --hand_detector 2`", op::Priority::High);
+                "\t`--body 0 --hand --hand_detector 2`", op::Priority::High);
 
         // Measuring total time
         op::printTime(opTimer, "OpenPose demo successfully finished. Total time: ", " seconds.", op::Priority::High);

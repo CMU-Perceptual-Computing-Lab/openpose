@@ -83,6 +83,7 @@ public:
                 auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<UserDatum>>>();
                 datumsPtr->emplace_back();
                 auto& datumPtr = datumsPtr->at(0);
+                datumPtr = std::make_shared<UserDatum>();
 
                 // Fill datum
                 datumPtr->cvInputData = cv::imread(mImageFiles.at(mCounter++));
@@ -189,15 +190,14 @@ int openPoseTutorialThread2()
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
         // Step 2 - Setting thread workers && manager
         typedef std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>> TypedefDatumsSP;
-        typedef std::shared_ptr<op::Worker<TypedefDatumsSP>> TypedefWorker;
         op::ThreadManager<TypedefDatumsSP> threadManager;
         // Step 3 - Initializing the worker classes
         // Frames producer (e.g., video, webcam, ...)
-        TypedefWorker wUserInput = std::make_shared<WUserInput>(FLAGS_image_dir);
+        auto wUserInput = std::make_shared<WUserInput>(FLAGS_image_dir);
         // Processing
-        TypedefWorker wUserProcessing = std::make_shared<WUserPostProcessing>();
+        auto wUserProcessing = std::make_shared<WUserPostProcessing>();
         // GUI (Display)
-        TypedefWorker wUserOutput = std::make_shared<WUserOutput>();
+        auto wUserOutput = std::make_shared<WUserOutput>();
 
         // ------------------------- CONFIGURING THREADING -------------------------
         // In this simple multi-thread example, we will do the following:

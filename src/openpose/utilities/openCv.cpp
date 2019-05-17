@@ -1,3 +1,4 @@
+#include <openpose/utilities/avx.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/openCv.hpp>
 
@@ -95,20 +96,76 @@ namespace op
                     const auto floatPtrImageOffsetY = (floatPtrImageOffsetC + y) * width;
                     const auto originFramePtrOffsetY = y * width;
                     for (auto x = 0; x < width; x++)
-                        floatPtrImage[floatPtrImageOffsetY + x] = float(originFramePtr[(originFramePtrOffsetY + x)
-                                                                        * channels + c]);
+                        floatPtrImage[floatPtrImageOffsetY + x] = float(
+                            originFramePtr[(originFramePtrOffsetY + x) * channels + c]);
                 }
             }
             // Normalizing if desired
-            // floatPtrImage wrapped as cv::Mat
-                // Empirically tested - OpenCV is more efficient normalizing a whole matrix/image (it uses AVX and
-                // other optimized instruction sets).
-                // In addition, the following if statement does not copy the pointer to a cv::Mat, just wrapps it.
             // VGG
             if (normalize == 1)
             {
-                cv::Mat floatPtrImageCvWrapper(height, width, CV_32FC3, floatPtrImage);
-                floatPtrImageCvWrapper = floatPtrImageCvWrapper/256.f - 0.5f;
+                #ifdef WITH_AVX
+                    // // To check results are the same (norm(x1-x2) = 0)
+                    // cv::Mat floatPtrImageCvWrapper(height, width, CV_32FC3, floatPtrImage);
+                    // cv::Mat floatPtrImageCvWrapperTest = floatPtrImageCvWrapper*(1/256.f) - 0.5f;
+                    // // Speed profiling
+                    // const auto REPS = 2000;
+                    // double timeNormalize0 = 0.;
+                    // double timeNormalize1 = 0.;
+                    // double timeNormalize2 = 0.;
+                    // double timeNormalize3 = 0.;
+                    // // OpenCV wrapper
+                    // OP_PROFILE_INIT(REPS);
+                    // cv::Mat floatPtrImageCvWrapper(height, width, CV_32FC3, floatPtrImage);
+                    // floatPtrImageCvWrapper = floatPtrImageCvWrapper*(1/256.f) - 0.5f;
+                    // OP_PROFILE_END(timeNormalize0, 1e6, REPS);
+                    // // C++ sequential code
+                    // OP_PROFILE_INIT(REPS);
+                    // const auto ratio = 1.f/256.f;
+                    // for (auto pixel = 0 ; pixel < width*height*channels ; ++pixel)
+                    //     floatPtrImage[pixel] = floatPtrImage[pixel]*ratio - 0.5f;
+                    // OP_PROFILE_END(timeNormalize1, 1e6, REPS);
+                    // // OpenCV wrapper
+                    // OP_PROFILE_INIT(REPS);
+                    // cv::Mat floatPtrImageCvWrapper(height, width, CV_32FC3, floatPtrImage);
+                    // floatPtrImageCvWrapper = floatPtrImageCvWrapper*(1/256.f) - 0.5f;
+                    // OP_PROFILE_END(timeNormalize2, 1e6, REPS);
+                    // OP_PROFILE_INIT(REPS);
+                    // AVX code
+                    const auto volume = width*height*channels;
+                    int pixel;
+                    const __m256 mmRatio = _mm256_set1_ps(1.f/256.f);
+                    const __m256 mmBias = _mm256_set1_ps(-0.5f);
+                    for (pixel = 0 ; pixel < volume-7 ; pixel += 8)
+                    {
+                        const __m256 input = _mm256_load_ps(&floatPtrImage[pixel]);
+                        // const __m256 input = _mm256_loadu_ps(&floatPtrImage[pixel]); // If non-aligned pointer
+                        const __m256 output = _mm256_fmadd_ps(input, mmRatio, mmBias);
+                        _mm256_store_ps(&floatPtrImage[pixel], output);
+                        // _mm256_storeu_ps(&floatPtrImage[pixel], output); // If non-aligned pointer
+                    }
+                    const auto ratio = 1.f/256.f;
+                    for (; pixel < volume ; ++pixel)
+                        floatPtrImage[pixel] = floatPtrImage[pixel]*ratio - 0.5f;
+                    // OP_PROFILE_END(timeNormalize3, 1e6, REPS);
+                    // std::cout
+                    //     << "TN1: " << timeNormalize0 << " us\n"
+                    //     << "TN1: " << timeNormalize1 << " us\n"
+                    //     << "TN2: " << timeNormalize2 << " us\n"
+                    //     << "TN3: " << timeNormalize3 << " us\n"
+                    //     << std::endl;
+                    // std::cout
+                    //     << "Norm: " << cv::norm(floatPtrImageCvWrapper-floatPtrImageCvWrapperTest) << "\n"
+                    //     << std::endl;
+                // Non optimized code
+                #else
+                    // floatPtrImage wrapped as cv::Mat
+                        // Empirically tested - OpenCV is more efficient normalizing a whole matrix/image (it uses AVX and
+                        // other optimized instruction sets).
+                        // In addition, the following if statement does not copy the pointer to a cv::Mat, just wrapps it.
+                    cv::Mat floatPtrImageCvWrapper(height, width, CV_32FC3, floatPtrImage);
+                    floatPtrImageCvWrapper = floatPtrImageCvWrapper*(1/256.f) - 0.5f;
+                #endif
             }
             // // ResNet
             // else if (normalize == 2)

@@ -124,15 +124,28 @@ namespace op
             spVideoSeek->second = 0;
 
             // Required parameters
-            const auto renderOutput = wrapperStructPose.renderMode != RenderMode::None
-                                        || wrapperStructFace.renderMode != RenderMode::None
-                                        || wrapperStructHand.renderMode != RenderMode::None;
-            const auto renderOutputGpu = wrapperStructPose.renderMode == RenderMode::Gpu
-                                            || wrapperStructFace.renderMode == RenderMode::Gpu
-                                            || wrapperStructHand.renderMode == RenderMode::Gpu;
-            const auto renderFace = wrapperStructFace.enable && wrapperStructFace.renderMode != RenderMode::None;
-            const auto renderHand = wrapperStructHand.enable && wrapperStructHand.renderMode != RenderMode::None;
-            const auto renderHandGpu = wrapperStructHand.enable && wrapperStructHand.renderMode == RenderMode::Gpu;
+            const auto gpuMode = getGpuMode();
+            const auto renderModePose = (
+                wrapperStructPose.renderMode != RenderMode::Auto
+                    ? wrapperStructPose.renderMode
+                    : (gpuMode == GpuMode::Cuda ? RenderMode::Gpu : RenderMode::Cpu));
+            const auto renderModeFace = (
+                wrapperStructFace.renderMode != RenderMode::Auto
+                    ? wrapperStructFace.renderMode
+                    : (gpuMode == GpuMode::Cuda ? RenderMode::Gpu : RenderMode::Cpu));
+            const auto renderModeHand = (
+                wrapperStructHand.renderMode != RenderMode::Auto
+                    ? wrapperStructHand.renderMode
+                    : (gpuMode == GpuMode::Cuda ? RenderMode::Gpu : RenderMode::Cpu));
+            const auto renderOutput = renderModePose != RenderMode::None
+                                        || renderModeFace != RenderMode::None
+                                        || renderModeHand != RenderMode::None;
+            const auto renderOutputGpu = renderModePose == RenderMode::Gpu
+                || renderModeFace == RenderMode::Gpu
+                || renderModeHand == RenderMode::Gpu;
+            const auto renderFace = wrapperStructFace.enable && renderModeFace != RenderMode::None;
+            const auto renderHand = wrapperStructHand.enable && renderModeHand != RenderMode::None;
+            const auto renderHandGpu = wrapperStructHand.enable && renderModeHand == RenderMode::Gpu;
 
             // Check no wrong/contradictory flags enabled
             const auto userInputAndPreprocessingWsEmpty = userInputWs.empty();
@@ -143,12 +156,12 @@ namespace op
                 userOutputWsEmpty, producerSharedPtr, threadManagerMode);
 
             // Get number threads
-            auto numberThreads = wrapperStructPose.gpuNumber;
+            auto numberGpuThreads = wrapperStructPose.gpuNumber;
             auto gpuNumberStart = wrapperStructPose.gpuNumberStart;
             // CPU --> 1 thread or no pose extraction
-            if (getGpuMode() == GpuMode::NoGpu)
+            if (gpuMode == GpuMode::NoGpu)
             {
-                numberThreads = (wrapperStructPose.gpuNumber == 0 ? 0 : 1);
+                numberGpuThreads = (wrapperStructPose.gpuNumber == 0 ? 0 : 1);
                 gpuNumberStart = 0;
                 // Disabling multi-thread makes the code 400 ms faster (2.3 sec vs. 2.7 in i7-6850K)
                 // and fixes the bug that the screen was not properly displayed and only refreshed sometimes
@@ -161,24 +174,24 @@ namespace op
                 // Get total number GPUs
                 const auto totalGpuNumber = getGpuNumber();
                 // If number GPU < 0 --> set it to all the available GPUs
-                if (numberThreads < 0)
+                if (numberGpuThreads < 0)
                 {
                     if (totalGpuNumber <= gpuNumberStart)
                         error("Number of initial GPU (`--number_gpu_start`) must be lower than the total number of"
                               " used GPUs (`--number_gpu`)", __LINE__, __FUNCTION__, __FILE__);
-                    numberThreads = totalGpuNumber - gpuNumberStart;
+                    numberGpuThreads = totalGpuNumber - gpuNumberStart;
                     // Reset initial GPU to 0 (we want them all)
                     // Logging message
                     log("Auto-detecting all available GPUs... Detected " + std::to_string(totalGpuNumber)
-                        + " GPU(s), using " + std::to_string(numberThreads) + " of them starting at GPU "
+                        + " GPU(s), using " + std::to_string(numberGpuThreads) + " of them starting at GPU "
                         + std::to_string(gpuNumberStart) + ".", Priority::High);
                 }
                 // Sanity check
-                if (gpuNumberStart + numberThreads > totalGpuNumber)
+                if (gpuNumberStart + numberGpuThreads > totalGpuNumber)
                     error("Initial GPU selected (`--number_gpu_start`) + number GPUs to use (`--number_gpu`) must"
                           " be lower or equal than the total number of GPUs in your machine ("
                           + std::to_string(gpuNumberStart) + " + "
-                          + std::to_string(numberThreads) + " vs. "
+                          + std::to_string(numberGpuThreads) + " vs. "
                           + std::to_string(totalGpuNumber) + ").",
                           __LINE__, __FUNCTION__, __FILE__);
             }
@@ -228,16 +241,21 @@ namespace op
             std::vector<std::shared_ptr<FaceExtractorNet>> faceExtractorNets;
             std::vector<std::shared_ptr<HandExtractorNet>> handExtractorNets;
             std::vector<std::shared_ptr<PoseGpuRenderer>> poseGpuRenderers;
+            // CUDA vs. CPU resize
+            std::vector<std::shared_ptr<CvMatToOpOutput>> cvMatToOpOutputs;
+            std::vector<std::shared_ptr<OpOutputToCvMat>> opOutputToCvMats;
             std::shared_ptr<PoseCpuRenderer> poseCpuRenderer;
             // Workers
             TWorker scaleAndSizeExtractorW;
             TWorker cvMatToOpInputW;
             TWorker cvMatToOpOutputW;
+            bool addCvMatToOpOutput = renderOutput;
+            bool addCvMatToOpOutputInCpu = addCvMatToOpOutput;
             std::vector<std::vector<TWorker>> poseExtractorsWs;
             std::vector<std::vector<TWorker>> poseTriangulationsWs;
             std::vector<std::vector<TWorker>> jointAngleEstimationsWs;
             std::vector<TWorker> postProcessingWs;
-            if (numberThreads > 0)
+            if (numberGpuThreads > 0)
             {
                 // Get input scales and sizes
                 const auto scaleAndSizeExtractor = std::make_shared<ScaleAndSizeExtractor>(
@@ -247,22 +265,34 @@ namespace op
                 scaleAndSizeExtractorW = std::make_shared<WScaleAndSizeExtractor<TDatumsSP>>(scaleAndSizeExtractor);
 
                 // Input cvMat to OpenPose input & output format
-                const auto cvMatToOpInput = std::make_shared<CvMatToOpInput>(wrapperStructPose.poseModel);
-                cvMatToOpInputW = std::make_shared<WCvMatToOpInput<TDatumsSP>>(cvMatToOpInput);
-                if (renderOutput)
+                // Note: resize on GPU reduces accuracy about 0.1%
+                bool resizeOnCpu = true;
+                // const auto resizeOnCpu = (numberGpuThreads < 3);
+                if (resizeOnCpu)
                 {
-                    const auto cvMatToOpOutput = std::make_shared<CvMatToOpOutput>();
+                    const auto gpuResize = false;
+                    const auto cvMatToOpInput = std::make_shared<CvMatToOpInput>(
+                        wrapperStructPose.poseModel, gpuResize);
+                    cvMatToOpInputW = std::make_shared<WCvMatToOpInput<TDatumsSP>>(cvMatToOpInput);
+                }
+                // Note: We realized that somehow doing it on GPU for any number of GPUs does speedup the whole OP
+                resizeOnCpu = false;
+                addCvMatToOpOutputInCpu = addCvMatToOpOutput && (resizeOnCpu || !renderOutputGpu);
+                if (addCvMatToOpOutputInCpu)
+                {
+                    const auto gpuResize = false;
+                    const auto cvMatToOpOutput = std::make_shared<CvMatToOpOutput>(gpuResize);
                     cvMatToOpOutputW = std::make_shared<WCvMatToOpOutput<TDatumsSP>>(cvMatToOpOutput);
                 }
 
                 // Pose estimators & renderers
                 std::vector<TWorker> cpuRenderers;
                 poseExtractorsWs.clear();
-                poseExtractorsWs.resize(numberThreads);
+                poseExtractorsWs.resize(numberGpuThreads);
                 if (wrapperStructPose.poseMode != PoseMode::Disabled)
                 {
                     // Pose estimators
-                    for (auto gpuId = 0; gpuId < numberThreads; gpuId++)
+                    for (auto gpuId = 0; gpuId < numberGpuThreads; gpuId++)
                         poseExtractorNets.emplace_back(std::make_shared<PoseExtractorCaffe>(
                             wrapperStructPose.poseModel, modelFolder, gpuId + gpuNumberStart,
                             wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScaleMode,
@@ -273,13 +303,13 @@ namespace op
                         ));
 
                     // Pose renderers
-                    if (renderOutputGpu || wrapperStructPose.renderMode == RenderMode::Cpu)
+                    if (renderOutputGpu || renderModePose == RenderMode::Cpu)
                     {
-                        // If wrapperStructPose.renderMode != RenderMode::Gpu but renderOutput, then we create an
+                        // If renderModePose != RenderMode::Gpu but renderOutput, then we create an
                         // alpha = 0 pose renderer in order to keep the removing background option
-                        const auto alphaKeypoint = (wrapperStructPose.renderMode != RenderMode::None
+                        const auto alphaKeypoint = (renderModePose != RenderMode::None
                                                     ? wrapperStructPose.alphaKeypoint : 0.f);
-                        const auto alphaHeatMap = (wrapperStructPose.renderMode != RenderMode::None
+                        const auto alphaHeatMap = (renderModePose != RenderMode::None
                                                     ? wrapperStructPose.alphaHeatMap : 0.f);
                         // GPU rendering
                         if (renderOutputGpu)
@@ -294,7 +324,7 @@ namespace op
                             }
                         }
                         // CPU rendering
-                        if (wrapperStructPose.renderMode == RenderMode::Cpu)
+                        if (renderModePose == RenderMode::Cpu)
                         {
                             poseCpuRenderer = std::make_shared<PoseCpuRenderer>(
                                 wrapperStructPose.poseModel, wrapperStructPose.renderThreshold,
@@ -330,7 +360,26 @@ namespace op
                         const auto poseExtractor = std::make_shared<PoseExtractor>(
                             poseExtractorNets.at(i), keepTopNPeople, personIdExtractor, personTrackers,
                             wrapperStructPose.numberPeopleMax, wrapperStructExtra.tracking);
-                        poseExtractorsWs.at(i) = {std::make_shared<WPoseExtractor<TDatumsSP>>(poseExtractor)};
+                        // If we want the initial image resize on GPU
+                        if (cvMatToOpInputW == nullptr)
+                        {
+                            const auto gpuResize = true;
+                            const auto cvMatToOpInput = std::make_shared<CvMatToOpInput>(
+                                wrapperStructPose.poseModel, gpuResize);
+                            poseExtractorsWs.at(i).emplace_back(
+                                std::make_shared<WCvMatToOpInput<TDatumsSP>>(cvMatToOpInput));
+                        }
+                        // If we want the final image resize on GPU
+                        if (addCvMatToOpOutput && cvMatToOpOutputW == nullptr)
+                        {
+                            const auto gpuResize = true;
+                            cvMatToOpOutputs.emplace_back(std::make_shared<CvMatToOpOutput>(gpuResize));
+                            poseExtractorsWs.at(i).emplace_back(
+                                std::make_shared<WCvMatToOpOutput<TDatumsSP>>(cvMatToOpOutputs.back()));
+                        }
+                        poseExtractorsWs.at(i).emplace_back(
+                            std::make_shared<WPoseExtractor<TDatumsSP>>(poseExtractor));
+                        // poseExtractorsWs.at(i) = {std::make_shared<WPoseExtractor<TDatumsSP>>(poseExtractor)};
                         // // Just OpenPose keypoint detector
                         // poseExtractorsWs.at(i) = {std::make_shared<WPoseExtractorNet<TDatumsSP>>(
                         //     poseExtractorNets.at(i))};
@@ -348,6 +397,22 @@ namespace op
                     //     for (auto& wPose : poseExtractorsWs)
                     //         wPose.emplace_back(std::make_shared<WKeepTopNPeople<TDatumsSP>>(keepTopNPeople));
                     // }
+                }
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+
+                // Pose renderer(s)
+                if (!poseGpuRenderers.empty())
+                {
+                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                    for (auto i = 0u; i < poseExtractorsWs.size(); i++)
+                    {
+                        poseExtractorsWs.at(i).emplace_back(std::make_shared<WPoseRenderer<TDatumsSP>>(
+                            poseGpuRenderers.at(i)));
+                        // Get shared params
+                        if (!cvMatToOpOutputs.empty())
+                            poseGpuRenderers.at(i)->setSharedParameters(
+                                cvMatToOpOutputs.at(i)->getSharedParameters());
+                    }
                 }
                 log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
@@ -424,8 +489,7 @@ namespace op
                         if (wrapperStructHand.detector == Detector::BodyWithTracking)
                         {
                             poseExtractorsWs.at(gpu).emplace_back(
-                                std::make_shared<WHandDetectorTracking<TDatumsSP>>(handDetector)
-                            );
+                                std::make_shared<WHandDetectorTracking<TDatumsSP>>(handDetector));
                         }
                         // OpenPose body-based hand detector
                         else if (wrapperStructHand.detector == Detector::Body)
@@ -453,20 +517,8 @@ namespace op
                         // If OpenPose body-based hand detector with tracking
                         if (wrapperStructHand.detector == Detector::BodyWithTracking)
                             poseExtractorsWs.at(gpu).emplace_back(
-                                std::make_shared<WHandDetectorUpdate<TDatumsSP>>(handDetector)
-                            );
+                                std::make_shared<WHandDetectorUpdate<TDatumsSP>>(handDetector));
                     }
-                }
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-
-                // Pose renderer(s)
-                if (!poseGpuRenderers.empty())
-                {
-                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-                    for (auto i = 0u; i < poseExtractorsWs.size(); i++)
-                        poseExtractorsWs.at(i).emplace_back(std::make_shared<WPoseRenderer<TDatumsSP>>(
-                            poseGpuRenderers.at(i)
-                        ));
                 }
                 log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
@@ -475,17 +527,17 @@ namespace op
                 {
                     log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     // CPU rendering
-                    if (wrapperStructFace.renderMode == RenderMode::Cpu)
+                    if (renderModeFace == RenderMode::Cpu)
                     {
                         // Construct face renderer
-                        const auto faceRenderer = std::make_shared<FaceCpuRenderer>(wrapperStructFace.renderThreshold,
-                                                                                    wrapperStructFace.alphaKeypoint,
-                                                                                    wrapperStructFace.alphaHeatMap);
+                        const auto faceRenderer = std::make_shared<FaceCpuRenderer>(
+                            wrapperStructFace.renderThreshold, wrapperStructFace.alphaKeypoint,
+                            wrapperStructFace.alphaHeatMap);
                         // Add worker
                         cpuRenderers.emplace_back(std::make_shared<WFaceRenderer<TDatumsSP>>(faceRenderer));
                     }
                     // GPU rendering
-                    else if (wrapperStructFace.renderMode == RenderMode::Gpu)
+                    else if (renderModeFace == RenderMode::Gpu)
                     {
                         for (auto i = 0u; i < poseExtractorsWs.size(); i++)
                         {
@@ -497,12 +549,12 @@ namespace op
                             // Performance boost -> share spGpuMemory for all renderers
                             if (!poseGpuRenderers.empty())
                             {
-                                const bool isLastRenderer = !renderHandGpu;
+                                // const bool isLastRenderer = !renderHandGpu;
+                                const bool isLastRenderer = !renderHandGpu && !(addCvMatToOpOutput && !addCvMatToOpOutputInCpu);
                                 const auto renderer = std::static_pointer_cast<PoseGpuRenderer>(
-                                    poseGpuRenderers.at(i)
-                                );
-                                faceRenderer->setSharedParametersAndIfLast(renderer->getSharedParameters(),
-                                                                           isLastRenderer);
+                                    poseGpuRenderers.at(i));
+                                faceRenderer->setSharedParametersAndIfLast(
+                                    renderer->getSharedParameters(), isLastRenderer);
                             }
                             // Add worker
                             poseExtractorsWs.at(i).emplace_back(
@@ -519,17 +571,17 @@ namespace op
                 {
                     log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     // CPU rendering
-                    if (wrapperStructHand.renderMode == RenderMode::Cpu)
+                    if (renderModeHand == RenderMode::Cpu)
                     {
                         // Construct hand renderer
-                        const auto handRenderer = std::make_shared<HandCpuRenderer>(wrapperStructHand.renderThreshold,
-                                                                                    wrapperStructHand.alphaKeypoint,
-                                                                                    wrapperStructHand.alphaHeatMap);
+                        const auto handRenderer = std::make_shared<HandCpuRenderer>(
+                            wrapperStructHand.renderThreshold, wrapperStructHand.alphaKeypoint,
+                            wrapperStructHand.alphaHeatMap);
                         // Add worker
                         cpuRenderers.emplace_back(std::make_shared<WHandRenderer<TDatumsSP>>(handRenderer));
                     }
                     // GPU rendering
-                    else if (wrapperStructHand.renderMode == RenderMode::Gpu)
+                    else if (renderModeHand == RenderMode::Gpu)
                     {
                         for (auto i = 0u; i < poseExtractorsWs.size(); i++)
                         {
@@ -541,12 +593,12 @@ namespace op
                             // Performance boost -> share spGpuMemory for all renderers
                             if (!poseGpuRenderers.empty())
                             {
-                                const bool isLastRenderer = true;
+                                // const bool isLastRenderer = true;
+                                const bool isLastRenderer = !(addCvMatToOpOutput && !addCvMatToOpOutputInCpu);
                                 const auto renderer = std::static_pointer_cast<PoseGpuRenderer>(
-                                    poseGpuRenderers.at(i)
-                                    );
-                                handRenderer->setSharedParametersAndIfLast(renderer->getSharedParameters(),
-                                                                           isLastRenderer);
+                                    poseGpuRenderers.at(i));
+                                handRenderer->setSharedParametersAndIfLast(
+                                    renderer->getSharedParameters(), isLastRenderer);
                             }
                             // Add worker
                             poseExtractorsWs.at(i).emplace_back(
@@ -555,6 +607,23 @@ namespace op
                     }
                     else
                         error("Unknown RenderMode.", __LINE__, __FUNCTION__, __FILE__);
+                }
+                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+
+                // Frames processor (OpenPose format -> cv::Mat format)
+                if (addCvMatToOpOutput && !addCvMatToOpOutputInCpu)
+                {
+                    // for (auto& poseExtractorsW : poseExtractorsWs)
+                    for (auto i = 0u ; i < poseExtractorsWs.size() ; ++i)
+                    {
+                        const auto gpuResize = true;
+                        opOutputToCvMats.emplace_back(std::make_shared<OpOutputToCvMat>(gpuResize));
+                        poseExtractorsWs[i].emplace_back(
+                            std::make_shared<WOpOutputToCvMat<TDatumsSP>>(opOutputToCvMats.back()));
+                        // Assign shared parameters
+                        opOutputToCvMats.back()->setSharedParameters(
+                            cvMatToOpOutputs.at(i)->getSharedParameters());
+                    }
                 }
                 log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
@@ -585,7 +654,7 @@ namespace op
                 //     );
                 // }
                 // Frames processor (OpenPose format -> cv::Mat format)
-                if (renderOutput)
+                if (addCvMatToOpOutputInCpu)
                 {
                     log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     postProcessingWs = mergeVectors(postProcessingWs, cpuRenderers);
@@ -769,7 +838,7 @@ namespace op
                                                 || threadManagerMode == ThreadManagerMode::AsynchronousOut))
             {
                 log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-                const auto guiInfoAdder = std::make_shared<GuiInfoAdder>(numberThreads, guiEnabled);
+                const auto guiInfoAdder = std::make_shared<GuiInfoAdder>(numberGpuThreads, guiEnabled);
                 outputWs.emplace_back(std::make_shared<WGuiInfoAdder<TDatumsSP>>(guiInfoAdder));
             }
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
@@ -781,7 +850,7 @@ namespace op
                 log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // PoseRenderers to Renderers
                 std::vector<std::shared_ptr<Renderer>> renderers;
-                if (wrapperStructPose.renderMode == RenderMode::Cpu)
+                if (renderModePose == RenderMode::Cpu)
                     renderers.emplace_back(std::static_pointer_cast<Renderer>(poseCpuRenderer));
                 else
                     for (const auto& poseGpuRenderer : poseGpuRenderers)

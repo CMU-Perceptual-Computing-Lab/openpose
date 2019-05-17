@@ -72,7 +72,12 @@ namespace op
                     // const auto fileName = baseFileName;
                     const auto fileName = baseFileName + (i != 0 ? "_" + std::to_string(i) : "");
 
+                    // Pose IDs from long long to float
+                    Array<float> poseIds{tDatumPtr->poseIds};
+
                     const std::vector<std::pair<Array<float>, std::string>> keypointVector{
+                        // Pose IDs
+                        std::make_pair(poseIds, "person_id"),
                         // 2D
                         std::make_pair(tDatumPtr->poseKeypoints, "pose_keypoints_2d"),
                         std::make_pair(tDatumPtr->faceKeypoints, "face_keypoints_2d"),
@@ -85,7 +90,8 @@ namespace op
                         std::make_pair(tDatumPtr->handKeypoints3D[1], "hand_right_keypoints_3d")
                     };
                     // Save keypoints
-                    spPeopleJsonSaver->save(keypointVector, tDatumPtr->poseCandidates, fileName, humanReadable);
+                    spPeopleJsonSaver->save(
+                        keypointVector, tDatumPtr->poseCandidates, fileName, humanReadable);
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

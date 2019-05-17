@@ -258,10 +258,16 @@ OpenPose Library - Release Notes
 
 
 
-## Current version - future OpenPose 1.5.0
+## OpenPose 1.5.0 (May 16, 2019)
 1. Main improvements:
     1. Added initial single-person tracker for further speed up or visual smoothing (`--tracking` flag).
-    2. Greedy body part connector implemented in CUDA: +~30% speed up in Nvidia (CUDA) version with default flags and +~10% in maximum accuracy configuration. In addition, it provides a small 0.5% boost in accuracy (default flags).
+    2. Speed up of the CUDA functions of OpenPose:
+        1. Greedy body part connector implemented in CUDA: +~30% speedup in Nvidia (CUDA) version with default flags and +~10% in maximum accuracy configuration. In addition, it provides a small 0.5% boost in accuracy (default flags).
+        2. +5-30% additional speedup for the body part connector of point 1.
+        3. About 2-4x speedup for NMS.
+        4. About 2x speedup for image resize and about 2x speedup for multi-scale resize.
+        5. About 25-30% speedup for rendering.
+        6. Reduced latency and increased speed by moving the resize in CvMatToOpOutput and OpOutputToCvMat to CUDA. The linear speedup generalizes better to higher number of GPUs.
     3. Unity binding of OpenPose released. OpenPose adds the flag `BUILD_UNITY_SUPPORT` on CMake, which enables special Unity code so it can be built as a Unity plugin.
     4. If camera is unplugged, OpenPose GUI and command line will display a warning and try to reconnect it.
     5. Wrapper classes simplified and renamed. Wrapper renamed as WrapperT, and created Wrapper as the non-templated class equivalent.
@@ -327,6 +333,7 @@ OpenPose Library - Release Notes
     35. Windows updates:
         1. Upgraded OpenCV version for Windows from 3.1 to 4.0.1, which provides stable 30 FPS for webcams (vs. 10 FPS that OpenCV 3.1 provides by default on Windows).
         2. Upgrade VS2015 to VS2017, allowing CUDA 10 and 20XX Nvidia cards.
+    36. Output JSON updated to version 1.3, which now includes the person IDs (if any).
 2. Functions or parameters renamed:
     1. By default, python example `tutorial_developer/python_2_pose_from_heatmaps.py` was using 2 scales starting at -1x736, changed to 1 scale at -1x368.
     2. WrapperStructPose default parameters changed to match those of the OpenPose demo binary.
@@ -355,6 +362,17 @@ OpenPose Library - Release Notes
     8. OpenCL fixes.
     9. If manual CUDA architectures are set in CMake, they are also set for Caffe rather than only for OpenPose.
     10. Fixed flag `--hand_alpha_pose`.
+
+
+
+## Current version - future OpenPose 1.5.1
+1. Main improvements:
+    1. Highly improved 3D triangulation for >3 cameras by fixing some small bugs.
+2. Functions or parameters renamed:
+    1. `--3d_min_views` default value (-1) no longer means that all camera views are required. Instead, it will be equal to max(2, min(4, #cameras-1)). This should provide a good trade-off between recall and precission.
+3. Main bugs fixed:
+    1. Windows: Added back support for OpenGL and Spinnaker, as well as DLLs for debug compilation.
+4. Changes/additions that affect the compatibility with the OpenPose Unity Plugin:
 
 
 
