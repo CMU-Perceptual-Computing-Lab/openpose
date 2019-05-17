@@ -186,7 +186,8 @@ namespace op
                 #endif
                 // Set spOutputBlob
                 #ifdef NV_CAFFE
-                    upImpl->spOutputBlob = boost::static_pointer_cast<caffe::TBlob<float>>(upImpl->upCaffeNet->blob_by_name(upImpl->mLastBlobName));
+                    upImpl->spOutputBlob = boost::static_pointer_cast<caffe::TBlob<float>>(
+                        upImpl->upCaffeNet->blob_by_name(upImpl->mLastBlobName));
                 #else
                     upImpl->spOutputBlob = upImpl->upCaffeNet->blob_by_name(upImpl->mLastBlobName);
                 #endif
