@@ -273,7 +273,8 @@ namespace op
 
                 // Sanity check
                 if (angles.empty())
-                    error("Variables `angles` is empty.", __LINE__, __FUNCTION__, __FILE__);
+                    error("Variables `angles` is empty when calling estimateAverageAngle().",
+                        __LINE__, __FUNCTION__, __FILE__);
 
                 // angles in range (-pi, pi]
                 auto anglesNormalized = angles;
@@ -840,6 +841,12 @@ namespace op
         }
     }
 
+    const std::string sEmptyErrorMessage = "No chessboard was found in any of the images. Are you sure you"
+        " are using the right value for `--grid_number_inner_corners`? Remember that it corresponds to the"
+        " number of inner corners on the image (not the total number of corners!). I.e., it corresponds to"
+        " the number of squares on each side minus 1! (or the number of total corners on each side - 1)."
+        " It follows the OpenCV notation.";
+
 
 
 
@@ -903,6 +910,9 @@ namespace op
                     imagesWithCorners.emplace_back(imageToPlot);
                 }
             }
+            // Sanity check
+            if (points2DVectors.empty())
+                error(sEmptyErrorMessage, __LINE__, __FUNCTION__, __FILE__);
 
             // Run calibration
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
@@ -1052,9 +1062,9 @@ namespace op
                         if (coutAndImshowVerbose)
                             log("########## Projection Matrix from secondary camera to main camera ##########",
                                 Priority::High);
-                        MCam1ToCam0s.emplace_back(getMFromCam1ToCam0(RGridToMainCam0, tGridToMainCam0,
-                                                                     RGridToMainCam1, tGridToMainCam1,
-                                                                     coutAndImshowVerbose));
+                        MCam1ToCam0s.emplace_back(
+                            getMFromCam1ToCam0(RGridToMainCam0, tGridToMainCam0, RGridToMainCam1, tGridToMainCam1,
+                                coutAndImshowVerbose));
                         if (coutResults)
                         {
                             if (coutAndImshowVerbose)
@@ -1069,6 +1079,9 @@ namespace op
                             log("Invalid frame (chessboard not found).", Priority::High);
                     }
                 }
+                // Sanity check
+                if (MCam1ToCam0s.empty())
+                    error(sEmptyErrorMessage, __LINE__, __FUNCTION__, __FILE__);
                 log("Finished processing images.", Priority::High);
 
                 // Pseudo RANSAC calibration
@@ -2101,10 +2114,15 @@ namespace op
                 const cv::Size gridInnerCornersCvSize{gridInnerCorners.x, gridInnerCorners.y};
 
                 // Load parameters (distortion, intrinsics, initial extrinsics)
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                log("Loading parameters...", Priority::High);
                 CameraParameterReader cameraParameterReader;
                 cameraParameterReader.readParameters(parameterFolder);
                 const auto cameraExtrinsicsInitial = cameraParameterReader.getCameraExtrinsicsInitial();
+                // Sanity check
+                if (cameraExtrinsicsInitial.empty())
+                    error("Camera intrinsics could not be loaded from " + parameterFolder
+                        + ". Are they in the right path? Remember than the XML must contain the right intrinsic"
+                        + " parameters before using this function. ", __LINE__, __FUNCTION__, __FILE__);
                 bool initialEmpty = false;
                 for (const auto& cameraExtrinsicInitial : cameraExtrinsicsInitial)
                 {
@@ -2114,6 +2132,7 @@ namespace op
                         break;
                     }
                 }
+                log("Parameters loaded.", Priority::High);
                 // Camera extrinsics
                 log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 auto cameraExtrinsics = (initialEmpty
@@ -2126,14 +2145,14 @@ namespace op
                 const auto cameraDistortions = (
                     imagesAreUndistorted
                     ? std::vector<cv::Mat>{cameraIntrinsics.size()} : cameraParameterReader.getCameraDistortions());
-
                 // Read images in folder
+                log("Reading images in folder...", Priority::High);
                 const auto numberCorners = gridInnerCorners.area();
                 std::vector<std::vector<cv::Point2f>> points2DVectorsExtrinsic(numberCameras); // camera - keypoints
                 std::vector<std::vector<unsigned int>> matchIndexes(numberCameras); // camera - indixes found
                 if (imageAndPaths.empty())
                     error("imageAndPaths.empty()!.", __LINE__, __FUNCTION__, __FILE__);
-
+                log("Images read.", Priority::High);
                 // Get 2D grid corners of each image
                 std::vector<cv::Mat> imagesWithCorners;
                 const auto imageSize = imageAndPaths.at(0).first.size();

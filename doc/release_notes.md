@@ -368,6 +368,7 @@ OpenPose Library - Release Notes
 ## Current version - future OpenPose 1.5.1
 1. Main improvements:
     1. Highly improved 3D triangulation for >3 cameras by fixing some small bugs.
+    2. Added community-based support for Nvidia NVCaffe.
 2. Functions or parameters renamed:
     1. `--3d_min_views` default value (-1) no longer means that all camera views are required. Instead, it will be equal to max(2, min(4, #cameras-1)). This should provide a good trade-off between recall and precission.
 3. Main bugs fixed:

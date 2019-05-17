@@ -173,23 +173,26 @@ endif (WIN32)
 ### PROJECT OPTIONS
 # Select the DL Framework
 set(DL_FRAMEWORK CAFFE CACHE STRING "Select Deep Learning Framework.")
-set_property(CACHE DL_FRAMEWORK PROPERTY STRINGS CAFFE)
-# set_property(CACHE DL_FRAMEWORK PROPERTY STRINGS CAFFE CAFFE2 TENSORFLOW)
+if (WIN32)
+  set_property(CACHE DL_FRAMEWORK PROPERTY STRINGS CAFFE)
+else (WIN32)
+  set_property(CACHE DL_FRAMEWORK PROPERTY STRINGS CAFFE NV_CAFFE)
+  # set_property(CACHE DL_FRAMEWORK PROPERTY STRINGS CAFFE NV_CAFFE PYTORCH TENSORFLOW)
+endif (WIN32)
 
 # Suboptions for Caffe DL Framework
 include(CMakeDependentOption)
-if (${DL_FRAMEWORK} MATCHES "CAFFE")
+if (${DL_FRAMEWORK} MATCHES "CAFFE" OR ${DL_FRAMEWORK} MATCHES "NV_CAFFE")
   CMAKE_DEPENDENT_OPTION(BUILD_CAFFE "Build Caffe as part of OpenPose." ON
     "DL_FRAMEWORK" ON)
   # OpenPose flags
   add_definitions(-DUSE_CAFFE)
-endif (${DL_FRAMEWORK} MATCHES "CAFFE")
-
-OPTION (NV_CAFFE "Use NVCaffe instead of normal Caffe." OFF)
-if (NV_CAFFE)
-    MESSAGE("-- Using NVIDIA NVCaffe")
-    add_definitions(-DNV_CAFFE)
-endif (NV_CAFFE)
+  # Nvidia NVCaffe
+  if (${DL_FRAMEWORK} MATCHES "NV_CAFFE")
+      MESSAGE(STATUS "Using NVIDIA NVCaffe")
+      add_definitions(-DNV_CAFFE)
+  endif (${DL_FRAMEWORK} MATCHES "NV_CAFFE")
+endif (${DL_FRAMEWORK} MATCHES "CAFFE" OR ${DL_FRAMEWORK} MATCHES "NV_CAFFE")
 
 # Set the acceleration library
 if (APPLE)
@@ -684,11 +687,9 @@ if (WIN32)
 endif (WIN32)
 
 
-### CAFFE
+### CAFFE/NVCAFFE in Ubuntu
 if (UNIX OR APPLE)
-
-  if (${DL_FRAMEWORK} MATCHES "CAFFE")
-
+  if (${DL_FRAMEWORK} MATCHES "CAFFE" OR ${DL_FRAMEWORK} MATCHES "NV_CAFFE")
     # Check if the user specified caffe paths
     if (Caffe_INCLUDE_DIRS AND Caffe_LIBS AND NOT BUILD_CAFFE)
       message(STATUS "\${Caffe_INCLUDE_DIRS} set by the user to " ${Caffe_INCLUDE_DIRS})
@@ -827,9 +828,7 @@ if (UNIX OR APPLE)
       message(FATAL_ERROR "Caffe not found. Either turn on the BUILD_CAFFE option or specify the path of Caffe includes
         and libs using -DCaffe_INCLUDE_DIRS and -DCaffe_LIBS.")
     endif (NOT Caffe_FOUND AND NOT BUILD_CAFFE)
-
-  endif (${DL_FRAMEWORK} MATCHES "CAFFE")
-
+  endif (${DL_FRAMEWORK} MATCHES "CAFFE" OR ${DL_FRAMEWORK} MATCHES "NV_CAFFE")
 endif (UNIX OR APPLE)
 
 ### PROJECT INCLUDES
@@ -915,9 +914,9 @@ elseif (WIN32)
       debug ${GLOG_LIBRARY_DEBUG} optimized ${GLOG_LIBRARY_RELEASE})
 endif (UNIX OR APPLE)
 # Deep net Framework
-if (${DL_FRAMEWORK} MATCHES "CAFFE")
+if (${DL_FRAMEWORK} MATCHES "CAFFE" OR ${DL_FRAMEWORK} MATCHES "NV_CAFFE")
   set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${Caffe_LIBS} ${GFLAGS_LIBRARY})
-endif (${DL_FRAMEWORK} MATCHES "CAFFE")
+endif (${DL_FRAMEWORK} MATCHES "CAFFE" OR ${DL_FRAMEWORK} MATCHES "NV_CAFFE")
 # CPU vs. GPU
 if (USE_MKL)
   set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${MKL_LIBS})
