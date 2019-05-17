@@ -22,9 +22,10 @@ OpenPose - Installation
     8. [Calibration Module](#calibration-module)
     9. [Compiling without cuDNN](#compiling-without-cudnn)
     10. [Custom Caffe](#custom-caffe)
-    11. [Custom OpenCV](#custom-opencv)
-    12. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
-    13. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
+    11. [Custom NVIDIA NVCaffe](#custom-nvidia-nvcaffe)
+    12. [Custom OpenCV](#custom-opencv)
+    13. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
+    14. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
 
 
 
@@ -362,6 +363,15 @@ Alternatively, you can use your own Caffe distribution on Ubuntu/Mac by 1) disab
 </p>
 
 For Windows, simply replace the OpenCV DLLs and include folder for your custom one.
+
+
+
+#### Custom NVIDIA NVCaffe
+This has been tested with the official Nvidia Docker image [nvcr.io/nvidia/caffe:18.12-py2](https://ngc.nvidia.com/catalog/containers/nvidia:caffe).
+
+This functionality was added by the community, and we do not officially support it. For questions and issues, please only post on the related [Pull Request #1169](https://github.com/CMU-Perceptual-Computing-Lab/openpose/pull/1169). New GitHub issues about this topic (i.e., outside PR #1169) will be automatically closed with no answer.
+
+To use a NVIDIA's NVCaffe docker image instead of the standard Caffe, 1) set the `NV_CAFFE` variable in CMake, 2) set the `BUILD_CAFFE` variable to `OFF`, and 3) set the correct `Caffe_INCLUDE_DIRS` and `Caffe_LIBS` paths following [Custom Caffe](#custom-caffe).
 
 
 

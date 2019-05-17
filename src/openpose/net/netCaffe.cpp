@@ -34,8 +34,13 @@ namespace op
             const std::string mLastBlobName;
             std::vector<int> mNetInputSize4D;
             // Init with thread
-            std::unique_ptr<caffe::Net<float>> upCaffeNet;
-            boost::shared_ptr<caffe::Blob<float>> spOutputBlob;
+            #ifdef NV_CAFFE
+                std::unique_ptr<caffe::Net> upCaffeNet;
+                boost::shared_ptr<caffe::TBlob<float>> spOutputBlob;
+            #else
+                std::unique_ptr<caffe::Net<float>> upCaffeNet;
+                boost::shared_ptr<caffe::Blob<float>> spOutputBlob;
+            #endif
 
             ImplNetCaffe(const std::string& caffeProto, const std::string& caffeTrainedModel, const int gpuId,
                          const bool enableGoogleLogging, const std::string& lastBlobName) :
@@ -93,7 +98,11 @@ namespace op
     };
 
     #ifdef USE_CAFFE
+        #ifdef NV_CAFFE
+        inline void reshapeNetCaffe(caffe::Net* caffeNet, const std::vector<int>& dimensions)
+        #else
         inline void reshapeNetCaffe(caffe::Net<float>* caffeNet, const std::vector<int>& dimensions)
+        #endif
         {
             try
             {
@@ -156,7 +165,11 @@ namespace op
                     #ifdef USE_CUDA
                         caffe::Caffe::set_mode(caffe::Caffe::GPU);
                         caffe::Caffe::SetDevice(upImpl->mGpuId);
-                        upImpl->upCaffeNet.reset(new caffe::Net<float>{upImpl->mCaffeProto, caffe::TEST});
+                        #ifdef NV_CAFFE
+                            upImpl->upCaffeNet.reset(new caffe::Net{upImpl->mCaffeProto, caffe::TEST});
+                        #else
+                            upImpl->upCaffeNet.reset(new caffe::Net<float>{upImpl->mCaffeProto, caffe::TEST});
+                        #endif
                     #else
                         caffe::Caffe::set_mode(caffe::Caffe::CPU);
                         #ifdef _WIN32
@@ -172,7 +185,12 @@ namespace op
                     #endif
                 #endif
                 // Set spOutputBlob
-                upImpl->spOutputBlob = upImpl->upCaffeNet->blob_by_name(upImpl->mLastBlobName);
+                #ifdef NV_CAFFE
+                    upImpl->spOutputBlob = boost::static_pointer_cast<caffe::TBlob<float>>(
+                        upImpl->upCaffeNet->blob_by_name(upImpl->mLastBlobName));
+                #else
+                    upImpl->spOutputBlob = upImpl->upCaffeNet->blob_by_name(upImpl->mLastBlobName);
+                #endif
                 // Sanity check
                 if (upImpl->spOutputBlob == nullptr)
                     error("The output blob is a nullptr. Did you use the same name than the prototxt? (Used: "
@@ -207,7 +225,11 @@ namespace op
                 }
                 // Copy frame data to GPU memory
                 #ifdef USE_CUDA
-                    auto* gpuImagePtr = upImpl->upCaffeNet->blobs().at(0)->mutable_gpu_data();
+                    #ifdef NV_CAFFE
+                        auto* gpuImagePtr = upImpl->upCaffeNet->blobs().at(0)->mutable_gpu_data<float>();
+                    #else
+                        auto* gpuImagePtr = upImpl->upCaffeNet->blobs().at(0)->mutable_gpu_data();
+                    #endif
                     cudaMemcpy(gpuImagePtr, inputData.getConstPtr(), inputData.getVolume() * sizeof(float),
                                cudaMemcpyHostToDevice);
                 #elif defined USE_OPENCL

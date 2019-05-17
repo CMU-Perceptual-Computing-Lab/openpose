@@ -185,6 +185,12 @@ if (${DL_FRAMEWORK} MATCHES "CAFFE")
   add_definitions(-DUSE_CAFFE)
 endif (${DL_FRAMEWORK} MATCHES "CAFFE")
 
+OPTION (NV_CAFFE "Use NVCaffe instead of normal Caffe." OFF)
+if (NV_CAFFE)
+    MESSAGE("-- Using NVIDIA NVCaffe")
+    add_definitions(-DNV_CAFFE)
+endif (NV_CAFFE)
+
 # Set the acceleration library
 if (APPLE)
   set(GPU_MODE CPU_ONLY CACHE STRING "Select the acceleration GPU library or CPU otherwise.")
