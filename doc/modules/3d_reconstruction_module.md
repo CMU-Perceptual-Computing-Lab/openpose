@@ -69,8 +69,7 @@ This demo assumes n arbitrary stereo cameras from the FLIR company (formerly Poi
 The user must manually get the intrinsic and extrinsic parameters of the stereo-cameras. Note, we will assume `Flir` cameras, which is specified by default with the flag `--camera_parameter_path "models/cameraParameters/flir/"`. Otherwise, change the path to your camera name accordingly.
 
 There are 2 alternatives to calibrate the cameras:
-
-1. Using the [OpenPose calibration toolbox](./modules/calibration_module.md#).
+1. Using the [OpenPose calibration toolbox](./calibration_module.md#).
 2. Using your own calibration toolbox (or if you already know the camera parameters of your cameras):
     1. Create a xml file for each camera named as `models/cameraParameters/flir/{camera_serial_number}.xml`.
     2. The elements inside each xml file are the extrinsic parameters of the camera (`CameraMatrix`), the intrinsic parameters (`Intrinsics`), and the distortion coefficients (`Distortion`). Copy the format from `models/cameraParameters/flir/17012332.xml.example`. For the extrinsic parameters of the camera, it allows you to set the coordinate origin (so that 3-d keypoints are distances with respect to that origin).
