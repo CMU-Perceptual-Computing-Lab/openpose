@@ -267,7 +267,7 @@ namespace op
                 // Input cvMat to OpenPose input & output format
                 // Note: resize on GPU reduces accuracy about 0.1%
                 bool resizeOnCpu = true;
-                // const auto resizeOnCpu = (numberGpuThreads < 3);
+                // const auto resizeOnCpu = (wrapperStructPose.poseMode != PoseMode::Enabled);
                 if (resizeOnCpu)
                 {
                     const auto gpuResize = false;
@@ -277,7 +277,8 @@ namespace op
                 }
                 // Note: We realized that somehow doing it on GPU for any number of GPUs does speedup the whole OP
                 resizeOnCpu = false;
-                addCvMatToOpOutputInCpu = addCvMatToOpOutput && (resizeOnCpu || !renderOutputGpu);
+                addCvMatToOpOutputInCpu = addCvMatToOpOutput
+                    && (resizeOnCpu || !renderOutputGpu || wrapperStructPose.poseMode != PoseMode::Enabled);
                 if (addCvMatToOpOutputInCpu)
                 {
                     const auto gpuResize = false;
@@ -618,7 +619,7 @@ namespace op
                     {
                         const auto gpuResize = true;
                         opOutputToCvMats.emplace_back(std::make_shared<OpOutputToCvMat>(gpuResize));
-                        poseExtractorsWs[i].emplace_back(
+                        poseExtractorsWs.at(i).emplace_back(
                             std::make_shared<WOpOutputToCvMat<TDatumsSP>>(opOutputToCvMats.back()));
                         // Assign shared parameters
                         opOutputToCvMats.back()->setSharedParameters(

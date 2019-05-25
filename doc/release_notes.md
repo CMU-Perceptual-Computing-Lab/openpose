@@ -369,10 +369,14 @@ OpenPose Library - Release Notes
 1. Main improvements:
     1. Highly improved 3D triangulation for >3 cameras by fixing some small bugs.
     2. Added community-based support for Nvidia NVCaffe.
+    3. Increased accuracy very lightly for CUDA version (about 0.01%) by adapting the threshold in `process()` in `bodyPartConnectorBase.cu` to `defaultNmsThreshold`. This also removes any posibility of future bugs in that function for using a default NMS threshold higher than 0.15 (which was the hard-coded value used previously).
+    4. Increased mAP but reduced mAR (both about 0.01%) as well as reduction of false positives. Step 1: removed legs where only knee/ankle/feet are found. Step 2: If no people is found in an image, `removePeopleBelowThresholds` is re-run with `maximizePositives = true`.
+    5. Number of maximum people is not limited by the maximum number of max peaks anymore. However, the number of body part candidates for a specific keypoint (e.g., nose) is still limited to the number of max peaks.
 2. Functions or parameters renamed:
     1. `--3d_min_views` default value (-1) no longer means that all camera views are required. Instead, it will be equal to max(2, min(4, #cameras-1)). This should provide a good trade-off between recall and precission.
 3. Main bugs fixed:
     1. Windows: Added back support for OpenGL and Spinnaker, as well as DLLs for debug compilation.
+    2. `06_face_from_image.cpp` and `07_hand_from_image.cpp` working again, they stopped working in version 1.5.0 with the GPU image resize for the GUI.
 4. Changes/additions that affect the compatibility with the OpenPose Unity Plugin:
 
 

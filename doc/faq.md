@@ -17,6 +17,7 @@ OpenPose - Frequently Asked Question (FAQ)
         11. [CUDA_cublas_device_LIBRARY Not Found](#cuda_cublas_device_library-not-found)
         12. [CMake-GUI Error While Getting Default Caffe](#cmake-gui-error-while-getting-default-caffe)
         13. [Libgomp Out of Memory Error](#libgomp-out-of-memory-error)
+        14. [Runtime Error with Turing GPU (Tesla T4) or Volta GPU][#runtime-error-with-turing-gpu-teslat4-or-volta-gpu)
     2. [Speed Performance Issues](#speed-performance-issues)
         1. [Speed Up, Memory Reduction, and Benchmark](#speed-up-memory-reduction-and-benchmark)
         2. [How to Measure the Latency Time?](#how-to-measure-the-latency-time)
@@ -39,7 +40,7 @@ OpenPose - Frequently Asked Question (FAQ)
 #### Out of Memory Error
 **Q: Out of memory error** - I get an error similar to: `Check failed: error == cudaSuccess (2 vs. 0)  out of memory`.
 
-**A**: Most probably cuDNN is not installed/enabled, the default Caffe model uses >12 GB of GPU memory, cuDNN reduces it to ~2 GB for BODY_25 and ~1.5 GB for COCO.
+**A**: Most probably cuDNN is not installed/enabled, the default Caffe model uses >12 GB of GPU memory, cuDNN reduces it to ~2.2 GB for BODY_25 (default) and ~1.5 GB for COCO (`--model_pose COCO`). Note that you still need at least about 2.2 GB free for the default OpenPose to run. I.e., GPUs with only 2 GB will not fit the default OpenPose, and you will have to either switch to the `COCO` model (slower and less accurate), or reduce the `--net_resolution` (faster speed but also lower accuracy).
 
 
 
@@ -158,6 +159,14 @@ git submodle update
 **Q**: When I start OpenPose, I receive an error similar to the following: `libgomp: Out of memory allocating 927712937064 bytes`.
 
 **A**: Reinstall and upgrade from scratch CUDA, cuDNN, Python, and OpenCV (GitHub issue #1160).
+
+
+
+
+#### Runtime Error with Turing GPU (Tesla T4) or Volta GPU
+**Q**: When I start OpenPose, I receive a runtime error for new GPU architectures.
+
+**A**: To solve this problem, 1) make sure you are using CUDA 10 or higher, and 2) change line 7 in `{OPENPOSE_PATH}/3rdparty/caffe/cmake/Cuda.cmake`, from `set(Caffe_known_gpu_archs "30 35 50 52 60 61")` to `set(Caffe_known_gpu_archs "30 35 50 52 60 61 75")`.
 
 
 

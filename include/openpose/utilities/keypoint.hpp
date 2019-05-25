@@ -21,12 +21,15 @@ namespace op
     void scaleKeypoints2d(Array<T>& keypoints, const T scaleX, const T scaleY, const T offsetX, const T offsetY);
 
     template <typename T>
-    void renderKeypointsCpu(Array<T>& frameArray, const Array<T>& keypoints, const std::vector<unsigned int>& pairs,
-                            const std::vector<T> colors, const T thicknessCircleRatio,
-                            const T thicknessLineRatioWRTCircle, const std::vector<T>& poseScales, const T threshold);
+    void renderKeypointsCpu(
+        Array<T>& frameArray, const Array<T>& keypoints, const std::vector<unsigned int>& pairs,
+        const std::vector<T> colors, const T thicknessCircleRatio, const T thicknessLineRatioWRTCircle,
+        const std::vector<T>& poseScales, const T threshold);
 
     template <typename T>
-    Rectangle<T> getKeypointsRectangle(const Array<T>& keypoints, const int person, const T threshold);
+    Rectangle<T> getKeypointsRectangle(
+        const Array<T>& keypoints, const int person, const T threshold, const int firstIndex = 0,
+        const int lastIndex = -1);
 
     template <typename T>
     T getAverageScore(const Array<T>& keypoints, const int person);
@@ -44,8 +47,9 @@ namespace op
     T getDistanceAverage(const Array<T>& keypoints, const int personA, const int personB, const T threshold);
 
     template <typename T>
-    T getDistanceAverage(const Array<T>& keypointsA, const int personA, const Array<T>& keypointsB, const int personB,
-                         const T threshold);
+    T getDistanceAverage(
+        const Array<T>& keypointsA, const int personA, const Array<T>& keypointsB, const int personB,
+        const T threshold);
 
     /**
      * Creates and Array<T> with a specific person.

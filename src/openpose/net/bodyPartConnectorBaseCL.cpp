@@ -156,26 +156,24 @@ namespace op
                     pairScoresGpuPtrBuffer, heatMapGpuPtrBuffer, peaksGpuPtrBuffer, bodyPartPairsGpuPtrBuffer, mapIdxGpuPtrBuffer,
                     maxPeaks, (int)numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
                     interMinAboveThreshold);
-                OpenCL::getInstance(gpuID)->getQueue().enqueueReadBuffer(pairScoresGpuPtrBuffer, CL_TRUE, 0,
-                                                                          totalComputations * sizeof(T), pairScoresCpu.getPtr());
+                OpenCL::getInstance(gpuID)->getQueue().enqueueReadBuffer(
+                    pairScoresGpuPtrBuffer, CL_TRUE, 0, totalComputations * sizeof(T), pairScoresCpu.getPtr());
 
                 // New code
                 // Get pair connections and their scores
                 const auto pairConnections = pafPtrIntoVector(
                     pairScoresCpu, peaksPtr, maxPeaks, bodyPartPairs, numberBodyPartPairs);
-                const auto peopleVector = pafVectorIntoPeopleVector(
+                auto peopleVector = pafVectorIntoPeopleVector(
                     pairConnections, peaksPtr, maxPeaks, bodyPartPairs, numberBodyParts);
-
-               // // Old code
-               // // Get pair connections and their scores
-               // // std::vector<std::pair<std::vector<int>, double>> refers to:
-               // //     - std::vector<int>: [body parts locations, #body parts found]
-               // //     - double: person subset score
-               // const T* const tNullptr = nullptr;
-               // const auto peopleVector = createPeopleVector(
-               //     tNullptr, peaksPtr, poseModel, heatMapSize, maxPeaks, interThreshold, interMinAboveThreshold,
-               //     bodyPartPairs, numberBodyParts, numberBodyPartPairs, pairScoresCpu);
-
+                // // Old code
+                // // Get pair connections and their scores
+                // // std::vector<std::pair<std::vector<int>, double>> refers to:
+                // //     - std::vector<int>: [body parts locations, #body parts found]
+                // //     - double: person subset score
+                // const T* const tNullptr = nullptr;
+                // const auto peopleVector = createPeopleVector(
+                //     tNullptr, peaksPtr, poseModel, heatMapSize, maxPeaks, interThreshold, interMinAboveThreshold,
+                //     bodyPartPairs, numberBodyParts, numberBodyPartPairs, pairScoresCpu);
                 // Delete people below the following thresholds:
                     // a) minSubsetCnt: removed if less than minSubsetCnt body parts
                     // b) minSubsetScore: removed if global score smaller than this
@@ -183,15 +181,13 @@ namespace op
                 int numberPeople;
                 std::vector<int> validSubsetIndexes;
                 validSubsetIndexes.reserve(fastMin((size_t)maxPeaks, peopleVector.size()));
-                removePeopleBelowThresholds(validSubsetIndexes, numberPeople, peopleVector, numberBodyParts, minSubsetCnt,
-                                            minSubsetScore, maxPeaks, maximizePositives);
-
+                removePeopleBelowThresholdsAndFillFaces(
+                    validSubsetIndexes, numberPeople, peopleVector, numberBodyParts, minSubsetCnt, minSubsetScore,
+                    maximizePositives, peaksPtr);
                 // Fill and return poseKeypoints
-                peopleVectorToPeopleArray(poseKeypoints, poseScores, scaleFactor, peopleVector, validSubsetIndexes,
-                                          peaksPtr, numberPeople, numberBodyParts, numberBodyPartPairs);
-
-               // // Sanity check
-               // cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                peopleVectorToPeopleArray(
+                    poseKeypoints, poseScores, scaleFactor, peopleVector, validSubsetIndexes, peaksPtr, numberPeople,
+                    numberBodyParts, numberBodyPartPairs);
             #else
                 UNUSED(poseKeypoints);
                 UNUSED(poseScores);

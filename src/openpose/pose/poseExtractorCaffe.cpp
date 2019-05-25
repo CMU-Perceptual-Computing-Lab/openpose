@@ -317,6 +317,7 @@ namespace op
                 // OP_CUDA_PROFILE_END(timeNormalize3, 1e3, REPS);
                 // OP_CUDA_PROFILE_INIT(REPS);
                 spBodyPartConnectorCaffe->setScaleNetToOutput(mScaleNetToOutput);
+                spBodyPartConnectorCaffe->setDefaultNmsThreshold((float)get(PoseProperty::NMSThreshold));
                 spBodyPartConnectorCaffe->setInterMinAboveThreshold(
                     (float)get(PoseProperty::ConnectInterMinAboveThreshold));
                 spBodyPartConnectorCaffe->setInterThreshold((float)get(PoseProperty::ConnectInterThreshold));

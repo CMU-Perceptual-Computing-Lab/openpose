@@ -18,10 +18,10 @@ namespace op
     void connectBodyPartsGpu(
         Array<T>& poseKeypoints, Array<T>& poseScores, const T* const heatMapGpuPtr, const T* const peaksPtr,
         const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks, const T interMinAboveThreshold,
-        const T interThreshold, const int minSubsetCnt, const T minSubsetScore, const T scaleFactor = 1.f,
-        const bool maximizePositives = false, Array<T> pairScoresCpu = Array<T>{}, T* pairScoresGpuPtr = nullptr,
-        const unsigned int* const bodyPartPairsGpuPtr = nullptr, const unsigned int* const mapIdxGpuPtr = nullptr,
-        const T* const peaksGpuPtr = nullptr);
+        const T interThreshold, const int minSubsetCnt, const T minSubsetScore, const T scaleFactor,
+        const bool maximizePositives, Array<T> pairScoresCpu, T* pairScoresGpuPtr,
+        const unsigned int* const bodyPartPairsGpuPtr, const unsigned int* const mapIdxGpuPtr,
+        const T* const peaksGpuPtr, const T defaultNmsThreshold);
 
     template <typename T>
     void connectBodyPartsOcl(
@@ -41,17 +41,17 @@ namespace op
         const unsigned int numberBodyPartPairs, const Array<T>& precomputedPAFs = Array<T>());
 
     template <typename T>
-    void removePeopleBelowThresholds(std::vector<int>& validSubsetIndexes, int& numberPeople,
-                                            const std::vector<std::pair<std::vector<int>, T>>& subsets,
-                                            const unsigned int numberBodyParts, const int minSubsetCnt,
-                                            const T minSubsetScore, const int maxPeaks, const bool maximizePositives);
+    void removePeopleBelowThresholdsAndFillFaces(
+        std::vector<int>& validSubsetIndexes, int& numberPeople,
+        std::vector<std::pair<std::vector<int>, T>>& subsets, const unsigned int numberBodyParts,
+        const int minSubsetCnt, const T minSubsetScore, const bool maximizePositives, const T* const peaksPtr);
 
     template <typename T>
-    void peopleVectorToPeopleArray(Array<T>& poseKeypoints, Array<T>& poseScores, const T scaleFactor,
-                                          const std::vector<std::pair<std::vector<int>, T>>& subsets,
-                                          const std::vector<int>& validSubsetIndexes, const T* const peaksPtr,
-                                          const int numberPeople, const unsigned int numberBodyParts,
-                                          const unsigned int numberBodyPartPairs);
+    void peopleVectorToPeopleArray(
+        Array<T>& poseKeypoints, Array<T>& poseScores, const T scaleFactor,
+        const std::vector<std::pair<std::vector<int>, T>>& subsets, const std::vector<int>& validSubsetIndexes,
+        const T* const peaksPtr, const int numberPeople, const unsigned int numberBodyParts,
+        const unsigned int numberBodyPartPairs);
 
     template <typename T>
     std::vector<std::tuple<T, T, int, int, int>> pafPtrIntoVector(
