@@ -61,17 +61,64 @@ namespace op
     template <typename T>
     void getKeypointCounter(
         int& personCounter, const std::vector<std::pair<std::vector<int>, T>>& peopleVector,
-        const unsigned int index, const int indexFirst, const int indexLast, const int minimum)
+        const unsigned int part, const int partFirst, const int partLast, const int minimum)
     {
         try
         {
             // Count keypoints
             auto keypointCounter = 0;
-            for (auto i = indexFirst ; i < indexLast ; i++)
-                keypointCounter += (peopleVector[index].first.at(i) > 0);
+            for (auto i = partFirst ; i < partLast ; i++)
+                keypointCounter += (peopleVector[part].first.at(i) > 0);
             // If enough keypoints --> subtract them and keep them at least as big as minimum
             if (keypointCounter > minimum)
                 personCounter += minimum-keypointCounter; // personCounter = non-considered keypoints + minimum
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template <typename T>
+    void getRoiDiameterAndBounds(
+        Rectangle<int>& roi, int& diameter, int& partFirstNon0, int& partLastNon0,
+        const std::vector<int>& personVector, const T* const peaksPtr,
+        const int partInit, const int partEnd)
+    {
+        try
+        {
+            // Find ROI, partFirstNon0, and partLastNon0
+            roi = Rectangle<int>{0,0,0,0};
+            partFirstNon0 = -1;
+            partLastNon0 = -1;
+            for (auto part = partInit ; part < partEnd ; part++)
+            {
+                const auto x = peaksPtr[personVector[part]-2];
+                const auto y = peaksPtr[personVector[part]-1];
+                const auto score = peaksPtr[personVector[part]];
+                if (score > 0)
+                {
+                    // ROI
+                    if (roi.x > x)
+                        roi.x = x;
+                    if (roi.y > y)
+                        roi.y = y;
+                    if (roi.width < x)
+                        roi.width = x;
+                    if (roi.height > y)
+                        roi.height = y;
+                    // First keypoint?
+                    if (partFirstNon0 < 0)
+                        partFirstNon0 = part;
+                    // Last keypoint?
+                    partLastNon0 = part;
+                }
+            }
+            // From [p1, p2] to [p1, width, height]
+            roi.width -= roi.x;
+            roi.height -= roi.y;
+            // diameter
+            diameter = fastMax(roi.width, roi.height);
         }
         catch (const std::exception& e)
         {
@@ -644,32 +691,6 @@ namespace op
     }
 
     template <typename T>
-    void getRoiDiameterAndBounds(
-        Rectangle<int>& roi, int& diameter, int& indexFirstNon0, int& indexLastNon0,
-        const std::vector<int>& personVector, const T* const peaksPtr,
-        const int indexInit, const int indexEnd)
-    {
-        try
-        {
-            roi = Rectangle<int>{0,0,0,0};
-            for (auto index = 0u ; index < personVector.size()-1 ; index++)
-            {
-                const auto x = peaksPtr[personVector[index]-2];
-                const auto y = peaksPtr[personVector[index]-1];
-                const auto score = peaksPtr[personVector[index]];
-                if (roi.x > x)
-                    roi.x = x;
-                if (roi.y > y)
-                    roi.y = y;
-            }
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-
-    template <typename T>
     void removePeopleBelowThresholdsAndFillFaces(
         std::vector<int>& validSubsetIndexes, int& numberPeople,
         std::vector<std::pair<std::vector<int>, T>>& peopleVector, const unsigned int numberBodyParts,
@@ -693,28 +714,28 @@ namespace op
             std::vector<int> faceInvalidSubsetIndexes;
             faceInvalidSubsetIndexes.reserve(peopleVector.size());
             // For each person candidate
-            for (auto index = 0u ; index < peopleVector.size() ; index++)
+            for (auto person = 0u ; person < peopleVector.size() ; person++)
             {
-                auto personCounter = peopleVector[index].first.back();
+                auto personCounter = peopleVector[person].first.back();
                 // Analog for hand/face keypoints
                 if (numberBodyParts >= 135)
                 {
                     // No consider face keypoints for personCounter
                     const auto currentCounter = personCounter;
-                    getKeypointCounter(personCounter, peopleVector, index, 65, 135, 1);
+                    getKeypointCounter(personCounter, peopleVector, person, 65, 135, 1);
                     const auto newCounter = personCounter;
-                    if (personCounter == 0)
+                    if (personCounter == 1)
                     {
-                        faceInvalidSubsetIndexes.emplace_back(index);
+                        faceInvalidSubsetIndexes.emplace_back(person);
                         continue;
                     }
                     // If body is still valid and facial points were removed, then add to valid faces
                     else if (currentCounter != newCounter)
-                        faceValidSubsetIndexes.emplace_back(index);
+                        faceValidSubsetIndexes.emplace_back(person);
                     // No consider right hand keypoints for personCounter
-                    getKeypointCounter(personCounter, peopleVector, index, 45, 65, 1);
+                    getKeypointCounter(personCounter, peopleVector, person, 45, 65, 1);
                     // No consider left hand keypoints for personCounter
-                    getKeypointCounter(personCounter, peopleVector, index, 25, 45, 1);
+                    getKeypointCounter(personCounter, peopleVector, person, 25, 45, 1);
                 }
                 // Foot keypoints do not affect personCounter (too many false positives,
                 // same foot usually appears as both left and right keypoints)
@@ -724,7 +745,7 @@ namespace op
                 if (!maximizePositives && (numberBodyParts == 25 || numberBodyParts > 70))
                 {
                     const auto currentCounter = personCounter;
-                    getKeypointCounter(personCounter, peopleVector, index, 19, 25, 0);
+                    getKeypointCounter(personCounter, peopleVector, person, 19, 25, 0);
                     const auto newCounter = personCounter;
                     // Problem: Same leg/foot keypoints are considered for both left and right keypoints.
                     // Solution: Remove legs that are duplicated and that do not have upper torso
@@ -733,11 +754,11 @@ namespace op
                         continue;
                 }
                 // Add only valid people
-                const auto personScore = peopleVector[index].second;
+                const auto personScore = peopleVector[person].second;
                 if (personCounter >= minSubsetCnt && (personScore/personCounter) >= minSubsetScore)
                 {
                     numberPeople++;
-                    validSubsetIndexes.emplace_back(index);
+                    validSubsetIndexes.emplace_back(person);
                     // // This is not required, it is OK if there are more people. No more GPU memory used.
                     // if (numberPeople == maxPeaks)
                     //     break;
@@ -747,25 +768,6 @@ namespace op
                     error("Bad personCounter (" + std::to_string(personCounter) + "). Bug in this"
                           " function if this happens.", __LINE__, __FUNCTION__, __FILE__);
             }
-//             // Random standalone facial keypoints --> Merge into a more complete face
-//             if (numberPeople > 0 && faceInvalidSubsetIndexes.size() > 0)
-//             {
-//                 for (auto faceId = 0u ; faceId < faceInvalidSubsetIndexes.size() ; faceId++)
-//                 {
-//                     // Get ROI
-//                     Rectangle<int> roi;
-//                     int diameter;
-//                     int indexFirstNon0;
-//                     int indexLastNon0;
-//                     const auto index = faceValidSubsetIndexes[faceId];
-//                     getRoiDiameterAndBounds(
-//                         roi, diameter, indexFirstNon0, indexLastNon0, peopleVector[index].first, peaksPtr, 65, 135);
-//                     // const auto personCounter = peopleVector[index].first.back();
-//                     // const auto x = peaksPtr[peopleVector[index].first[part]-2];
-//                     // const auto y = peaksPtr[peopleVector[index].first[part]-1];
-//                     // const auto score = peaksPtr[peopleVector[index].first[part]];
-//                 }
-//             }
             // If no people found --> Repeat with maximizePositives = true
             // Result: Increased COCO mAP because we catch more foot-only images
             if (numberPeople == 0 && !maximizePositives)

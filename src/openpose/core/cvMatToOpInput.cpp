@@ -34,9 +34,23 @@ namespace op
                 if (mGpuResize)
                 {
                     // Free temporary memory
-                    cudaFree(pInputImageCuda);
-                    cudaFree(pOutputImageCuda);
-                    cudaFree(pInputImageReorderedCuda);
+                    cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                    if (pInputImageCuda != nullptr)
+                    {
+                        cudaFree(pInputImageCuda);
+                        pInputImageCuda = nullptr;
+                    }
+                    if (pOutputImageCuda != nullptr)
+                    {
+                        cudaFree(pOutputImageCuda);
+                        pOutputImageCuda = nullptr;
+                    }
+                    if (pInputImageReorderedCuda != nullptr)
+                    {
+                        cudaFree(pInputImageReorderedCuda);
+                        pInputImageReorderedCuda = nullptr;
+                    }
+                    cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 }
             #endif
         }

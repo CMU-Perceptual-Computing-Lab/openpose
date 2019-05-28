@@ -3,6 +3,7 @@
 #endif
 #ifdef USE_CUDA
     #include <openpose/gpu/cuda.hpp>
+    #include <openpose/gpu/cuda.hu>
 #endif
 #ifdef USE_OPENCL
     #include <openpose/gpu/opencl.hcl>
@@ -41,14 +42,28 @@ namespace op
         try
         {
             #if defined USE_CAFFE && defined USE_CUDA
-                cudaFree(pBodyPartPairsGpuPtr);
-                cudaFree(pMapIdxGpuPtr);
-                cudaFree(pFinalOutputGpuPtr);
+                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
+                if (pBodyPartPairsGpuPtr != nullptr)
+                {
+                    cudaFree(pBodyPartPairsGpuPtr);
+                    pBodyPartPairsGpuPtr = nullptr;
+                }
+                if (pMapIdxGpuPtr != nullptr)
+                {
+                    cudaFree(pMapIdxGpuPtr);
+                    pMapIdxGpuPtr = nullptr;
+                }
+                if (pFinalOutputGpuPtr != nullptr)
+                {
+                    cudaFree(pFinalOutputGpuPtr);
+                    pFinalOutputGpuPtr = nullptr;
+                }
+                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
             #endif
         }
         catch (const std::exception& e)
         {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 

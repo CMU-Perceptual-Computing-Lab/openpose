@@ -46,7 +46,10 @@ namespace op
         {
             #ifdef USE_CUDA
                 if (mIsLastRenderer && spGpuMemory != nullptr)
+                {
                     cudaFree(*spGpuMemory);
+                    *spGpuMemory = nullptr;
+                }
             #endif
         }
         catch (const std::exception& e)

@@ -34,16 +34,32 @@ namespace op
         try
         {
             // Free CUDA pointers - Note that if pointers are 0 (i.e., nullptr), no operation is performed.
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             #ifdef USE_CUDA
+                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 if (pGpuPose != nullptr)
+                {
                     cudaFree(pGpuPose);
+                    pGpuPose = nullptr;
+                }
                 if (pMaxPtr != nullptr)
+                {
                     cudaFree(pMaxPtr);
+                    pMaxPtr = nullptr;
+                }
                 if (pMinPtr != nullptr)
+                {
                     cudaFree(pMinPtr);
+                    pMinPtr = nullptr;
+                }
                 if (pScalePtr != nullptr)
+                {
                     cudaFree(pScalePtr);
+                    pScalePtr = nullptr;
+                }
+                cudaCheck(__LINE__, __FUNCTION__, __FILE__);
             #endif
+            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
         {

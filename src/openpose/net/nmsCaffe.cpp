@@ -45,9 +45,9 @@ namespace op
             #if defined USE_CAFFE && defined USE_OPENCL
                 try
                 {
-                    if(mKernelGpuPtr != nullptr)
+                    if (mKernelGpuPtr != nullptr)
                         clReleaseMemObject((cl_mem)mKernelGpuPtr);
-                    if(mKernelCpuPtr != nullptr)
+                    if (mKernelCpuPtr != nullptr)
                         delete mKernelCpuPtr;
                 }
                 catch (const std::exception& e)

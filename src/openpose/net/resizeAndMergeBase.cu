@@ -4,7 +4,17 @@
 
 namespace op
 {
+    const auto THREADS_PER_BLOCK = 256u;
     const auto THREADS_PER_BLOCK_1D = 16u;
+
+    template <typename T>
+    __global__ void fillKernel(
+        T* targetPtr, const T* const sourcePtr, const int N)
+    {
+        const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
+        if (x < N)
+            targetPtr[x] = sourcePtr[x];
+    }
 
     // template <typename T>
     // __global__ void resizeKernelOld(
@@ -329,18 +339,29 @@ namespace op
 
                     // Optimized function for 8x resize
                     // OP_CUDA_PROFILE_INIT(REPS);
-                    if (widthTarget / widthSource != 8 || heightTarget / heightSource != 8)
-                        error("Kernel only implemented for 8x resize. Notify us if this error appears.",
-                            __LINE__, __FUNCTION__, __FILE__);
-                    const auto rescaleFactor = (unsigned int) std::ceil(heightTarget / (float)(heightSource));
-                    const dim3 threadsPerBlock{rescaleFactor, rescaleFactor, 1};
-                    const dim3 numBlocks{
-                        getNumberCudaBlocks(widthTarget, threadsPerBlock.x),
-                        getNumberCudaBlocks(heightTarget, threadsPerBlock.y),
-                        getNumberCudaBlocks(num * channels, threadsPerBlock.z)};
-                    resize8TimesKernel<<<numBlocks, threadsPerBlock>>>(
-                        targetPtr, sourcePtrs.at(0), widthSource, heightSource, widthTarget, heightTarget,
-                        rescaleFactor);
+                    if (widthTarget / widthSource == 1 && heightTarget / heightSource == 1)
+                    {
+                        const auto N = widthTarget * heightTarget * num * channels;
+                        const dim3 threadsPerBlock{THREADS_PER_BLOCK};
+                        const dim3 numBlocks{getNumberCudaBlocks(N, threadsPerBlock.x)};
+                        fillKernel<<<numBlocks, threadsPerBlock>>>(
+                            targetPtr, sourcePtrs.at(0), N);
+                    }
+                    else
+                    {
+                        if (widthTarget / widthSource != 8 || heightTarget / heightSource != 8)
+                            error("Kernel only implemented for 8x resize. Notify us if this error appears.",
+                                __LINE__, __FUNCTION__, __FILE__);
+                        const auto rescaleFactor = (unsigned int) std::ceil(heightTarget / (float)(heightSource));
+                        const dim3 threadsPerBlock{rescaleFactor, rescaleFactor, 1};
+                        const dim3 numBlocks{
+                            getNumberCudaBlocks(widthTarget, threadsPerBlock.x),
+                            getNumberCudaBlocks(heightTarget, threadsPerBlock.y),
+                            getNumberCudaBlocks(num * channels, threadsPerBlock.z)};
+                        resize8TimesKernel<<<numBlocks, threadsPerBlock>>>(
+                            targetPtr, sourcePtrs.at(0), widthSource, heightSource, widthTarget, heightTarget,
+                            rescaleFactor);
+                    }
                     // OP_CUDA_PROFILE_END(timeNormalize3, 1e3, REPS);
 
                     // // Profiling code
@@ -482,10 +503,14 @@ namespace op
                     widthTarget, heightTarget, sourcePtrs[0], sourcePtrs[1], sourcePtrs[2], sourcePtrs[3],
                     sourcePtrs[4], sourcePtrs[5], sourcePtrs[6], sourcePtrs[7]);
                 // Free memory
-                cudaFree(widthSources);
-                cudaFree(heightSources);
-                cudaFree(scaleWidths);
-                cudaFree(scaleHeights);
+                if (widthSources != nullptr)
+                    cudaFree(widthSources);
+                if (heightSources != nullptr)
+                    cudaFree(heightSources);
+                if (scaleWidths != nullptr)
+                    cudaFree(scaleWidths);
+                if (scaleHeights != nullptr)
+                    cudaFree(scaleHeights);
                 // OP_CUDA_PROFILE_END(timeNormalize3, 1e3, REPS);
 
                 // // Profiling code
