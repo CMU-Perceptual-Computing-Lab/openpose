@@ -1,8 +1,8 @@
 input: "image"
 input_dim: 1 # Original: 2
 input_dim: 3 # It crashes if not left to 3
-input_dim: 1 # Original: 368
-input_dim: 1 # Original: 368
+input_dim: 368 # Original: 368
+input_dim: 368 # Original: 368
 layer {
   name: "conv1_1"
   type: "Convolution"
