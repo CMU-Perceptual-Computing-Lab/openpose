@@ -148,7 +148,7 @@ namespace op
             const auto renderHandGpu = wrapperStructHand.enable && renderModeHand == RenderMode::Gpu;
 
             // Check no wrong/contradictory flags enabled
-            const auto userInputAndPreprocessingWsEmpty = userInputWs.empty();
+            const auto userInputAndPreprocessingWsEmpty = userInputWs.empty() && userPreProcessingWs.empty();
             const auto userOutputWsEmpty = userOutputWs.empty();
             wrapperConfigureSanityChecks(
                 wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra, wrapperStructInput,
