@@ -21,7 +21,7 @@ In addition, CMake automatically downloads all the OpenPose models. However, **s
     - [Hands model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/hand/pose_iter_102000.caffemodel): download in `models/hand/`.
     
 ## Ensure all submodules are iniatilised for thirdParty directory eg. caffe 
-   `git submodule update --init --recursive
+   `git submodule update --init --recursive --remote
 
 
 ### Ubuntu Prerequisites
