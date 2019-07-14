@@ -19,13 +19,15 @@ In addition, CMake automatically downloads all the OpenPose models. However, **s
     - [MPI model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/mpi/pose_iter_160000.caffemodel): download in `models/pose/mpi/`.
     - [Face model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/face/pose_iter_116000.caffemodel): download in `models/face/`.
     - [Hands model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/hand/pose_iter_102000.caffemodel): download in `models/hand/`.
-    
-## Ensure all submodules are iniatilised for thirdParty directory eg. caffe 
-   `git submodule update --init --recursive --remote
+
+Finally, if some weird/obscure errors about Caffe and/or Pybind appear, run the following command. It will ensure that all submodules are iniatilised. Reason: OpenPose runs that command through CMake, but some firewalls might block it and we have to run it manually.
+```
+git submodule update --init --recursive --remote
+```
+
 
 
 ### Ubuntu Prerequisites
-
 1. Ubuntu - **Anaconda should not be installed** on your system. Anaconda includes a Protobuf version that is incompatible with Caffe. Either you uninstall anaconda and install protobuf via apt-get, or you compile your own Caffe and link it to OpenPose.
 2. Install **CMake GUI**:
     - Ubuntu 14 or 16: run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only).
