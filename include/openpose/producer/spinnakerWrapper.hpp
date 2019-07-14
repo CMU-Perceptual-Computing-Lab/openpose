@@ -23,6 +23,10 @@ namespace op
 
         std::vector<cv::Mat> getRawFrames();
 
+        /**
+         * Note: The camera parameters are only read if undistortImage is true. This should be changed to add a
+         * new bool flag in the constructor, e.g., readCameraParameters
+         */
         std::vector<cv::Mat> getCameraMatrices() const;
 
         std::vector<cv::Mat> getCameraExtrinsics() const;

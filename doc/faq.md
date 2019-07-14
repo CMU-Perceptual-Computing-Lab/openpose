@@ -18,6 +18,7 @@ OpenPose - Frequently Asked Question (FAQ)
         12. [CMake-GUI Error While Getting Default Caffe](#cmake-gui-error-while-getting-default-caffe)
         13. [Libgomp Out of Memory Error](#libgomp-out-of-memory-error)
         14. [Runtime Error with Turing GPU (Tesla T4) or Volta GPU][#runtime-error-with-turing-gpu-teslat4-or-volta-gpu)
+        15. [Obscure CMake Error about Caffe or Pybind](#obscure-cmake-error-about-caffe-or-pybind).
     2. [Speed Performance Issues](#speed-performance-issues)
         1. [Speed Up, Memory Reduction, and Benchmark](#speed-up-memory-reduction-and-benchmark)
         2. [How to Measure the Latency Time?](#how-to-measure-the-latency-time)
@@ -167,6 +168,14 @@ git submodle update
 **Q**: When I start OpenPose, I receive a runtime error for new GPU architectures.
 
 **A**: To solve this problem, 1) make sure you are using CUDA 10 or higher, and 2) change line 7 in `{OPENPOSE_PATH}/3rdparty/caffe/cmake/Cuda.cmake`, from `set(Caffe_known_gpu_archs "30 35 50 52 60 61")` to `set(Caffe_known_gpu_archs "30 35 50 52 60 61 75")`.
+
+
+
+
+#### Obscure CMake Error about Caffe or Pybind
+**Q:** There appear some weird and obscure errors on CMake about Caffe and/or Pybind.
+
+**A**: Check [doc/prerequisites.md#general-tips](./prerequisites.md#general-tips) to run the `git submodule` command.
 
 
 

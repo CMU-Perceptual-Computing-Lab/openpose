@@ -551,8 +551,9 @@ namespace op
         const Array<double>& keypoints, const int personA, const int personB, const double threshold);
 
     template <typename T>
-    float getKeypointsRoi(const Array<T>& keypointsA, const int personA, const Array<T>& keypointsB, const int personB,
-                          const T threshold)
+    float getKeypointsRoi(
+        const Array<T>& keypointsA, const int personA, const Array<T>& keypointsB, const int personB,
+        const T threshold)
     {
         try
         {
@@ -566,30 +567,7 @@ namespace op
             // Get ROI
             const auto rectangleA = getKeypointsRectangle(keypointsA, personA, threshold);
             const auto rectangleB = getKeypointsRectangle(keypointsB, personB, threshold);
-            const Point<T> pointAIntersection{
-                fastMax(rectangleA.x, rectangleB.x),
-                fastMax(rectangleA.y, rectangleB.y)
-            };
-            const Point<T> pointBIntersection{
-                fastMin(rectangleA.x+rectangleA.width, rectangleB.x+rectangleB.width),
-                fastMin(rectangleA.y+rectangleA.height, rectangleB.y+rectangleB.height)
-            };
-            // Make sure there is overlap
-            if (pointAIntersection.x < pointBIntersection.x && pointAIntersection.y < pointBIntersection.y)
-            {
-                const Rectangle<T> rectangleIntersection{
-                    pointAIntersection.x,
-                    pointAIntersection.y,
-                    pointBIntersection.x-pointAIntersection.x,
-                    pointBIntersection.y-pointAIntersection.y
-                };
-                const auto areaA = rectangleA.area();
-                const auto areaB = rectangleB.area();
-                const auto intersection = rectangleIntersection.area();
-                return float(intersection) / float(areaA + areaB - intersection);
-            }
-            // If non overlap --> Return 0
-            return 0.f;
+            return getKeypointsRoi(rectangleA, rectangleB);
         }
         catch (const std::exception& e)
         {
@@ -603,4 +581,67 @@ namespace op
     template OP_API float getKeypointsRoi(
         const Array<double>& keypointsA, const int personA, const Array<double>& keypointsB, const int personB,
         const double threshold);
+
+    template <typename T>
+    float getKeypointsRoi(const Rectangle<T>& rectangleA, const Rectangle<T>& rectangleB)
+    {
+        try
+        {
+            // Check if negative values, then normalize it
+            auto rectangleANorm = rectangleA;
+            auto rectangleBNorm = rectangleB;
+            // E.g., [-10,-10,W1,H1] and [-20,-20,W2,H2] should be equivalent to [10,10,W1,H1] and [0,0,W2,H2]
+            const auto biasX = std::min(std::min(T{0}, rectangleA.x), rectangleB.x);
+            if (biasX != 0)
+            {
+                rectangleANorm.x -= biasX;
+                rectangleBNorm.x -= biasX;
+            }
+            const auto biasY = std::min(std::min(T{0}, rectangleA.y), rectangleB.y);
+            if (biasY != 0)
+            {
+                rectangleANorm.y -= biasY;
+                rectangleBNorm.y -= biasY;
+            }
+            // Get ROI
+            const Point<T> pointAIntersection{
+                fastMax(rectangleANorm.x, rectangleBNorm.x),
+                fastMax(rectangleANorm.y, rectangleBNorm.y)
+            };
+            const Point<T> pointBIntersection{
+                fastMin(rectangleANorm.x+rectangleANorm.width, rectangleBNorm.x+rectangleBNorm.width),
+                fastMin(rectangleANorm.y+rectangleANorm.height, rectangleBNorm.y+rectangleBNorm.height)
+            };
+            // Make sure there is overlap
+            if (pointAIntersection.x < pointBIntersection.x && pointAIntersection.y < pointBIntersection.y)
+            {
+                const Rectangle<T> rectangleIntersection{
+                    pointAIntersection.x,
+                    pointAIntersection.y,
+                    pointBIntersection.x-pointAIntersection.x,
+                    pointBIntersection.y-pointAIntersection.y
+                };
+                const auto areaA = rectangleANorm.area();
+                const auto areaB = rectangleBNorm.area();
+                const auto intersection = rectangleIntersection.area();
+                return float(intersection) / float(areaA + areaB - intersection);
+            }
+            // If non overlap --> Return 0
+            else
+                return 0.f;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return 0.f;
+        }
+    }
+    template OP_API float getKeypointsRoi(
+        const Rectangle<int>& rectangleA, const Rectangle<int>& rectangleB);
+    template OP_API float getKeypointsRoi(
+        const Rectangle<unsigned int>& rectangleA, const Rectangle<unsigned int>& rectangleB);
+    template OP_API float getKeypointsRoi(
+        const Rectangle<float>& rectangleA, const Rectangle<float>& rectangleB);
+    template OP_API float getKeypointsRoi(
+        const Rectangle<double>& rectangleA, const Rectangle<double>& rectangleB);
 }

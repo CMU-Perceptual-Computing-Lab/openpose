@@ -184,9 +184,10 @@ DEFINE_bool(disable_blending,           false,          "If enabled, it will ren
                                                         " `alpha_pose`, and `alpha_pose`.");
 // OpenPose Rendering Pose
 DEFINE_double(render_threshold,         0.05,           "Only estimated keypoints whose score confidences are higher than this threshold will be"
-                                                        " rendered. Generally, a high threshold (> 0.5) will only render very clear body parts;"
-                                                        " while small thresholds (~0.1) will also output guessed and occluded keypoints, but also"
-                                                        " more false positives (i.e., wrong detections).");
+                                                        " rendered. Note: Rendered refers only to visual display in the OpenPose basic GUI, not in"
+                                                        " the saved results. Generally, a high threshold (> 0.5) will only render very clear body"
+                                                        " parts; while small thresholds (~0.1) will also output guessed and occluded keypoints,"
+                                                        " but also more false positives (i.e., wrong detections).");
 DEFINE_int32(render_pose,               -1,             "Set to 0 for no rendering, 1 for CPU rendering (slightly faster), and 2 for GPU rendering"
                                                         " (slower but greater functionality, e.g., `alpha_X` flags). If -1, it will pick CPU if"
                                                         " CPU_ONLY is enabled, or GPU if CUDA is enabled. If rendering is enabled, it will render"

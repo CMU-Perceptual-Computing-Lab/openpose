@@ -27,7 +27,7 @@ namespace op
                    __LINE__, __FUNCTION__, __FILE__);
             // Warnings
             if (!mHeatMapTypes.empty())
-                log("Note only keypoint heatmaps are available with face heatmaps (no background nor PAFs).",
+                log("Note that only the keypoint heatmaps are available with face heatmaps (no background nor PAFs).",
                     Priority::High);
         }
         catch (const std::exception& e)

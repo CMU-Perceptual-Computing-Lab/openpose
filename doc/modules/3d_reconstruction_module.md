@@ -100,7 +100,7 @@ The visual GUI should show 3 screens.
 It should be similar to the following image.
 
 <p align="center">
-    <img src="media/openpose3d.png">
+    <img src="../media/openpose3d.gif">
 </p>
 
 

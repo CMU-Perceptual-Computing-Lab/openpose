@@ -505,8 +505,8 @@ namespace op
     {
         try
         {
-            return reconstructArray(std::vector<std::vector<Array<float>>>{keypointsVector},
-                                    cameraMatrices, imageSizes).at(0);
+            return reconstructArray(
+                std::vector<std::vector<Array<float>>>{keypointsVector}, cameraMatrices, imageSizes).at(0);
         }
         catch (const std::exception& e)
         {
@@ -515,6 +515,9 @@ namespace op
         }
     }
 
+    const std::string sFlirErrorMessage{
+        " If you are simultaneously using FLIR cameras (`--flir_camera`) and the 3-D reconstruction module"
+        " (`--3d), you should also enable `--frame_undistort` so their camera parameters are read."};
     std::vector<Array<float>> PoseTriangulation::reconstructArray(
         const std::vector<std::vector<Array<float>>>& keypointsVectors,
         const std::vector<cv::Mat>& cameraMatrices,
@@ -522,6 +525,20 @@ namespace op
     {
         try
         {
+            // Sanity checks
+            if (cameraMatrices.size() < 2)
+                error("3-D reconstruction (`--3d`) requires at least 2 camera views, only found "
+                    + std::to_string(cameraMatrices.size()) + "camera parameter matrices." + sFlirErrorMessage,
+                    __LINE__, __FUNCTION__, __FILE__);
+            for (const auto& cameraMatrix : cameraMatrices)
+                if (cameraMatrix.empty())
+                    error("Camera matrix was found empty during 3-D reconstruction (`--3d`)." + sFlirErrorMessage,
+                        __LINE__, __FUNCTION__, __FILE__);
+            if (cameraMatrices.size() != imageSizes.size())
+                error("The camera parameters and number of images must be the same ("
+                    + std::to_string(cameraMatrices.size()) + " vs. " + std::to_string(imageSizes.size()) + ").",
+                    __LINE__, __FUNCTION__, __FILE__);
+            // Run 3-D reconstruction
             bool keypointsReconstructed = false;
             std::vector<Array<float>> keypoints3Ds(keypointsVectors.size());
             // std::vector<std::thread> threads(keypointsVectors.size()-1);

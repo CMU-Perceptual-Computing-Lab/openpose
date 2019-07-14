@@ -330,9 +330,10 @@ Also as a side note, if the default installation fails (i.e., the one explained 
     3. `Caffe_LIBS` set to `/usr/local/lib/libcaffe.dylib`.
     4. Run `Configure` and `Generate` from CMake GUI.
 
-You may also have to apply the following patch if you have the latest OSX 10.14. It can be done as follows:
-
-`cd 3rdparty/caffe; git apply ../../scripts/osx/mac_opencl_patch.txt`
+In addition, if you face an OpenCV error during compiling time similar to `fatal error: 'opencv2/highgui/highgui.hpp' file not found`, please apply the following patch (this error has been reported in the latest OSX 10.14):
+```
+cd 3rdparty/caffe; git apply ../../scripts/osx/mac_opencl_patch.txt
+```
 
 
 #### 3D Reconstruction Module

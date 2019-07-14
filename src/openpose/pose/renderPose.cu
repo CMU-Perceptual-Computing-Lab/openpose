@@ -828,9 +828,9 @@ namespace op
         }
     }
 
-    void renderPosePAFGpu(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize,
-                          const float* const heatMapPtr, const Point<int>& heatMapSize, const float scaleToKeepRatio,
-                          const int part, const float alphaBlending)
+    void renderPosePAFGpu(
+        float* framePtr, const PoseModel poseModel, const Point<int>& frameSize, const float* const heatMapPtr,
+        const Point<int>& heatMapSize, const float scaleToKeepRatio, const int part, const float alphaBlending)
     {
         try
         {
@@ -843,16 +843,16 @@ namespace op
         }
     }
 
-    void renderPosePAFsGpu(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize,
-                           const float* const heatMapPtr, const Point<int>& heatMapSize, const float scaleToKeepRatio,
-                           const float alphaBlending)
+    void renderPosePAFsGpu(
+        float* framePtr, const PoseModel poseModel, const Point<int>& frameSize, const float* const heatMapPtr,
+        const Point<int>& heatMapSize, const float scaleToKeepRatio, const float alphaBlending)
     {
         try
         {
             const auto numberBodyPartPairs = (int)getPosePartPairs(poseModel).size()/2;
             renderPosePAFGpuAux(
                 framePtr, poseModel, frameSize, heatMapPtr, heatMapSize, scaleToKeepRatio,
-                getPoseNumberBodyParts(poseModel) + (poseModel != PoseModel::BODY_25B ? 1 : 0),
+                getPoseNumberBodyParts(poseModel) + (addBkgChannel(poseModel) ? 1 : 0),
                 numberBodyPartPairs, alphaBlending);
         }
         catch (const std::exception& e)
@@ -861,9 +861,9 @@ namespace op
         }
     }
 
-    void renderPoseDistanceGpu(float* framePtr, const Point<int>& frameSize, const float* const heatMapPtr,
-                               const Point<int>& heatMapSize, const float scaleToKeepRatio, const unsigned int part,
-                               const float alphaBlending)
+    void renderPoseDistanceGpu(
+        float* framePtr, const Point<int>& frameSize, const float* const heatMapPtr, const Point<int>& heatMapSize,
+        const float scaleToKeepRatio, const unsigned int part, const float alphaBlending)
     {
         try
         {

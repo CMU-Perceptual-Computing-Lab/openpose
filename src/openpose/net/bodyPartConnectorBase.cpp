@@ -83,12 +83,12 @@ namespace op
     void getRoiDiameterAndBounds(
         Rectangle<int>& roi, int& diameter, int& partFirstNon0, int& partLastNon0,
         const std::vector<int>& personVector, const T* const peaksPtr,
-        const int partInit, const int partEnd)
+        const int partInit, const int partEnd, const float margin)
     {
         try
         {
             // Find ROI, partFirstNon0, and partLastNon0
-            roi = Rectangle<int>{0,0,0,0};
+            roi = Rectangle<int>{std::numeric_limits<int>::max(),std::numeric_limits<int>::max(),0,0};
             partFirstNon0 = -1;
             partLastNon0 = -1;
             for (auto part = partInit ; part < partEnd ; part++)
@@ -96,7 +96,7 @@ namespace op
                 const auto x = peaksPtr[personVector[part]-2];
                 const auto y = peaksPtr[personVector[part]-1];
                 const auto score = peaksPtr[personVector[part]];
-                if (score > 0)
+                if (personVector[part] > 0 && score > 0)
                 {
                     // ROI
                     if (roi.x > x)
@@ -105,7 +105,7 @@ namespace op
                         roi.y = y;
                     if (roi.width < x)
                         roi.width = x;
-                    if (roi.height > y)
+                    if (roi.height < y)
                         roi.height = y;
                     // First keypoint?
                     if (partFirstNon0 < 0)
@@ -114,11 +114,24 @@ namespace op
                     partLastNon0 = part;
                 }
             }
-            // From [p1, p2] to [p1, width, height]
-            roi.width -= roi.x;
-            roi.height -= roi.y;
-            // diameter
-            diameter = fastMax(roi.width, roi.height);
+            if (partLastNon0 > -1)
+            {
+                // Add margin
+                const auto marginX = roi.width * margin;
+                const auto marginY = roi.height * margin;
+                roi.x -= marginX;
+                roi.y -= marginY;
+                roi.width += 2*marginX;
+                roi.height += 2*marginY;
+                // partFirstNon0+1 for for loops
+                partLastNon0++;
+                // From [p1, p2] to [p1, width, height]
+                // +1 to account for 1-line keypoints
+                roi.width += 1 - roi.x;
+                roi.height += 1 - roi.y;
+                // diameter
+                diameter = fastMax(roi.width, roi.height);
+            }
         }
         catch (const std::exception& e)
         {
@@ -712,7 +725,8 @@ namespace op
             faceValidSubsetIndexes.reserve(peopleVector.size());
             // Face invalid sets
             std::vector<int> faceInvalidSubsetIndexes;
-            faceInvalidSubsetIndexes.reserve(peopleVector.size());
+            if (numberBodyParts >= 135)
+                faceInvalidSubsetIndexes.reserve(peopleVector.size());
             // For each person candidate
             for (auto person = 0u ; person < peopleVector.size() ; person++)
             {
@@ -767,6 +781,77 @@ namespace op
                 else if ((personCounter < 1 && numberBodyParts != 25 && numberBodyParts < 70) || personCounter < 0)
                     error("Bad personCounter (" + std::to_string(personCounter) + "). Bug in this"
                           " function if this happens.", __LINE__, __FUNCTION__, __FILE__);
+            }
+            // Random standalone facial keypoints --> Merge into a more complete face
+            if (numberPeople > 0)
+            {
+                // Check invalid faces
+                for (const auto& personInvalid : faceInvalidSubsetIndexes)
+                {
+                    // Get ROI of current face
+                    Rectangle<int> roiInvalid;
+                    int diameterInvalid = -1;
+                    int partFirstNon0Invalid = -1;
+                    int partLastNon0Invalid = -1;
+                    getRoiDiameterAndBounds(
+                        roiInvalid, diameterInvalid, partFirstNon0Invalid, partLastNon0Invalid,
+                        peopleVector[personInvalid].first, peaksPtr, 65, 135, 0.2f);
+                    // Check all valid faces to find best candidate
+                    float keypointsRoiBest = 0.f;
+                    auto keypointsRoiBestIndex = -1;
+                    for (auto personId = 0u ; personId < faceValidSubsetIndexes.size() ; personId++)
+                    {
+                        const auto& personValid = faceValidSubsetIndexes[personId];
+                        // Get ROI of current face
+                        Rectangle<int> roiValid;
+                        int diameterValid = -1;
+                        int partFirstNon0Valid = -1;
+                        int partLastNon0Valid = -1;
+                        getRoiDiameterAndBounds(
+                            roiValid, diameterValid, partFirstNon0Valid, partLastNon0Valid, peopleVector[personValid].first,
+                            peaksPtr, 65, 135, 0.1f);
+                        // Get ROI between both faces
+                        const auto keypointsRoi = getKeypointsRoi(roiValid, roiInvalid);
+                        // Update best so far
+                        if (keypointsRoiBest < keypointsRoi)
+                        {
+                            keypointsRoiBest = keypointsRoi;
+                            keypointsRoiBestIndex = personId;
+                        }
+                    }
+                    // If invalid and best valid candidate overlap enough --> Merge them
+                    if (keypointsRoiBest > 0.3f || (keypointsRoiBest > 0.01f && faceValidSubsetIndexes.size() < 3))
+                    {
+                        const auto& personValid = faceValidSubsetIndexes[keypointsRoiBestIndex];
+                        // If it is from that face --> Combine invalid face keypoints into valid face
+                        for (auto part = partFirstNon0Invalid ; part < partLastNon0Invalid ; part++)
+                        {
+                            auto& personVectorValid = peopleVector[personValid].first;
+                            const auto scoreValid = peaksPtr[personVectorValid[part]];
+                            const auto& personVectorInvalid = peopleVector[personInvalid].first;
+                            const auto scoreInvalid = peaksPtr[personVectorInvalid[part]];
+                            // If the new one has a keypoint...
+                            if (personVectorInvalid[part] != 0)
+                            {
+                                // ... and the original face does not have it, then add it to it
+                                if (personVectorValid[part] == 0)
+                                {
+                                    if (personVectorInvalid[part] != 0)
+                                    {
+                                        personVectorValid[part] = personVectorInvalid[part];
+                                        peopleVector[personValid].second += scoreInvalid;
+                                    }
+                                }
+                                // ... and its score is higher than the original one, then replace it
+                                else if (scoreValid < scoreInvalid)
+                                {
+                                    personVectorValid[part] = personVectorInvalid[part];
+                                    peopleVector[personValid].second += scoreInvalid - scoreValid;
+                                }
+                            }
+                        }
+                    }
+                }
             }
             // If no people found --> Repeat with maximizePositives = true
             // Result: Increased COCO mAP because we catch more foot-only images
