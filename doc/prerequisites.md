@@ -20,6 +20,11 @@ In addition, CMake automatically downloads all the OpenPose models. However, **s
     - [Face model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/face/pose_iter_116000.caffemodel): download in `models/face/`.
     - [Hands model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/hand/pose_iter_102000.caffemodel): download in `models/hand/`.
 
+Finally, if some weird/obscure errors about Caffe and/or Pybind appear, run the following command. It will ensure that all submodules are iniatilised. Reason: OpenPose runs that command through CMake, but some firewalls might block it and we have to run it manually.
+```
+git submodule update --init --recursive --remote
+```
+
 
 
 ### Ubuntu Prerequisites
