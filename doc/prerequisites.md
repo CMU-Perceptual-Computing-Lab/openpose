@@ -59,7 +59,8 @@ In addition, CMake automatically downloads all the OpenPose models. However, **s
             - [Eigen3](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/eigen_2018_05_23.zip): Unzip as `3rdparty/eigen/`.
         2. Run `sudo apt-get install libeigen3-dev` if you prefer to set `WITH_EIGEN` to `FIND`.
         3. Use your own version of Eigen by setting `WITH_EIGEN` to `BUILD`, run CMake so that OpenPose downloads the zip file, and then replace the contents of `3rdparty/eigen/` by your own version.
-
+        
+        > NOTE: Eigen <= 3.3.6 is [not supported](https://bitbucket.org/eigen/eigen/commits/034b6c3e101792a3cc3ccabd9bfaddcabe85bb58?at=default) by CUDA 9.1+
 
 
 ### Mac OS Prerequisites
