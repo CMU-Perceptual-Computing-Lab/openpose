@@ -22,6 +22,7 @@ namespace op
         const auto numberPointsInLine = max(5, min(25, intRoundGPU(sqrt(5*vectorAToBMax))));
         const auto vectorNorm = T(sqrt(vectorAToBX*vectorAToBX + vectorAToBY*vectorAToBY));
 
+        // If the peaksPtr are coincident. Don't connect them.
         if (vectorNorm > 1e-6)
         {
             const auto sX = bodyPartA[0];
@@ -45,7 +46,6 @@ namespace op
                     count++;
                 }
             }
-
             // Return PAF score
             if (count/T(numberPointsInLine) > interMinAboveThreshold)
                 return sum/count;
@@ -148,10 +148,10 @@ namespace op
     void connectBodyPartsGpu(
         Array<T>& poseKeypoints, Array<T>& poseScores, const T* const heatMapGpuPtr, const T* const peaksPtr,
         const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks, const T interMinAboveThreshold,
-        const T interThreshold, const int minSubsetCnt, const T minSubsetScore, const T scaleFactor,
-        const bool maximizePositives, Array<T> pairScoresCpu, T* pairScoresGpuPtr,
+        const T interThreshold, const int minSubsetCnt, const T minSubsetScore, const T defaultNmsThreshold,
+        const T scaleFactor, const bool maximizePositives, Array<T> pairScoresCpu, T* pairScoresGpuPtr,
         const unsigned int* const bodyPartPairsGpuPtr, const unsigned int* const mapIdxGpuPtr,
-        const T* const peaksGpuPtr, const T defaultNmsThreshold)
+        const T* const peaksGpuPtr)
     {
         try
         {
@@ -219,7 +219,7 @@ namespace op
             // const T* const tNullptr = nullptr;
             // const auto peopleVector = createPeopleVector(
             //     tNullptr, peaksPtr, poseModel, heatMapSize, maxPeaks, interThreshold, interMinAboveThreshold,
-            //     bodyPartPairs, numberBodyParts, numberBodyPartPairs, pairScoresCpu);
+            //     bodyPartPairs, numberBodyParts, numberBodyPartPairs, defaultNmsThreshold, pairScoresCpu);
             // Delete people below the following thresholds:
                 // a) minSubsetCnt: removed if less than minSubsetCnt body parts
                 // b) minSubsetScore: removed if global score smaller than this
@@ -253,14 +253,16 @@ namespace op
         Array<float>& poseKeypoints, Array<float>& poseScores, const float* const heatMapGpuPtr,
         const float* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks,
         const float interMinAboveThreshold, const float interThreshold, const int minSubsetCnt,
-        const float minSubsetScore, const float scaleFactor, const bool maximizePositives,
-        Array<float> pairScoresCpu, float* pairScoresGpuPtr, const unsigned int* const bodyPartPairsGpuPtr,
-        const unsigned int* const mapIdxGpuPtr, const float* const peaksGpuPtr, const float defaultNmsThreshold);
+        const float minSubsetScore, const float scaleFactor, const float defaultNmsThreshold,
+        const bool maximizePositives, Array<float> pairScoresCpu, float* pairScoresGpuPtr,
+        const unsigned int* const bodyPartPairsGpuPtr, const unsigned int* const mapIdxGpuPtr,
+        const float* const peaksGpuPtr);
     template void connectBodyPartsGpu(
         Array<double>& poseKeypoints, Array<double>& poseScores, const double* const heatMapGpuPtr,
         const double* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks,
         const double interMinAboveThreshold, const double interThreshold, const int minSubsetCnt,
-        const double minSubsetScore, const double scaleFactor, const bool maximizePositives,
-        Array<double> pairScoresCpu, double* pairScoresGpuPtr, const unsigned int* const bodyPartPairsGpuPtr,
-        const unsigned int* const mapIdxGpuPtr, const double* const peaksGpuPtr, const double defaultNmsThreshold);
+        const double minSubsetScore, const double scaleFactor, const double defaultNmsThreshold,
+        const bool maximizePositives, Array<double> pairScoresCpu, double* pairScoresGpuPtr,
+        const unsigned int* const bodyPartPairsGpuPtr, const unsigned int* const mapIdxGpuPtr,
+        const double* const peaksGpuPtr);
 }

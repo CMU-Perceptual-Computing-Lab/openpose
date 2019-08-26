@@ -21,7 +21,7 @@ namespace op
 
             Type process(__global const Type* bodyPartA, __global const Type* bodyPartB, __global const Type* mapX, __global const Type* mapY,
                                          const int heatmapWidth, const int heatmapHeight, const Type interThreshold,
-                                         const Type interMinAboveThreshold)
+                                         const Type interMinAboveThreshold, const T defaultNmsThreshold)
             {
                 const Type vectorAToBX = bodyPartB[0] - bodyPartA[0];
                 const Type vectorAToBY = bodyPartB[1] - bodyPartA[1];
@@ -67,17 +67,18 @@ namespace op
                         const Type l2Dist = sqrt((Type)(vectorAToBX*vectorAToBX + vectorAToBY*vectorAToBY));
                         const Type threshold = sqrt((Type)(heatmapWidth*heatmapHeight))/150; // 3.3 for 368x656, 6.6 for 2x resolution
                         if (l2Dist < threshold)
-                            return 0.15;
+                            return T(defaultNmsThreshold+1e-6); // Without 1e-6 will not work because I use strict greater
                     }
                 }
                 return -1;
             }
 
-            __kernel void pafScoreKernel(__global Type* pairScoresPtr, __global const Type* const heatMapPtr, __global const Type* const peaksPtr,
-                                         __global const unsigned int* const bodyPartPairsPtr, __global const unsigned int* const mapIdxPtr,
-                                         const unsigned int maxPeaks, const int numberBodyPartPairs,
-                                         const int heatmapWidth, const int heatmapHeight, const Type interThreshold,
-                                         const Type interMinAboveThreshold)
+            __kernel void pafScoreKernel(
+                __global Type* pairScoresPtr, __global const Type* const heatMapPtr, __global const Type* const peaksPtr,
+                __global const unsigned int* const bodyPartPairsPtr, __global const unsigned int* const mapIdxPtr,
+                const unsigned int maxPeaks, const int numberBodyPartPairs, const int heatmapWidth,
+                const int heatmapHeight, const Type interThreshold, const Type interMinAboveThreshold,
+                const T defaultNmsThreshold)
             {
                 int pairIndex = get_global_id(0);
                 int peakA = get_global_id(1);
@@ -105,7 +106,7 @@ namespace op
 
                         pairScoresPtr[outputIndex] = process(
                             bodyPartA, bodyPartB, mapX, mapY, heatmapWidth, heatmapHeight, interThreshold,
-                            interMinAboveThreshold);
+                            interMinAboveThreshold, defaultNmsThreshold);
                     }
                     else
                         pairScoresPtr[outputIndex] = -1;
@@ -116,13 +117,13 @@ namespace op
     #endif
 
     template <typename T>
-    void connectBodyPartsOcl(Array<T>& poseKeypoints, Array<T>& poseScores, const T* const heatMapGpuPtr,
-                             const T* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize,
-                             const int maxPeaks, const T interMinAboveThreshold, const T interThreshold,
-                             const int minSubsetCnt, const T minSubsetScore, const T scaleFactor,
-                             const bool maximizePositives, Array<T> pairScoresCpu, T* pairScoresGpuPtr,
-                             const unsigned int* const bodyPartPairsGpuPtr, const unsigned int* const mapIdxGpuPtr,
-                             const T* const peaksGpuPtr, const int gpuID)
+    void connectBodyPartsOcl(
+        Array<T>& poseKeypoints, Array<T>& poseScores, const T* const heatMapGpuPtr, const T* const peaksPtr,
+        const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks, const T interMinAboveThreshold,
+        const T interThreshold, const int minSubsetCnt, const T minSubsetScore, const T defaultNmsThreshold,
+        const T scaleFactor, const bool maximizePositives, Array<T> pairScoresCpu, T* pairScoresGpuPtr,
+        const unsigned int* const bodyPartPairsGpuPtr, const unsigned int* const mapIdxGpuPtr,
+        const T* const peaksGpuPtr, const int gpuID)
     {
         try
         {
@@ -155,7 +156,7 @@ namespace op
                     cl::EnqueueArgs(OpenCL::getInstance(gpuID)->getQueue(), cl::NDRange(numberBodyPartPairs,maxPeaks,maxPeaks)),
                     pairScoresGpuPtrBuffer, heatMapGpuPtrBuffer, peaksGpuPtrBuffer, bodyPartPairsGpuPtrBuffer, mapIdxGpuPtrBuffer,
                     maxPeaks, (int)numberBodyPartPairs, heatMapSize.x, heatMapSize.y, interThreshold,
-                    interMinAboveThreshold);
+                    interMinAboveThreshold, defaultNmsThreshold);
                 OpenCL::getInstance(gpuID)->getQueue().enqueueReadBuffer(
                     pairScoresGpuPtrBuffer, CL_TRUE, 0, totalComputations * sizeof(T), pairScoresCpu.getPtr());
 
@@ -200,6 +201,7 @@ namespace op
                 UNUSED(interThreshold);
                 UNUSED(minSubsetCnt);
                 UNUSED(minSubsetScore);
+                UNUSED(defaultNmsThreshold);
                 UNUSED(scaleFactor);
                 UNUSED(maximizePositives);
                 UNUSED(pairScoresCpu);
@@ -220,14 +222,16 @@ namespace op
         Array<float>& poseKeypoints, Array<float>& poseScores, const float* const heatMapGpuPtr,
         const float* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks,
         const float interMinAboveThreshold, const float interThreshold, const int minSubsetCnt,
-        const float minSubsetScore, const float scaleFactor, const bool maximizePositives,
-        Array<float> pairScoresCpu, float* pairScoresGpuPtr, const unsigned int* const bodyPartPairsGpuPtr,
-        const unsigned int* const mapIdxGpuPtr, const float* const peaksGpuPtr, const int gpuID);
+        const float defaultNmsThreshold, const float minSubsetScore, const float scaleFactor,
+        const bool maximizePositives, Array<float> pairScoresCpu, float* pairScoresGpuPtr,
+        const unsigned int* const bodyPartPairsGpuPtr, const unsigned int* const mapIdxGpuPtr,
+        const float* const peaksGpuPtr, const int gpuID);
     template void connectBodyPartsOcl(
         Array<double>& poseKeypoints, Array<double>& poseScores, const double* const heatMapGpuPtr,
         const double* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks,
         const double interMinAboveThreshold, const double interThreshold, const int minSubsetCnt,
-        const double minSubsetScore, const double scaleFactor, const bool maximizePositives,
-        Array<double> pairScoresCpu, double* pairScoresGpuPtr, const unsigned int* const bodyPartPairsGpuPtr,
-        const unsigned int* const mapIdxGpuPtr, const double* const peaksGpuPtr, const int gpuID);
+        const double defaultNmsThreshold, const double minSubsetScore, const double scaleFactor,
+        const bool maximizePositives, Array<double> pairScoresCpu, double* pairScoresGpuPtr,
+        const unsigned int* const bodyPartPairsGpuPtr, const unsigned int* const mapIdxGpuPtr,
+        const double* const peaksGpuPtr, const int gpuID);
 }

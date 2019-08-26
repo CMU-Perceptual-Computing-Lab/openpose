@@ -10,25 +10,26 @@ namespace op
     void connectBodyPartsCpu(
         Array<T>& poseKeypoints, Array<T>& poseScores, const T* const heatMapPtr, const T* const peaksPtr,
         const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks, const T interMinAboveThreshold,
-        const T interThreshold, const int minSubsetCnt, const T minSubsetScore, const T scaleFactor = 1.f,
-        const bool maximizePositives = false);
+        const T interThreshold, const int minSubsetCnt, const T minSubsetScore, const T defaultNmsThreshold,
+        const T scaleFactor = 1.f, const bool maximizePositives = false);
 
     // Windows: Cuda functions do not include OP_API
     template <typename T>
     void connectBodyPartsGpu(
         Array<T>& poseKeypoints, Array<T>& poseScores, const T* const heatMapGpuPtr, const T* const peaksPtr,
         const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks, const T interMinAboveThreshold,
-        const T interThreshold, const int minSubsetCnt, const T minSubsetScore, const T scaleFactor,
-        const bool maximizePositives, Array<T> pairScoresCpu, T* pairScoresGpuPtr,
+        const T interThreshold, const int minSubsetCnt, const T minSubsetScore, const T defaultNmsThreshold,
+        const T scaleFactor, const bool maximizePositives, Array<T> pairScoresCpu, T* pairScoresGpuPtr,
         const unsigned int* const bodyPartPairsGpuPtr, const unsigned int* const mapIdxGpuPtr,
-        const T* const peaksGpuPtr, const T defaultNmsThreshold);
+        const T* const peaksGpuPtr);
 
     template <typename T>
     void connectBodyPartsOcl(
         Array<T>& poseKeypoints, Array<T>& poseScores, const T* const heatMapGpuPtr, const T* const peaksPtr,
         const PoseModel poseModel, const Point<int>& heatMapSize, const int maxPeaks, const T interMinAboveThreshold,
-        const T interThreshold, const int minSubsetCnt, const T minSubsetScore, const T scaleFactor = 1.f,
-        const bool maximizePositives = false, Array<T> pairScoresCpu = Array<T>{}, T* pairScoresGpuPtr = nullptr,
+        const T interThreshold, const int minSubsetCnt, const T minSubsetScore, const T defaultNmsThreshold,
+        const T scaleFactor = 1.f, const bool maximizePositives = false,
+        Array<T> pairScoresCpu = Array<T>{}, T* pairScoresGpuPtr = nullptr,
         const unsigned int* const bodyPartPairsGpuPtr = nullptr, const unsigned int* const mapIdxGpuPtr = nullptr,
         const T* const peaksGpuPtr = nullptr, const int gpuID = 0);
 
@@ -38,7 +39,8 @@ namespace op
         const T* const heatMapPtr, const T* const peaksPtr, const PoseModel poseModel, const Point<int>& heatMapSize,
         const int maxPeaks, const T interThreshold, const T interMinAboveThreshold,
         const std::vector<unsigned int>& bodyPartPairs, const unsigned int numberBodyParts,
-        const unsigned int numberBodyPartPairs, const Array<T>& precomputedPAFs = Array<T>());
+        const unsigned int numberBodyPartPairs, const T defaultNmsThreshold,
+        const Array<T>& precomputedPAFs = Array<T>());
 
     template <typename T>
     void removePeopleBelowThresholdsAndFillFaces(
