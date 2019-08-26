@@ -21,7 +21,7 @@ namespace op
 
             Type process(__global const Type* bodyPartA, __global const Type* bodyPartB, __global const Type* mapX, __global const Type* mapY,
                                          const int heatmapWidth, const int heatmapHeight, const Type interThreshold,
-                                         const Type interMinAboveThreshold, const T defaultNmsThreshold)
+                                         const Type interMinAboveThreshold, const Type defaultNmsThreshold)
             {
                 const Type vectorAToBX = bodyPartB[0] - bodyPartA[0];
                 const Type vectorAToBY = bodyPartB[1] - bodyPartA[1];
@@ -78,7 +78,7 @@ namespace op
                 __global const unsigned int* const bodyPartPairsPtr, __global const unsigned int* const mapIdxPtr,
                 const unsigned int maxPeaks, const int numberBodyPartPairs, const int heatmapWidth,
                 const int heatmapHeight, const Type interThreshold, const Type interMinAboveThreshold,
-                const T defaultNmsThreshold)
+                const Type defaultNmsThreshold)
             {
                 int pairIndex = get_global_id(0);
                 int peakA = get_global_id(1);

@@ -374,6 +374,7 @@ OpenPose Library - Release Notes
     5. Number of maximum people is not limited by the maximum number of max peaks anymore. However, the number of body part candidates for a specific keypoint (e.g., nose) is still limited to the number of max peaks.
     6. Added more checks during destructors of CUDA-related functions and safer CUDA frees.
     7. Improved accuracy of CPU version about 0.2% by following the CUDA/OpenCL approach of assigning the minimum possible PAF score to keypoints that are very close to each other.
+    8. Added Windows auto-testing (AppVeyor).
 2. Functions or parameters renamed:
     1. `--3d_min_views` default value (-1) no longer means that all camera views are required. Instead, it will be equal to max(2, min(4, #cameras-1)). This should provide a good trade-off between recall and precission.
 3. Main bugs fixed:
