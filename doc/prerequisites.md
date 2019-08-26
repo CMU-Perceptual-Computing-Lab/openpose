@@ -61,6 +61,7 @@ In addition, CMake automatically downloads all the OpenPose models. However, **s
         3. Use your own version of Eigen by setting `WITH_EIGEN` to `BUILD`, run CMake so that OpenPose downloads the zip file, and then replace the contents of `3rdparty/eigen/` by your own version.
 
 
+
 ### Mac OS Prerequisites
 1. If you don't have `brew`, install it by running `bash scripts/osx/install_brew.sh` on your terminal.
 2. Install **CMake GUI**: Run the command `brew cask install cmake`.
