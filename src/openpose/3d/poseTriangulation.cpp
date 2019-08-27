@@ -154,9 +154,9 @@ namespace op
         }
     }
 
-    double triangulateWithOptimization(cv::Mat& reconstructedPoint, const std::vector<cv::Mat>& cameraMatrices,
-                                       const std::vector<cv::Point2d>& pointsOnEachCamera,
-                                       const double reprojectionMaxAcceptable)
+    double triangulateWithOptimization(
+        cv::Mat& reconstructedPoint, const std::vector<cv::Mat>& cameraMatrices,
+        const std::vector<cv::Point2d>& pointsOnEachCamera, const double reprojectionMaxAcceptable)
     {
         try
         {
@@ -356,7 +356,7 @@ namespace op
             {
                 if (!keypoints.empty())
                 {
-                    detectionMissed++;
+                    ++detectionMissed;
                     if (detectionMissed > 1)
                     {
                         numberBodyParts = keypoints.getSize(1);
@@ -372,7 +372,7 @@ namespace op
                 std::vector<int> indexesUsed;
                 std::vector<std::vector<cv::Point2d>> xyPoints;
                 std::vector<std::vector<cv::Mat>> cameraMatricesPerPoint;
-                for (auto part = 0; part < numberBodyParts; part++)
+                for (auto part = 0; part < numberBodyParts; ++part)
                 {
                     // Create vector of points
                     // auto missedPoint = false;
@@ -383,7 +383,7 @@ namespace op
                     for (auto i = 0u ; i < keypointsVector.size() ; i++)
                     {
                         const auto& keypoints = keypointsVector[i];
-                        if (isValidKeypoint(&keypoints[baseIndex], imageSizes[i]))
+                        if (!keypoints.empty() && isValidKeypoint(&keypoints[baseIndex], imageSizes[i]))
                         {
                             xyPointsElement.emplace_back(
                                 cv::Point2d{keypoints[baseIndex], keypoints[baseIndex+1]});
@@ -408,9 +408,9 @@ namespace op
                 const auto imageRatio = std::sqrt(imageSizes[0].x * imageSizes[0].y / 1310720.);
                 const auto reprojectionMaxAcceptable = 25 * imageRatio;
                 std::vector<double> reprojectionErrors(xyPoints.size());
-                keypoints3D.reset({ 1, numberBodyParts, 4 }, 0.f);
                 if (!xyPoints.empty())
                 {
+                    keypoints3D.reset({ 1, numberBodyParts, 4 }, 0.f);
                     // Do 3D reconstruction
                     std::vector<cv::Point3f> xyzPoints(xyPoints.size());
                     for (auto i = 0u; i < xyPoints.size(); i++)
@@ -434,7 +434,7 @@ namespace op
                     // 20 pixels for 1280x1024 image
                     bool atLeastOnePointProjected = false;
                     const auto lastChannelLength = keypoints3D.getSize(2);
-                    for (auto index = 0u; index < indexesUsed.size(); index++)
+                    for (auto index = 0u; index < indexesUsed.size(); ++index)
                     {
                         if (std::isfinite(xyzPoints[index].x) && std::isfinite(xyzPoints[index].y)
                             && std::isfinite(xyzPoints[index].z)

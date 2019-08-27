@@ -19,7 +19,7 @@ endfunction (download_model)
 function(download_zip FILE_NAME URL DOWNLOAD_PATH CHECKSUM)
   set(FULL_FILE_PATH "${DOWNLOAD_PATH}/${FILE_NAME}")
   if (NOT EXISTS ${FULL_FILE_PATH})
-    message(STATUS "Downloading ${URL}...")
+    message(STATUS "Downloading ${URL}/${FILE_NAME}...")
     file(DOWNLOAD "${URL}/${FILE_NAME}" "${DOWNLOAD_PATH}/${FILE_NAME}"
         EXPECTED_MD5 ${CHECKSUM})
     message(STATUS "Extracting ${FULL_FILE_PATH}...")

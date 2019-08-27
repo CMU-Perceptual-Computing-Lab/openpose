@@ -11,7 +11,8 @@
 namespace op
 {
     #ifdef USE_OPENCL
-        typedef cl::KernelFunctor<cl::Buffer, cl::Buffer, cl::Buffer, cl::Buffer, cl::Buffer, unsigned int, int, int, int, float, float> PAFScoreKernelFunctor;
+        typedef cl::KernelFunctor<cl::Buffer, cl::Buffer, cl::Buffer, cl::Buffer, cl::Buffer, unsigned int, int, int,
+            int, float, float, float> PAFScoreKernelFunctor;
         const std::string pafScoreKernel = MULTI_LINE_STRING(
 
             int intRoundGPU(const Type a)
@@ -19,9 +20,10 @@ namespace op
                 return (int)(a+0.5);
             }
 
-            Type process(__global const Type* bodyPartA, __global const Type* bodyPartB, __global const Type* mapX, __global const Type* mapY,
-                                         const int heatmapWidth, const int heatmapHeight, const Type interThreshold,
-                                         const Type interMinAboveThreshold, const Type defaultNmsThreshold)
+            Type process(
+                __global const Type* bodyPartA, __global const Type* bodyPartB, __global const Type* mapX,
+                __global const Type* mapY, const int heatmapWidth, const int heatmapHeight, const Type interThreshold,
+                const Type interMinAboveThreshold, const Type defaultNmsThreshold)
             {
                 const Type vectorAToBX = bodyPartB[0] - bodyPartA[0];
                 const Type vectorAToBY = bodyPartB[1] - bodyPartA[1];
@@ -67,7 +69,7 @@ namespace op
                         const Type l2Dist = sqrt((Type)(vectorAToBX*vectorAToBX + vectorAToBY*vectorAToBY));
                         const Type threshold = sqrt((Type)(heatmapWidth*heatmapHeight))/150; // 3.3 for 368x656, 6.6 for 2x resolution
                         if (l2Dist < threshold)
-                            return T(defaultNmsThreshold+1e-6); // Without 1e-6 will not work because I use strict greater
+                            return Type(defaultNmsThreshold+1e-6); // Without 1e-6 will not work because I use strict greater
                     }
                 }
                 return -1;

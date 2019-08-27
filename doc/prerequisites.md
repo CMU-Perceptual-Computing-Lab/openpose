@@ -103,7 +103,10 @@ NOTE: These instructions are only required when compiling OpenPose brom source. 
     - CMake automatically downloads all the Windows DLLs. Alternatively, you might prefer to download them manually:
         - Dependencies:
             - Note: Leave the zip files in `3rdparty/windows/` so that CMake does not try to download them again.
-            - [Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_15_2019_05_16.zip): Unzip as `3rdparty/windows/caffe/`.
+            - Caffe (if you are not sure which one you need, donwload the default one):
+                - [CUDA Caffe (Default)](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_15_2019_05_16.zip): Unzip as `3rdparty/windows/caffe/`.
+                - [CPU Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_cpu_2018_05_27.zip): Unzip as `3rdparty/windows/caffe_cpu/`.
+                - [OpenCL Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_opencl_2018_02_13.zip): Unzip as `3rdparty/windows/caffe_opencl/`.
             - [Caffe dependencies](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe3rdparty_15_2019_03_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
             - [OpenCV 4.0.1](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_401_v14_15_2019_03_14.zip): Unzip as `3rdparty/windows/opencv/`.
 6. **Eigen prerequisite** (optional, only required for some specific extra functionality, such as extrinsic camera calibration):
