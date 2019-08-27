@@ -248,7 +248,7 @@ Each flag is divided into flag name, default value, and description.
 - DEFINE_int32(write_coco_json_variants,  1,              "Add 1 for body, add 2 for foot, 4 for face, and/or 8 for hands. Use 0 to use all the possible candidates. E.g., 7 would mean body+foot+face COCO JSON.");
 - DEFINE_int32(write_coco_json_variant,   0,              "Currently, this option is experimental and only makes effect on car JSON generation. It selects the COCO variant for cocoJsonSaver.");
 - DEFINE_string(write_heatmaps,           "",             "Directory to write body pose heatmaps in PNG format. At least 1 `add_heatmaps_X` flag must be enabled.");
-- DEFINE_string(write_heatmaps_format,    "png",          "File extension and format for `write_heatmaps`, analogous to `write_images_format`. For lossless compression, recommended `png` for integer `heatmaps_scale` and `float` for floating values.");
+- DEFINE_string(write_heatmaps_format,    "png",          "File extension and format for `write_heatmaps`, analogous to `write_images_format`. For lossless compression, recommended `png` for integer `heatmaps_scale` and `float` for floating values. See `doc/output.md` for more details.");
 - DEFINE_string(write_keypoint,           "",             "(Deprecated, use `write_json`) Directory to write the people pose keypoint data. Set format with `write_keypoint_format`.");
 - DEFINE_string(write_keypoint_format,    "yml",          "(Deprecated, use `write_json`) File extension and format for `write_keypoint`: json, xml, yaml & yml. Json not available for OpenCV < 3.0, use `write_json` instead.");
 

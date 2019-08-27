@@ -7,10 +7,11 @@ OpenPose Demo - Output
 1. [Output Format](#output-format)
     1. [Keypoint Ordering](#keypoint-ordering)
     2. [Heatmap Ordering](#heatmap-ordering)
-    3. [Face and Hands](#face-and-hands)
-    4. [Pose Output Format](#pose-output-format)
-    5. [Face Output Format](#face-output-format)
-    6. [Hand Output Format](#hand-output-format)
+    3. [Heatmap Saving in Float Format](#heatmap-saving-in-float-format)
+    4. [Face and Hands](#face-and-hands)
+    5. [Pose Output Format](#pose-output-format)
+    6. [Face Output Format](#face-output-format)
+    7. [Hand Output Format](#hand-output-format)
 3. [Reading Saved Results](#reading-saved-results)
 4. [Keypoint Format in the C++ API](#keypoint-format-in-the-c-api)
 
@@ -114,7 +115,7 @@ const auto& poseBodyPartMappingMpi = getPoseBodyPartMapping(PoseModel::MPI_15);
 
 
 ### Heatmap Ordering
-For the **heat maps storing format**, instead of saving each of the 67 heatmaps (18 body parts + background + 2 x 19 PAFs) individually, the library concatenates them into a huge (width x #heat maps) x (height) matrix (i.e., concatenated by columns). E.g., columns [0, individual heat map width] contains the first heat map, columns [individual heat map width + 1, 2 * individual heat map width] contains the second heat map, etc. Note that some image viewers are not able to display the resulting images due to the size. However, Chrome and Firefox are able to properly open them.
+For the **heat maps storing format**, instead of saving each of the 67 heatmaps (18 body parts + background + 2 x 19 PAFs) individually, the library concatenates them into a huge (width x #heat maps) x (height) matrix (i.e., concatenated by columns). E.g., columns [0, individual heat map width] contain the first heat map, columns [individual heat map width + 1, 2 * individual heat map width] contain the second heat map, etc. Note that some image viewers are not able to display the resulting images due to the size. However, Chrome and Firefox are able to properly open them.
 
 The saving order is body parts + background + PAFs. Any of them can be disabled with program flags. If background is disabled, then the final image will be body parts + PAFs. The body parts and background follow the order of `getPoseBodyPartMapping(const PoseModel poseModel)`.
 
@@ -132,6 +133,22 @@ const auto& posePartPairsMpi = getPosePartPairs(PoseModel::MPI_15);
 
 // getPoseMapIndex(PoseModel::BODY_25) result
 // 0,1, 14,15, 22,23, 16,17, 18,19, 24,25, 26,27, 6,7, 2,3, 4,5, 8,9, 10,11, 12,13, 30,31, 32,33, 36,37, 34,35, 38,39, 20,21, 28,29, 40,41,42,43,44,45, 46,47,48,49,50,51
+```
+
+
+
+### Heatmap Saving in Float Format
+If you save the heatmaps in floating format by using the flag `--write_heatmaps_format float`, you can later read them in Python with:
+```
+# Load custom float format - Example in Python, assuming a (18 x 300 x 500) size Array
+x = np.fromfile(heatMapFullPath, dtype=np.float32)
+assert x[0] == 3 # First parameter saves the number of dimensions (18x300x500 = 3 dimensions)
+shape_x = x[1:1+int(x[0])]
+assert len(shape_x[0]) == 3 # Number of dimensions
+assert shape_x[0] == 18 # Size of the first dimension
+assert shape_x[1] == 300 # Size of the second dimension
+assert shape_x[2] == 500 # Size of the third dimension
+arrayData = x[1+int(round(x[0])):]
 ```
 
 

@@ -256,7 +256,7 @@ DEFINE_string(write_heatmaps,           "",             "Directory to write body
                                                         " must be enabled.");
 DEFINE_string(write_heatmaps_format,    "png",          "File extension and format for `write_heatmaps`, analogous to `write_images_format`."
                                                         " For lossless compression, recommended `png` for integer `heatmaps_scale` and `float` for"
-                                                        " floating values.");
+                                                        " floating values. See `doc/output.md` for more details.");
 DEFINE_string(write_keypoint,           "",             "(Deprecated, use `write_json`) Directory to write the people pose keypoint data. Set format"
                                                         " with `write_keypoint_format`.");
 DEFINE_string(write_keypoint_format,    "yml",          "(Deprecated, use `write_json`) File extension and format for `write_keypoint`: json, xml,"
