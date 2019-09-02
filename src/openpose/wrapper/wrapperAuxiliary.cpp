@@ -102,9 +102,10 @@ namespace op
                 }
             }
             if (!wrapperStructOutput.writeVideo.empty() && producerSharedPtr == nullptr)
-                error("Writting video is only available if the OpenPose producer is used (i.e."
-                      " producerSharedPtr cannot be a nullptr).",
-                      __LINE__, __FUNCTION__, __FILE__);
+                error("Writting video (`--write_video`) is only available if the OpenPose producer is used (i.e."
+                      " producerSharedPtr cannot be a nullptr). Otherwise, OpenPose would not know the frame rate"
+                      " of that output video nor whether all the images maintain the same resolution. You might"
+                      " use `--write_images` instead.", __LINE__, __FUNCTION__, __FILE__);
             if (wrapperStructPose.poseMode == PoseMode::Disabled && !wrapperStructFace.enable
                 && !wrapperStructHand.enable)
                 error("Body, face, and hand keypoint detectors are disabled. You must enable at least one (i.e,"

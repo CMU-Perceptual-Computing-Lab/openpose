@@ -8,10 +8,11 @@ OpenPose Demo - Output
     1. [Keypoint Ordering](#keypoint-ordering)
     2. [Heatmap Ordering](#heatmap-ordering)
     3. [Heatmap Saving in Float Format](#heatmap-saving-in-float-format)
-    4. [Face and Hands](#face-and-hands)
-    5. [Pose Output Format](#pose-output-format)
-    6. [Face Output Format](#face-output-format)
-    7. [Hand Output Format](#hand-output-format)
+    4. [Heatmap Scaling](#heatmap-scaling)
+    5. [Face and Hands](#face-and-hands)
+    6. [Pose Output Format](#pose-output-format)
+    7. [Face Output Format](#face-output-format)
+    8. [Hand Output Format](#hand-output-format)
 3. [Reading Saved Results](#reading-saved-results)
 4. [Keypoint Format in the C++ API](#keypoint-format-in-the-c-api)
 
@@ -150,6 +151,11 @@ assert shape_x[1] == 300 # Size of the second dimension
 assert shape_x[2] == 500 # Size of the third dimension
 arrayData = x[1+int(round(x[0])):]
 ```
+
+
+
+### Heatmap Scaling
+Note that `--net_resolution` sets the size of the network, thus also the size of the output heatmaps. This heatmaps are resized while keeping the aspect ratio. When aspect ratio of the the input and network are not the same, padding is added at the bottom and/or right part of the output heatmaps.
 
 
 
