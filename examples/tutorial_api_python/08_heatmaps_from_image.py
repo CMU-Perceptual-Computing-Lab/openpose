@@ -80,7 +80,7 @@ try:
         heatmap = heatmaps[counter, :, :].copy()
         heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
         combined = cv2.addWeighted(outputImageF, 0.5, heatmap, 0.5, 0)
-        cv2.imshow("OpenPose 1.5.0 - Tutorial Python API", combined)
+        cv2.imshow("OpenPose 1.5.1 - Tutorial Python API", combined)
         key = cv2.waitKey(-1)
         if key == 27:
             break

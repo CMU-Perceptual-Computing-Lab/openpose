@@ -89,7 +89,7 @@ try:
     opWrapper.emplaceAndPop([datum])
     print("Left hand keypoints: \n" + str(datum.handKeypoints[0]))
     print("Right hand keypoints: \n" + str(datum.handKeypoints[1]))
-    cv2.imshow("OpenPose 1.5.0 - Tutorial Python API", datum.cvOutputData)
+    cv2.imshow("OpenPose 1.5.1 - Tutorial Python API", datum.cvOutputData)
     cv2.waitKey(0)
 except Exception as e:
     # print(e)

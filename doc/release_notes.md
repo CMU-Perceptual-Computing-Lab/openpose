@@ -365,7 +365,7 @@ OpenPose Library - Release Notes
 
 
 
-## Current version - future OpenPose 1.5.1
+## OpenPose 1.5.1 (Sep 03, 2019)
 1. Main improvements:
     1. Highly improved 3D triangulation for >3 cameras by fixing some small bugs.
     2. Added community-based support for Nvidia NVCaffe.
@@ -380,6 +380,13 @@ OpenPose Library - Release Notes
 3. Main bugs fixed:
     1. Windows: Added back support for OpenGL and Spinnaker, as well as DLLs for debug compilation.
     2. `06_face_from_image.cpp`, `07_hand_from_image.cpp`, and `09_keypoints_from_heatmaps` working again, they stopped working in version 1.5.0 with the GPU image resize for the GUI.
+
+
+
+## Current version - Future OpenPose 1.5.2
+1. Main improvements:
+2. Functions or parameters renamed:
+3. Main bugs fixed:
 4. Changes/additions that affect the compatibility with the OpenPose Unity Plugin:
 
 

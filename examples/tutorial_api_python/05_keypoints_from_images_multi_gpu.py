@@ -99,7 +99,7 @@ try:
                 print("Body keypoints: \n" + str(datum.poseKeypoints))
 
                 if not args[0].no_display:
-                    cv2.imshow("OpenPose 1.5.0 - Tutorial Python API", datum.cvOutputData)
+                    cv2.imshow("OpenPose 1.5.1 - Tutorial Python API", datum.cvOutputData)
                     key = cv2.waitKey(15)
                     if key == 27: break
 
