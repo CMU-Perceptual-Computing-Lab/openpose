@@ -320,7 +320,7 @@ If you only have an integrated Intel Graphics card, then it will most probably b
 build/examples/openpose/openpose.bin --num_gpu 1 --num_gpu_start 1
 ```
 
-Also as a side note, if the default installation fails (i.e., the one explained above), instal Caffe separately and set `BUILD_CAFFE` to false in the CMake config. Steps:
+Also as a side note, if the default installation fails (i.e., the one explained above), install Caffe separately and set `BUILD_CAFFE` to false in the CMake config. Steps:
 - Re-create the build folder: `rm -rf build; mkdir build; cd build`.
 - `brew uninstall caffe` to remove the version of Caffe previously installed via cmake.
 - `brew install caffe` to install Caffe separately.
