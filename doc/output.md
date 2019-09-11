@@ -13,8 +13,8 @@ OpenPose Demo - Output
     6. [Pose Output Format](#pose-output-format)
     7. [Face Output Format](#face-output-format)
     8. [Hand Output Format](#hand-output-format)
-3. [Reading Saved Results](#reading-saved-results)
-4. [Keypoint Format in the C++ API](#keypoint-format-in-the-c-api)
+2. [Reading Saved Results](#reading-saved-results)
+3. [Keypoint Format in the C++ API](#keypoint-format-in-the-c-api)
 
 
 

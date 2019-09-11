@@ -93,8 +93,9 @@ DEFINE_int32(body,                      1,              "Select 0 to disable bod
                                                         " keypoint detection, custom hand detector, etc.), 1 (default) for body keypoint"
                                                         " estimation, and 2 to disable its internal body pose estimation network but still"
                                                         " still run the greedy association parsing algorithm");
-DEFINE_string(model_pose,               "BODY_25",      "Model to be used. E.g., `COCO` (18 keypoints), `MPI` (15 keypoints, ~10% faster), "
-                                                        "`MPI_4_layers` (15 keypoints, even faster but less accurate).");
+DEFINE_string(model_pose,               "BODY_25",      "Model to be used. E.g., `BODY_25` (fastest for CUDA version, most accurate, and includes"
+                                                        " foot keypoints), `COCO` (18 keypoints), `MPI` (15 keypoints, least accurate model but"
+                                                        " fastest on CPU), `MPI_4_layers` (15 keypoints, even faster but less accurate).");
 DEFINE_string(net_resolution,           "-1x368",       "Multiples of 16. If it is increased, the accuracy potentially increases. If it is"
                                                         " decreased, the speed increases. For maximum speed-accuracy balance, it should keep the"
                                                         " closest aspect ratio possible to the images or videos to be processed. Using `-1` in"
@@ -176,9 +177,10 @@ DEFINE_int32(ik_threads,                0,              "Experimental, not avail
                                                         " keypoints to obtain 3-D joint angles. By default (0 threads), it is disabled. Increasing"
                                                         " the number of threads will increase the speed but also the global system latency.");
 // OpenPose Rendering
-DEFINE_int32(part_to_show,              0,              "Prediction channel to visualize (default: 0). 0 for all the body parts, 1-18 for each body"
-                                                        " part heat map, 19 for the background heat map, 20 for all the body part heat maps"
-                                                        " together, 21 for all the PAFs, 22-40 for each body part pair PAF.");
+DEFINE_int32(part_to_show,              0,              "Prediction channel to visualize: 0 (default) for all the body parts, 1 for the background"
+                                                        " heat map, 2 for the superposition of heatmaps, 3 for the superposition of PAFs,"
+                                                        " 4-(4+#keypoints) for each body part heat map, the following ones for each body part pair"
+                                                        " PAF.");
 DEFINE_bool(disable_blending,           false,          "If enabled, it will render the results (keypoint skeletons or heatmaps) on a black"
                                                         " background, instead of being rendered into the original image. Related: `part_to_show`,"
                                                         " `alpha_pose`, and `alpha_pose`.");

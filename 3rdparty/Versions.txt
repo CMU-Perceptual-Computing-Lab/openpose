@@ -26,7 +26,7 @@ Windows:
         - Link: https://www.transmissionzero.co.uk/software/freeglut-devel/
 
     - OpenCV:
-        - Version 3.1.0, extracted from their oficial website, section releases/3.1.0/Win pack.
+        - Version 4.0.1, extracted from their oficial website, section releases/4.0.1/Win pack.
         - Link: http://opencv.org/releases.html
 
     - Unzip:

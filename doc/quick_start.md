@@ -3,18 +3,28 @@ OpenPose - Quick Start
 
 ## Contents
 1. [Quick Start](#quick-start)
-    1. [Running on Video](#running-on-video)
-    2. [Running on Webcam](#running-on-webcam)
-    3. [Running on Images](#running-on-images)
-    4. [Maximum Accuracy Configuration](#maximum-accuracy-configuration)
-    5. [3-D Reconstruction](#3-d-reconstruction)
-    6. [Tracking](#tracking)
+    1. [BODY_25 vs. COCO vs. MPI Models](#body-25-vs-coco-vs-mpi-models)
+    2. [Running on Video](#running-on-video)
+    3. [Running on Webcam](#running-on-webcam)
+    4. [Running on Images](#running-on-images)
+    5. [Maximum Accuracy Configuration](#maximum-accuracy-configuration)
+    6. [3-D Reconstruction](#3-d-reconstruction)
+    7. [Tracking](#tracking)
 2. [Expected Visual Results](#expected-visual-results)
 
 
 
 ## Quick Start
 Check that the library is working properly by running any of the following commands on any command-line interface program. In Ubuntu, Mac, and other Unix systems, use any command-line interface, such as `Terminal` or `Terminator`. In Windows, open the `PowerShell` (recommended) or Windows Command Prompt (CMD). They can be open by pressing the Windows button + X, and then A. Feel free to watch any Youtube video tutorial if you are not familiar with these non-GUI tools. Make sure that you are in the **root directory of the project** (i.e., in the OpenPose folder, not inside `build/` nor `windows/` nor `bin/`). In addition, `examples/media/video.avi` and `examples/media` do exist, no need to change the paths.
+
+
+
+### BODY_25 vs. COCO vs. MPI Models
+The BODY_25 model (`--model_pose BODY_25`) includes both body and foot keypoints and it is based in [OpenPose: Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields](https://arxiv.org/abs/1812.08008). COCO and MPI models are slower, less accurate, and do not contain foot keypoints. They are based in our older paper [Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields](https://arxiv.org/abs/1611.08050). We highly recommend only using the BODY_25 model.
+
+There is an exception, for CPU version, the COCO and MPI models seems to be faster. Accuracy is still better for the BODY_25 model.
+
+
 
 ### Running on Video
 ```
