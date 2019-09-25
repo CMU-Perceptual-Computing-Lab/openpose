@@ -100,7 +100,7 @@ namespace op
             {
                 // Copy
                 for (auto i = 0u ; i < array.getVolume() ; i++)
-                    pData[i] = array[i];
+                    pData[i] = T(array[i]);
             }
             catch (const std::exception& e)
             {

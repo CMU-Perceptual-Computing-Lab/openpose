@@ -388,6 +388,7 @@ OpenPose Library - Release Notes
     1. Default OpenCV version for Windows upgraded to version 4.1.1, extracted from their oficial website: section `Releases`, subsection `OpenCV – 4.1.1`, `Windows` version.
 2. Functions or parameters renamed:
 3. Main bugs fixed:
+    1. Removed many Visual Studio (Windows) warnings.
 4. Changes/additions that affect the compatibility with the OpenPose Unity Plugin:
 
 

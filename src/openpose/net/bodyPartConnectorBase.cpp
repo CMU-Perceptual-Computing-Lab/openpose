@@ -95,14 +95,14 @@ namespace op
 
     template <typename T>
     void getRoiDiameterAndBounds(
-        Rectangle<int>& roi, int& diameter, int& partFirstNon0, int& partLastNon0,
+        Rectangle<T>& roi, int& partFirstNon0, int& partLastNon0,
         const std::vector<int>& personVector, const T* const peaksPtr,
-        const int partInit, const int partEnd, const float margin)
+        const int partInit, const int partEnd, const T margin)
     {
         try
         {
             // Find ROI, partFirstNon0, and partLastNon0
-            roi = Rectangle<int>{std::numeric_limits<int>::max(),std::numeric_limits<int>::max(),0,0};
+            roi = Rectangle<T>{std::numeric_limits<T>::max(),std::numeric_limits<T>::max(),T(0),T(0)};
             partFirstNon0 = -1;
             partLastNon0 = -1;
             for (auto part = partInit ; part < partEnd ; part++)
@@ -131,8 +131,8 @@ namespace op
             if (partLastNon0 > -1)
             {
                 // Add margin
-                const auto marginX = roi.width * margin;
-                const auto marginY = roi.height * margin;
+                const auto marginX = T(roi.width * margin);
+                const auto marginY = T(roi.height * margin);
                 roi.x -= marginX;
                 roi.y -= marginY;
                 roi.width += 2*marginX;
@@ -143,8 +143,6 @@ namespace op
                 // +1 to account for 1-line keypoints
                 roi.width += 1 - roi.x;
                 roi.height += 1 - roi.y;
-                // diameter
-                diameter = fastMax(roi.width, roi.height);
             }
         }
         catch (const std::exception& e)
@@ -803,13 +801,12 @@ namespace op
                 for (const auto& personInvalid : faceInvalidSubsetIndexes)
                 {
                     // Get ROI of current face
-                    Rectangle<int> roiInvalid;
-                    int diameterInvalid = -1;
+                    Rectangle<T> roiInvalid;
                     int partFirstNon0Invalid = -1;
                     int partLastNon0Invalid = -1;
                     getRoiDiameterAndBounds(
-                        roiInvalid, diameterInvalid, partFirstNon0Invalid, partLastNon0Invalid,
-                        peopleVector[personInvalid].first, peaksPtr, 65, 135, 0.2f);
+                        roiInvalid, partFirstNon0Invalid, partLastNon0Invalid,
+                        peopleVector[personInvalid].first, peaksPtr, 65, 135, T(0.2));
                     // Check all valid faces to find best candidate
                     float keypointsRoiBest = 0.f;
                     auto keypointsRoiBestIndex = -1;
@@ -817,13 +814,12 @@ namespace op
                     {
                         const auto& personValid = faceValidSubsetIndexes[personId];
                         // Get ROI of current face
-                        Rectangle<int> roiValid;
-                        int diameterValid = -1;
+                        Rectangle<T> roiValid;
                         int partFirstNon0Valid = -1;
                         int partLastNon0Valid = -1;
                         getRoiDiameterAndBounds(
-                            roiValid, diameterValid, partFirstNon0Valid, partLastNon0Valid, peopleVector[personValid].first,
-                            peaksPtr, 65, 135, 0.1f);
+                            roiValid, partFirstNon0Valid, partLastNon0Valid, peopleVector[personValid].first,
+                            peaksPtr, 65, 135, T(0.1));
                         // Get ROI between both faces
                         const auto keypointsRoi = getKeypointsRoi(roiValid, roiInvalid);
                         // Update best so far
