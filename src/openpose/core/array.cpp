@@ -174,7 +174,7 @@ namespace op
                 // Allocate memory
                 reset(sizes);
                 // Copy desired index
-                const auto arrayArea = array.getVolume(1);
+                const auto arrayArea = (int)array.getVolume(1);
                 const auto keypointsIndex = index*arrayArea;
                 std::copy(&array[keypointsIndex], &array[keypointsIndex]+arrayArea, pData);
             }

@@ -434,7 +434,7 @@ namespace op
                     error("Person index out of range.", __LINE__, __FUNCTION__, __FILE__);
                 // Count keypoints
                 auto nonZeroCounter = 0;
-                const auto baseIndex = person * keypoints.getVolume(1,2);
+                const auto baseIndex = person * (int)keypoints.getVolume(1,2);
                 for (auto part = 0 ; part < keypoints.getSize(1) ; part++)
                     if (keypoints[baseIndex + 3*part + 2] >= threshold)
                         nonZeroCounter++;
@@ -486,8 +486,8 @@ namespace op
             // Get total distance
             T totalDistance = 0;
             int nonZeroCounter = 0;
-            const auto baseIndexA = personA * keypointsA.getVolume(1,2);
-            const auto baseIndexB = personB * keypointsB.getVolume(1,2);
+            const auto baseIndexA = personA * (int)keypointsA.getVolume(1,2);
+            const auto baseIndexB = personB * (int)keypointsB.getVolume(1,2);
             for (auto part = 0 ; part < keypointsA.getSize(1) ; part++)
             {
                 if (keypointsA[baseIndexA+3*part+2] >= threshold && keypointsB[baseIndexB+3*part+2] >= threshold)

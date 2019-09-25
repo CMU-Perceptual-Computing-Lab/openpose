@@ -10,7 +10,7 @@ namespace op
     {
         try
         {
-            return getLastNumber(imageName);
+            return (int)getLastNumber(imageName);
         }
         catch (const std::exception& e)
         {

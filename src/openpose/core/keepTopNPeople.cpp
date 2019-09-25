@@ -52,7 +52,7 @@ namespace op
                 // Naively, we could accidentally keep the first 2x 0.5 and remove the 1.0 threshold.
                 // Our method keeps the first 0.5 and 1.0.
                 Array<float> topPeopleArray({mNumberPeopleMax, peopleArray.getSize(1), peopleArray.getSize(2)});
-                const auto personArea = peopleArray.getVolume(1, 2);
+                const auto personArea = (int)peopleArray.getVolume(1, 2);
                 auto assignedPeopleOnThreshold = 0;
                 auto nextPersonIndex = 0;
                 const auto numberPeopleOnThresholdToBeAdded = mNumberPeopleMax - numberPeopleAboveThreshold;

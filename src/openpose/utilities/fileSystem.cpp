@@ -388,12 +388,12 @@ namespace op
             // Get files on directory with the desired extensions
             if (extensions == Extensions::Images)
             {
-                const std::vector<std::string> extensions{
+                const std::vector<std::string> extensionNames{
                     // Completely supported by OpenCV
                     "bmp", "dib", "pbm", "pgm", "ppm", "sr", "ras",
                     // Most of them supported by OpenCV
                     "jpg", "jpeg", "png"};
-                return getFilesOnDirectory(directoryPath, extensions);
+                return getFilesOnDirectory(directoryPath, extensionNames);
             }
             // Unknown kind of extensions
             else

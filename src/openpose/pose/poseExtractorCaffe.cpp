@@ -439,20 +439,20 @@ namespace op
                                     mUpsamplingRatio);
                             }
                             // 2. Resize heat maps + merge different scales
-                            const auto caffeNetOutputBlobs = arraySharedToPtr(caffeNetOutputBlob);
-                            // const std::vector<float> floatScaleRatios(
+                            const auto caffeNetOutputBlobsNew = arraySharedToPtr(caffeNetOutputBlob);
+                            // const std::vector<float> floatScaleRatiosNew(
                             //     scaleInputToNetInputs.begin(), scaleInputToNetInputs.end());
-                            const std::vector<float> floatScaleRatios{(float)scaleInputToNetInputs[0]};
-                            spResizeAndMergeCaffe->setScaleRatios(floatScaleRatios);
+                            const std::vector<float> floatScaleRatiosNew{(float)scaleInputToNetInputs[0]};
+                            spResizeAndMergeCaffe->setScaleRatios(floatScaleRatiosNew);
                             spResizeAndMergeCaffe->Forward(
-                                caffeNetOutputBlobs, {spHeatMapsBlob.get()});
+								caffeNetOutputBlobsNew, {spHeatMapsBlob.get()});
                             // Get scale net to output (i.e., image input)
                             const auto scaleRoiToOutput = float(mScaleNetToOutput / scaleNetToRoi);
                             // 3. Get peaks by Non-Maximum Suppression
                             const auto nmsThresholdRefined = 0.02f;
                             spNmsCaffe->setThreshold(nmsThresholdRefined);
-                            const auto nmsOffset = float(0.5/double(scaleRoiToOutput));
-                            spNmsCaffe->setOffset(Point<float>{nmsOffset, nmsOffset});
+                            const auto nmsOffsetNew = float(0.5/double(scaleRoiToOutput));
+                            spNmsCaffe->setOffset(Point<float>{nmsOffsetNew, nmsOffsetNew});
                             spNmsCaffe->Forward({spHeatMapsBlob.get()}, {spPeaksBlob.get()});
                             // Define poseKeypoints
                             Array<float> poseKeypoints;

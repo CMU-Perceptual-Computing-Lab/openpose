@@ -55,7 +55,7 @@ namespace op
     template <typename T>
     __global__ void resizeAndPadKernel(
         T* targetPtr, const T* const sourcePtr, const int widthSource, const int heightSource, const int widthTarget,
-        const int heightTarget, const float rescaleFactor)
+        const int heightTarget, const T rescaleFactor)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -80,7 +80,7 @@ namespace op
     template <typename T>
     __global__ void resizeAndPadKernel(
         T* targetPtr, const unsigned char* const sourcePtr, const int widthSource, const int heightSource,
-        const int widthTarget, const int heightTarget, const float rescaleFactor)
+        const int widthTarget, const int heightTarget, const T rescaleFactor)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -290,10 +290,10 @@ namespace op
             const auto channels = targetSize[1];
             const auto heightTarget = targetSize[2];
             const auto widthTarget = targetSize[3];
-            const dim3 threadsPerBlock{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D};
-            const dim3 numBlocks{
-                getNumberCudaBlocks(widthTarget, threadsPerBlock.x),
-                getNumberCudaBlocks(heightTarget, threadsPerBlock.y)};
+            // const dim3 threadsPerBlock{THREADS_PER_BLOCK_1D, THREADS_PER_BLOCK_1D};
+            // const dim3 numBlocks{
+            //     getNumberCudaBlocks(widthTarget, threadsPerBlock.x),
+            //     getNumberCudaBlocks(heightTarget, threadsPerBlock.y)};
             const auto& sourceSize = sourceSizes[0];
             const auto heightSource = sourceSize[2];
             const auto widthSource = sourceSize[3];
