@@ -141,7 +141,7 @@ Note: This installer will not incorporate any new features, we recommend to use 
     - Dependencies:
         - [Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_15_2019_05_16.zip): Unzip as `3rdparty/windows/caffe/`.
         - [Caffe dependencies](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe3rdparty_15_2019_03_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
-        - [OpenCV 4.0.1](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_401_v14_15_2019_03_14.zip): Unzip as `3rdparty/windows/opencv/`.
+        - [OpenCV 4.1.1](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_411_v14_15_2019_09_24.zip): Unzip as `3rdparty/windows/opencv/`.
 2. Open the Visual Studio project sln file by double-cliking on `{openpose_path}\windows\OpenPose.sln`.
 3. In order to verify OpenPose is working, try compiling and executing the demo:
     1. Right click on `OpenPoseDemo` --> `Set as StartUp Project`.

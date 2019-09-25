@@ -554,7 +554,7 @@ if (WIN32)
   set(OP_WIN_DIR "${CMAKE_SOURCE_DIR}/3rdparty/windows")
 
   # Download required zip files
-  download_zip("opencv_401_v14_15_2019_03_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} df8f611c032cfa86c56a8ad419f01832)
+  download_zip("opencv_411_v14_15_2019_09_24.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} cf080121a8189ecb7f53ac9b0fef36c6)
   # download_zip("caffe3rdparty_2019_03_12.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 34c49be6a2418fd1670b46fc455eebc0)
   download_zip("caffe3rdparty_15_2019_03_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 9fcc6bdf4765db699d1a279c8d6b830b)
   if (${GPU_MODE} MATCHES "OPENCL")
@@ -572,7 +572,7 @@ if (WIN32)
 
   # set(VS_VERSION "14")
   set(VS_VERSION "15") # Note: VS2017 code seems to simply works in VS2015
-  find_library(OpenCV_LIBS opencv_world401 HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc${VS_VERSION}/lib)
+  find_library(OpenCV_LIBS opencv_world411 HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc${VS_VERSION}/lib)
   find_library(GFLAGS_LIBRARY_RELEASE gflags HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
   find_library(GFLAGS_LIBRARY_DEBUG gflagsd HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
   find_library(GLOG_LIBRARY_RELEASE glog HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
