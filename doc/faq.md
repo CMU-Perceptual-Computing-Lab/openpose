@@ -9,16 +9,17 @@ OpenPose - Frequently Asked Question (FAQ)
         3. [Cannot Find OpenPose.dll Error](#cannot-find-openposedll-error-windows)
         4. [Free Invalid Pointer Error](#free-invalid-pointer-error)
         5. [Source Directory does not Contain CMakeLists.txt (Windows)](#source-directory-does-not-contain-cmakeliststxt-windows)
-        6. [Zero People Detected](#zero-people-detected)
-        7. [Check Failed for ReadProtoFromBinaryFile (Failed to Parse NetParameter File)](#check-failed-for-readprotofrombinaryfile-failed-to-parse-netparameter-file)
-        8. [3D OpenPose Returning Wrong Results: 0, NaN, Infinity, etc.](#3d-openpose-returning-wrong-results-0-nan-infinity-etc)
-        9. [Protobuf Clip Param Caffe Error](#protobuf-clip-param-caffe-error)
-        10. [The Human Skeleton Looks like Dotted Lines Rather than Solid Lines](#the-human-skeleton-looks-like-dotted-lines-rather-than-solid-lines)
-        11. [CUDA_cublas_device_LIBRARY Not Found](#cuda_cublas_device_library-not-found)
-        12. [CMake-GUI Error While Getting Default Caffe](#cmake-gui-error-while-getting-default-caffe)
-        13. [Libgomp Out of Memory Error](#libgomp-out-of-memory-error)
-        14. [Runtime Error with Turing GPU (Tesla T4) or Volta GPU][#runtime-error-with-turing-gpu-teslat4-or-volta-gpu)
-        15. [Obscure CMake Error about Caffe or Pybind](#obscure-cmake-error-about-caffe-or-pybind).
+        6. [Always Zero People Detected](#always-zero-people-detected)
+        7. [Very Few People Detected](#very-few-people-detected)
+        8. [Check Failed for ReadProtoFromBinaryFile (Failed to Parse NetParameter File)](#check-failed-for-readprotofrombinaryfile-failed-to-parse-netparameter-file)
+        9. [3D OpenPose Returning Wrong Results: 0, NaN, Infinity, etc.](#3d-openpose-returning-wrong-results-0-nan-infinity-etc)
+        10. [Protobuf Clip Param Caffe Error](#protobuf-clip-param-caffe-error)
+        11. [The Human Skeleton Looks like Dotted Lines Rather than Solid Lines](#the-human-skeleton-looks-like-dotted-lines-rather-than-solid-lines)
+        12. [CUDA_cublas_device_LIBRARY Not Found](#cuda_cublas_device_library-not-found)
+        13. [CMake-GUI Error While Getting Default Caffe](#cmake-gui-error-while-getting-default-caffe)
+        14. [Libgomp Out of Memory Error](#libgomp-out-of-memory-error)
+        15. [Runtime Error with Turing GPU (Tesla T4) or Volta GPU][#runtime-error-with-turing-gpu-teslat4-or-volta-gpu)
+        16. [Obscure CMake Error about Caffe or Pybind](#obscure-cmake-error-about-caffe-or-pybind).
     2. [Speed Performance Issues](#speed-performance-issues)
         1. [Speed Up, Memory Reduction, and Benchmark](#speed-up-memory-reduction-and-benchmark)
         2. [How to Measure the Latency Time?](#how-to-measure-the-latency-time)
@@ -41,7 +42,11 @@ OpenPose - Frequently Asked Question (FAQ)
 #### Out of Memory Error
 **Q: Out of memory error** - I get an error similar to: `Check failed: error == cudaSuccess (2 vs. 0)  out of memory`.
 
-**A**: Most probably cuDNN is not installed/enabled, the default Caffe model uses >12 GB of GPU memory, cuDNN reduces it to ~2.2 GB for BODY_25 (default) and ~1.5 GB for COCO (`--model_pose COCO`). Note that you still need at least about 2.2 GB free for the default OpenPose to run. I.e., GPUs with only 2 GB will not fit the default OpenPose, and you will have to either switch to the `COCO` model (slower and less accurate), or reduce the `--net_resolution` (faster speed but also lower accuracy).
+**A**: Make sure you have a GPU with at least 4 GB of memory. If your GPU is between 2 and 4 GB, it should be fine for body-only settings, but you can also reduce the `--net_resolution` if it does not fit (check [Speed Up, Memory Reduction, and Benchmark](#speed-up-memory-reduction-and-benchmark) for the consequences of this).
+
+(Only if you are compiling OpenPose by yourself, this does not apply to the portable OpenPose binaries for Windows because they already include cuDNN): If you have a GPU with >= 4 GB of memory, and you still face this error, most probably cuDNN is not installed/enabled. The default Caffe model uses >12 GB of GPU memory, cuDNN reduces it to ~2.2 GB for BODY_25 (default) and ~1.5 GB for COCO (`--model_pose COCO`). Note that you still need at least about 2.2 GB free for the default OpenPose to run. I.e., GPUs with only 2 GB will not fit the default OpenPose, and you will have to either switch to the `COCO` model (slower and less accurate), or reduce the `--net_resolution` (faster speed but also lower accuracy).
+
+Also, hands and face increases the GPU memory requeriments, and 4 GB GPUs might run a bit short in some cases.
 
 
 
@@ -79,10 +84,10 @@ Note: OpenPose library is not an executable, but a library. So instead clicking 
 
 
 
-#### Zero People Detected
-**Q: 0 people detected and displayed in default video and images.**
+#### Always Zero People Detected
+**Q: Always 0 people detected and displayed in default video and images.**
 
-**A**: This problem usually occurs in 2 situations: 1) When you selection `--num_gpu 0`, and 2) when the caffemodel has not been properly downloaded. E.g., if the connection drops when downloading the models.
+**A**: This answer assumes that never a single person is detected. If in your case it works sometimes, then check [Always Zero People Detected](#always-zero-people-detected). This always-0-people problem usually occurs in 2 situations: 1) When you selection `--num_gpu 0`, and 2) when the caffemodel has not been properly downloaded. E.g., if the connection drops when downloading the models.
 
 For problem 1, setting `--num_gpu 0` means that no processing is done, so you can use this setting e.g., to record webcam. This functionality is kept for back-compatibility. You are most probably trying to run on CPU-only mode, for that, install OpenPose in CPU-only mode following [doc/installation.md](./installation.md).
 
@@ -94,10 +99,17 @@ For problem 2, try the following solutions (in this order):
 
 
 
+#### Very Few People Detected
+**Q: Low detection rate. It can detect the person on some images (usually higher contrast, with bigger people), but it will fail for most of images with low resolution or small people.**
+
+**A**: Images with low resolution, or with people too tiny will simply not work too well. However, it can be highly improved by using the maximum accuracy configuration detailed in [doc/quick_start.md#maximum-accuracy-configuration](./quick_start.md#maximum-accuracy-configuration).
+
+
+
 #### Check Failed for ReadProtoFromBinaryFile (Failed to Parse NetParameter File)
 **Q: I am facing an error similar to:** `Check failed: ReadProtoFromBinaryFile(param_file, param) Failed to parse NetParameter file: models/pose/body_25/pose_iter_584000.caffemodel`
 
-**A**: Same answer than for [Zero People Detected](#zero-people-detected).
+**A**: Same answer than for [Always Zero People Detected](#always-zero-people-detected).
 
 
 

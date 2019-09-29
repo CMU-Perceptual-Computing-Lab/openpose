@@ -93,6 +93,8 @@ build\x64\Release\OpenPoseDemo.exe --image_dir examples\media\ --face --hand
 
 
 ### Maximum Accuracy Configuration
+Note: Unfortunately, this will not work on CPU given the huge ammount of memory required. Your only option with CPU-only versions is to manually crop the people to fit the whole area of the image that is fed into OpenPose.
+
 This command provides the most accurate results we have been able to achieve for body, hand and face keypoint detection. However, this command will need ~10.5 GB of GPU memory (6.7 GB for COCO model) and runs at ~2 FPS on a Titan X for the body-foot model (1 FPS for COCO).
 
 - **Note 1:** Increasing `--net_resolution` will highly reduce the frame rate and increase latency, while it might increase the accuracy. However, this accuracy increase is not guaranteed in all scenarios, required a more detailed analysis for each particular scenario. E.g., it will work better for images with very small people, but usually worse for people taking a big ratio of the image. Thus, we recommend to follow the commands below for maximum accuracy in most cases for both big and small-size people.

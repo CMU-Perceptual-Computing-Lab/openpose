@@ -8,7 +8,9 @@ OpenPose Calibration Module and Demo
     1. [General Quality Tips](#general-quality-tips)
     2. [Step 1 - Distortion and Intrinsic Parameter Calibration](#step-1---distortion-and-intrinsic-parameter-calibration)
     3. [Step 2 - Extrinsic Parameter Calibration](#step-2---extrinsic-parameter-calibration)
-4. [Using a Different Camera Brand](#using-a-different-camera-brand)
+4. [Camera Matrix Output Format](#camera-matrix-output-format)
+5. [Using a Different Camera Brand](#using-a-different-camera-brand)
+6. [Naming Convention for the Output Images](#naming-convention-for-the-output-images)
 
 
 
@@ -147,6 +149,25 @@ Examples:
         5. Thus, the distance between that camera and the origin camera 1 should be (approximately) equal to the L2-norm of the `translation` vector.
     3. Translation vector - Relative x-y-z distances:
         1. The 3x1 `translation` vector represents the `x`, `y`, and `z` distances to the origin camera, respectively. The camera is looking along the positive `z` axis, the `y` axis is down, and the `x` axis is right. This should match the real distance between both cameras.
+
+
+
+## Camera Matrix Output Format
+Your CameraMatrix will look something like:
+```
+<CameraMatrix type_id="opencv-matrix">
+<rows>3</rows>
+<cols>4</cols>
+<dt>d</dt>
+<data>
+    8.4965260991319647e-01 1.1164693980389649e-01
+    -5.1538859446064478e-01 2.1494190603291283e+00
+    -1.5848315388246692e-01 9.8621217567379460e-01
+    -4.7630184633558698e-02 -4.5237471366168569e-01
+    5.0296474270386005e-01 1.2214952060972525e-01 8.5563190813085876e-01
+    1.1418502919988400e+00</data></CameraMatrix>
+```
+This is a 3x4 matrix, which represents rotation (R as a 3x3 matrix) and translation (t as a 3x1 matrix) in the following format: [R | t]. They represent the rotation and translation with respect to the world origin. When calibrating with OpenPose, we set one of the cameras as the origin, but this can be easily modified with some manual post-processing.
 
 
 

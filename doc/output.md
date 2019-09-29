@@ -15,6 +15,7 @@ OpenPose Demo - Output
     8. [Hand Output Format](#hand-output-format)
 2. [Reading Saved Results](#reading-saved-results)
 3. [Keypoint Format in the C++ API](#keypoint-format-in-the-c-api)
+4. [Camera Matrix Output Format](#camera-matrix-output-format)
 
 
 
@@ -259,3 +260,6 @@ There are 3 different keypoint `Array<float>` elements in the `Datum` class:
     const auto yR = handKeypoints[1][baseIndex + 1];
     const auto scoreR = handKeypoints[1][baseIndex + 2];
 ```
+
+## Camera Matrix Output Format
+Check [doc/modules/calibration_module.md#camera-matrix-output-format](./modules/calibration_module.md#camera-matrix-output-format).
