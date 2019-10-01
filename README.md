@@ -30,6 +30,7 @@ It is **authored by [Gines Hidalgo](https://www.gineshidalgo.com), [Zhe Cao](htt
 - **Functionality**:
     - **2D real-time multi-person keypoint detection**:
         - 15 or 18 or **25-keypoint body/foot keypoint estimation**. **Running time invariant to number of detected people**.
+        - **6-keypoint foot keypoint estimation**. Integrated together with the 25-keypoint body/foot keypoint detector.
         - **2x21-keypoint hand keypoint estimation**. Currently, **running time depends** on **number of detected people**.
         - **70-keypoint face keypoint estimation**. Currently, **running time depends** on **number of detected people**.
     - **3D real-time single-person keypoint detection**:
@@ -42,23 +43,22 @@ It is **authored by [Gines Hidalgo](https://www.gineshidalgo.com), [Zhe Cao](htt
 - **Input**: Image, video, webcam, Flir/Point Grey and IP camera. Included C++ demos to add your custom input.
 - **Output**: Basic image + keypoint display/saving (PNG, JPG, AVI, ...), keypoint saving (JSON, XML, YML, ...), and/or keypoints as array class.
 - **OS**: Ubuntu (14, 16), Windows (8, 10), Mac OSX, Nvidia TX2.
+- **Training and datasets**:
+    - [OpenPose Training](https://github.com/CMU-Perceptual-Computing-Lab/openpose_train).
+    - [Foot dataset website](https://cmu-perceptual-computing-lab.github.io/foot_keypoint_dataset/).
 - **Others**:
     - Available: command-line demo, C++ wrapper, and C++ API.
     - [**Python API**](doc/modules/python_module.md).
     - [**Unity Plugin**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin).
     - CUDA (Nvidia GPU), OpenCL (AMD GPU), and CPU-only (no GPU) versions.
-    - Training code included in the [**original CVPR 2017 GitHub repository**](https://github.com/ZheC/Multi-Person-Pose-Estimation).
 
 
 
 ## Latest Features
+- Oct 2019: [**Training code released**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_train)!
 - Jan 2019: [**Unity plugin released**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin)!
 - Jan 2019: [**Improved Python API**](doc/modules/python_module.md) released! Including body, face, hands, and all the functionality of the C++ API!
-- Dec 2018: [**Foot dataset**](https://cmu-perceptual-computing-lab.github.io/foot_keypoint_dataset) and [**new paper released**](https://arxiv.org/abs/1812.08008)!
-- Sep 2018: [**Experimental single-person tracker**](doc/quick_start.md#tracking) for further speed up or visual smoothing!
-- Jun 2018: [**Combined body-foot model released! 40% faster and 5% more accurate**](doc/installation.md)!
-- Jun 2018: [**OpenCL/AMD graphic card version**](doc/installation.md) released!
-- Jun 2018: [**Calibration toolbox**](doc/modules/calibration_module.md) released!
+- Dec 2018: [**Foot dataset released**](https://cmu-perceptual-computing-lab.github.io/foot_keypoint_dataset) and [**new paper released**](https://arxiv.org/abs/1812.08008)!
 
 For further details, check [all released features](doc/released_features.md) and [release notes](doc/release_notes.md).
 
@@ -113,7 +113,7 @@ This analysis was performed using the same images for each algorithm and a batch
 5. [Quick Start](#quick-start)
 6. [Output](#output)
 7. [Speeding Up OpenPose and Benchmark](#speeding-up-openpose-and-benchmark)
-8. [Foot Dataset](#foot-dataset)
+8. [Training Code and Foot Dataset](#training-code-and-foot-dataset)
 9. [Send Us Failure Cases and Feedback!](#send-us-failure-cases-and-feedback)
 10. [Citation](#citation)
 11. [License](#license)
@@ -162,8 +162,10 @@ Check the OpenPose Benchmark as well as some hints to speed up and/or reduce the
 
 
 
-## Foot Dataset
-Check the [foot dataset website](https://cmu-perceptual-computing-lab.github.io/foot_keypoint_dataset/) and new [OpenPose paper](https://arxiv.org/abs/1812.08008) for more information.
+## Training Code and Foot Dataset
+For training OpenPose, check [github.com/CMU-Perceptual-Computing-Lab/openpose_train](https://github.com/CMU-Perceptual-Computing-Lab/openpose_train).
+
+For the foot dataset, check the [foot dataset website](https://cmu-perceptual-computing-lab.github.io/foot_keypoint_dataset/) and new [OpenPose paper](https://arxiv.org/abs/1812.08008) for more information.
 
 
 

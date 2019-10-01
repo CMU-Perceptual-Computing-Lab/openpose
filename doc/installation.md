@@ -20,12 +20,13 @@ OpenPose - Installation
     6. [Mac OSX Version](#mac-osx-version)
     7. [3D Reconstruction Module](#3d-reconstruction-module)
     8. [Calibration Module](#calibration-module)
-    9. [Compiling without cuDNN](#compiling-without-cudnn)
-    10. [Custom Caffe](#custom-caffe)
-    11. [Custom NVIDIA NVCaffe](#custom-nvidia-nvcaffe)
-    12. [Custom OpenCV](#custom-opencv)
-    13. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
-    14. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
+    9. [Unity Compatible Version](#unity-compatible-version)
+    10. [Compiling without cuDNN](#compiling-without-cudnn)
+    11. [Custom Caffe](#custom-caffe)
+    12. [Custom NVIDIA NVCaffe](#custom-nvidia-nvcaffe)
+    13. [Custom OpenCV](#custom-opencv)
+    14. [Doxygen Documentation Autogeneration (Ubuntu Only)](#doxygen-documentation-autogeneration-ubuntu-only)
+    15. [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only)
 
 
 
@@ -372,6 +373,13 @@ After installation, check the [doc/modules/3d_reconstruction_module.md](./module
 The calibration module is included by default, but you must also enable `WITH_EIGEN` if you intend to use the extrinsic camera parameter estimation tool. You can set that flag to 2 different values: `BUILD` or `FIND`, check [Requirements and Dependencies](#requirements-and-dependencies) for more information.
 
 After installation, check the [doc/modules/calibration_module.md](./modules/calibration_module.md) instructions.
+
+
+
+#### Unity Compatible Version
+Check [**Unity Plugin**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin).
+
+However, the OpenPose Unity version will crash if if faces an error while it is not used inside Unity. Thus, do not use it without Unity. Although this version would work as long as no errors occur.
 
 
 
