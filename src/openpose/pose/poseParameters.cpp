@@ -1,5 +1,5 @@
-#include <openpose/pose/poseParametersRender.hpp>
 #include <openpose/pose/poseParameters.hpp>
+#include <openpose/pose/poseParametersRender.hpp>
 
 namespace op
 {

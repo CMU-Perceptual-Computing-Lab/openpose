@@ -388,6 +388,7 @@ OpenPose Library - Release Notes
     1. Headers do not contain any 3rd-party library includes nor functions. This way, OpenPose can be exported without needing 3rd-party includes nor static library files (e.g., lib files in Windows), allowing people to use their own versions of OpenCV, Eigen, etc. without conflicting with OpenPose. Dynamic library files (e.g., `dll` files in Windows, `so` in Ubuntu) are still required.
     2. Created the `openpose_private` directory with some internal headers that, if exported with OpenPose, would require including 3rd-party headers and static library files.
     3. Default OpenCV version for Windows upgraded to version 4.1.1, extracted from their oficial website: section `Releases`, subsection `OpenCV - 4.1.1`, `Windows` version.
+    4. In all `*.cpp` files, their include of their analog `*.hpp` file has been moved to the first line of those `*.cpp` files to slightly speed up compiling time.
 2. Functions or parameters renamed:
     1. All headers moved into `openpose_private` and all 3rd-party library calls in headers.
 3. Main bugs fixed:

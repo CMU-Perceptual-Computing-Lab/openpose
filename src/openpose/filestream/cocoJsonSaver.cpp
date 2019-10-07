@@ -1,8 +1,8 @@
+#include <openpose/filestream/cocoJsonSaver.hpp>
 #include <numeric> // std::iota
 #include <openpose/pose/poseParametersRender.hpp>
 #include <openpose/utilities/fileSystem.hpp>
 #include <openpose/utilities/string.hpp>
-#include <openpose/filestream/cocoJsonSaver.hpp>
 
 namespace op
 {

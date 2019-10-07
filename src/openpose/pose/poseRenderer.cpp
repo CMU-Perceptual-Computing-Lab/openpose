@@ -1,8 +1,8 @@
+#include <openpose/pose/poseRenderer.hpp>
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/pose/poseParametersRender.hpp>
 #include <openpose/pose/renderPose.hpp>
 #include <openpose/utilities/fastMath.hpp>
-#include <openpose/pose/poseRenderer.hpp>
 
 namespace op
 {

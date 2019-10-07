@@ -1,9 +1,9 @@
 #ifdef USE_3D_ADAM_MODEL
+#include <openpose/3d/jointAngleEstimation.hpp>
 #ifdef USE_3D_ADAM_MODEL
     #include <adam/FitToBody.h>
     #include <adam/totalmodel.h>
 #endif
-#include <openpose/3d/jointAngleEstimation.hpp>
 
 namespace op
 {

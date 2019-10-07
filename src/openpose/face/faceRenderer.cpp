@@ -1,6 +1,6 @@
+#include <openpose/face/faceRenderer.hpp>
 #include <openpose/face/renderFace.hpp>
 #include <openpose/utilities/keypoint.hpp>
-#include <openpose/face/faceRenderer.hpp>
 
 namespace op
 {

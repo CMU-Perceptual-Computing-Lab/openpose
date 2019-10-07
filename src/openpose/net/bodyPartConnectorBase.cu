@@ -1,7 +1,7 @@
+#include <openpose/net/bodyPartConnectorBase.hpp>
 #include <openpose/gpu/cuda.hpp>
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/utilities/fastMath.hpp>
-#include <openpose/net/bodyPartConnectorBase.hpp>
 
 namespace op
 {

@@ -1,8 +1,8 @@
+#include <openpose/net/maximumCaffe.hpp>
 #ifdef USE_CAFFE
     #include <caffe/blob.hpp>
 #endif
 #include <openpose/net/maximumBase.hpp>
-#include <openpose/net/maximumCaffe.hpp>
 
 namespace op
 {

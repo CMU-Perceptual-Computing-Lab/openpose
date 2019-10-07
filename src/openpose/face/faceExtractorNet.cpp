@@ -1,5 +1,5 @@
-#include <openpose/utilities/check.hpp>
 #include <openpose/face/faceExtractorNet.hpp>
+#include <openpose/utilities/check.hpp>
 
 namespace op
 {

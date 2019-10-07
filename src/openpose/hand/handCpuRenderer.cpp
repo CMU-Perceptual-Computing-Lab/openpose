@@ -1,5 +1,5 @@
-#include <openpose/hand/renderHand.hpp>
 #include <openpose/hand/handCpuRenderer.hpp>
+#include <openpose/hand/renderHand.hpp>
 
 namespace op
 {

@@ -1,10 +1,10 @@
+#include <openpose/hand/handGpuRenderer.hpp>
 #ifdef USE_CUDA
     #include <cuda.h>
     #include <cuda_runtime_api.h>
 #endif
 #include <openpose/gpu/cuda.hpp>
 #include <openpose/hand/renderHand.hpp>
-#include <openpose/hand/handGpuRenderer.hpp>
 
 namespace op
 {

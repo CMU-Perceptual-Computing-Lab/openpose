@@ -6,6 +6,7 @@
 #include <openpose/pose/enumClasses.hpp>
 #include <openpose/pose/poseExtractorNet.hpp>
 #include <openpose/pose/poseParameters.hpp>
+#include <openpose/pose/poseParametersRender.hpp>
 #include <openpose/pose/poseRenderer.hpp>
 
 namespace op

@@ -1,3 +1,4 @@
+#include <openpose/pose/poseGpuRenderer.hpp>
 #ifdef USE_CUDA
     #include <cuda.h>
     #include <cuda_runtime_api.h>
@@ -6,7 +7,6 @@
 #include <openpose/pose/renderPose.hpp>
 #include <openpose/gpu/cuda.hpp>
 #include <openpose/utilities/keypoint.hpp>
-#include <openpose/pose/poseGpuRenderer.hpp>
 
 namespace op
 {

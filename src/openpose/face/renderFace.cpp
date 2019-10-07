@@ -1,7 +1,7 @@
+#include <openpose/face/renderFace.hpp>
 #include <openpose/face/faceParameters.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/keypoint.hpp>
-#include <openpose/face/renderFace.hpp>
 
 namespace op
 {

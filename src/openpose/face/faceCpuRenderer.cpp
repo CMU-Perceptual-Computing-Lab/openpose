@@ -1,5 +1,5 @@
-#include <openpose/face/renderFace.hpp>
 #include <openpose/face/faceCpuRenderer.hpp>
+#include <openpose/face/renderFace.hpp>
 
 namespace op
 {

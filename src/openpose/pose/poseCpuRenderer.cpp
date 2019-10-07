@@ -1,6 +1,6 @@
+#include <openpose/pose/poseCpuRenderer.hpp>
 #include <openpose/pose/renderPose.hpp>
 #include <openpose/utilities/keypoint.hpp>
-#include <openpose/pose/poseCpuRenderer.hpp>
 
 namespace op
 {

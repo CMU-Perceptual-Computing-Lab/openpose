@@ -1,5 +1,5 @@
-#include <openpose/filestream/fileStream.hpp>
 #include <openpose/filestream/keypointSaver.hpp>
+#include <openpose/filestream/fileStream.hpp>
 
 namespace op
 {

@@ -1,8 +1,8 @@
+#include <openpose/hand/handDetector.hpp>
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/utilities/check.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/keypoint.hpp>
-#include <openpose/hand/handDetector.hpp>
 
 namespace op
 {

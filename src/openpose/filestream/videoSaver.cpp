@@ -1,8 +1,8 @@
+#include <openpose/filestream/videoSaver.hpp>
 #include <opencv2/highgui/highgui.hpp> // cv::VideoWriter
 #include <openpose/filestream/imageSaver.hpp>
 #include <openpose/utilities/fileSystem.hpp>
 #include <openpose/utilities/string.hpp>
-#include <openpose/filestream/videoSaver.hpp>
 
 namespace op
 {

@@ -1,5 +1,5 @@
-#include <openpose/utilities/fastMath.hpp>
 #include <openpose/core/verbosePrinter.hpp>
+#include <openpose/utilities/fastMath.hpp>
 
 namespace op
 {

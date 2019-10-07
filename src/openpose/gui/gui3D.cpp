@@ -1,4 +1,5 @@
-﻿#include <atomic>
+﻿#include <openpose/gui/gui3D.hpp>
+#include <atomic>
 #include <mutex>
 #include <stdio.h>
 #ifdef USE_3D_RENDERER
@@ -11,7 +12,6 @@
 #include <openpose/hand/handParameters.hpp>
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/utilities/keypoint.hpp>
-#include <openpose/gui/gui3D.hpp>
 
 namespace op
 {

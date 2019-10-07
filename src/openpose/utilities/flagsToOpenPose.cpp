@@ -1,6 +1,6 @@
+#include <openpose/utilities/flagsToOpenPose.hpp>
 #include <cstdio> // sscanf
 #include <openpose/utilities/check.hpp>
-#include <openpose/utilities/flagsToOpenPose.hpp>
 
 namespace op
 {

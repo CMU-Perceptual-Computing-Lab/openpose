@@ -1,8 +1,8 @@
+#include <openpose/core/gpuRenderer.hpp>
 #ifdef USE_CUDA
     #include <cuda.h>
     #include <cuda_runtime_api.h>
 #endif
-#include <openpose/core/gpuRenderer.hpp>
 
 namespace op
 {

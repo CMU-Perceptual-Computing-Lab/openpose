@@ -1,5 +1,5 @@
-#include <openpose/utilities/keypoint.hpp>
 #include <openpose/hand/handRenderer.hpp>
+#include <openpose/utilities/keypoint.hpp>
 
 namespace op
 {

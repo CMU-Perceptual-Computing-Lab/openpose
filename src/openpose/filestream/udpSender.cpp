@@ -1,3 +1,4 @@
+#include <openpose/filestream/udpSender.hpp>
 #ifdef USE_ASIO
     #include <iostream>
     #include <asio.hpp>
@@ -6,7 +7,6 @@
     #include <Eigen/Core>
 #endif
 #include <openpose/filestream/fileStream.hpp>
-#include <openpose/filestream/udpSender.hpp>
 
 namespace op
 {

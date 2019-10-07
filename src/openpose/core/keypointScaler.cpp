@@ -1,5 +1,5 @@
-#include <openpose/utilities/keypoint.hpp>
 #include <openpose/core/keypointScaler.hpp>
+#include <openpose/utilities/keypoint.hpp>
 
 namespace op
 {

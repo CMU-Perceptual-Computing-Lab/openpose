@@ -1,6 +1,6 @@
+#include <openpose/core/scaleAndSizeExtractor.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/openCv.hpp> // resizeGetScaleFactor
-#include <openpose/core/scaleAndSizeExtractor.hpp>
 
 namespace op
 {

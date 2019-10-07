@@ -1,9 +1,9 @@
+#include <openpose/gpu/cuda.hpp>
 #ifdef USE_CUDA
     #include <cuda.h>
     #include <cuda_runtime.h>
     #include <openpose_private/gpu/cuda.hu>
 #endif
-#include <openpose/gpu/cuda.hpp>
 
 namespace op
 {

@@ -1,8 +1,8 @@
+#include <openpose/net/maximumBase.hpp>
 #include <thrust/device_ptr.h>
 #include <thrust/extrema.h>
 #include <openpose/gpu/cuda.hpp>
 #include <openpose/gpu/cuda.hpp>
-#include <openpose/net/maximumBase.hpp>
 
 namespace op
 {

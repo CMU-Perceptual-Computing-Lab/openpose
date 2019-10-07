@@ -1,6 +1,6 @@
+#include <openpose/wrapper/wrapperAuxiliary.hpp>
 #include <openpose/gpu/gpu.hpp>
 #include <openpose/thread/enumClasses.hpp>
-#include <openpose/wrapper/wrapperAuxiliary.hpp>
 
 namespace op
 {

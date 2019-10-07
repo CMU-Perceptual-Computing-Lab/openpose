@@ -1,5 +1,5 @@
-#include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/core/datum.hpp>
+#include <openpose/utilities/errorAndLog.hpp>
 
 namespace op
 {

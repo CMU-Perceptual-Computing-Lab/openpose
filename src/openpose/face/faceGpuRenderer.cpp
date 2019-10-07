@@ -1,10 +1,10 @@
+#include <openpose/face/faceGpuRenderer.hpp>
 #ifdef USE_CUDA
     #include <cuda.h>
     #include <cuda_runtime_api.h>
 #endif
 #include <openpose/face/renderFace.hpp>
 #include <openpose/gpu/cuda.hpp>
-#include <openpose/face/faceGpuRenderer.hpp>
 
 namespace op
 {

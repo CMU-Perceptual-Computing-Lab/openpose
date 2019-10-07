@@ -1,10 +1,10 @@
+#include <openpose/filestream/fileStream.hpp>
 #include <fstream> // std::ifstream, std::ofstream
 #include <opencv2/highgui/highgui.hpp> // cv::imread
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/fileSystem.hpp>
 #include <openpose/utilities/string.hpp>
 #include <openpose/filestream/jsonOfstream.hpp>
-#include <openpose/filestream/fileStream.hpp>
 
 namespace op
 {

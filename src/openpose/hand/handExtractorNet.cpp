@@ -1,5 +1,5 @@
-#include <openpose/utilities/check.hpp>
 #include <openpose/hand/handExtractorNet.hpp>
+#include <openpose/utilities/check.hpp>
 
 namespace op
 {

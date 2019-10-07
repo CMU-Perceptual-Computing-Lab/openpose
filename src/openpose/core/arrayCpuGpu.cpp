@@ -1,8 +1,8 @@
+#include <openpose/core/arrayCpuGpu.hpp>
 #ifdef USE_CAFFE
     #include <caffe/blob.hpp>
 #endif
 #include <openpose/utilities/errorAndLog.hpp>
-#include <openpose/core/arrayCpuGpu.hpp>
 
 namespace op
 {
