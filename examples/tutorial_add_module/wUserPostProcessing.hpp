@@ -56,9 +56,12 @@ namespace op
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 for (auto& datum : *tDatums)
-                    // THIS IS THE ONLY LINE THAT THE USER MUST MODIFY ON THIS HPP FILE, by using the proper function
-                    // and datum elements
-                    spUserPostProcessing->doSomething(datum->cvOutputData, datum->cvOutputData);
+                {
+                    // THESE 2 ARE THE ONLY LINES THAT THE USER MUST MODIFY ON THIS HPP FILE, by using the proper
+                    // function and datum elements
+                    cv::Mat cvOutputData = OP_OP2CVMAT(datum->cvOutputData);
+                    spUserPostProcessing->doSomething(cvOutputData, cvOutputData);
+                }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);

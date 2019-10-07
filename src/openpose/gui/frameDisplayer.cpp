@@ -1,5 +1,5 @@
-#include <opencv2/highgui/highgui.hpp> // cv::imshow, cv::waitKey, cv::namedWindow, cv::setWindowProperty
 #include <openpose/gui/frameDisplayer.hpp>
+ #include <openpose_private/utilities/openCvMultiversionHeaders.hpp>
 
 namespace op
 {
@@ -31,7 +31,8 @@ namespace op
         {
             setFullScreenMode(mFullScreenMode);
 
-            const cv::Mat blackFrame(mWindowedSize.y, mWindowedSize.x, CV_32FC3, {0,0,0});
+            const cv::Mat cvBlackFrame(mWindowedSize.y, mWindowedSize.x, CV_32FC3, {0,0,0});
+            const Matrix blackFrame = OP_CV2OPCONSTMAT(cvBlackFrame);
             FrameDisplayer::displayFrame(blackFrame);
             // This one will show most probably a white image (I guess the program does not have time to render
             // in 1 msec)
@@ -90,24 +91,25 @@ namespace op
         }
     }
 
-    void FrameDisplayer::displayFrame(const cv::Mat& frame, const int waitKeyValue)
+    void FrameDisplayer::displayFrame(const Matrix& frame, const int waitKeyValue)
     {
         try
         {
             // Sanity check
             if (frame.empty())
                 error("Empty frame introduced.", __LINE__, __FUNCTION__, __FILE__);
+            const cv::Mat cvFrame = OP_OP2CVCONSTMAT(frame);
             // If frame > window size --> Resize window
-            if (mWindowedSize.x < frame.cols || mWindowedSize.y < frame.rows)
+            if (mWindowedSize.x < cvFrame.cols || mWindowedSize.y < cvFrame.rows)
             {
-                mWindowedSize.x = std::max(mWindowedSize.x, frame.cols);
-                mWindowedSize.y = std::max(mWindowedSize.y, frame.rows);
+                mWindowedSize.x = std::max(mWindowedSize.x, cvFrame.cols);
+                mWindowedSize.y = std::max(mWindowedSize.y, cvFrame.rows);
                 cv::resizeWindow(mWindowName, mWindowedSize.x, mWindowedSize.y);
                 // This one will show most probably a white image (I guess the program does not have time to render
                 // in 1 msec)
                 cv::waitKey(1);
             }
-            cv::imshow(mWindowName, frame);
+            cv::imshow(mWindowName, cvFrame);
             if (waitKeyValue != -1)
                 cv::waitKey(waitKeyValue);
         }
@@ -117,13 +119,13 @@ namespace op
         }
     }
 
-    void FrameDisplayer::displayFrame(const std::vector<cv::Mat>& frames, const int waitKeyValue)
+    void FrameDisplayer::displayFrame(const std::vector<Matrix>& frames, const int waitKeyValue)
     {
         try
         {
             // No frames
             if (frames.empty())
-                displayFrame(cv::Mat(), waitKeyValue);
+                displayFrame(Matrix(), waitKeyValue);
             // 1 frame
             else if (frames.size() == 1u)
                 displayFrame(frames[0], waitKeyValue);
@@ -132,12 +134,17 @@ namespace op
             {
                 // Prepare final cvMat
                 // Concat (0)
-                cv::Mat cvMat = frames[0].clone();
+                Matrix opMat = frames[0].clone();
+                cv::Mat cvMat = OP_OP2CVMAT(opMat);
                 // Concat (1,size()-1)
                 for (auto i = 1u; i < frames.size(); i++)
-                    cv::hconcat(cvMat, frames[i], cvMat);
+                {
+                    const cv::Mat framesI = OP_OP2CVCONSTMAT(frames[i]);
+                    cv::hconcat(cvMat, framesI, cvMat);
+                }
+                opMat = OP_CV2OPMAT(cvMat);
                 // Display it
-                displayFrame(cvMat, waitKeyValue);
+                displayFrame(opMat, waitKeyValue);
             }
         }
         catch (const std::exception& e)

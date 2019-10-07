@@ -15,7 +15,7 @@ namespace op
             {
                 const auto fullScreen = false;
                 FrameDisplayer frameDisplayer{OPEN_POSE_NAME_AND_VERSION + " - GUI Help",
-                                              Point<int>{helpCvMat.cols, helpCvMat.rows}, fullScreen};
+                                              Point<int>{helpCvMat.cols(), helpCvMat.rows()}, fullScreen};
                 frameDisplayer.displayFrame(helpCvMat, 33);
             }
         }
@@ -247,11 +247,11 @@ namespace op
         mFrameDisplayer.initializationOnThread();
     }
 
-    void Gui::setImage(const cv::Mat& cvMatOutput)
+    void Gui::setImage(const Matrix& cvMatOutput)
     {
         try
         {
-            setImage(std::vector<cv::Mat>{cvMatOutput});
+            setImage(std::vector<Matrix>{cvMatOutput});
         }
         catch (const std::exception& e)
         {
@@ -259,7 +259,7 @@ namespace op
         }
     }
 
-    void Gui::setImage(const std::vector<cv::Mat>& cvMatOutputs)
+    void Gui::setImage(const std::vector<Matrix>& cvMatOutputs)
     {
         try
         {

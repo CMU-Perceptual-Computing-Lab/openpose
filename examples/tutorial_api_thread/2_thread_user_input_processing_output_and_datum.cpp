@@ -8,7 +8,8 @@
     // 1. `core` module: for the Datum struct that the `thread` module sends between the queues
     // 2. `utilities` module: for the error & logging functions, i.e., op::error & op::log respectively
 
-// 3rdparty dependencies
+// Third-party dependencies
+#include <opencv2/opencv.hpp>
 // GFlags: DEFINE_bool, _int32, _int64, _uint64, _double, _string
 #include <gflags/gflags.h>
 // Allow Google Flags in Ubuntu 14
@@ -86,7 +87,8 @@ public:
                 datumPtr = std::make_shared<UserDatum>();
 
                 // Fill datum
-                datumPtr->cvInputData = cv::imread(mImageFiles.at(mCounter++));
+                const cv::Mat cvInputData = cv::imread(mImageFiles.at(mCounter++));
+                datumPtr->cvInputData = OP_CV2OPCONSTMAT(cvInputData);
 
                 // If empty frame -> return nullptr
                 if (datumPtr->cvInputData.empty())
@@ -127,14 +129,19 @@ public:
 
     void work(std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>>& datumsPtr)
     {
-        // User's post-processing (after OpenPose processing & before OpenPose outputs) here
-            // datumPtr->cvOutputData: rendered frame with pose or heatmaps
-            // datumPtr->poseKeypoints: Array<float> with the estimated pose
         try
         {
+            // User's post-processing (after OpenPose processing & before OpenPose outputs) here
+                // datumPtr->cvOutputData: rendered frame with pose or heatmaps
+                // datumPtr->poseKeypoints: Array<float> with the estimated pose
             if (datumsPtr != nullptr && !datumsPtr->empty())
+            {
                 for (auto& datumPtr : *datumsPtr)
-                    cv::bitwise_not(datumPtr->cvInputData, datumPtr->cvOutputData);
+                {
+                    cv::Mat cvOutputData = OP_OP2CVMAT(datumPtr->cvOutputData);
+                    cv::bitwise_not(cvOutputData, cvOutputData);
+                }
+            }
         }
         catch (const std::exception& e)
         {
@@ -160,7 +167,8 @@ public:
                 // datumPtr->poseKeypoints: Array<float> with the estimated pose
             if (datumsPtr != nullptr && !datumsPtr->empty())
             {
-                cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial Thread API", datumsPtr->at(0)->cvOutputData);
+                const cv::Mat cvMat = OP_OP2CVCONSTMAT(datumsPtr->at(0)->cvOutputData);
+                cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial Thread API", cvMat);
                 // It displays the image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
                 cv::waitKey(1);
             }

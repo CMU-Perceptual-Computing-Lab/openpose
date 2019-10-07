@@ -1,10 +1,11 @@
 #ifndef OPENPOSE_CORE_DATUM_HPP
 #define OPENPOSE_CORE_DATUM_HPP
 
-#ifdef USE_EIGEN
-    #include <Eigen/Core>
+#ifdef USE_3D_ADAM_MODEL
+    #ifdef USE_EIGEN
+        #include <Eigen/Core>
+    #endif
 #endif
-#include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/common.hpp>
 
 namespace op
@@ -41,7 +42,7 @@ namespace op
          * Original image to be processed in cv::Mat uchar format.
          * Size: (input_width x input_height) x 3 channels
          */
-        cv::Mat cvInputData;
+        Matrix cvInputData;
 
         /**
          * Original image to be processed in Array<float> format.
@@ -68,12 +69,12 @@ namespace op
          * If outputData is empty, cvOutputData will also be empty.
          * Size: (output_height x output_width) x 3 channels
          */
-        cv::Mat cvOutputData;
+        Matrix cvOutputData;
 
         /**
          * Rendered 3D image in cv::Mat uchar format.
          */
-        cv::Mat cvOutputData3D;
+        Matrix cvOutputData3D;
 
         // ------------------------------ Resulting Array<float> data parameters ------------------------------ //
         /**
@@ -195,17 +196,17 @@ namespace op
         /**
          * 3x4 camera matrix of the camera (equivalent to cameraIntrinsics * cameraExtrinsics).
          */
-        cv::Mat cameraMatrix;
+        Matrix cameraMatrix;
 
         /**
          * 3x4 extrinsic parameters of the camera.
          */
-        cv::Mat cameraExtrinsics;
+        Matrix cameraExtrinsics;
 
         /**
          * 3x3 intrinsic parameters of the camera.
          */
-        cv::Mat cameraIntrinsics;
+        Matrix cameraIntrinsics;
 
         /**
          * If it is not empty, OpenPose will not run its internal body pose estimation network and will instead use
@@ -223,7 +224,7 @@ namespace op
 
         /**
          * Size(s) (width x height) of the image(s) fed to the pose deep net.
-         * The size of the std::vector corresponds to the number of scales. 
+         * The size of the std::vector corresponds to the number of scales.
          */
         std::vector<Point<int>> netInputSizes;
 

@@ -1,17 +1,17 @@
+#include <openpose/net/bodyPartConnectorCaffe.hpp>
 #ifdef USE_CAFFE
     #include <caffe/blob.hpp>
 #endif
 #ifdef USE_CUDA
     #include <openpose/gpu/cuda.hpp>
-    #include <openpose/gpu/cuda.hu>
-#endif
-#ifdef USE_OPENCL
-    #include <openpose/gpu/opencl.hcl>
-    #include <openpose/gpu/cl2.hpp>
+    #include <openpose_private/gpu/cuda.hu>
 #endif
 #include <openpose/net/bodyPartConnectorBase.hpp>
 #include <openpose/pose/poseParameters.hpp>
-#include <openpose/net/bodyPartConnectorCaffe.hpp>
+#ifdef USE_OPENCL
+    #include <openpose_private/gpu/opencl.hcl>
+    #include <openpose_private/gpu/cl2.hpp>
+#endif
 
 namespace op
 {

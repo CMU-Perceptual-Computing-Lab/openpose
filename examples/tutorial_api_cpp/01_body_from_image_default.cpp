@@ -1,7 +1,9 @@
 // ----------------------------- OpenPose C++ API Tutorial - Example 1 - Body from image -----------------------------
 // It reads an image, process it, and displays it with the pose keypoints.
 
-// Command-line user intraface
+// Third-party dependencies
+#include <opencv2/opencv.hpp>
+// Command-line user interface
 #define OPENPOSE_FLAGS_DISABLE_POSE
 #include <openpose/flags.hpp>
 // OpenPose dependencies
@@ -26,7 +28,8 @@ void display(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& dat
         if (datumsPtr != nullptr && !datumsPtr->empty())
         {
             // Display image
-            cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", datumsPtr->at(0)->cvOutputData);
+            const cv::Mat cvMat = OP_OP2CVCONSTMAT(datumsPtr->at(0)->cvOutputData);
+            cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", cvMat);
             cv::waitKey(0);
         }
         else
@@ -99,7 +102,8 @@ int tutorialApiCpp()
         opWrapper.start();
 
         // Process and display image
-        const auto imageToProcess = cv::imread(FLAGS_image_path);
+        const cv::Mat cvImageToProcess = cv::imread(FLAGS_image_path);
+        const op::Matrix imageToProcess = OP_CV2OPCONSTMAT(cvImageToProcess);
         auto datumProcessed = opWrapper.emplaceAndPop(imageToProcess);
         if (datumProcessed != nullptr)
         {

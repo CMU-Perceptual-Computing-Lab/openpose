@@ -53,7 +53,7 @@ namespace op
                 else
                 {
                     // heatMaps -> cvOutputDatas
-                    std::vector<cv::Mat> cvOutputDatas(heatMaps.size());
+                    std::vector<Matrix> cvOutputDatas(heatMaps.size());
                     for (auto i = 0u; i < cvOutputDatas.size(); i++)
                         unrollArrayToUCharCvMat(cvOutputDatas[i], heatMaps[i]);
                     // Save each heatMap

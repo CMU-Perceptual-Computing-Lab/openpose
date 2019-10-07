@@ -23,7 +23,7 @@
 // This example is a sub-case of `tutorial_api_cpp/15_synchronous_custom_postprocessing.cpp`, where only custom post-processing is
 // considered.
 
-// Command-line user intraface
+// Command-line user interface
 #include <openpose/flags.hpp>
 // OpenPose dependencies
 #include <openpose/headers.hpp>

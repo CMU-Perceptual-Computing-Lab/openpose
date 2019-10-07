@@ -7,7 +7,7 @@
 // If the user wants to learn to use the OpenPose C++ library, we highly recommend to start with the examples in
 // `examples/tutorial_api_cpp/`.
 
-// Command-line user intraface
+// Command-line user interface
 #include <openpose/flags.hpp>
 // OpenPose dependencies
 #include <openpose/headers.hpp>

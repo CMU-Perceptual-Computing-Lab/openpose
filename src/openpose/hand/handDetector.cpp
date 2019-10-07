@@ -3,7 +3,7 @@
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/keypoint.hpp>
 #include <openpose/hand/handDetector.hpp>
- 
+
 namespace op
 {
     inline Rectangle<float> getHandFromPoseIndexes(const Array<float>& poseKeypoints, const unsigned int person, const unsigned int wrist,

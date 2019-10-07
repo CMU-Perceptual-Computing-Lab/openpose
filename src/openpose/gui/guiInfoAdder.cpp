@@ -1,8 +1,8 @@
+#include <openpose/gui/guiInfoAdder.hpp>
 #include <cstdio> // std::snprintf
 #include <limits> // std::numeric_limits
 #include <openpose/utilities/fastMath.hpp>
-#include <openpose/utilities/openCv.hpp>
-#include <openpose/gui/guiInfoAdder.hpp>
+#include <openpose_private/utilities/openCvPrivate.hpp>
 
 namespace op
 {
@@ -117,15 +117,16 @@ namespace op
     {
     }
 
-    void GuiInfoAdder::addInfo(cv::Mat& cvOutputData, const int numberPeople, const unsigned long long id,
+    void GuiInfoAdder::addInfo(Matrix& outputData, const int numberPeople, const unsigned long long id,
                                const std::string& elementRenderedName, const unsigned long long frameNumber,
                                const Array<long long>& poseIds, const Array<float>& poseKeypoints)
     {
         try
         {
+            cv::Mat cvOutputData = OP_OP2CVMAT(outputData);
             // Sanity check
             if (cvOutputData.empty())
-                error("Wrong input element (empty cvOutputData).", __LINE__, __FUNCTION__, __FILE__);
+                error("Wrong input element (empty outputData).", __LINE__, __FUNCTION__, __FILE__);
             // Size
             const auto borderMargin = positiveIntRound(fastMax(cvOutputData.cols, cvOutputData.rows) * 0.025);
             // Update fps

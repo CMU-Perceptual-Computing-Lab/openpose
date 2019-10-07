@@ -2,7 +2,9 @@
 // It reads images, process them, and display them with the pose (and optionally hand and face) keypoints. In addition,
 // it includes all the OpenPose configuration flags (enable/disable hand, face, output saving, etc.).
 
-// Command-line user intraface
+// Third-party dependencies
+#include <opencv2/opencv.hpp>
+// Command-line user interface
 #define OPENPOSE_FLAGS_DISABLE_PRODUCER
 #define OPENPOSE_FLAGS_DISABLE_DISPLAY
 #include <openpose/flags.hpp>
@@ -34,7 +36,8 @@ bool display(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& dat
         if (datumsPtr != nullptr && !datumsPtr->empty())
         {
             // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
-            cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", datumsPtr->at(0)->cvOutputData);
+            const cv::Mat cvMat = OP_OP2CVCONSTMAT(datumsPtr->at(0)->cvOutputData);
+            cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", cvMat);
         }
         else
             op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
@@ -199,7 +202,8 @@ int tutorialApiCpp()
                     {
                         const auto& imagePath = imagePaths.at(imageId);
                         // Faster alternative that moves imageToProcess
-                        auto imageToProcess = cv::imread(imagePath);
+                        cv::Mat cvImageToProcess = cv::imread(imagePath);
+                        op::Matrix imageToProcess = OP_CV2OPMAT(cvImageToProcess);
                         opWrapper.waitAndEmplace(imageToProcess);
                         // // Slower but safer alternative that copies imageToProcess
                         // const auto imageToProcess = cv::imread(imagePath);
@@ -245,7 +249,8 @@ int tutorialApiCpp()
             for (const auto& imagePath : imagePaths)
             {
                 // Faster alternative that moves imageToProcess
-                auto imageToProcess = cv::imread(imagePath);
+                cv::Mat cvImageToProcess = cv::imread(imagePath);
+                op::Matrix imageToProcess = OP_CV2OPMAT(cvImageToProcess);
                 opWrapper.waitAndEmplace(imageToProcess);
                 // // Slower but safer alternative that copies imageToProcess
                 // const auto imageToProcess = cv::imread(imagePath);

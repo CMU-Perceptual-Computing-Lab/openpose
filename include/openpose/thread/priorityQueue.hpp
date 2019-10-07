@@ -1,5 +1,5 @@
 #ifndef OPENPOSE_THREAD_PRIORITY_QUEUE_HPP
-#define OPENPOSE_THREAD_PRIORITY_QUEUE_HPP 
+#define OPENPOSE_THREAD_PRIORITY_QUEUE_HPP
 
 #include <queue> // std::priority_queue
 #include <openpose/core/common.hpp>

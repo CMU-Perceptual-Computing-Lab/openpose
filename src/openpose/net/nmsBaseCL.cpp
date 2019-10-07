@@ -1,13 +1,13 @@
+#include <openpose/net/nmsBase.hpp>
 #include <algorithm>
 #include <bitset>
 #include <numeric>
 #include <opencv2/opencv.hpp>
-#ifdef USE_OPENCL
-    #include <openpose/gpu/opencl.hcl>
-    #include <openpose/gpu/cl2.hpp>
-#endif
 #include <openpose/core/common.hpp>
-#include <openpose/net/nmsBase.hpp>
+#ifdef USE_OPENCL
+    #include <openpose_private/gpu/opencl.hcl>
+    #include <openpose_private/gpu/cl2.hpp>
+#endif
 
 namespace op
 {
@@ -135,7 +135,7 @@ namespace op
             {
                 int x = get_global_id(0);
                 int y = get_global_id(1);
-                int index = y*w + x;      
+                int index = y*w + x;
 
                 if (0 < x && x < (w-1) && 0 < y && y < (h-1))
                 {

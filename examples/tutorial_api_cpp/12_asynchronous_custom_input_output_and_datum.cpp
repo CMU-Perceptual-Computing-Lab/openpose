@@ -3,7 +3,9 @@
 // In this function, the user can implement its own way to create frames (e.g., reading his own folder of images)
 // and its own way to render/display them after being processed by OpenPose.
 
-// Command-line user intraface
+// Third-party dependencies
+#include <opencv2/opencv.hpp>
+// Command-line user interface
 #define OPENPOSE_FLAGS_DISABLE_PRODUCER
 #define OPENPOSE_FLAGS_DISABLE_DISPLAY
 #include <openpose/flags.hpp>
@@ -66,7 +68,8 @@ public:
             datumPtr = std::make_shared<UserDatum>();
 
             // Fill datum
-            datumPtr->cvInputData = cv::imread(mImageFiles.at(mCounter++));
+            const cv::Mat cvInputData = cv::imread(mImageFiles.at(mCounter++));
+            datumPtr->cvInputData = OP_CV2OPCONSTMAT(cvInputData);
 
             // If empty frame -> return nullptr
             if (datumPtr->cvInputData.empty())
@@ -106,7 +109,8 @@ public:
             if (datumsPtr != nullptr && !datumsPtr->empty())
             {
                 // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
-                cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", datumsPtr->at(0)->cvOutputData);
+                const cv::Mat cvMat = OP_OP2CVCONSTMAT(datumsPtr->at(0)->cvOutputData);
+                cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", cvMat);
             }
             else
                 op::log("Nullptr or empty datumsPtr found.", op::Priority::High);

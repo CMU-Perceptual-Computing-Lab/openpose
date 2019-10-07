@@ -1,9 +1,11 @@
+#include <openpose/net/bodyPartConnectorBase.hpp>
+#include <algorithm> // std::sort
+#include <cmath> // std::sqrt
 #include <set>
 #include <openpose/utilities/check.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/keypoint.hpp>
 #include <openpose/pose/poseParameters.hpp>
-#include <openpose/net/bodyPartConnectorBase.hpp>
 
 namespace op
 {
@@ -385,7 +387,7 @@ namespace op
                                 rowVector[bodyPartPairs[1]] = indexB;
                                 rowVector.back() = 2;
                                 // add the score of parts and the connection
-                                const auto personScore = peaksPtr[indexA] + peaksPtr[indexB] + score;
+                                const auto personScore = T(peaksPtr[indexA] + peaksPtr[indexB] + score);
                                 peopleVector.emplace_back(std::make_pair(rowVector, personScore));
                             }
                         }
@@ -452,7 +454,7 @@ namespace op
                                     rowVector[bodyPartA] = indexA;
                                     rowVector[bodyPartB] = indexB;
                                     rowVector.back() = 2;
-                                    const auto personScore = peaksPtr[indexA] + peaksPtr[indexB] + score;
+                                    const auto personScore = T(peaksPtr[indexA] + peaksPtr[indexB] + score);
                                     peopleVector.emplace_back(std::make_pair(rowVector, personScore));
                                 }
                             }
@@ -603,7 +605,7 @@ namespace op
                     // Number keypoints
                     rowVector.back() = 2;
                     // Score
-                    const auto personScore = peaksPtr[indexScoreA] + peaksPtr[indexScoreB] + pafScore;
+                    const auto personScore = T(peaksPtr[indexScoreA] + peaksPtr[indexScoreB] + pafScore);
                     // Set associated personAssigned as assigned
                     aAssigned = (int)peopleVector.size();
                     bAssigned = aAssigned;

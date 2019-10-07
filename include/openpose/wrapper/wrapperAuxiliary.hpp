@@ -217,8 +217,8 @@ namespace op
                 producerSharedPtr->set(ProducerProperty::Rotation, wrapperStructInput.frameRotate);
                 producerSharedPtr->set(ProducerProperty::AutoRepeat, wrapperStructInput.framesRepeat);
                 // 2. Set finalOutputSize
-                producerSize = Point<int>{(int)producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
-                                          (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
+                producerSize = Point<int>{(int)producerSharedPtr->get(getCvCapPropFrameWidth()),
+                                          (int)producerSharedPtr->get(getCvCapPropFrameHeight())};
                 // Set finalOutputSize to input size if desired
                 if (finalOutputSize.x == -1 || finalOutputSize.y == -1)
                     finalOutputSize = producerSize;
@@ -708,7 +708,7 @@ namespace op
             {
                 log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto verbosePrinter = std::make_shared<VerbosePrinter>(
-                    wrapperStructOutput.verbose, producerSharedPtr->get(CV_CAP_PROP_FRAME_COUNT));
+                    wrapperStructOutput.verbose, uLongLongRound(producerSharedPtr->get(getCvCapPropFrameCount())));
                 outputWs.emplace_back(std::make_shared<WVerbosePrinter<TDatumsSP>>(verbosePrinter));
             }
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
@@ -778,7 +778,7 @@ namespace op
             {
                 log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 if (wrapperStructOutput.writeVideoFps <= 0
-                    && (!oPProducer || producerSharedPtr->get(CV_CAP_PROP_FPS) <= 0))
+                    && (!oPProducer || producerSharedPtr->get(getCvCapPropFrameFps()) <= 0))
                     error("The frame rate of the frames producer is unknown. Set `--write_video_fps` to your desired"
                           " FPS if you wanna record video (`--write_video`). E.g., if it is a folder of images, you"
                           " will have to know or guess the frame rate; if it is a webcam, you should use the OpenPose"
@@ -786,7 +786,7 @@ namespace op
                           __LINE__, __FUNCTION__, __FILE__);
                 originalVideoFps = (
                     wrapperStructOutput.writeVideoFps > 0 ?
-                    wrapperStructOutput.writeVideoFps : producerSharedPtr->get(CV_CAP_PROP_FPS));
+                    wrapperStructOutput.writeVideoFps : producerSharedPtr->get(getCvCapPropFrameFps()));
             }
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Write frames as *.avi video on hard disk
@@ -804,7 +804,7 @@ namespace op
                           __LINE__, __FUNCTION__, __FILE__);
                 // Create video saver worker
                 const auto videoSaver = std::make_shared<VideoSaver>(
-                    wrapperStructOutput.writeVideo, CV_FOURCC('M','J','P','G'), originalVideoFps,
+                    wrapperStructOutput.writeVideo, getCvFourcc('M','J','P','G'), originalVideoFps,
                     (wrapperStructOutput.writeVideoWithAudio ? wrapperStructInput.producerString : ""));
                 outputWs.emplace_back(std::make_shared<WVideoSaver<TDatumsSP>>(videoSaver));
             }
@@ -900,7 +900,7 @@ namespace op
                     if (!wrapperStructOutput.writeVideo3D.empty())
                     {
                         const auto videoSaver = std::make_shared<VideoSaver>(
-                            wrapperStructOutput.writeVideo3D, CV_FOURCC('M','J','P','G'), originalVideoFps, "");
+                            wrapperStructOutput.writeVideo3D, getCvFourcc('M','J','P','G'), originalVideoFps, "");
                         videoSaver3DW = std::make_shared<WVideoSaver3D<TDatumsSP>>(videoSaver);
                     }
                 }

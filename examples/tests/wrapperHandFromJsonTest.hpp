@@ -1,6 +1,9 @@
 #ifndef OPENPOSE_WRAPPER_WRAPPER_HAND_FROM_JSON_TEST_HPP
 #define OPENPOSE_WRAPPER_WRAPPER_HAND_FROM_JSON_TEST_HPP
 
+// Third-party dependencies
+#include <opencv2/opencv.hpp>
+// OpenPose dependencies
 #include <openpose/headers.hpp>
 
 namespace op
@@ -59,7 +62,7 @@ namespace op
 
         /**
          * Set ThreadManager from TWorkers (private internal function).
-         * After any configure() has been called, the TWorkers are initialized. This function resets the ThreadManager and adds them. 
+         * After any configure() has been called, the TWorkers are initialized. This function resets the ThreadManager and adds them.
          * Common code for start() and exec().
          */
         void configureThreadManager();
@@ -292,7 +295,7 @@ namespace op
         try
         {
             mThreadManager.reset();
-            // Reset 
+            // Reset
             wDatumProducer = nullptr;
             spWScaleAndSizeExtractor = nullptr;
             spWCvMatToOpInput = nullptr;

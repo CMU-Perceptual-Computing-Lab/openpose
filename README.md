@@ -44,8 +44,8 @@ It is **authored by [Gines Hidalgo](https://www.gineshidalgo.com), [Zhe Cao](htt
 - **Output**: Basic image + keypoint display/saving (PNG, JPG, AVI, ...), keypoint saving (JSON, XML, YML, ...), and/or keypoints as array class.
 - **OS**: Ubuntu (14, 16), Windows (8, 10), Mac OSX, Nvidia TX2.
 - **Training and datasets**:
-    - [OpenPose Training](https://github.com/CMU-Perceptual-Computing-Lab/openpose_train).
-    - [Foot dataset website](https://cmu-perceptual-computing-lab.github.io/foot_keypoint_dataset/).
+    - [**OpenPose Training**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_train).
+    - [**Foot dataset website**](https://cmu-perceptual-computing-lab.github.io/foot_keypoint_dataset/).
 - **Others**:
     - Available: command-line demo, C++ wrapper, and C++ API.
     - [**Python API**](doc/modules/python_module.md).
@@ -55,7 +55,7 @@ It is **authored by [Gines Hidalgo](https://www.gineshidalgo.com), [Zhe Cao](htt
 
 
 ## Latest Features
-- Oct 2019: [**Training code released**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_train)!
+- Sep 2019: [**Training code released**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_train)!
 - Jan 2019: [**Unity plugin released**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin)!
 - Jan 2019: [**Improved Python API**](doc/modules/python_module.md) released! Including body, face, hands, and all the functionality of the C++ API!
 - Dec 2018: [**Foot dataset released**](https://cmu-perceptual-computing-lab.github.io/foot_keypoint_dataset) and [**new paper released**](https://arxiv.org/abs/1812.08008)!

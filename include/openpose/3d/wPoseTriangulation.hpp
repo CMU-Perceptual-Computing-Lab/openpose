@@ -70,7 +70,7 @@ namespace op
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // 3-D triangulation and reconstruction
-                std::vector<cv::Mat> cameraMatrices;
+                std::vector<Matrix> cameraMatrices;
                 std::vector<Array<float>> poseKeypointVector;
                 std::vector<Array<float>> faceKeypointVector;
                 std::vector<Array<float>> leftHandKeypointVector;
@@ -84,7 +84,7 @@ namespace op
                     rightHandKeypointVector.emplace_back(tDatumPtr->handKeypoints[1]);
                     cameraMatrices.emplace_back(tDatumPtr->cameraMatrix);
                     imageSizes.emplace_back(
-                        Point<int>{tDatumPtr->cvInputData.cols, tDatumPtr->cvInputData.rows});
+                        Point<int>{tDatumPtr->cvInputData.cols(), tDatumPtr->cvInputData.rows()});
                 }
                 // Pose 3-D reconstruction
                 auto poseKeypoints3Ds = spPoseTriangulation->reconstructArray(

@@ -1,9 +1,10 @@
+#include <openpose/producer/producer.hpp>
 #include <openpose/producer/headers.hpp>
 #include <openpose/utilities/check.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/fileSystem.hpp>
 #include <openpose/utilities/openCv.hpp>
-#include <openpose/producer/producer.hpp>
+#include <openpose_private/utilities/openCvMultiversionHeaders.hpp>
 
 namespace op
 {
@@ -83,26 +84,26 @@ namespace op
 
     Producer::~Producer(){}
 
-    cv::Mat Producer::getFrame()
+    Matrix Producer::getFrame()
     {
         try
         {
             // Return first element from getFrames (if any)
             const auto frames = getFrames();
-            return (frames.empty() ? cv::Mat() : frames[0]);
+            return (frames.empty() ? Matrix() : frames[0]);
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return cv::Mat();
+            return Matrix();
         }
     }
 
-    std::vector<cv::Mat> Producer::getFrames()
+    std::vector<Matrix> Producer::getFrames()
     {
         try
         {
-            std::vector<cv::Mat> frames;
+            std::vector<Matrix> frames;
 
             if (isOpened())
             {
@@ -144,7 +145,7 @@ namespace op
         }
     }
 
-    std::vector<cv::Mat> Producer::getCameraMatrices()
+    std::vector<Matrix> Producer::getCameraMatrices()
     {
         try
         {
@@ -157,7 +158,7 @@ namespace op
         }
     }
 
-    std::vector<cv::Mat> Producer::getCameraExtrinsics()
+    std::vector<Matrix> Producer::getCameraExtrinsics()
     {
         try
         {
@@ -170,7 +171,7 @@ namespace op
         }
     }
 
-    std::vector<cv::Mat> Producer::getCameraIntrinsics()
+    std::vector<Matrix> Producer::getCameraIntrinsics()
     {
         try
         {
@@ -273,7 +274,7 @@ namespace op
         }
     }
 
-    void Producer::checkFrameIntegrity(cv::Mat& frame)
+    void Producer::checkFrameIntegrity(Matrix& frame)
     {
         try
         {
@@ -290,15 +291,15 @@ namespace op
                 mNumberEmptyFrames = 0;
 
                 if (mType != ProducerType::ImageDirectory
-                      && ((frame.cols != get(CV_CAP_PROP_FRAME_WIDTH) && get(CV_CAP_PROP_FRAME_WIDTH) > 0)
-                          || (frame.rows != get(CV_CAP_PROP_FRAME_HEIGHT) && get(CV_CAP_PROP_FRAME_HEIGHT) > 0)))
+                      && ((frame.cols() != get(CV_CAP_PROP_FRAME_WIDTH) && get(CV_CAP_PROP_FRAME_WIDTH) > 0)
+                          || (frame.rows() != get(CV_CAP_PROP_FRAME_HEIGHT) && get(CV_CAP_PROP_FRAME_HEIGHT) > 0)))
                 {
                     log("Frame size changed. Returning empty frame.\nExpected vs. received sizes: "
                         + std::to_string(positiveIntRound(get(CV_CAP_PROP_FRAME_WIDTH)))
                         + "x" + std::to_string(positiveIntRound(get(CV_CAP_PROP_FRAME_HEIGHT)))
-                        + " vs. " + std::to_string(frame.cols) + "x" + std::to_string(frame.rows),
+                        + " vs. " + std::to_string(frame.cols()) + "x" + std::to_string(frame.rows()),
                         Priority::Max, __LINE__, __FUNCTION__, __FILE__);
-                    frame = cv::Mat();
+                    frame = Matrix();
                 }
             }
         }
@@ -373,7 +374,7 @@ namespace op
                             }
                             else
                             {
-                                std::vector<cv::Mat> frames;
+                                std::vector<Matrix> frames;
                                 for (auto i = 0 ; i < std::floor(difference) ; i++)
                                     frames = getRawFrames();
                             }

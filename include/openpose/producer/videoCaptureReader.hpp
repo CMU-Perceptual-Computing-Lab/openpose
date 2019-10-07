@@ -1,8 +1,6 @@
 #ifndef OPENPOSE_PRODUCER_VIDEO_CAPTURE_READER_HPP
 #define OPENPOSE_PRODUCER_VIDEO_CAPTURE_READER_HPP
 
-#include <opencv2/core/core.hpp> // cv::Mat
-#include <opencv2/highgui/highgui.hpp> // cv::VideoCapture
 #include <openpose/core/common.hpp>
 #include <openpose/producer/producer.hpp>
 
@@ -49,14 +47,17 @@ namespace op
         virtual void set(const int capProperty, const double value) = 0;
 
     protected:
-        virtual cv::Mat getRawFrame() = 0;
+        virtual Matrix getRawFrame() = 0;
 
-        virtual std::vector<cv::Mat> getRawFrames() = 0;
+        virtual std::vector<Matrix> getRawFrames() = 0;
 
         void resetWebcam(const int index, const bool throwExceptionIfNoOpened);
 
     private:
-        cv::VideoCapture mVideoCapture;
+        // PIMPL idiom
+        // http://www.cppsamples.com/common-tasks/pimpl.html
+        struct ImplVideoCaptureReader;
+        std::unique_ptr<ImplVideoCaptureReader> upImpl;
 
         DELETE_COPY(VideoCaptureReader);
     };

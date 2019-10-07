@@ -23,12 +23,12 @@ if (UNIX OR APPLE)
   endif ()
 
   target_link_libraries(openpose_face openpose_core)
-  
+
   if (BUILD_CAFFE)
     add_dependencies(openpose_face openpose)
   endif (BUILD_CAFFE)
 
-  install(TARGETS openpose_face 
+  install(TARGETS openpose_face
       EXPORT OpenPose
       RUNTIME DESTINATION bin
       LIBRARY DESTINATION lib

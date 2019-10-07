@@ -1,5 +1,5 @@
-#ifndef OPENPOSE_CORE_OPENCL_HPP
-#define OPENPOSE_CORE_OPENCL_HPP
+#ifndef OPENPOSE_PRIVATE_GPU_OPENCL_HPP
+#define OPENPOSE_PRIVATE_GPU_OPENCL_HPP
 
 #include <openpose/core/common.hpp>
 
@@ -30,7 +30,7 @@ namespace cl
 
 namespace op
 {
-    class OP_API OpenCL
+    class OpenCL
     {
     public:
         static std::shared_ptr<OpenCL> getInstance(const int deviceId = 0, const int deviceType = CL_DEVICE_TYPE_GPU,
@@ -51,10 +51,10 @@ namespace op
 
         template <typename K, typename T>
         inline K getKernelFunctorFromManager(const std::string& kernelName, const std::string& src = "", bool isFile = false)
-        {            
+        {
             return K(getKernelFromManager<T>(kernelName, src, isFile));
         }
-      
+
         template <typename T> static void getBufferRegion(cl_buffer_region& region, const int origin, const int size);
 
         int getAlignment();
@@ -73,4 +73,4 @@ namespace op
     };
 }
 
-#endif // OPENPOSE_CORE_OPENCL_HPP
+#endif // OPENPOSE_PRIVATE_GPU_OPENCL_HPP

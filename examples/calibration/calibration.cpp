@@ -3,7 +3,9 @@
 // Implemented on top of OpenCV.
 // It computes and saves the intrinsics parameters of the input images.
 
-// Command-line user intraface
+// Third-party dependencies
+#include <opencv2/opencv.hpp>
+// Command-line user interface
 #define OPENPOSE_FLAGS_DISABLE_POSE
 #include <openpose/flags.hpp>
 // OpenPose dependencies
@@ -47,6 +49,7 @@ int openPoseDemo()
         // Common parameters
         const auto gridInnerCorners = op::flagsToPoint(FLAGS_grid_number_inner_corners, "12x7");
         const auto calibrationImageDir = op::formatAsDirectory(FLAGS_calibration_image_dir);
+        const auto gridSqureSizeMm = (float)FLAGS_grid_square_size_mm;
 
         // Calibration - Intrinsics
         if (FLAGS_mode == 1)
@@ -61,7 +64,7 @@ int openPoseDemo()
             const auto saveImagesWithCorners = true;
             // Run calibration
             op::estimateAndSaveIntrinsics(
-                gridInnerCorners, FLAGS_grid_square_size_mm, flags,
+                gridInnerCorners, gridSqureSizeMm, flags,
                 op::formatAsDirectory(FLAGS_camera_parameter_folder), calibrationImageDir, FLAGS_camera_serial_number,
                 saveImagesWithCorners);
             op::log("Intrinsic calibration completed!", op::Priority::High);
@@ -73,7 +76,7 @@ int openPoseDemo()
             op::log("Running calibration (extrinsic parameters)...", op::Priority::High);
             // Run calibration
             op::estimateAndSaveExtrinsics(
-                FLAGS_camera_parameter_folder, calibrationImageDir, gridInnerCorners, FLAGS_grid_square_size_mm,
+                FLAGS_camera_parameter_folder, calibrationImageDir, gridInnerCorners, gridSqureSizeMm,
                 FLAGS_cam0, FLAGS_cam1, FLAGS_omit_distortion, FLAGS_combine_cam0_extrinsics);
             // Logging
             op::log("Extrinsic calibration completed!", op::Priority::High);
@@ -91,7 +94,7 @@ int openPoseDemo()
             const auto saveImagesWithCorners = false;
             // Run calibration
             op::refineAndSaveExtrinsics(
-                FLAGS_camera_parameter_folder, calibrationImageDir, gridInnerCorners, FLAGS_grid_square_size_mm,
+                FLAGS_camera_parameter_folder, calibrationImageDir, gridInnerCorners, gridSqureSizeMm,
                 FLAGS_number_cameras, FLAGS_omit_distortion, saveImagesWithCorners);
             // Logging
             op::log("Extrinsic calibration (bundle adjustment) completed!", op::Priority::High);
@@ -120,7 +123,7 @@ int openPoseDemo()
 
         return 0;
     }
-    catch (const std::exception& e)
+    catch (const std::exception&)
     {
         return -1;
     }

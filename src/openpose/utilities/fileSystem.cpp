@@ -1,4 +1,8 @@
-#include <cstdio> // fopen
+#include <openpose/utilities/fileSystem.hpp>
+#include <algorithm> // std::replace
+#include <cctype> // std::isdigit
+#include <cstdio> // std::fopen
+#include <cstring> // std::strncmp
 #ifdef _WIN32
     #include <direct.h> // _mkdir
     #include <windows.h> // DWORD, GetFileAttributesA
@@ -9,7 +13,6 @@
     #error Unknown environment!
 #endif
 #include <openpose/utilities/string.hpp>
-#include <openpose/utilities/fileSystem.hpp>
 
 namespace op
 {

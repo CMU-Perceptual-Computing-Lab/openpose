@@ -9,6 +9,7 @@ set(SOURCES_OP_CORE
     gpuRenderer.cpp
     keepTopNPeople.cpp
     keypointScaler.cpp
+    matrix.cpp
     opOutputToCvMat.cpp
     point.cpp
     rectangle.cpp

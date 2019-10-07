@@ -16,9 +16,9 @@ namespace op
 
         bool isOpened();
 
-        void write(const cv::Mat& cvMat);
+        void write(const Matrix& matToSave);
 
-        void write(const std::vector<cv::Mat>& cvMats);
+        void write(const std::vector<Matrix>& matsToSave);
 
     private:
         // PIMPL idiom

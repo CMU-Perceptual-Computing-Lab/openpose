@@ -1,5 +1,5 @@
-#ifndef OPENPOSE_GPU_CUDA_HU
-#define OPENPOSE_GPU_CUDA_HU
+#ifndef OPENPOSE_PRIVATE_GPU_CUDA_HU
+#define OPENPOSE_PRIVATE_GPU_CUDA_HU
 
 // Note: This class should only be included if CUDA is enabled
 
@@ -201,4 +201,4 @@ namespace op
     }
 }
 
-#endif // OPENPOSE_GPU_CUDA_HU
+#endif // OPENPOSE_PRIVATE_GPU_CUDA_HU

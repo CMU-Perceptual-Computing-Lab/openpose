@@ -125,7 +125,7 @@ OpenPose Library - Release Notes
         3. CvMatToOutput and Renderers allow to keep input resolution as output for images (core module).
     6. New standalone face keypoint detector based on OpenCV face detector: much faster if body keypoint detection is not required but much less accurate.
     7. Face and hand keypoint detectors now can return each keypoint heatmap.
-    8. The flag `USE_CUDNN` is no longer required; `USE_CAFFE` and `USE_CUDA` (replacing the old `CPU_ONLY`) are no longer required to use the library, only to build it. In addition, Boost, Caffe, and its dependencies have been removed from the OpenPose header files. Only OpenCV include and lib folders are required when building a project using OpenPose.
+    8. The flag `USE_CUDNN` is no longer required; `USE_CAFFE` and `USE_CUDA` (replacing the old `CPU_ONLY`) are no longer required to use the library, only to build it. In addition, Boost, Caffe, and its dependencies have been removed from the OpenPose header files. Only OpenCV include and lib directories are required when building a project using OpenPose.
     9. OpenPose successfully compiles if the flags `USE_CAFFE` and/or `USE_CUDA` are not enabled, although it will give an error saying they are required.
     10. COCO JSON file outputs 0 as score for non-detected keypoints.
     11. Added example for OpenPose for user asynchronous output and cleaned all `tutorial_wrapper/` examples.
@@ -247,7 +247,7 @@ OpenPose Library - Release Notes
     1. Removed scale parameter from hand and face rectangle extractor (causing wrong results if custom `--output_resolution`).
     2. Functions `scaleKeypoints`, other than `scaleKeypoints(Array<float>& keypoints, const float scale)`, renamed as `scaleKeypoints2d`.
     3. `(W)PoseExtractor` renamed to `(W)PoseExtractorNet` to distinguish from new `PoseExtractor`. Analogously with `(W)FaceExtractorNet` and `(W)HandExtractorNet`.
-    4. Experimental module removed and internal `tracking` folder moved to main openpose folder.
+    4. Experimental module removed and internal `tracking` directory moved to main openpose directory.
     5. Switched GUI shortcuts for the kind of channel to render (skeleton, heatmap, PAF, ...) in order to make it more intuitive: 1 for skeleton, 1 for background heatmap, 2 for adding all heatmaps, 3 for adding all PAFs, and 4 to 0 for the initial heatmaps.
 3. Main bugs fixed:
     1. Fixed hand and face extraction and rendering scaling issues when `--output_resolution` is not the default one.
@@ -276,7 +276,7 @@ OpenPose Library - Release Notes
         2. Renamed `tutorial_wrapper` as `tutorial_api_cpp` as well as new examples were added.
         2. Renamed `tutorial_python` as `tutorial_api_python` as well as new examples were added.
         3. Renamed `tutorial_thread` as `tutorial_api_thread`, focused in the multi-thread mechanism.
-        4. Removed `tutorial_pose`, the folder `tutorial_api_cpp` includes much cleaner and commented examples.
+        4. Removed `tutorial_pose`, the directory `tutorial_api_cpp` includes much cleaner and commented examples.
         5. Examples do not end in core dumped if an OpenPose exception occurred during initialization, but they are rather closed returning -1. However, it will still results in core dumped if the exception occurs during multi-threading execution.
         6. Added new examples, including examples to extract face and/or hand from images.
         7. Added `--no_display` flag for the examples that does not use OpenPose output.
@@ -345,9 +345,9 @@ OpenPose Library - Release Notes
         1. Replaced `--camera_fps` flag by `--write_video_fps`, given that it was a confusing name: It did not affect the webcam FPS, but only the FPS of the output video. In addition, default value changed from 30 to -1.
         2. Flag `--hand_tracking` is a subcase of `--hand_detector`, so it has been removed and incorporated as `--hand_detector 3`.
     8. Renamed `--frame_keep_distortion` as `--frame_undistort`, which performs the opposite operation (the default value has been also changed to the opposite).
-    9. Renamed `--camera_parameter_folder` as `--camera_parameter_path` because it could also take a whole XML file path rather than its parent folder.
+    9. Renamed `--camera_parameter_folder` as `--camera_parameter_path` because it could also take a whole XML file path rather than its parent directory.
     10. Default value of flag `--scale_gap` changed from 0.3 to 0.25.
-    11. Moved most sh scripts into the `scripts/` folder. Only models/getModels.sh and the `*.bat` files are kept under `models/` and `3rdparty/windows`.
+    11. Moved most sh scripts into the `scripts/` directory. Only models/getModels.sh and the `*.bat` files are kept under `models/` and `3rdparty/windows`.
     12. For Python compatibility and scalability increase, template `TDatums` used for `include/openpose/wrapper/wrapper.hpp` has changed from `std::vector<Datum>` to `std::vector<std::shared_ptr<Datum>>`, including the respective changes in all the worker classes. In addition, some template classes have been simplified to only take 1 template parameter for user simplicity.
     13. Renamed intRound, charRound, etc. by positiveIntRound, positiveCharRound, etc. so that people can realize it is not safe for negative numbers.
     14. Replaced flag `--write_coco_foot_json` by `--write_coco_json_variants` in order to generalize to any COCO JSON format (i.e., hand, face, etc).
@@ -357,7 +357,7 @@ OpenPose Library - Release Notes
     3. Template functions could not be imported in Windows for projects using the OpenPose library DLL.
     4. Function `scaleKeypoints2d` was not working if any of the scales was 1 (e.g., fail if scaleX = 1 but scaleY != 1, or if any offset was not 0).
     5. Fixed bug in `KeepTopNPeople` that could provoke segmentation fault for `number_people_max` > 1.
-    6. Camera parameter reader can now take folder paths even if they are not finished in `/` (e.g., `~/Desktop/` worked but `~/Desktop` did not).
+    6. Camera parameter reader can now take directory paths even if they are not finished in `/` (e.g., `~/Desktop/` worked but `~/Desktop` did not).
     7. 3D module: If the image area was smaller than HD resolution image area, the 3D keypoints were not properly estimated.
     8. OpenCL fixes.
     9. If manual CUDA architectures are set in CMake, they are also set for Caffe rather than only for OpenPose.
@@ -383,10 +383,13 @@ OpenPose Library - Release Notes
 
 
 
-## Current version - Future OpenPose 1.5.2
+## Current version - Future OpenPose 1.6.0
 1. Main improvements:
-    1. Default OpenCV version for Windows upgraded to version 4.1.1, extracted from their oficial website: section `Releases`, subsection `OpenCV – 4.1.1`, `Windows` version.
+    1. Headers do not contain any 3rd-party library includes nor functions. This way, OpenPose can be exported without needing 3rd-party includes nor static library files (e.g., lib files in Windows), allowing people to use their own versions of OpenCV, Eigen, etc. without conflicting with OpenPose. Dynamic library files (e.g., `dll` files in Windows, `so` in Ubuntu) are still required.
+    2. Created the `openpose_private` directory with some internal headers that, if exported with OpenPose, would require including 3rd-party headers and static library files.
+    3. Default OpenCV version for Windows upgraded to version 4.1.1, extracted from their oficial website: section `Releases`, subsection `OpenCV - 4.1.1`, `Windows` version.
 2. Functions or parameters renamed:
+    1. All headers moved into `openpose_private` and all 3rd-party library calls in headers.
 3. Main bugs fixed:
     1. Removed many Visual Studio (Windows) warnings.
 4. Changes/additions that affect the compatibility with the OpenPose Unity Plugin:

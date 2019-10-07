@@ -5,7 +5,9 @@
 // Output: OpenPose hand keypoint detection.
 // NOTE: This demo is auto-selecting the following flags: `--body 0 --hand --hand_detector 2`
 
-// Command-line user intraface
+// Third-party dependencies
+#include <opencv2/opencv.hpp>
+// Command-line user interface
 #define OPENPOSE_FLAGS_DISABLE_PRODUCER
 #define OPENPOSE_FLAGS_DISABLE_DISPLAY
 #include <openpose/flags.hpp>
@@ -31,7 +33,8 @@ void display(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& dat
         if (datumsPtr != nullptr && !datumsPtr->empty())
         {
             // Display image
-            cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", datumsPtr->at(0)->cvOutputData);
+            const cv::Mat cvMat = OP_OP2CVCONSTMAT(datumsPtr->at(0)->cvOutputData);
+            cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", cvMat);
             cv::waitKey(0);
         }
         else
@@ -173,7 +176,8 @@ int tutorialApiCpp()
         opWrapper.start();
 
         // Read image and hand rectangle locations
-        const auto imageToProcess = cv::imread(FLAGS_image_path);
+        const cv::Mat cvImageToProcess = cv::imread(FLAGS_image_path);
+        const op::Matrix imageToProcess = OP_CV2OPCONSTMAT(cvImageToProcess);
         const std::vector<std::array<op::Rectangle<float>, 2>> handRectangles{
             // Left/Right hands of person 0
             std::array<op::Rectangle<float>, 2>{

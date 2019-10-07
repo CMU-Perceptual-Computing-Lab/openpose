@@ -1,8 +1,7 @@
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+#include <openpose/net/resizeAndMergeBase.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/openCv.hpp>
-#include <openpose/net/resizeAndMergeBase.hpp>
+#include <openpose_private/utilities/openCvMultiversionHeaders.hpp>
 
 namespace op
 {

@@ -32,7 +32,7 @@ namespace op
 
         virtual void update();
 
-        virtual cv::Mat readCvMat();
+        virtual Matrix readCvMat();
 
     private:
         const bool mCopyGlToCvMat;

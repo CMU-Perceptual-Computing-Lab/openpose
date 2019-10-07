@@ -46,20 +46,20 @@ namespace op
 
         // PersonIdExtractor functions
         // Not thread-safe
-        Array<long long> extractIds(const Array<float>& poseKeypoints, const cv::Mat& cvMatInput,
+        Array<long long> extractIds(const Array<float>& poseKeypoints, const Matrix& cvMatInput,
                                     const unsigned long long imageIndex = 0ull);
 
         // Same than extractIds but thread-safe
-        Array<long long> extractIdsLockThread(const Array<float>& poseKeypoints, const cv::Mat& cvMatInput,
+        Array<long long> extractIdsLockThread(const Array<float>& poseKeypoints, const Matrix& cvMatInput,
                                               const unsigned long long imageIndex,
                                               const long long frameId);
 
         // PersonTracker functions
         void track(Array<float>& poseKeypoints, Array<long long>& poseIds,
-                   const cv::Mat& cvMatInput, const unsigned long long imageViewIndex = 0ull);
+                   const Matrix& cvMatInput, const unsigned long long imageViewIndex = 0ull);
 
         void trackLockThread(Array<float>& poseKeypoints, Array<long long>& poseIds,
-                             const cv::Mat& cvMatInput,
+                             const Matrix& cvMatInput,
                              const unsigned long long imageViewIndex,
                              const long long frameId);
 

@@ -1,8 +1,8 @@
+#include <openpose/face/renderFace.hpp>
 #include <openpose/face/faceParameters.hpp>
 #include <openpose/gpu/cuda.hpp>
-#include <openpose/gpu/cuda.hu>
-#include <openpose/utilities/render.hu>
-#include <openpose/face/renderFace.hpp>
+#include <openpose_private/gpu/cuda.hu>
+#include <openpose_private/utilities/render.hu>
 
 namespace op
 {

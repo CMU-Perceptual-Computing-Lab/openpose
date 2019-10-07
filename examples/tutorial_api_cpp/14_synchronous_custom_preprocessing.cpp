@@ -4,7 +4,9 @@
 // In this function, the user can implement its own pre-processing, i.e., his function will be called after the image
 // has been read by OpenPose but before OpenPose processes the frames.
 
-// Command-line user intraface
+// Third-party dependencies
+#include <opencv2/opencv.hpp>
+// Command-line user interface
 #include <openpose/flags.hpp>
 // OpenPose dependencies
 #include <openpose/headers.hpp>
@@ -22,13 +24,18 @@ public:
 
     void work(std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr)
     {
-        // User's pre-processing (after OpenPose read the input image & before OpenPose processing) here
-            // datumPtr->cvInputData: input frame
         try
         {
+            // User's pre-processing (after OpenPose read the input image & before OpenPose processing) here
+                // datumPtr->cvInputData: input frame
             if (datumsPtr != nullptr && !datumsPtr->empty())
+            {
                 for (auto& datumPtr : *datumsPtr)
-                    cv::bitwise_not(datumPtr->cvOutputData, datumPtr->cvOutputData);
+                {
+                    cv::Mat cvOutputData = OP_OP2CVMAT(datumPtr->cvOutputData);
+                    cv::bitwise_not(cvOutputData, cvOutputData);
+                }
+            }
         }
         catch (const std::exception& e)
         {

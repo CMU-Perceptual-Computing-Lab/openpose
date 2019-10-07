@@ -1,7 +1,7 @@
+#include <openpose/face/faceExtractorCaffe.hpp>
 #ifdef USE_CAFFE
     #include <caffe/blob.hpp>
 #endif
-#include <opencv2/opencv.hpp> // CV_WARP_INVERSE_MAP, CV_INTER_LINEAR
 #include <openpose/face/faceParameters.hpp>
 #include <openpose/gpu/cuda.hpp>
 #include <openpose/net/maximumCaffe.hpp>
@@ -9,7 +9,7 @@
 #include <openpose/net/resizeAndMergeCaffe.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/openCv.hpp>
-#include <openpose/face/faceExtractorCaffe.hpp>
+#include <openpose_private/utilities/openCvMultiversionHeaders.hpp>
 
 namespace op
 {
@@ -49,7 +49,7 @@ namespace op
                 const auto volumeBodyParts = FACE_NUMBER_PARTS * channelOffset;
                 auto totalOffset = 0u;
                 auto* heatMapsPtr = &heatMaps.getPtr()[person*volumeBodyParts];
-                // Copy face parts                                      
+                // Copy face parts
                 #ifdef USE_CUDA
                     cudaMemcpy(heatMapsPtr, heatMapsGpuPtr, volumeBodyParts * sizeof(float), cudaMemcpyDeviceToHost);
                 #else
@@ -172,13 +172,15 @@ namespace op
     }
 
     void FaceExtractorCaffe::forwardPass(
-        const std::vector<Rectangle<float>>& faceRectangles, const cv::Mat& cvInputData)
+        const std::vector<Rectangle<float>>& faceRectangles, const Matrix& inputData)
     {
         try
         {
             #ifdef USE_CAFFE
                 if (mEnabled && !faceRectangles.empty())
                 {
+                    const cv::Mat cvInputData = OP_OP2CVCONSTMAT(inputData);
+
                     // Sanity check
                     if (cvInputData.empty())
                         error("Empty cvInputData.", __LINE__, __FUNCTION__, __FILE__);
@@ -240,7 +242,7 @@ namespace op
                                            cv::BORDER_CONSTANT, cv::Scalar(0,0,0));
 
                             // cv::Mat -> float*
-                            uCharCvMatToFloatPtr(mFaceImageCrop.getPtr(), faceImage, true);
+                            uCharCvMatToFloatPtr(mFaceImageCrop.getPtr(), OP_CV2OPMAT(faceImage), true);
 
                             // // Debugging
                             // if (person < 5)

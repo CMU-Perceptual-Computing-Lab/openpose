@@ -484,7 +484,7 @@ namespace op
                              const Array<float>& leftHandKeypoints3D, const Array<float>& rightHandKeypoints3D)
     {
         try
-        {   
+        {
             // 3-D rendering
             #ifdef USE_3D_RENDERER
                 if (mDisplayMode == DisplayMode::DisplayAll || mDisplayMode == DisplayMode::Display3D)
@@ -556,34 +556,35 @@ namespace op
         }
     }
 
-    cv::Mat Gui3D::readCvMat()
+    Matrix Gui3D::readCvMat()
     {
         try
         {
             // 3-D rendering
-            cv::Mat image;
+            cv::Mat cvImage;
             #ifdef USE_3D_RENDERER
                 if (mDisplayMode == DisplayMode::DisplayAll || mDisplayMode == DisplayMode::Display3D)
                 {
                     // Save/display 3D display in OpenCV window
                     if (mCopyGlToCvMat)
                     {
-                        image = cv::Mat(WINDOW_HEIGHT, WINDOW_WIDTH, CV_8UC3);
+                        cvImage = cv::Mat(WINDOW_HEIGHT, WINDOW_WIDTH, CV_8UC3);
                         #ifdef _WIN32
-                            glReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_BGR_EXT, GL_UNSIGNED_BYTE, image.data);
+                            glReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_BGR_EXT, GL_UNSIGNED_BYTE, cvImage.data);
                         #else
-                            glReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_BGR, GL_UNSIGNED_BYTE, image.data);
+                            glReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_BGR, GL_UNSIGNED_BYTE, cvImage.data);
                         #endif
-                        cv::flip(image, image, 0);
+                        cv::flip(cvImage, cvImage, 0);
                     }
                 }
             #endif
+            Matrix image = OP_CV2OPMAT(cvImage);
             return image;
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return cv::Mat();
+            return Matrix();
         }
     }
 }

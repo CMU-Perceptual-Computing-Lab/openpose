@@ -65,7 +65,7 @@ namespace op
                 // cv::Mat -> float*
                 for (auto& tDatumPtr : *tDatums)
                 {
-                    const Point<int> inputSize{tDatumPtr->cvInputData.cols, tDatumPtr->cvInputData.rows};
+                    const Point<int> inputSize{tDatumPtr->cvInputData.cols(), tDatumPtr->cvInputData.rows()};
                     std::tie(tDatumPtr->scaleInputToNetInputs, tDatumPtr->netInputSizes, tDatumPtr->scaleInputToOutput,
                         tDatumPtr->netOutputSize) = spScaleAndSizeExtractor->extract(inputSize);
                 }

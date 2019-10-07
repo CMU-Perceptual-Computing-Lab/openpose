@@ -1,10 +1,10 @@
-#ifdef USE_OPENCL
-    #include <openpose/gpu/opencl.hcl>
-    #include <openpose/gpu/cl2.hpp>
-#endif
-#include <openpose/core/common.hpp>
 #include <openpose/net/resizeAndMergeBase.hpp>
 #include <iostream>
+#include <openpose/core/common.hpp>
+#ifdef USE_OPENCL
+    #include <openpose_private/gpu/opencl.hcl>
+    #include <openpose_private/gpu/cl2.hpp>
+#endif
 
 namespace op
 {

@@ -73,7 +73,7 @@ namespace op
                 // Update cvMat
                 if (!tDatums->empty())
                 {
-                    std::vector<cv::Mat> cvOutputDatas;
+                    std::vector<Matrix> cvOutputDatas;
                     for (auto& tDatumPtr : *tDatums)
                         cvOutputDatas.emplace_back(tDatumPtr->cvOutputData);
                     spGui->setImage(cvOutputDatas);

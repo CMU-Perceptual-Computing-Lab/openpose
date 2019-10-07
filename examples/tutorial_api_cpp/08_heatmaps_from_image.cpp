@@ -2,7 +2,9 @@
 // It reads an image, process it, and displays it with the body heatmaps. In addition, it includes all the
 // OpenPose configuration flags (enable/disable hand, face, output saving, etc.).
 
-// Command-line user intraface
+// Third-party dependencies
+#include <opencv2/opencv.hpp>
+// Command-line user interface
 #define OPENPOSE_FLAGS_DISABLE_PRODUCER
 #define OPENPOSE_FLAGS_DISABLE_DISPLAY
 #include <openpose/flags.hpp>
@@ -203,7 +205,8 @@ int tutorialApiCpp()
         opWrapper.start();
 
         // Process and display image
-        const auto imageToProcess = cv::imread(FLAGS_image_path);
+        const cv::Mat cvImageToProcess = cv::imread(FLAGS_image_path);
+        const op::Matrix imageToProcess = OP_CV2OPCONSTMAT(cvImageToProcess);
         auto datumProcessed = opWrapper.emplaceAndPop(imageToProcess);
         if (datumProcessed != nullptr)
         {

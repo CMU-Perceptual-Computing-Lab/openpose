@@ -73,7 +73,7 @@ namespace op
                 for (auto& tDatumPtr : *tDatums)
                 {
                     spPoseExtractorNet->forwardPass(
-                        tDatumPtr->inputNetData, Point<int>{tDatumPtr->cvInputData.cols, tDatumPtr->cvInputData.rows},
+                        tDatumPtr->inputNetData, Point<int>{tDatumPtr->cvInputData.cols(), tDatumPtr->cvInputData.rows()},
                         tDatumPtr->scaleInputToNetInputs, tDatumPtr->poseNetOutput);
                     tDatumPtr->poseCandidates = spPoseExtractorNet->getCandidatesCopy();
                     tDatumPtr->poseHeatMaps = spPoseExtractorNet->getHeatMapsCopy();

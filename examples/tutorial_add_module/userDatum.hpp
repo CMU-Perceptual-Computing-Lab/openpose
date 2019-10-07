@@ -1,7 +1,6 @@
 #ifndef OPENPOSE_TUTORIAL_USER_DATUM_HPP
 #define OPENPOSE_TUTORIAL_USER_DATUM_HPP
 
-#include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/datum.hpp>
 #include <openpose/core/common.hpp>
 

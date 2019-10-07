@@ -185,16 +185,17 @@ namespace op
             {
                 // Array<T> --> cv::Mat
                 auto frame = frameArray.getCvMat();
+                cv::Mat cvFrame = OP_OP2CVMAT(frame);
 
                 // Sanity check
-                if (frame.channels() != 3)
+                if (cvFrame.channels() != 3)
                     error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
 
                 // Get frame channels
-                const auto width = frame.size[1];
-                const auto height = frame.size[0];
+                const auto width = cvFrame.size[1];
+                const auto height = cvFrame.size[0];
                 const auto area = width * height;
-                cv::Mat frameBGR(height, width, CV_32FC3, frame.data);
+                cv::Mat frameBGR(height, width, CV_32FC3, cvFrame.data);
 
                 // Parameters
                 const auto lineType = 8;

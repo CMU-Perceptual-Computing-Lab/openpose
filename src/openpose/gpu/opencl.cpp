@@ -1,8 +1,8 @@
+#include <openpose_private/gpu/opencl.hcl> // Must be before below includes
 #include <map>
 #include <mutex>
-#include <openpose/gpu/opencl.hcl> // Must be before below includes
 #ifdef USE_OPENCL
-    #include <openpose/gpu/cl2.hpp>
+    #include <openpose_private/gpu/cl2.hpp>
     #include <viennacl/backend/opencl.hpp>
     #include <caffe/caffe.hpp>
 #endif

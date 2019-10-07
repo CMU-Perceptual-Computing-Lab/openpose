@@ -3,7 +3,9 @@
 // In this function, the user can implement its own way to create frames (e.g., reading his own folder of images)
 // and emplaces/pushes the frames to OpenPose.
 
-// Command-line user intraface
+// Third-party dependencies
+#include <opencv2/opencv.hpp>
+// Command-line user interface
 #define OPENPOSE_FLAGS_DISABLE_PRODUCER
 #include <openpose/flags.hpp>
 // OpenPose dependencies
@@ -49,7 +51,8 @@ public:
             datumPtr = std::make_shared<op::Datum>();
 
             // Fill datum
-            datumPtr->cvInputData = cv::imread(mImageFiles.at(mCounter++));
+            const cv::Mat cvInputData = cv::imread(mImageFiles.at(mCounter++));
+            datumPtr->cvInputData = OP_CV2OPCONSTMAT(cvInputData);
 
             // If empty frame -> return nullptr
             if (datumPtr->cvInputData.empty())

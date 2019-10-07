@@ -1,21 +1,21 @@
+#include <openpose/calibration/cameraParameterEstimation.hpp>
 #include <fstream>
 #include <numeric> // std::accumulate
 #ifdef USE_CERES
     #include <ceres/ceres.h>
     #include <ceres/rotation.h>
 #endif
-#include <opencv2/core/core.hpp>
 #ifdef USE_EIGEN
     #include <Eigen/Dense>
     #include <opencv2/core/eigen.hpp>
 #endif
 #include <openpose/3d/cameraParameterReader.hpp>
-#include <openpose/3d/poseTriangulation.hpp>
-#include <openpose/calibration/gridPatternFunctions.hpp>
 #include <openpose/filestream/fileStream.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/fileSystem.hpp>
-#include <openpose/calibration/cameraParameterEstimation.hpp>
+#include <openpose_private/3d/poseTriangulationPrivate.hpp>
+#include <openpose_private/calibration/gridPatternFunctions.hpp>
+#include <openpose_private/utilities/openCvMultiversionHeaders.hpp>
 
 namespace op
 {
@@ -831,7 +831,10 @@ namespace op
                     fileRemoved = {remove(finalPath.c_str()) == 0};
                     // save images on hhd in the desired place
                     if (i < imagesWithCorners.size())
-                        saveImage(imagesWithCorners.at(i), finalPath);
+                    {
+                        const auto opMat = OP_CV2OPMAT(imagesWithCorners.at(i));
+                        saveImage(opMat, finalPath);
+                    }
                 }
             }
         }
@@ -923,8 +926,10 @@ namespace op
 
             // Save intrinsics/results
             log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            Matrix opCameraMatrix = OP_CV2OPMAT(intrinsics.cameraMatrix);
+            Matrix opDistortionCoefficients = OP_CV2OPMAT(intrinsics.distortionCoefficients);
             CameraParameterReader cameraParameterReader{
-                serialNumber, intrinsics.cameraMatrix, intrinsics.distortionCoefficients};
+                serialNumber, opCameraMatrix, opDistortionCoefficients };
             cameraParameterReader.writeParameters(outputParameterFolder);
 
             // Debugging (optional) - Save images with corners
@@ -946,7 +951,10 @@ namespace op
                     fileRemoved = {remove(finalPath.c_str()) == 0};
                     // save images on hhd in the desired place
                     if (i < imagesWithCorners.size())
-                        saveImage(imagesWithCorners.at(i), finalPath);
+                    {
+                        const auto opMat = OP_CV2OPMAT(imagesWithCorners.at(i));
+                        saveImage(opMat, finalPath);
+                    }
                 }
             }
         }
@@ -978,8 +986,10 @@ namespace op
                 CameraParameterReader cameraParameterReader;
                 cameraParameterReader.readParameters(parameterFolder);
                 const auto cameraSerialNumbers = cameraParameterReader.getCameraSerialNumbers();
-                const auto realCameraDistortions = cameraParameterReader.getCameraDistortions();
-                auto cameraIntrinsicsSubset = cameraParameterReader.getCameraIntrinsics();
+                const auto opRealCameraDistortions = cameraParameterReader.getCameraDistortions();
+                OP_OP2CVVECTORMAT(realCameraDistortions, opRealCameraDistortions)
+                auto opCameraIntrinsicsSubset = cameraParameterReader.getCameraIntrinsics();
+                OP_OP2CVVECTORMAT(cameraIntrinsicsSubset, opCameraIntrinsicsSubset)
                 auto cameraDistortionsSubset = (imagesAreUndistorted ?
                     std::vector<cv::Mat>{realCameraDistortions.size()}
                     : realCameraDistortions);
@@ -993,7 +1003,9 @@ namespace op
                 bool cam0IsOrigin = true;
                 if (combineCam0Extrinsics)
                 {
-                    cameraParameterReader.getCameraExtrinsics().at(index0).copyTo(extrinsicsCam0(cv::Rect{0,0,4,3}));
+                    const cv::Mat cameraExtrinsicsAtIndex0 = OP_OP2CVCONSTMAT(
+                        cameraParameterReader.getCameraExtrinsics().at(index0));
+                    cameraExtrinsicsAtIndex0.copyTo(extrinsicsCam0(cv::Rect{0,0,4,3}));
                     cam0IsOrigin = cv::norm(extrinsicsCam0 - cv::Mat::eye(4, 4, extrinsicsCam0.type())) < 1e-9;
                 }
 
@@ -1173,9 +1185,10 @@ namespace op
                 log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 CameraParameterReader cameraParameterReaderFinal{
                     cameraSerialNumbers.at(index1),
-                    cameraIntrinsicsSubset.at(1),
-                    realCameraDistortions.at(index1),
-                    cvMatExtrinsics};
+                    OP_CV2OPMAT(cameraIntrinsicsSubset.at(1)),
+                    OP_CV2OPMAT(realCameraDistortions.at(index1)),
+                    OP_CV2OPMAT(cvMatExtrinsics)
+                };
                 cameraParameterReaderFinal.writeParameters(parameterFolder);
 
                 // Let the rendered image to be displayed
@@ -2117,14 +2130,14 @@ namespace op
                 log("Loading parameters...", Priority::High);
                 CameraParameterReader cameraParameterReader;
                 cameraParameterReader.readParameters(parameterFolder);
-                const auto cameraExtrinsicsInitial = cameraParameterReader.getCameraExtrinsicsInitial();
+                const auto opCameraExtrinsicsInitial = cameraParameterReader.getCameraExtrinsicsInitial();
                 // Sanity check
-                if (cameraExtrinsicsInitial.empty())
+                if (opCameraExtrinsicsInitial.empty())
                     error("Camera intrinsics could not be loaded from " + parameterFolder
                         + ". Are they in the right path? Remember than the XML must contain the right intrinsic"
                         + " parameters before using this function. ", __LINE__, __FUNCTION__, __FILE__);
                 bool initialEmpty = false;
-                for (const auto& cameraExtrinsicInitial : cameraExtrinsicsInitial)
+                for (const auto& cameraExtrinsicInitial : opCameraExtrinsicsInitial)
                 {
                     if (cameraExtrinsicInitial.empty())
                     {
@@ -2135,16 +2148,18 @@ namespace op
                 log("Parameters loaded.", Priority::High);
                 // Camera extrinsics
                 log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-                auto cameraExtrinsics = (initialEmpty
-                    ? cameraParameterReader.getCameraExtrinsics() : cameraExtrinsicsInitial);
+                auto opCameraExtrinsics = (initialEmpty
+                    ? cameraParameterReader.getCameraExtrinsics() : opCameraExtrinsicsInitial);
+                OP_OP2CVVECTORMAT(cameraExtrinsics, opCameraExtrinsics)
                 // The first one should be [I | 0]: Multiply them all by inv(camera 0 extrinsics)
                 cv::Mat cameraOriginInv;
                 cameraXAsOrigin(cameraExtrinsics, cameraOriginInv, cameraExtrinsics.at(0).clone());
                 // Camera intrinsics and distortion
-                const auto cameraIntrinsics = cameraParameterReader.getCameraIntrinsics();
+                const auto opCameraIntrinsics = cameraParameterReader.getCameraIntrinsics();
+                OP_OP2CVVECTORMAT(cameraIntrinsics, opCameraIntrinsics);
                 const auto cameraDistortions = (
                     imagesAreUndistorted
-                    ? std::vector<cv::Mat>{cameraIntrinsics.size()} : cameraParameterReader.getCameraDistortions());
+                    ? std::vector<Matrix>{cameraIntrinsics.size()} : cameraParameterReader.getCameraDistortions());
                 // Read images in folder
                 log("Reading images in folder...", Priority::High);
                 const auto numberCorners = gridInnerCorners.area();
@@ -2156,7 +2171,7 @@ namespace op
                 // Get 2D grid corners of each image
                 std::vector<cv::Mat> imagesWithCorners;
                 const auto imageSize = imageAndPaths.at(0).first.size();
-                const auto numberViews = imageAndPaths.size() / numberCameras;
+                const auto numberViews = (unsigned int)(imageAndPaths.size() / numberCameras);
                 log("Processing cameras...", Priority::High);
                 std::vector<std::thread> threads;
                 for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
@@ -2292,15 +2307,15 @@ namespace op
                 // Save new extrinsics
                 log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto cameraSerialNumbers = cameraParameterReader.getCameraSerialNumbers();
-                const auto realCameraDistortions = cameraParameterReader.getCameraDistortions();
+                const auto opRealCameraDistortions = cameraParameterReader.getCameraDistortions();
                 for (auto i = 0 ; i < numberCameras ; i++)
                 {
                     CameraParameterReader cameraParameterReaderFinal{
                         cameraSerialNumbers.at(i),
-                        cameraIntrinsics.at(i),
-                        realCameraDistortions.at(i),
-                        refinedExtrinsics.at(i),
-                        (initialEmpty ? cameraExtrinsics.at(i) : cameraExtrinsicsInitial.at(i))};
+                        OP_CV2OPCONSTMAT(cameraIntrinsics.at(i)),
+                        opRealCameraDistortions.at(i),
+                        OP_CV2OPCONSTMAT(refinedExtrinsics.at(i)),
+                        (initialEmpty ? OP_CV2OPCONSTMAT(cameraExtrinsics.at(i)) : opCameraExtrinsicsInitial.at(i))};
                     cameraParameterReaderFinal.writeParameters(parameterFolder);
                 }
                 log(" ", Priority::High);
@@ -2344,7 +2359,7 @@ namespace op
             // Get 2D grid corners of each image
             std::vector<cv::Mat> imagesWithCorners;
             const auto imageSize = imageAndPaths.at(0).first.size();
-            const auto numberViews = imageAndPaths.size() / numberCameras;
+            const auto numberViews = (unsigned int)(imageAndPaths.size() / numberCameras);
             log("Processing cameras...", Priority::High);
             std::vector<std::thread> threads;
             for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)

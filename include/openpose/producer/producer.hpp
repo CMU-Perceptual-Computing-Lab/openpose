@@ -1,8 +1,6 @@
 #ifndef OPENPOSE_PRODUCER_PRODUCER_HPP
 #define OPENPOSE_PRODUCER_PRODUCER_HPP
 
-#include <opencv2/core/core.hpp> // cv::Mat
-#include <opencv2/highgui/highgui.hpp> // capProperties of OpenCV
 #include <openpose/3d/cameraParameterReader.hpp>
 #include <openpose/core/common.hpp>
 #include <openpose/producer/enumClasses.hpp>
@@ -30,36 +28,36 @@ namespace op
 
         /**
          * Main function of Producer, it retrieves and returns a new frame from the frames producer.
-         * @return cv::Mat with the new frame.
+         * @return Mat with the new frame.
          */
-        cv::Mat getFrame();
+        Matrix getFrame();
 
         /**
          * Analogous to getFrame, but it could return > 1 frame.
-         * @return std::vector<cv::Mat> with the new frame(s).
+         * @return std::vector<Mat> with the new frame(s).
          */
-        std::vector<cv::Mat> getFrames();
+        std::vector<Matrix> getFrames();
 
         /**
          * It retrieves and returns the camera matrixes from the frames producer.
          * Virtual class because FlirReader implements their own.
-         * @return std::vector<cv::Mat> with the camera matrices.
+         * @return std::vector<Mat> with the camera matrices.
          */
-        virtual std::vector<cv::Mat> getCameraMatrices();
+        virtual std::vector<Matrix> getCameraMatrices();
 
         /**
          * It retrieves and returns the camera extrinsic parameters from the frames producer.
          * Virtual class because FlirReader implements their own.
-         * @return std::vector<cv::Mat> with the camera extrinsic parameters.
+         * @return std::vector<Mat> with the camera extrinsic parameters.
          */
-        virtual std::vector<cv::Mat> getCameraExtrinsics();
+        virtual std::vector<Matrix> getCameraExtrinsics();
 
         /**
          * It retrieves and returns the camera intrinsic parameters from the frames producer.
          * Virtual class because FlirReader implements their own.
-         * @return std::vector<cv::Mat> with the camera intrinsic parameters.
+         * @return std::vector<Mat> with the camera intrinsic parameters.
          */
-        virtual std::vector<cv::Mat> getCameraIntrinsics();
+        virtual std::vector<Matrix> getCameraIntrinsics();
 
         /**
          * This function returns a unique frame name (e.g., the frame number for video, the
@@ -132,10 +130,10 @@ namespace op
         /**
          * Protected function which checks that the frames keeps their integry (some OpenCV versions
          * might return corrupted frames within a video or webcam with a size different to the
-         * standard resolution). If the frame is corrupted, it is set to an empty cv::Mat.
-         * @param frame cv::Mat with the frame matrix to be checked and modified.
+         * standard resolution). If the frame is corrupted, it is set to an empty Mat.
+         * @param frame Mat with the frame matrix to be checked and modified.
          */
-        void checkFrameIntegrity(cv::Mat& frame);
+        void checkFrameIntegrity(Matrix& frame);
 
         /**
          * Protected function which checks that the frame producer has ended. If so, if resets
@@ -150,16 +148,16 @@ namespace op
 
         /**
          * Function to be defined by its children class. It retrieves and returns a new frame from the frames producer.
-         * @return cv::Mat with the new frame.
+         * @return Mat with the new frame.
          */
-        virtual cv::Mat getRawFrame() = 0;
+        virtual Matrix getRawFrame() = 0;
 
         /**
          * Function to be defined by its children class. It retrieves and returns a new frame from the frames producer.
          * It is equivalent to getRawFrame when more than 1 image can be returned.
-         * @return std::vector<cv::Mat> with the new frames.
+         * @return std::vector<Mat> with the new frames.
          */
-        virtual std::vector<cv::Mat> getRawFrames() = 0;
+        virtual std::vector<Matrix> getRawFrames() = 0;
 
     private:
         const ProducerType mType;

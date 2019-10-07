@@ -1,12 +1,12 @@
-#ifdef USE_OPENCL
-    #include <openpose/gpu/opencl.hcl>
-    #include <openpose/gpu/cl2.hpp>
-#endif
+#include <openpose/net/bodyPartConnectorBase.hpp>
+#include <iostream>
 #include <openpose/gpu/cuda.hpp>
 #include <openpose/pose/poseParameters.hpp>
 #include <openpose/utilities/fastMath.hpp>
-#include <openpose/net/bodyPartConnectorBase.hpp>
-#include <iostream>
+#ifdef USE_OPENCL
+    #include <openpose_private/gpu/opencl.hcl>
+    #include <openpose_private/gpu/cl2.hpp>
+#endif
 
 namespace op
 {

@@ -670,22 +670,22 @@ namespace op
             }
         }
 
-		OP_API void _OPConfigureDebugging(
-			uchar loggingLevel, // Priority
-			bool disableMultiThread, 
-			unsigned long long profileSpeed)
-		{
-			try
-			{
-				ConfigureLog::setPriorityThreshold((Priority)loggingLevel);
-				sMultiThreadDisabled = disableMultiThread;
-				Profiler::setDefaultX(profileSpeed);
-			}
-			catch (const std::exception& e)
-			{
-				errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
-			}
-		}
+        OP_API void _OPConfigureDebugging(
+            uchar loggingLevel, // Priority
+            bool disableMultiThread,
+            unsigned long long profileSpeed)
+        {
+            try
+            {
+                ConfigureLog::setPriorityThreshold((Priority)loggingLevel);
+                sMultiThreadDisabled = disableMultiThread;
+                Profiler::setDefaultX(profileSpeed);
+            }
+            catch (const std::exception& e)
+            {
+                errorDestructor(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            }
+        }
     }
 }
 #endif

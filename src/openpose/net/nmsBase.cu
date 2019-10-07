@@ -1,8 +1,8 @@
+#include <openpose/net/nmsBase.hpp>
 #include <thrust/device_ptr.h>
 #include <thrust/scan.h>
 #include <openpose/gpu/cuda.hpp>
-#include <openpose/gpu/cuda.hu>
-#include <openpose/net/nmsBase.hpp>
+#include <openpose_private/gpu/cuda.hu>
 
 namespace op
 {

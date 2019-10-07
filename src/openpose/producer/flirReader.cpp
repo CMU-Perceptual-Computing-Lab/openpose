@@ -1,6 +1,7 @@
+#include <openpose/producer/flirReader.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/string.hpp>
-#include <openpose/producer/flirReader.hpp>
+#include <openpose_private/utilities/openCvMultiversionHeaders.hpp>
 
 namespace op
 {
@@ -36,7 +37,7 @@ namespace op
         }
     }
 
-    std::vector<cv::Mat> FlirReader::getCameraMatrices()
+    std::vector<Matrix> FlirReader::getCameraMatrices()
     {
         try
         {
@@ -49,7 +50,7 @@ namespace op
         }
     }
 
-    std::vector<cv::Mat> FlirReader::getCameraExtrinsics()
+    std::vector<Matrix> FlirReader::getCameraExtrinsics()
     {
         try
         {
@@ -62,7 +63,7 @@ namespace op
         }
     }
 
-    std::vector<cv::Mat> FlirReader::getCameraIntrinsics()
+    std::vector<Matrix> FlirReader::getCameraIntrinsics()
     {
         try
         {
@@ -114,7 +115,7 @@ namespace op
         }
     }
 
-    cv::Mat FlirReader::getRawFrame()
+    Matrix FlirReader::getRawFrame()
     {
         try
         {
@@ -123,11 +124,11 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return cv::Mat();
+            return Matrix();
         }
     }
 
-    std::vector<cv::Mat> FlirReader::getRawFrames()
+    std::vector<Matrix> FlirReader::getRawFrames()
     {
         try
         {

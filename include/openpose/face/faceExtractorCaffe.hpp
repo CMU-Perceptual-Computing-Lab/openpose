@@ -1,7 +1,6 @@
 #ifndef OPENPOSE_FACE_FACE_EXTRACTOR_CAFFE_HPP
 #define OPENPOSE_FACE_FACE_EXTRACTOR_CAFFE_HPP
 
-#include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/common.hpp>
 #include <openpose/core/enumClasses.hpp>
 #include <openpose/face/faceExtractorNet.hpp>
@@ -39,9 +38,9 @@ namespace op
          * each index corresponds to a different person in the image. Internally, a op::Rectangle<float>
          * (similar to cv::Rect for floating values) with the position of that face (or 0,0,0,0 if
          * some face is missing, e.g., if a specific person has only half of the body inside the image).
-         * @param cvInputData Original image in cv::Mat format and BGR format.
+         * @param cvInputData Original image in Mat format and BGR format.
          */
-        void forwardPass(const std::vector<Rectangle<float>>& faceRectangles, const cv::Mat& cvInputData);
+        void forwardPass(const std::vector<Rectangle<float>>& faceRectangles, const Matrix& inputData);
 
     private:
         // PIMPL idiom

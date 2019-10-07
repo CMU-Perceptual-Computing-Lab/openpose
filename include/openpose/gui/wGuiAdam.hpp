@@ -75,7 +75,7 @@ namespace op
                 if (!tDatums->empty())
                 {
                     // Update cvMat
-                    std::vector<cv::Mat> cvOutputDatas;
+                    std::vector<Mat> cvOutputDatas;
                     for (auto& tDatum : *tDatums)
                         cvOutputDatas.emplace_back(tDatumPtr->cvOutputData);
                     spGuiAdam->setImage(cvOutputDatas);

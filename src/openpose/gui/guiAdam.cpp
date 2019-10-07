@@ -275,7 +275,7 @@ namespace op
     void GuiAdam::update()
     {
         try
-        {   
+        {
             // 2-D rendering
             if (mDisplayMode == DisplayMode::DisplayAll || mDisplayMode == DisplayMode::Display2D)
                 Gui::update();

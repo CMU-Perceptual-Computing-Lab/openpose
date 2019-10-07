@@ -11,7 +11,8 @@ OpenPose - Installation
 7. [Installation](#installation)
 8. [Reinstallation](#reinstallation)
 9. [Uninstallation](#uninstallation)
-10. [Optional Settings](#optional-settings)
+10. [Deploying OpenPose (Exporting OpenPose to Other Projects)](#desploying-openpose-exporting-openpose-to-other-projects)
+11. [Optional Settings](#optional-settings)
     1. [Maximum Speed](#maximum-speed)
     2. [COCO and MPI Models](#coco-and-mpi-models)
     3. [Python API](#python-api)
@@ -129,7 +130,6 @@ The instructions in this section describe the steps to build OpenPose using CMak
 3. [OpenPose Configuration](#openpose-configuration)
 4. [OpenPose Building](#openpose-building)
 5. [Run OpenPose](#run-openpose)
-6. [OpenPose from other Projects (Ubuntu and Mac)](#openpose-from-other-projects-ubuntu-and-mac)
 
 
 
@@ -207,42 +207,6 @@ Check OpenPose was properly installed by running it on the default images, video
 
 
 
-### OpenPose from other Projects (Ubuntu and Mac)
-If you only intend to use the OpenPose demo, you might skip this step. This step is only recommended if you plan to use the OpenPose API from other projects.
-
-To install the OpenPose headers and libraries into the system environment path (e.g., `/usr/local/` or `/usr/`), run the following command.
-```
-cd build/
-sudo make install
-```
-
-Once the installation is completed, you can use OpenPose in your other project using the `find_package` cmake command. Below, is a small example `CMakeLists.txt`. In order to use this script, you also need to copy `FindGFlags.cmake` and `FindGlog.cmake` into your `<project_root_directory>/cmake/Modules/` (create the directory if necessary).
-```
-cmake_minimum_required(VERSION 2.8.7)
-
-add_definitions(-std=c++11)
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
-
-find_package(GFlags)
-find_package(Glog)
-find_package(OpenCV)
-find_package(OpenPose REQUIRED)
-
-include_directories(${OpenPose_INCLUDE_DIRS} ${GFLAGS_INCLUDE_DIR} ${GLOG_INCLUDE_DIR} ${OpenCV_INCLUDE_DIRS})
-
-add_executable(example.bin example.cpp)
-
-target_link_libraries(example.bin ${OpenPose_LIBS} ${GFLAGS_LIBRARY} ${GLOG_LIBRARY} ${OpenCV_LIBS})
-```
-
-If Caffe was built with OpenPose, it will automatically find it. Otherwise, you will need to link Caffe again as shown below (otherwise, you might get an error like `/usr/bin/ld: cannot find -lcaffe`).
-```
-link_directories(<path_to_caffe_installation>/caffe/build/install/lib)
-```
-
-
-
 ## Reinstallation
 In order to re-install OpenPose:
 1. (Ubuntu and Mac) If you ran `sudo make install`, then run `sudo make uninstall` in `build/`.
@@ -256,6 +220,11 @@ In order to re-install OpenPose:
 In order to uninstall OpenPose:
 1. (Ubuntu and Mac) If you ran `sudo make install`, then run `sudo make uninstall` in `build/`.
 2. Remove the OpenPose folder.
+
+
+
+## Deploying OpenPose (Exporting OpenPose to Other Projects)
+See [doc/deployment.md](./deployment.md).
 
 
 

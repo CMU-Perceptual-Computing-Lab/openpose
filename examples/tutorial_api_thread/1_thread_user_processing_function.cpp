@@ -8,7 +8,9 @@
     // 1. `core` module: for the Datum struct that the `thread` module sends between the queues
     // 2. `utilities` module: for the error & logging functions, i.e., op::error & op::log respectively
 
-// Command-line user intraface
+// Third-party dependencies
+#include <opencv2/opencv.hpp>
+// Command-line user interface
 #include <openpose/flags.hpp>
 // OpenPose dependencies
 #include <openpose/headers.hpp>
@@ -33,9 +35,14 @@ public:
             // User's processing here
                 // datumPtr->cvInputData: initial cv::Mat obtained from the frames producer (video, webcam, etc.)
                 // datumPtr->cvOutputData: final cv::Mat to be displayed
-            if (datumsPtr != nullptr)
+            if (datumsPtr != nullptr && !datumsPtr->empty())
+            {
                 for (auto& datumPtr : *datumsPtr)
-                    cv::bitwise_not(datumPtr->cvInputData, datumPtr->cvOutputData);
+                {
+                    cv::Mat cvOutputData = OP_OP2CVMAT(datumPtr->cvOutputData);
+                    cv::bitwise_not(cvOutputData, cvOutputData);
+                }
+            }
         }
         catch (const std::exception& e)
         {
@@ -82,8 +89,8 @@ int openPoseTutorialThread1()
         videoSeekSharedPtr->first = false;
         videoSeekSharedPtr->second = 0;
         const op::Point<int> producerSize{
-            (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
-            (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
+            (int)producerSharedPtr->get(op::getCvCapPropFrameWidth()),
+            (int)producerSharedPtr->get(op::getCvCapPropFrameHeight())};
         // Step 4 - Setting thread workers && manager
         typedef std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>> TypedefDatumsSP;
         op::ThreadManager<TypedefDatumsSP> threadManager;

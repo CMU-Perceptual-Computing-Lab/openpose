@@ -18,7 +18,7 @@ You can quickly add your custom code into this folder so that quick prototypes c
 cd build/
 make -j`nproc`
 # Windows
-# Close Visual Studio, re-run CMake, and re-compile the project in Visual Studio 
+# Close Visual Studio, re-run CMake, and re-compile the project in Visual Studio
 ```
 5. **Run step 4 every time that you make changes into your code**.
 

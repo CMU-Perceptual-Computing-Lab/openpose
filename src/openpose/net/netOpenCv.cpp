@@ -1,11 +1,12 @@
 // TODO: After completely adding the OpenCV DNN module, add this flag to CMake as alternative to USE_CAFFE
 // #define USE_OPEN_CV_DNN
 
+#include <openpose/net/netOpenCv.hpp>
 // Note: OpenCV only uses CPU or OpenCL (for Intel GPUs). Used CUDA for following blobs (Resize + NMS)
-#include <openpose/core/macros.hpp> // OPEN_CV_IS_4_OR_HIGHER
 #ifdef USE_CAFFE
     #include <caffe/net.hpp>
 #endif
+#include <openpose_private/utilities/openCvMultiversionHeaders.hpp> // OPEN_CV_IS_4_OR_HIGHER
 #ifdef USE_OPEN_CV_DNN
     #if defined(USE_CAFFE) && defined(USE_CUDA) && defined(OPEN_CV_IS_4_OR_HIGHER)
         #include <opencv2/opencv.hpp>
@@ -17,7 +18,6 @@
 #endif
 #include <numeric> // std::accumulate
 #include <openpose/utilities/fileSystem.hpp>
-#include <openpose/net/netOpenCv.hpp>
 
 namespace op
 {

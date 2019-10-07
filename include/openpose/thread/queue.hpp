@@ -1,5 +1,5 @@
 #ifndef OPENPOSE_THREAD_QUEUE_HPP
-#define OPENPOSE_THREAD_QUEUE_HPP 
+#define OPENPOSE_THREAD_QUEUE_HPP
 
 #include <queue> // std::queue
 #include <openpose/core/common.hpp>

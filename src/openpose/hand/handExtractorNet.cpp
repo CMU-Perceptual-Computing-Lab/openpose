@@ -4,7 +4,7 @@
 namespace op
 {
     HandExtractorNet::HandExtractorNet(const Point<int>& netInputSize, const Point<int>& netOutputSize,
-                                       const unsigned short numberScales, const float rangeScales,
+                                       const int numberScales, const float rangeScales,
                                        const std::vector<HeatMapType>& heatMapTypes,
                                        const ScaleMode heatMapScaleMode) :
         mMultiScaleNumberAndRange{std::make_pair(numberScales, rangeScales)},

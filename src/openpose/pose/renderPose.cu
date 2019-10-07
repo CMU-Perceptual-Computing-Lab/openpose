@@ -1,8 +1,8 @@
-#include <openpose/gpu/cuda.hpp>
-#include <openpose/gpu/cuda.hu>
-#include <openpose/pose/poseParameters.hpp>
-#include <openpose/utilities/render.hu>
 #include <openpose/pose/renderPose.hpp>
+#include <openpose/gpu/cuda.hpp>
+#include <openpose/pose/poseParameters.hpp>
+#include <openpose_private/gpu/cuda.hu>
+#include <openpose_private/utilities/render.hu>
 
 namespace op
 {

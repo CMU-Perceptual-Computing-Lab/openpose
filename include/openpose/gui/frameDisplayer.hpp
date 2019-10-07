@@ -1,7 +1,6 @@
 #ifndef OPENPOSE_GUI_FRAMES_DISPLAY_HPP
 #define OPENPOSE_GUI_FRAMES_DISPLAY_HPP
 
-#include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/common.hpp>
 #include <openpose/gui/enumClasses.hpp>
 
@@ -43,18 +42,18 @@ namespace op
 
         /**
          * This function displays an image on the display.
-         * @param frame cv::Mat image to display.
+         * @param frame Mat image to display.
          * @param waitKeyValue int value that specifies the argument parameter for cv::waitKey (see OpenCV
          * documentation for more information). Special cases: select -1
          * not to use cv::waitKey or 0 for cv::waitKey(0). OpenCV doc:
          * http://docs.opencv.org/2.4/modules/highgui/doc/user_interface.html?highlight=waitkey
          */
-        void displayFrame(const cv::Mat& frame, const int waitKeyValue = -1);
+        void displayFrame(const Matrix& frame, const int waitKeyValue = -1);
 
         /**
          * Analogous to the previous displayFrame, but first it horizontally concatenates all the frames
          */
-        void displayFrame(const std::vector<cv::Mat>& frames, const int waitKeyValue = -1);
+        void displayFrame(const std::vector<Matrix>& frames, const int waitKeyValue = -1);
 
     private:
         const std::string mWindowName;

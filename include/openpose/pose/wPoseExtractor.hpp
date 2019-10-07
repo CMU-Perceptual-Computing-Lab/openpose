@@ -76,7 +76,7 @@ namespace op
                     auto& tDatumPtr = (*tDatums)[i];
                     // OpenPose net forward pass
                     spPoseExtractor->forwardPass(
-                        tDatumPtr->inputNetData, Point<int>{tDatumPtr->cvInputData.cols, tDatumPtr->cvInputData.rows},
+                        tDatumPtr->inputNetData, Point<int>{tDatumPtr->cvInputData.cols(), tDatumPtr->cvInputData.rows()},
                         tDatumPtr->scaleInputToNetInputs, tDatumPtr->poseNetOutput, tDatumPtr->id);
                     // OpenPose keypoint detector
                     tDatumPtr->poseCandidates = spPoseExtractor->getCandidatesCopy();

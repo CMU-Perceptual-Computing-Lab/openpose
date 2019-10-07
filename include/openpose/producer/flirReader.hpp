@@ -23,11 +23,11 @@ namespace op
 
         virtual ~FlirReader();
 
-        std::vector<cv::Mat> getCameraMatrices();
+        std::vector<Matrix> getCameraMatrices();
 
-        std::vector<cv::Mat> getCameraExtrinsics();
+        std::vector<Matrix> getCameraExtrinsics();
 
-        std::vector<cv::Mat> getCameraIntrinsics();
+        std::vector<Matrix> getCameraIntrinsics();
 
         std::string getNextFrameName();
 
@@ -44,9 +44,9 @@ namespace op
         Point<int> mResolution;
         unsigned long long mFrameNameCounter;
 
-        cv::Mat getRawFrame();
+        Matrix getRawFrame();
 
-        std::vector<cv::Mat> getRawFrames();
+        std::vector<Matrix> getRawFrames();
 
         DELETE_COPY(FlirReader);
     };

@@ -4,7 +4,9 @@
 // In this function, the user can implement its own post-processing, i.e., his function will be called after OpenPose
 // has processed the frames but before saving or visualizing any result.
 
-// Command-line user intraface
+// Third-party dependencies
+#include <opencv2/opencv.hpp>
+// Command-line user interface
 #include <openpose/flags.hpp>
 // OpenPose dependencies
 #include <openpose/headers.hpp>
@@ -22,14 +24,19 @@ public:
 
     void work(std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr)
     {
-        // User's post-processing (after OpenPose processing & before OpenPose outputs) here
-            // datumPtr->cvOutputData: rendered frame with pose or heatmaps
-            // datumPtr->poseKeypoints: Array<float> with the estimated pose
         try
         {
+            // User's post-processing (after OpenPose processing & before OpenPose outputs) here
+                // datumPtr->cvOutputData: rendered frame with pose or heatmaps
+                // datumPtr->poseKeypoints: Array<float> with the estimated pose
             if (datumsPtr != nullptr && !datumsPtr->empty())
+            {
                 for (auto& datumPtr : *datumsPtr)
-                    cv::bitwise_not(datumPtr->cvOutputData, datumPtr->cvOutputData);
+                {
+                    cv::Mat cvOutputData = OP_OP2CVMAT(datumPtr->cvOutputData);
+                    cv::bitwise_not(cvOutputData, cvOutputData);
+                }
+            }
         }
         catch (const std::exception& e)
         {

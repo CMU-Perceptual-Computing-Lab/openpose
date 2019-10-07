@@ -2,7 +2,8 @@ set(SOURCES_OP_3D
     cameraParameterReader.cpp
     defineTemplates.cpp
     jointAngleEstimation.cpp
-    poseTriangulation.cpp)
+    poseTriangulation.cpp
+    poseTriangulationPrivate.cpp)
 
 include(${CMAKE_SOURCE_DIR}/cmake/Utils.cmake)
 prepend(SOURCES_OP_3D_WITH_CP ${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES_OP_3D})
@@ -17,7 +18,7 @@ if (UNIX OR APPLE)
   endif ()
 
   add_library(caffe SHARED IMPORTED)
-  set_property(TARGET caffe PROPERTY IMPORTED_LOCATION ${Caffe_LIBS}) 
+  set_property(TARGET caffe PROPERTY IMPORTED_LOCATION ${Caffe_LIBS})
   target_link_libraries(openpose_3d caffe openpose_core ${MKL_LIBS})
 
   if (BUILD_CAFFE)

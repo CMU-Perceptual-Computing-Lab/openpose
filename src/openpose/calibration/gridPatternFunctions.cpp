@@ -1,6 +1,7 @@
+#include <openpose_private/calibration/gridPatternFunctions.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/fileSystem.hpp>
-#include <openpose/calibration/gridPatternFunctions.hpp>
+#include <openpose_private/utilities/openCvMultiversionHeaders.hpp>
 
 namespace op
 {

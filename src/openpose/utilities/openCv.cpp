@@ -1,36 +1,11 @@
-#include <openpose/utilities/avx.hpp>
-#include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/openCv.hpp>
+#include <openpose/utilities/fastMath.hpp>
+#include <openpose_private/utilities/avx.hpp>
+#include <openpose_private/utilities/openCvMultiversionHeaders.hpp>
 
 namespace op
 {
-    void putTextOnCvMat(cv::Mat& cvMat, const std::string& textToDisplay, const Point<int>& position,
-                        const cv::Scalar& color, const bool normalizeWidth, const int imageWidth)
-    {
-        try
-        {
-            const auto font = cv::FONT_HERSHEY_SIMPLEX;
-            const auto ratio = imageWidth/1280.;
-            // const auto fontScale = 0.75;
-            const auto fontScale = 0.8 * ratio;
-            const auto fontThickness = std::max(1, positiveIntRound(2*ratio));
-            const auto shadowOffset = std::max(1, positiveIntRound(2*ratio));
-            int baseline = 0;
-            const auto textSize = cv::getTextSize(textToDisplay, font, fontScale, fontThickness, &baseline);
-            const cv::Size finalPosition{position.x - (normalizeWidth ? textSize.width : 0),
-                                         position.y + textSize.height/2};
-            cv::putText(cvMat, textToDisplay,
-                        cv::Size{finalPosition.width + shadowOffset, finalPosition.height + shadowOffset},
-                        font, fontScale, cv::Scalar{0,0,0}, fontThickness);
-            cv::putText(cvMat, textToDisplay, finalPosition, font, fontScale, color, fontThickness);
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-
-    void unrollArrayToUCharCvMat(cv::Mat& cvMatResult, const Array<float>& array)
+    void unrollArrayToUCharCvMat(Matrix& matResult, const Array<float>& array)
     {
         try
         {
@@ -46,6 +21,7 @@ namespace op
                 const auto areaInput = height * width;
                 const auto areaOutput = channels * width;
                 // Allocate cv::Mat if it was not initialized yet
+                cv::Mat cvMatResult = OP_OP2CVMAT(matResult);
                 if (cvMatResult.empty() || cvMatResult.cols != channels * width || cvMatResult.rows != height)
                     cvMatResult = cv::Mat(height, areaOutput, CV_8UC1);
                 // Fill cvMatResult from array
@@ -67,9 +43,10 @@ namespace op
                         }
                     }
                 }
+                matResult = OP_CV2OPMAT(cvMatResult);
             }
             else
-                cvMatResult = cv::Mat();
+                matResult = Matrix();
         }
         catch (const std::exception& e)
         {
@@ -77,10 +54,11 @@ namespace op
         }
     }
 
-    void uCharCvMatToFloatPtr(float* floatPtrImage, const cv::Mat& cvImage, const int normalize)
+    void uCharCvMatToFloatPtr(float* floatPtrImage, const Matrix& matImage, const int normalize)
     {
         try
         {
+            const cv::Mat cvImage = OP_OP2CVCONSTMAT(matImage);
             // float* (deep net format): C x H x W
             // cv::Mat (OpenCV format): H x W x C
             const int width = cvImage.cols;
@@ -216,28 +194,7 @@ namespace op
         }
     }
 
-    void resizeFixedAspectRatio(cv::Mat& resizedCvMat, const cv::Mat& cvMat, const double scaleFactor,
-                                const Point<int>& targetSize, const int borderMode, const cv::Scalar& borderValue)
-    {
-        try
-        {
-            const cv::Size cvTargetSize{targetSize.x, targetSize.y};
-            cv::Mat M = cv::Mat::eye(2,3,CV_64F);
-            M.at<double>(0,0) = scaleFactor;
-            M.at<double>(1,1) = scaleFactor;
-            if (scaleFactor != 1. || cvTargetSize != cvMat.size())
-                cv::warpAffine(cvMat, resizedCvMat, M, cvTargetSize,
-                               (scaleFactor > 1. ? cv::INTER_CUBIC : cv::INTER_AREA), borderMode, borderValue);
-            else
-                cvMat.copyTo(resizedCvMat);
-        }
-        catch (const std::exception& e)
-        {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-    }
-
-    void keepRoiInside(cv::Rect& roi, const int imageWidth, const int imageHeight)
+    void keepRoiInside(Rectangle<int>& roi, const int imageWidth, const int imageHeight)
     {
         try
         {
@@ -267,38 +224,39 @@ namespace op
         }
     }
 
-    void rotateAndFlipFrame(cv::Mat& frame, const double rotationAngle, const bool flipFrame)
+    void rotateAndFlipFrame(Matrix& frame, const double rotationAngle, const bool flipFrame)
     {
         try
         {
-            if (!frame.empty())
+            cv::Mat cvMatFrame = OP_OP2CVMAT(frame);
+            if (!cvMatFrame.empty())
             {
                 const auto rotationAngleInt = (int)std::round(rotationAngle) % 360;
                 if (rotationAngleInt == 0 || rotationAngleInt == 360)
                 {
                     if (flipFrame)
-                        cv::flip(frame, frame, 1);
+                        cv::flip(cvMatFrame, cvMatFrame, 1);
                 }
                 else if (rotationAngleInt == 90 || rotationAngleInt == -270)
                 {
-                    cv::transpose(frame, frame);
+                    cv::transpose(cvMatFrame, cvMatFrame);
                     if (!flipFrame)
-                        cv::flip(frame, frame, 0);
+                        cv::flip(cvMatFrame, cvMatFrame, 0);
                 }
                 else if (rotationAngleInt == 180 || rotationAngleInt == -180)
                 {
                     if (flipFrame)
-                        cv::flip(frame, frame, 0);
+                        cv::flip(cvMatFrame, cvMatFrame, 0);
                     else
-                        cv::flip(frame, frame, -1);
+                        cv::flip(cvMatFrame, cvMatFrame, -1);
                 }
                 else if (rotationAngleInt == 270 || rotationAngleInt == -90)
                 {
-                    cv::transpose(frame, frame);
+                    cv::transpose(cvMatFrame, cvMatFrame);
                     if (flipFrame)
-                        cv::flip(frame, frame, -1);
+                        cv::flip(cvMatFrame, cvMatFrame, -1);
                     else
-                        cv::flip(frame, frame, 1);
+                        cv::flip(cvMatFrame, cvMatFrame, 1);
                 }
                 else
                     error("Rotation angle = " + std::to_string(rotationAngleInt)
@@ -308,6 +266,110 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    int getCvCapPropFrameCount()
+    {
+        try
+        {
+            return CV_CAP_PROP_FRAME_COUNT;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return -1;
+        }
+    }
+
+    int getCvCapPropFrameFps()
+    {
+        try
+        {
+            return CV_CAP_PROP_FPS;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return -1;
+        }
+    }
+
+    int getCvCapPropFrameWidth()
+    {
+        try
+        {
+            return CV_CAP_PROP_FRAME_WIDTH;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return -1;
+        }
+    }
+
+    int getCvCapPropFrameHeight()
+    {
+        try
+        {
+            return CV_CAP_PROP_FRAME_HEIGHT;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return -1;
+        }
+    }
+
+    int getCvFourcc(const char c1, const char c2, const char c3, const char c4)
+    {
+        try
+        {
+            return CV_FOURCC(c1,c2,c3,c4);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return -1;
+        }
+    }
+
+    int getCvImwriteJpegQuality()
+    {
+        try
+        {
+            return CV_IMWRITE_JPEG_QUALITY;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return -1;
+        }
+    }
+
+    int getCvImwritePngCompression()
+    {
+        try
+        {
+            return CV_IMWRITE_PNG_COMPRESSION;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return -1;
+        }
+    }
+
+    int getCvLoadImageAnydepth()
+    {
+        try
+        {
+            return CV_LOAD_IMAGE_ANYDEPTH;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return -1;
         }
     }
 }

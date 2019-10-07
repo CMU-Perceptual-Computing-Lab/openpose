@@ -16,8 +16,8 @@ set(SOURCES_OPENPOSE ${SOURCES_OPENPOSE} ${SOURCES_OP_WRAPPER_WITH_CP} PARENT_SC
 
 if (UNIX OR APPLE)
   add_library(openpose_wrapper ${SOURCES_OP_WRAPPER})
-  target_link_libraries(openpose_wrapper openpose_thread openpose_pose openpose_hand 
-      openpose_core openpose_face openpose_filestream openpose_gui openpose_producer 
+  target_link_libraries(openpose_wrapper openpose_thread openpose_pose openpose_hand
+      openpose_core openpose_face openpose_filestream openpose_gui openpose_producer
       openpose_utilities)
 
   install(TARGETS openpose_wrapper

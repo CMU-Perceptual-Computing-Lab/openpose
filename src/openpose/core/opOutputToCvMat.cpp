@@ -1,9 +1,10 @@
+#include <openpose/core/opOutputToCvMat.hpp>
+#include <opencv2/core/core.hpp> // cv::Mat
 #ifdef USE_CUDA
     #include <openpose/gpu/cuda.hpp>
-    #include <openpose/gpu/cuda.hu>
+    #include <openpose_private/gpu/cuda.hu>
 #endif
 #include <openpose/utilities/openCv.hpp>
-#include <openpose/core/opOutputToCvMat.hpp>
 
 namespace op
 {
@@ -73,7 +74,7 @@ namespace op
         }
     }
 
-    cv::Mat OpOutputToCvMat::formatToCvMat(const Array<float>& outputData)
+    Matrix OpOutputToCvMat::formatToCvMat(const Array<float>& outputData)
     {
         try
         {
@@ -86,7 +87,9 @@ namespace op
             if (!mGpuResize)
             {
                 // outputData to cvMat
-                outputData.getConstCvMat().convertTo(cvMat, CV_8UC3);
+                // Equivalent: outputData.getConstCvMat().convertTo(cvMat, CV_8UC3);
+                const cv::Mat constCvMat = OP_OP2CVCONSTMAT(outputData.getConstCvMat());
+                constCvMat.convertTo(cvMat, CV_8UC3);
             }
             // CUDA version
             else
@@ -116,12 +119,13 @@ namespace op
                 #endif
             }
             // Return cvMat
-            return cvMat;
+            const Matrix opMat = OP_CV2OPMAT(cvMat);
+            return opMat;
         }
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return cv::Mat();
+            return Matrix();
         }
     }
 }

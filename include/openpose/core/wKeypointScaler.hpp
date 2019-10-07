@@ -67,11 +67,11 @@ namespace op
                         tDatumPtr->handKeypoints[1], tDatumPtr->faceKeypoints};
                     spKeypointScaler->scale(
                         arraysToScale, tDatumPtr->scaleInputToOutput, tDatumPtr->scaleNetToOutput,
-                        Point<int>{tDatumPtr->cvInputData.cols, tDatumPtr->cvInputData.rows});
+                        Point<int>{tDatumPtr->cvInputData.cols(), tDatumPtr->cvInputData.rows()});
                     // Rescale part candidates
                     spKeypointScaler->scale(
                         tDatumPtr->poseCandidates, tDatumPtr->scaleInputToOutput, tDatumPtr->scaleNetToOutput,
-                        Point<int>{tDatumPtr->cvInputData.cols, tDatumPtr->cvInputData.rows});
+                        Point<int>{tDatumPtr->cvInputData.cols(), tDatumPtr->cvInputData.rows()});
                 }
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

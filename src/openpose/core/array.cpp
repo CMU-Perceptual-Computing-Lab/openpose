@@ -1,7 +1,8 @@
+#include <openpose/core/array.hpp>
 #include <typeinfo> // typeid
 #include <numeric> // std::accumulate
-#include <openpose/utilities/avx.hpp>
-#include <openpose/core/array.hpp>
+#include <opencv2/core/core.hpp> // cv::Mat
+#include <openpose_private/utilities/avx.hpp>
 
 // Note: std::shared_ptr not (fully) supported for array pointers:
 // http://stackoverflow.com/questions/8947579/
@@ -21,12 +22,12 @@ namespace op
      * std::shared_ptr points to.
      */
     template<typename T>
-    void setCvMatFromPtr(std::pair<bool, cv::Mat>& cvMatData, T* const dataPtr, const std::vector<int>& sizes)
+    void setCvMatFromPtr(std::pair<bool, Matrix>& cvMatData, T* const dataPtr, const std::vector<int>& sizes)
     {
         try
         {
             cvMatData.first = true;
-            cvMatData.second = cv::Mat();
+            cvMatData.second = Matrix();
             // BGR image
             if (sizes.size() == 3 && sizes[2] == 3)
             {
@@ -46,7 +47,10 @@ namespace op
                     cvMatData.first = false;
 
                 if (cvMatData.first)
-                    cvMatData.second = cv::Mat(sizes[0], sizes[1], cvFormat, dataPtr);
+                {
+                    cv::Mat cvMat(sizes[0], sizes[1], cvFormat, dataPtr);
+                    cvMatData.second = OP_CV2OPMAT(cvMat);
+                }
             }
             // Any other type
             else
@@ -67,7 +71,10 @@ namespace op
                     cvMatData.first = false;
 
                 if (cvMatData.first)
-                    cvMatData.second = cv::Mat((int)sizes.size(), sizes.data(), cvFormat, dataPtr);
+                {
+                    cv::Mat cvMat((int)sizes.size(), sizes.data(), cvFormat, dataPtr);
+                    cvMatData.second = OP_CV2OPMAT(cvMat);
+                }
             }
         }
         catch (const std::exception& e)
@@ -362,16 +369,16 @@ namespace op
     }
 
     template<typename T>
-    void Array<T>::setFrom(const cv::Mat& cvMat)
+    void Array<T>::setFrom(const Matrix& cvMat)
     {
         try
         {
             if (!cvMat.empty())
             {
                 // New size
-                std::vector<int> newSize(cvMat.dims,0);
+                std::vector<int> newSize(cvMat.dims(),0);
                 for (auto i = 0u ; i < newSize.size() ; i++)
-                    newSize[i] = cvMat.size[i];
+                    newSize[i] = cvMat.size(i);
                 // Reset data & volume
                 reset(newSize);
                 // Integrity checks
@@ -528,12 +535,12 @@ namespace op
     }
 
     template<typename T>
-    const cv::Mat& Array<T>::getConstCvMat() const
+    const Matrix& Array<T>::getConstCvMat() const
     {
         try
         {
             if (!mCvMatData.first)
-                error("Array<T>: cv::Mat functions only valid for T types defined by OpenCV: unsigned char,"
+                error("Array<T>: Matrix functions only valid for T types defined by OpenCV: unsigned char,"
                       " signed char, int, float & double", __LINE__, __FUNCTION__, __FILE__);
             return mCvMatData.second;
         }
@@ -545,12 +552,12 @@ namespace op
     }
 
     template<typename T>
-    cv::Mat& Array<T>::getCvMat()
+    Matrix& Array<T>::getCvMat()
     {
         try
         {
             if (!mCvMatData.first)
-                error("Array<T>: cv::Mat functions only valid for T types defined by OpenCV: unsigned char,"
+                error("Array<T>: Matrix functions only valid for T types defined by OpenCV: unsigned char,"
                       " signed char, int, float & double", __LINE__, __FUNCTION__, __FILE__);
             return mCvMatData.second;
         }
@@ -687,8 +694,8 @@ namespace op
                 mVolume = 0ul;
                 spData.reset();
                 pData = nullptr;
-                // cv::Mat available but empty
-                mCvMatData = std::make_pair(true, cv::Mat());
+                // Matrix available but empty
+                mCvMatData = std::make_pair(true, Matrix());
             }
         }
         catch (const std::exception& e)

@@ -1,10 +1,10 @@
+#include <openpose/gpu/gpu.hpp>
 #ifdef USE_CUDA
     #include <openpose/gpu/cuda.hpp>
 #endif
 #ifdef USE_OPENCL
-    #include <openpose/gpu/opencl.hcl>
+    #include <openpose_private/gpu/opencl.hcl>
 #endif
-#include <openpose/gpu/gpu.hpp>
 
 namespace op
 {

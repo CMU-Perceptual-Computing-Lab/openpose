@@ -1,7 +1,6 @@
 #ifndef OPENPOSE_CORE_CV_MAT_TO_OP_OUTPUT_HPP
 #define OPENPOSE_CORE_CV_MAT_TO_OP_OUTPUT_HPP
 
-#include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/common.hpp>
 
 namespace op
@@ -17,7 +16,7 @@ namespace op
             getSharedParameters();
 
         Array<float> createArray(
-            const cv::Mat& cvInputData, const double scaleInputToOutput, const Point<int>& outputResolution);
+            const Matrix& inputData, const double scaleInputToOutput, const Point<int>& outputResolution);
 
     private:
         const bool mGpuResize;

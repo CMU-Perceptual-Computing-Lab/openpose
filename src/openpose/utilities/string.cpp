@@ -1,5 +1,7 @@
-#include <algorithm> // std::transform
 #include <openpose/utilities/string.hpp>
+#include <algorithm> // std::transform
+#include <cctype> // std::tolower, std::toupper
+#include <locale> // std::tolower, std::toupper
 
 namespace op
 {
@@ -88,8 +90,9 @@ namespace op
     {
         try
         {
-            auto result = string;
-            std::transform(string.begin(), string.end(), result.begin(), tolower);
+            std::string result = string;
+            std::transform(string.begin(), string.end(), result.begin(),
+                [](unsigned char c) { return (unsigned char)std::tolower(c); });
             return result;
         }
         catch (const std::exception& e)
@@ -103,8 +106,9 @@ namespace op
     {
         try
         {
-            auto result = string;
-            std::transform(string.begin(), string.end(), result.begin(), toupper);
+            std::string result = string;
+            std::transform(string.begin(), string.end(), result.begin(),
+                [](unsigned char c) { return (unsigned char)std::toupper(c); });
             return result;
         }
         catch (const std::exception& e)

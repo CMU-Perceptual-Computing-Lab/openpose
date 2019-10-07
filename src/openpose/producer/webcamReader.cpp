@@ -1,7 +1,8 @@
-#include <opencv2/highgui/highgui.hpp>
+#include <openpose/producer/webcamReader.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/openCv.hpp>
-#include <openpose/producer/webcamReader.hpp>
+#include <openpose_private/utilities/openCvMultiversionHeaders.hpp>
+#include <openpose_private/utilities/openCvPrivate.hpp>
 
 namespace op
 {
@@ -122,14 +123,14 @@ namespace op
         }
     }
 
-    cv::Mat WebcamReader::getRawFrame()
+    Matrix WebcamReader::getRawFrame()
     {
         try
         {
             mFrameNameCounter++; // Simple counter: 0,1,2,3,...
 
             // Retrieve frame from buffer
-            cv::Mat cvMat;
+            Matrix opMat;
             auto cvMatRetrieved = false;
             while (!cvMatRetrieved)
             {
@@ -137,7 +138,7 @@ namespace op
                 std::unique_lock<std::mutex> lock{mBufferMutex};
                 if (!mBuffer.empty())
                 {
-                    std::swap(cvMat, mBuffer);
+                    std::swap(opMat, mBuffer);
                     cvMatRetrieved = true;
                 }
                 // No frames available -> sleep & wait
@@ -147,7 +148,7 @@ namespace op
                     std::this_thread::sleep_for(std::chrono::microseconds{5});
                 }
             }
-            return cvMat;
+            return opMat;
 
             // Naive implementation - No flashing buffers
             // return VideoCaptureReader::getRawFrame();
@@ -155,15 +156,15 @@ namespace op
         catch (const std::exception& e)
         {
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-            return cv::Mat();
+            return Matrix();
         }
     }
 
-    std::vector<cv::Mat> WebcamReader::getRawFrames()
+    std::vector<Matrix> WebcamReader::getRawFrames()
     {
         try
         {
-            return std::vector<cv::Mat>{getRawFrame()};
+            return std::vector<Matrix>{getRawFrame()};
         }
         catch (const std::exception& e)
         {
@@ -185,14 +186,24 @@ namespace op
                 if (mDisconnectedCounter > DISCONNETED_THRESHOLD)
                     cameraConnected = reset();
                 // Get frame
-                auto cvMat = VideoCaptureReader::getRawFrame();
+                auto opMat = VideoCaptureReader::getRawFrame();
                 // Detect whether camera is connected
-                const auto newNorm = (
-                    cvMat.empty() ? mLastNorm : cv::norm(cvMat.row(cvMat.rows/2)));
+                // Equivalent code:
+                // const auto newNorm = (
+                //     opMat.empty() ? mLastNorm : cv::norm(opMat.row(opMat.rows() / 2)));
+                double newNorm;
+                if (opMat.empty())
+                    newNorm = mLastNorm;
+                else
+                {
+                    cv::Mat rowMat;
+                    OP_CONST_MAT_RETURN_FUNCTION(rowMat, opMat, row(opMat.rows() / 2));
+                    newNorm = cv::norm(rowMat);
+                }
                 if (mLastNorm == newNorm)
                 {
                     mDisconnectedCounter++;
-                    if (mDisconnectedCounter > 1 && cvMat.empty())
+                    if (mDisconnectedCounter > 1 && opMat.empty())
                         log("Camera frame empty (it has occurred for the last " + std::to_string(mDisconnectedCounter)
                             + " consecutive frames).", Priority::Max);
                 }
@@ -204,7 +215,7 @@ namespace op
                 // If camera disconnected: black image
                 if (!cameraConnected)
                 {
-                    cvMat = cv::Mat(mResolution.y, mResolution.x, CV_8UC3, cv::Scalar{0,0,0});
+                    cv::Mat cvMat(mResolution.y, mResolution.x, CV_8UC3, cv::Scalar{0,0,0});
                     putTextOnCvMat(cvMat, "Camera disconnected, reconnecting...", {cvMat.cols/16, cvMat.rows/2},
                                    cv::Scalar{255, 255, 255}, false, positiveIntRound(2.3*cvMat.cols));
                     // Anti flip + anti rotate frame (so it is balanced with the final flip + rotate)
@@ -213,13 +224,14 @@ namespace op
                     if (int(std::round(rotationAngle)) % 180 != 0.)
                         rotationAngle = 0;
                     const auto flipFrame = ((unsigned char)Producer::get(ProducerProperty::Flip) == 1.);
-                    rotateAndFlipFrame(cvMat, rotationAngle, flipFrame);
+                    opMat = OP_CV2OPMAT(cvMat);
+                    rotateAndFlipFrame(opMat, rotationAngle, flipFrame);
                 }
                 // Move to buffer
-                if (!cvMat.empty())
+                if (!opMat.empty())
                 {
                     const std::lock_guard<std::mutex> lock{mBufferMutex};
-                    std::swap(mBuffer, cvMat);
+                    std::swap(mBuffer, opMat);
                 }
             }
         }

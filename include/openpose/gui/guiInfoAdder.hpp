@@ -2,7 +2,6 @@
 #define OPENPOSE_GUI_ADD_GUI_INFO_HPP
 
 #include <queue>
-#include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/common.hpp>
 
 namespace op
@@ -14,7 +13,7 @@ namespace op
 
         virtual ~GuiInfoAdder();
 
-        void addInfo(cv::Mat& cvOutputData, const int numberPeople, const unsigned long long id,
+        void addInfo(Matrix& outputData, const int numberPeople, const unsigned long long id,
                      const std::string& elementRenderedName, const unsigned long long frameNumber,
                      const Array<long long>& poseIds = Array<long long>{},
                      const Array<float>& poseKeypoints = Array<float>{});

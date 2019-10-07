@@ -1,6 +1,9 @@
 #ifndef OPENPOSE_EXAMPLES_TUTORIAL_USER_POST_PROCESSING_HPP
 #define OPENPOSE_EXAMPLES_TUTORIAL_USER_POST_PROCESSING_HPP
 
+// Third-party dependencies
+#include <opencv2/opencv.hpp>
+// OpenPose dependencies
 #include <openpose/core/common.hpp>
 #include <openpose/core/cvMatToOpInput.hpp>
 

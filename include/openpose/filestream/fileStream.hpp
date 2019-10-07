@@ -1,10 +1,9 @@
 #ifndef OPENPOSE_FILESTREAM_FILE_STREAM_HPP
 #define OPENPOSE_FILESTREAM_FILE_STREAM_HPP
 
-#include <opencv2/core/core.hpp> // cv::Mat
-#include <opencv2/highgui/highgui.hpp> // CV_LOAD_IMAGE_ANYDEPTH, CV_IMWRITE_PNG_COMPRESSION
 #include <openpose/core/common.hpp>
 #include <openpose/filestream/enumClasses.hpp>
+#include <openpose/utilities/openCv.hpp>
 
 namespace op
 {
@@ -26,18 +25,18 @@ namespace op
 
     // Save/load json, xml, yaml, yml
     OP_API void saveData(
-        const std::vector<cv::Mat>& cvMats, const std::vector<std::string>& cvMatNames,
+        const std::vector<Matrix>& opMats, const std::vector<std::string>& cvMatNames,
         const std::string& fileNameNoExtension, const DataFormat dataFormat);
 
     OP_API void saveData(
-        const cv::Mat& cvMat, const std::string cvMatName, const std::string& fileNameNoExtension,
+        const Matrix& opMat, const std::string cvMatName, const std::string& fileNameNoExtension,
         const DataFormat dataFormat);
 
-    OP_API std::vector<cv::Mat> loadData(
+    OP_API std::vector<Matrix> loadData(
         const std::vector<std::string>& cvMatNames, const std::string& fileNameNoExtension,
         const DataFormat dataFormat);
 
-    OP_API cv::Mat loadData(
+    OP_API Matrix loadData(
         const std::string& cvMatName, const std::string& fileNameNoExtension, const DataFormat dataFormat);
 
     // Json - Saving as *.json not available in OpenCV verions < 3.0, this function is a quick fix
@@ -53,11 +52,11 @@ namespace op
 
     // Save/load image
     OP_API void saveImage(
-        const cv::Mat& cvMat, const std::string& fullFilePath,
+        const Matrix& matrix, const std::string& fullFilePath,
         const std::vector<int>& openCvCompressionParams
-            = {CV_IMWRITE_JPEG_QUALITY, 100, CV_IMWRITE_PNG_COMPRESSION, 9});
+            = {getCvImwriteJpegQuality(), 100, getCvImwritePngCompression(), 9});
 
-    OP_API cv::Mat loadImage(const std::string& fullFilePath, const int openCvFlags = CV_LOAD_IMAGE_ANYDEPTH);
+    OP_API Matrix loadImage(const std::string& fullFilePath, const int openCvFlags = getCvLoadImageAnydepth());
 
     OP_API std::vector<std::array<Rectangle<float>, 2>> loadHandDetectorTxt(const std::string& txtFilePath);
 }

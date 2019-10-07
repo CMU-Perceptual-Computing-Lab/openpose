@@ -1,7 +1,7 @@
 #include <openpose/filestream/fileStream.hpp>
 #include <openpose/utilities/fileSystem.hpp>
 #include <openpose/hand/handDetectorFromTxt.hpp>
- 
+
 namespace op
 {
     std::vector<std::string> getTxtPathsOnDirectory(const std::string& txtDirectoryPath)

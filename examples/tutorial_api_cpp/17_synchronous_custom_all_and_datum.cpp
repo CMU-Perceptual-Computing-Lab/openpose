@@ -5,7 +5,9 @@
 // function will be called after OpenPose has processed the frames but before saving), visualizing any result
 // render/display/storage the results, and use their custom Datum structure
 
-// Command-line user intraface
+// Third-party dependencies
+#include <opencv2/opencv.hpp>
+// Command-line user interface
 #define OPENPOSE_FLAGS_DISABLE_PRODUCER
 #define OPENPOSE_FLAGS_DISABLE_DISPLAY
 #include <openpose/flags.hpp>
@@ -72,7 +74,8 @@ public:
                 datumPtr = std::make_shared<UserDatum>();
 
                 // Fill datum
-                datumPtr->cvInputData = cv::imread(mImageFiles.at(mCounter++));
+                const cv::Mat cvInputData = cv::imread(mImageFiles.at(mCounter++));
+                datumPtr->cvInputData = OP_CV2OPCONSTMAT(cvInputData);
 
                 // If empty frame -> return nullptr
                 if (datumPtr->cvInputData.empty())
@@ -112,14 +115,19 @@ public:
 
     void work(std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>>& datumsPtr)
     {
-        // User's post-processing (after OpenPose processing & before OpenPose outputs) here
-            // datumPtr->cvOutputData: rendered frame with pose or heatmaps
-            // datumPtr->poseKeypoints: Array<float> with the estimated pose
         try
         {
+            // User's post-processing (after OpenPose processing & before OpenPose outputs) here
+                // datumPtr->cvOutputData: rendered frame with pose or heatmaps
+                // datumPtr->poseKeypoints: Array<float> with the estimated pose
             if (datumsPtr != nullptr && !datumsPtr->empty())
+            {
                 for (auto& datumPtr : *datumsPtr)
-                    cv::bitwise_not(datumPtr->cvOutputData, datumPtr->cvOutputData);
+                {
+                    cv::Mat cvOutputData = OP_OP2CVMAT(datumPtr->cvOutputData);
+                    cv::bitwise_not(cvOutputData, cvOutputData);
+                }
+            }
         }
         catch (const std::exception& e)
         {
@@ -194,7 +202,8 @@ public:
                 if (!FLAGS_no_display)
                 {
                     // Display rendered output image
-                    cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", datumsPtr->at(0)->cvOutputData);
+                    const cv::Mat cvMat = OP_OP2CVCONSTMAT(datumsPtr->at(0)->cvOutputData);
+                    cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", cvMat);
                     // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
                     const char key = (char)cv::waitKey(1);
                     if (key == 27)

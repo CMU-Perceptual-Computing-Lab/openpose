@@ -1,8 +1,8 @@
-#include <openpose/gpu/cuda.hpp>
-#include <openpose/gpu/cuda.hu>
-#include <openpose/hand/handParameters.hpp>
-#include <openpose/utilities/render.hu>
 #include <openpose/hand/renderHand.hpp>
+#include <openpose/gpu/cuda.hpp>
+#include <openpose/hand/handParameters.hpp>
+#include <openpose_private/gpu/cuda.hu>
+#include <openpose_private/utilities/render.hu>
 
 namespace op
 {

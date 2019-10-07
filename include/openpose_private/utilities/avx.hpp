@@ -1,5 +1,5 @@
-#ifndef OPENPOSE_UTILITIES_AVX_HPP
-#define OPENPOSE_UTILITIES_AVX_HPP
+#ifndef OPENPOSE_PRIVATE_UTILITIES_AVX_HPP
+#define OPENPOSE_PRIVATE_UTILITIES_AVX_HPP
 
 // Warning:
 // This file contains auxiliary functions for AVX.
@@ -97,4 +97,4 @@
     }
 #endif
 
-#endif // OPENPOSE_UTILITIES_AVX_HPP
+#endif // OPENPOSE_PRIVATE_UTILITIES_AVX_HPP

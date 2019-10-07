@@ -1,5 +1,7 @@
-#include <openpose/utilities/keypoint.hpp>
 #include <openpose/core/keepTopNPeople.hpp>
+#include <algorithm> // std::sort
+#include <cmath> // std::sqrt
+#include <openpose/utilities/keypoint.hpp>
 
 namespace op
 {
@@ -45,7 +47,7 @@ namespace op
                         numberPeopleAboveThreshold++;
 
                 // Remove extra people - Fille topPeopleArray
-                // assignedPeopleOnThreshold avoids that people with repeated threshold remove higher elements. 
+                // assignedPeopleOnThreshold avoids that people with repeated threshold remove higher elements.
                 // In our case, it will keep the first N people with score = threshold, while keeping all the
                 // people with higher scores.
                 // E.g., poseFinalScores = [0, 0.5, 0.5, 0.5, 1.0]; mNumberPeopleMax = 2

@@ -24,7 +24,7 @@ if (UNIX OR APPLE)
   endif ()
 
   target_link_libraries(openpose_pose openpose_core)
-  
+
   if (BUILD_CAFFE)
     add_dependencies(openpose_pose openpose)
   endif (BUILD_CAFFE)

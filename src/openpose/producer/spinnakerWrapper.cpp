@@ -1,7 +1,8 @@
-#include <openpose/core/macros.hpp> // OPEN_CV_IS_4_OR_HIGHER
+#include <openpose/producer/spinnakerWrapper.hpp>
 #include <atomic>
 #include <mutex>
 #include <opencv2/imgproc/imgproc.hpp> // cv::undistort, cv::initUndistortRectifyMap
+#include <openpose_private/utilities/openCvMultiversionHeaders.hpp> // OPEN_CV_IS_4_OR_HIGHER
 #ifdef OPEN_CV_IS_4_OR_HIGHER
     #include <opencv2/calib3d.hpp> // cv::initUndistortRectifyMap for OpenCV 4
 #endif
@@ -9,7 +10,6 @@
     #include <Spinnaker.h>
 #endif
 #include <openpose/3d/cameraParameterReader.hpp>
-#include <openpose/producer/spinnakerWrapper.hpp>
 
 namespace op
 {
@@ -510,12 +510,15 @@ namespace op
             }
 
             // This function acquires and displays images from each device.
-            std::vector<cv::Mat> acquireImages(const std::vector<cv::Mat>& cameraIntrinsics,
-                                               const std::vector<cv::Mat>& cameraDistorsions,
-                                               const int cameraIndex = -1)
+            std::vector<Matrix> acquireImages(
+                const std::vector<Matrix>& opCameraIntrinsics,
+                const std::vector<Matrix>& opCameraDistorsions,
+                const int cameraIndex = -1)
             {
                 try
                 {
+                    OP_OP2CVVECTORMAT(cameraIntrinsics, opCameraIntrinsics)
+                    OP_OP2CVVECTORMAT(cameraDistorsions, opCameraDistorsions)
                     // std::vector<cv::Mat> cvMats;
 
                     // Retrieve, convert, and return an image for each camera
@@ -639,7 +642,8 @@ namespace op
                             mCvMats = std::vector<cv::Mat>{mCvMats[cameraIndex]};
                         }
                     }
-                    return mCvMats;
+                    OP_CV2OPVECTORMAT(opMats, mCvMats)
+                    return opMats;
                 }
                 catch (Spinnaker::Exception &e)
                 {
@@ -890,7 +894,7 @@ namespace op
                 if (cvMats.empty())
                     error("Cameras could not be opened.", __LINE__, __FUNCTION__, __FILE__);
                 // Get resolution
-                upImpl->mResolution = Point<int>{cvMats[0].cols, cvMats[0].rows};
+                upImpl->mResolution = Point<int>{cvMats[0].cols(), cvMats[0].rows()};
 
                 const std::string numberCameras = std::to_string(upImpl->mCameraIndex < 0 ? serialNumbers.size() : 1);
                 log("\nRunning for " + numberCameras + " out of " + std::to_string(serialNumbers.size())
@@ -925,7 +929,7 @@ namespace op
         }
     }
 
-    std::vector<cv::Mat> SpinnakerWrapper::getRawFrames()
+    std::vector<Matrix> SpinnakerWrapper::getRawFrames()
     {
         try
         {
@@ -960,7 +964,7 @@ namespace op
         }
     }
 
-    std::vector<cv::Mat> SpinnakerWrapper::getCameraMatrices() const
+    std::vector<Matrix> SpinnakerWrapper::getCameraMatrices() const
     {
         try
         {
@@ -977,7 +981,7 @@ namespace op
         }
     }
 
-    std::vector<cv::Mat> SpinnakerWrapper::getCameraExtrinsics() const
+    std::vector<Matrix> SpinnakerWrapper::getCameraExtrinsics() const
     {
         try
         {
@@ -994,7 +998,7 @@ namespace op
         }
     }
 
-    std::vector<cv::Mat> SpinnakerWrapper::getCameraIntrinsics() const
+    std::vector<Matrix> SpinnakerWrapper::getCameraIntrinsics() const
     {
         try
         {

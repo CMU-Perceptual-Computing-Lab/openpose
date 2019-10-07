@@ -143,7 +143,7 @@ namespace op
                     auto codeAnswerAudio = system(audioCommand.c_str());
                     // Move temp output to real output
                     if (codeAnswerAudio == 0)
-						codeAnswerAudio = system(("mv " + tempOutput + " " + upImpl->mVideoSaverPath).c_str());
+                        codeAnswerAudio = system(("mv " + tempOutput + " " + upImpl->mVideoSaverPath).c_str());
                     // Sanity check
                     if (codeAnswerAudio != 0)
                         log("\nVideo " + upImpl->mVideoSaverPath + " could not be saved with audio (exit code: "
@@ -176,11 +176,11 @@ namespace op
         }
     }
 
-    void VideoSaver::write(const cv::Mat& cvMat)
+    void VideoSaver::write(const Matrix& matToSave)
     {
         try
         {
-            write(std::vector<cv::Mat>{cvMat});
+            write(std::vector<Matrix>{matToSave});
         }
         catch (const std::exception& e)
         {
@@ -188,10 +188,11 @@ namespace op
         }
     }
 
-    void VideoSaver::write(const std::vector<cv::Mat>& cvMats)
+    void VideoSaver::write(const std::vector<Matrix>& matsToSave)
     {
         try
         {
+            OP_OP2CVVECTORMAT(cvMats, matsToSave);
             // Sanity check
             if (cvMats.empty())
                 error("The image(s) to be saved cannot be empty.", __LINE__, __FUNCTION__, __FILE__);
@@ -236,7 +237,8 @@ namespace op
             // FFmpeg video
             if (upImpl->mUseFfmpeg)
             {
-                upImpl->upImageSaver->saveImages(cvOutputData, toFixedLengthString(upImpl->mImageSaverCounter, 12u));
+                const auto opMat = OP_CV2OPMAT(cvOutputData);
+                upImpl->upImageSaver->saveImages(opMat, toFixedLengthString(upImpl->mImageSaverCounter, 12u));
                 upImpl->mImageSaverCounter++;
             }
             // OpenCV video

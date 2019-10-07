@@ -1,5 +1,6 @@
-// #include <thrust/extrema.h>
 #include <openpose/net/maximumBase.hpp>
+// #include <thrust/extrema.h>
+#include <opencv2/core/core.hpp> // cv::Mat
 
 namespace op
 {

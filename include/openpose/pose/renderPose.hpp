@@ -1,7 +1,6 @@
 #ifndef OPENPOSE_POSE_RENDER_POSE_HPP
 #define OPENPOSE_POSE_RENDER_POSE_HPP
 
-#include <opencv2/core/core.hpp> // cv::Mat
 #include <openpose/core/common.hpp>
 #include <openpose/pose/enumClasses.hpp>
 #include <openpose/pose/poseParametersRender.hpp>

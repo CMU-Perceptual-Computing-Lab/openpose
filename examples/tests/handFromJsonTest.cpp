@@ -1,7 +1,7 @@
 // ----------------------- OpenPose Tests - Hand Keypoint Detection from JSON Ground-Truth Data -----------------------
 // Example to test hands accuracy given ground-truth bounding boxes.
 
-// Command-line user intraface
+// Command-line user interface
 #define OPENPOSE_FLAGS_DISABLE_POSE
 #include <openpose/flags.hpp>
 // OpenPose dependencies
