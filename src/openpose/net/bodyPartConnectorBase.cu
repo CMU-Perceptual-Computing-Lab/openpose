@@ -237,8 +237,8 @@ namespace op
                 numberBodyParts, numberBodyPartPairs);
 
             // // Profiling verbose
-            // log("  BPC(ori)=" + std::to_string(timeNormalize1) + "ms");
-            // log("  BPC(new)=" + std::to_string(timeNormalize2) + "ms");
+            // opLog("  BPC(ori)=" + std::to_string(timeNormalize1) + "ms");
+            // opLog("  BPC(new)=" + std::to_string(timeNormalize2) + "ms");
 
             // Sanity check
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);

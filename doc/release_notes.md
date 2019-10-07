@@ -391,6 +391,7 @@ OpenPose Library - Release Notes
     4. In all `*.cpp` files, their include of their analog `*.hpp` file has been moved to the first line of those `*.cpp` files to slightly speed up compiling time.
 2. Functions or parameters renamed:
     1. All headers moved into `openpose_private` and all 3rd-party library calls in headers.
+    2. Renamed `dLog()` as `opLogIfDebug()`, `log()` as `opLog()`, `check()` as `checkBool()`, and also renamed all the `checkX()` functions in `include/openpose/utilities/check.hpp`. This avoids compiling crashes when exporting OpenPose to other projects which contain other 3rd-party libraries that define functions with the same popular names with `#define`.
 3. Main bugs fixed:
     1. Removed many Visual Studio (Windows) warnings.
 4. Changes/additions that affect the compatibility with the OpenPose Unity Plugin:

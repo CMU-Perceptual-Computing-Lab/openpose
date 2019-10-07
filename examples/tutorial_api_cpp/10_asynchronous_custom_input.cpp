@@ -36,7 +36,7 @@ public:
         // Close program when empty frame
         if (mClosed || mImageFiles.size() <= mCounter)
         {
-            op::log("Last frame read and added to queue. Closing program after it is processed.", op::Priority::High);
+            op::opLog("Last frame read and added to queue. Closing program after it is processed.", op::Priority::High);
             // This funtion stops this worker, which will eventually stop the whole thread system once all the frames
             // have been processed
             mClosed = true;
@@ -57,7 +57,7 @@ public:
             // If empty frame -> return nullptr
             if (datumPtr->cvInputData.empty())
             {
-                op::log("Empty frame detected on path: " + mImageFiles.at(mCounter-1) + ". Closing program.",
+                op::opLog("Empty frame detected on path: " + mImageFiles.at(mCounter-1) + ". Closing program.",
                         op::Priority::High);
                 mClosed = true;
                 datumsPtr = nullptr;
@@ -85,8 +85,9 @@ void configureWrapper(op::Wrapper& opWrapper)
         // Configuring OpenPose
 
         // logging_level
-        op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
-                  __LINE__, __FUNCTION__, __FILE__);
+        op::checkBool(
+            0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
+            __LINE__, __FUNCTION__, __FILE__);
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
         op::Profiler::setDefaultX(FLAGS_profile_speed);
 
@@ -105,8 +106,9 @@ void configureWrapper(op::Wrapper& opWrapper)
         const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
         // JSON saving
         if (!FLAGS_write_keypoint.empty())
-            op::log("Flag `write_keypoint` is deprecated and will eventually be removed."
-                    " Please, use `write_json` instead.", op::Priority::Max);
+            op::opLog(
+                "Flag `write_keypoint` is deprecated and will eventually be removed. Please, use `write_json`"
+                " instead.", op::Priority::Max);
         // keypointScaleMode
         const auto keypointScaleMode = op::flagsToScaleMode(FLAGS_keypoint_scale);
         // heatmaps to add
@@ -172,16 +174,16 @@ int tutorialApiCpp()
 {
     try
     {
-        op::log("Starting OpenPose demo...", op::Priority::High);
+        op::opLog("Starting OpenPose demo...", op::Priority::High);
         const auto opTimer = op::getTimerInit();
 
         // Configuring OpenPose
-        op::log("Configuring OpenPose...", op::Priority::High);
+        op::opLog("Configuring OpenPose...", op::Priority::High);
         op::Wrapper opWrapper{op::ThreadManagerMode::AsynchronousIn};
         configureWrapper(opWrapper);
 
         // Start, run, and stop processing - exec() blocks this thread until OpenPose wrapper has finished
-        op::log("Starting thread(s)...", op::Priority::High);
+        op::opLog("Starting thread(s)...", op::Priority::High);
         opWrapper.start();
 
         // User processing
@@ -195,11 +197,11 @@ int tutorialApiCpp()
             {
                 auto successfullyEmplaced = opWrapper.waitAndEmplace(datumToProcess);
                 if (!successfullyEmplaced)
-                    op::log("Processed datum could not be emplaced.", op::Priority::High);
+                    op::opLog("Processed datum could not be emplaced.", op::Priority::High);
             }
         }
 
-        op::log("Stopping thread(s)", op::Priority::High);
+        op::opLog("Stopping thread(s)", op::Priority::High);
         opWrapper.stop();
 
         // Measuring total time

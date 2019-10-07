@@ -58,7 +58,7 @@ namespace op
     {
         try
         {
-            log("Starting initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("Starting initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // GPU memory allocation for rendering
             #ifdef USE_CUDA
                 cudaMalloc((void**)(&pGpuHand), HAND_MAX_HANDS * HAND_NUMBER_PARTS * 3 * sizeof(float));
@@ -66,7 +66,7 @@ namespace op
                 cudaMalloc((void**)&pMinPtr, sizeof(float) * 2 * HAND_MAX_HANDS);
                 cudaMalloc((void**)&pScalePtr, sizeof(float) * HAND_MAX_HANDS);
             #endif
-            log("Finished initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("Finished initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
         {

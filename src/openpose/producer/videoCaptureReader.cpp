@@ -167,7 +167,7 @@ namespace op
             if (upImpl->mVideoCapture.isOpened())
             {
                 upImpl->mVideoCapture.release();
-                log("cv::VideoCapture released.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("cv::VideoCapture released.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             }
         }
         catch (const std::exception& e)

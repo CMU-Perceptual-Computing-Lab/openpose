@@ -19,7 +19,7 @@ namespace op
     bool sUnityOutputEnabled = true;
     bool sImageOutput = false;
 
-    enum class OutputType : uchar
+    enum class OutputType : unsigned char
     {
         None,
         DatumsInfo,
@@ -417,7 +417,7 @@ namespace op
         try
         {
             // Starting
-            log("Starting OpenPose...");
+            opLog("Starting OpenPose...");
 
             // OpenPose wrapper
             auto spWrapper = std::make_shared<Wrapper>();
@@ -446,7 +446,7 @@ namespace op
             spWrapper->exec();
 
             // Ending
-            log("OpenPose finished");
+            opLog("OpenPose finished");
         }
         catch (const std::exception& e)
         {
@@ -476,7 +476,7 @@ namespace op
             {
                 if (ptrUserOutput != nullptr)
                 {
-                    log("Stopping...");
+                    opLog("Stopping...");
                     ptrUserOutput->stop();
                 }
             }

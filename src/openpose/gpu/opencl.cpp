@@ -155,7 +155,7 @@ namespace op
                                         upImpl->mQueue = cl::CommandQueue(upImpl->mContext, upImpl->mDevice,
                                                                           CL_QUEUE_PROFILING_ENABLE);
                                         deviceFound = true;
-                                        log("Made new GPU Instance: " + std::to_string(deviceId));
+                                        opLog("Made new GPU Instance: " + std::to_string(deviceId));
                                         break;
                                     }
                                 }
@@ -186,7 +186,7 @@ namespace op
                                         upImpl->mQueue = cl::CommandQueue(upImpl->mContext, upImpl->mDevice,
                                                                           CL_QUEUE_PROFILING_ENABLE);
                                         deviceFound = true;
-                                        log("Made new CPU Instance: " + std::to_string(deviceId));
+                                        opLog("Made new CPU Instance: " + std::to_string(deviceId));
                                         break;
                                     }
                                 }
@@ -219,7 +219,7 @@ namespace op
                                         upImpl->mQueue = cl::CommandQueue(upImpl->mContext, upImpl->mDevice,
                                                                           CL_QUEUE_PROFILING_ENABLE);
                                         deviceFound = true;
-                                        log("Made new ACC Instance: " + std::to_string(deviceId));
+                                        opLog("Made new ACC Instance: " + std::to_string(deviceId));
                                         break;
                                     }
                                 }
@@ -240,7 +240,7 @@ namespace op
                 #if defined(USE_OPENCL) && defined(CL_HPP_ENABLE_EXCEPTIONS)
                 catch (cl::Error e)
                 {
-                    log("Error: " + std::string(e.what()));
+                    opLog("Error: " + std::string(e.what()));
                 }
                 #endif
                 catch (const std::exception& e)
@@ -316,13 +316,13 @@ namespace op
             if (!(upImpl->mClKernels.find(key) != upImpl->mClKernels.end()))
             {
                 upImpl->mClKernels[key] = cl::Kernel(program, kernelName.c_str());
-                log("Kernel: " + kernelName + " Type: " + type + + " GPU: " + std::to_string(upImpl->mId) +
+                opLog("Kernel: " + kernelName + " Type: " + type + + " GPU: " + std::to_string(upImpl->mId) +
                     " built successfully");
                 return true;
             }
             else
             {
-                log("Kernel " + kernelName + " already built");
+                opLog("Kernel " + kernelName + " already built");
                 return false;
             }
         #else
@@ -477,7 +477,7 @@ namespace op
             #if defined(USE_OPENCL) && defined(CL_HPP_ENABLE_EXCEPTIONS)
             catch (cl::Error& e)
             {
-                log("Error: " + std::string(e.what()));
+                opLog("Error: " + std::string(e.what()));
             }
             #endif
             catch (const std::exception& e)

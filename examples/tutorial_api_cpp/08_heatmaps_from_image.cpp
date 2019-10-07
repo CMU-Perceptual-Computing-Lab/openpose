@@ -60,7 +60,7 @@ bool display(
             cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", imageToRender);
         }
         else
-            op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
+            op::opLog("Nullptr or empty datumsPtr found.", op::Priority::High);
         const auto key = (char)cv::waitKey(1);
         return (key == 27);
     }
@@ -82,12 +82,12 @@ void printKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>
             const auto numberChannels = poseHeatMaps.getSize(0);
             const auto height = poseHeatMaps.getSize(1);
             const auto width = poseHeatMaps.getSize(2);
-            op::log("Body heatmaps has " + std::to_string(numberChannels) + " channels, and each channel has a"
+            op::opLog("Body heatmaps has " + std::to_string(numberChannels) + " channels, and each channel has a"
                     " dimension of " + std::to_string(width) + " x " + std::to_string(height) + " pixels.",
                     op::Priority::High);
         }
         else
-            op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
+            op::opLog("Nullptr or empty datumsPtr found.", op::Priority::High);
     }
     catch (const std::exception& e)
     {
@@ -102,8 +102,9 @@ void configureWrapper(op::Wrapper& opWrapper)
         // Configuring OpenPose
 
         // logging_level
-        op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
-                  __LINE__, __FUNCTION__, __FILE__);
+        op::checkBool(
+            0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
+            __LINE__, __FUNCTION__, __FILE__);
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
         op::Profiler::setDefaultX(FLAGS_profile_speed);
 
@@ -122,8 +123,9 @@ void configureWrapper(op::Wrapper& opWrapper)
         const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
         // JSON saving
         if (!FLAGS_write_keypoint.empty())
-            op::log("Flag `write_keypoint` is deprecated and will eventually be removed."
-                    " Please, use `write_json` instead.", op::Priority::Max);
+            op::opLog(
+                "Flag `write_keypoint` is deprecated and will eventually be removed. Please, use `write_json`"
+                " instead.", op::Priority::Max);
         // keypointScaleMode
         const auto keypointScaleMode = op::flagsToScaleMode(FLAGS_keypoint_scale);
         // heatmaps to add
@@ -186,7 +188,7 @@ int tutorialApiCpp()
 {
     try
     {
-        op::log("Starting OpenPose demo...", op::Priority::High);
+        op::opLog("Starting OpenPose demo...", op::Priority::High);
         const auto opTimer = op::getTimerInit();
 
         // Required flags to enable heatmaps
@@ -196,12 +198,12 @@ int tutorialApiCpp()
         FLAGS_heatmaps_scale = 2;
 
         // Configuring OpenPose
-        op::log("Configuring OpenPose...", op::Priority::High);
+        op::opLog("Configuring OpenPose...", op::Priority::High);
         op::Wrapper opWrapper{op::ThreadManagerMode::Asynchronous};
         configureWrapper(opWrapper);
 
         // Starting OpenPose
-        op::log("Starting thread(s)...", op::Priority::High);
+        op::opLog("Starting thread(s)...", op::Priority::High);
         opWrapper.start();
 
         // Process and display image
@@ -220,10 +222,10 @@ int tutorialApiCpp()
             }
         }
         else
-            op::log("Image could not be processed.", op::Priority::High);
+            op::opLog("Image could not be processed.", op::Priority::High);
 
         // Info
-        op::log("NOTE: In addition with the user flags, this demo has auto-selected the following flags:\n"
+        op::opLog("NOTE: In addition with the user flags, this demo has auto-selected the following flags:\n"
                 "\t`--heatmaps_add_parts --heatmaps_add_bkg --heatmaps_add_PAFs`",
                 op::Priority::High);
 

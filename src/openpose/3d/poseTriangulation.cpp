@@ -141,14 +141,14 @@ namespace op
                     }
                     // Warning
                     if (reprojectionErrorTotal > 60)
-                        log("Unusual high re-projection error (averaged over #keypoints) of value "
+                        opLog("Unusual high re-projection error (averaged over #keypoints) of value "
                             + std::to_string(reprojectionErrorTotal) + " pixels, while the average for a good OpenPose"
                             " detection from 4 cameras is about 2-3 pixels. It might be simply a wrong OpenPose"
                             " detection. However, if this message appears very frequently, your calibration parameters"
                             " might be wrong. Note: If you have introduced your own camera intrinsics, are they an"
                             " upper triangular matrix (as specified in the OpenPose doc/modules/calibration_module.md"
                             " and 3d_reconstruction_module.md)?", Priority::High);
-                    // log("Reprojection error: " + std::to_string(reprojectionErrorTotal)); // To debug reprojection error
+                    // opLog("Reprojection error: " + std::to_string(reprojectionErrorTotal)); // To debug reprojection error
                     return atLeastOnePointProjected;
                 }
                 return false;
@@ -251,7 +251,7 @@ namespace op
             //         thread.join();
             // Warning
             if (!keypointsReconstructed)
-                log("No keypoints were reconstructed on this frame. It might be simply a challenging frame."
+                opLog("No keypoints were reconstructed on this frame. It might be simply a challenging frame."
                     " However, if this message appears frequently, OpenPose is facing some unknown issue,"
                     " mabe the calibration parameters are not accurate. Feel free to open a GitHub issue"
                     " (remember to fill all the required information detailed in the GitHub issue template"

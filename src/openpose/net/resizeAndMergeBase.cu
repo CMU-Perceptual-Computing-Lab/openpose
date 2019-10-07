@@ -365,9 +365,9 @@ namespace op
                     // OP_CUDA_PROFILE_END(timeNormalize3, 1e3, REPS);
 
                     // // Profiling code
-                    // log("  Res(ori)=" + std::to_string(timeNormalize1) + "ms");
-                    // log("  Res(new)=" + std::to_string(timeNormalize2) + "ms");
-                    // log("  Res(new8x)=" + std::to_string(timeNormalize3) + "ms");
+                    // opLog("  Res(ori)=" + std::to_string(timeNormalize1) + "ms");
+                    // opLog("  Res(new)=" + std::to_string(timeNormalize2) + "ms");
+                    // opLog("  Res(new8x)=" + std::to_string(timeNormalize3) + "ms");
                 }
                 // Old inefficient multi-scale merging
                 else
@@ -514,9 +514,9 @@ namespace op
                 // OP_CUDA_PROFILE_END(timeNormalize3, 1e3, REPS);
 
                 // // Profiling code
-                // log("  Res(orig)=" + std::to_string(timeNormalize1) + "ms");
-                // log("  Res(new4)=" + std::to_string(timeNormalize2) + "ms");
-                // log("  Res(new1)=" + std::to_string(timeNormalize3) + "ms");
+                // opLog("  Res(orig)=" + std::to_string(timeNormalize1) + "ms");
+                // opLog("  Res(new4)=" + std::to_string(timeNormalize2) + "ms");
+                // opLog("  Res(new1)=" + std::to_string(timeNormalize3) + "ms");
             }
 
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);

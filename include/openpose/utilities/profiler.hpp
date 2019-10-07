@@ -27,7 +27,7 @@ namespace op
     //     OP_PROFILE_INIT(REPS);
     //         // [Some code in here]
     //     OP_PROFILE_END(time, 1e3, REPS); // Time in msec. 1 = sec, 1e3 = msec, 1e6 = usec, 1e9 = nsec, etc.
-    //     log("Function X took " + std::to_string(time) + " milliseconds.");
+    //     opLog("Function X took " + std::to_string(time) + " milliseconds.");
     #define OP_PROFILE_INIT(REPS) \
     { \
         const auto timerInit = getTimerInit(); \
@@ -45,7 +45,7 @@ namespace op
     //     OP_CUDA_PROFILE_INIT(REPS);
     //         // [Some code with CUDA calls in here]
     //     OP_CUDA_PROFILE_END(time, 1e3, REPS); // Time in msec. 1 = sec, 1e3 = msec, 1e6 = usec, 1e9 = nsec, etc.
-    //     log("Function X took " + std::to_string(time) + " milliseconds.");
+    //     opLog("Function X took " + std::to_string(time) + " milliseconds.");
     // Analogous to OP_PROFILE_INIT, but also waits for CUDA kernels to finish their asynchronous operations
     // It requires: #include <cuda_runtime.h>
     #define OP_CUDA_PROFILE_INIT(REPS) \

@@ -48,7 +48,7 @@ namespace op
                 #endif
             }
 
-            void log(const std::string& message) { DebugInUnity(message, 0); }
+            void opLog(const std::string& message) { DebugInUnity(message, 0); }
             void logWarning(const std::string& message) { DebugInUnity(message, 1); }
             void logError(const std::string& message) { DebugInUnity(message, -1); }
         }
@@ -295,8 +295,9 @@ namespace op
         errorAux(3, message, line, function, file);
     }
 
-    void log(const std::string& message, const Priority priority, const int line, const std::string& function,
-             const std::string& file)
+    void opLog(
+        const std::string& message, const Priority priority, const int line, const std::string& function,
+        const std::string& file)
     {
         if (priority >= ConfigureLog::getPriorityThreshold())
         {
@@ -312,7 +313,7 @@ namespace op
 
             // Unity log
             #ifdef USE_UNITY_SUPPORT
-                UnityDebugger::log(infoMessage);
+                UnityDebugger::opLog(infoMessage);
             #endif
         }
     }

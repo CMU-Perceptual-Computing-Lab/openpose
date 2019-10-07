@@ -110,9 +110,9 @@ namespace op
     {
         try
         {
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             stop();
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
         {
@@ -302,7 +302,7 @@ namespace op
     {
         try
         {
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             const std::lock_guard<std::mutex> lock{mMutex};
             mPopIsStopped = {true};
             mPushIsStopped = {true};
@@ -321,7 +321,7 @@ namespace op
     {
         try
         {
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             const std::lock_guard<std::mutex> lock{mMutex};
             mPushers--;
             if (mPushers == 0)
@@ -343,7 +343,7 @@ namespace op
     {
         try
         {
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             const std::lock_guard<std::mutex> lock{mMutex};
             mPoppers++;
             updateMaxPoppersPushers();
@@ -359,7 +359,7 @@ namespace op
     {
         try
         {
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             const std::lock_guard<std::mutex> lock{mMutex};
             mPushers++;
             updateMaxPoppersPushers();

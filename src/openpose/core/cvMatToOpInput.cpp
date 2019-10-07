@@ -98,7 +98,7 @@ namespace op
                     // cv::dnn::blobFromImage(
                     //     // frameWithNetSize, cvMat, scale, outputSize, mean);
                     //     frameWithNetSize, inputNetData[i].getCvMat(), scale, outputSize, mean);
-                    // // log(cv::norm(cvMat - inputNetData[i].getCvMat())); // ~0.25
+                    // // opLog(cv::norm(cvMat - inputNetData[i].getCvMat())); // ~0.25
                 }
                 // CUDA version (if #Gpus > n)
                 else

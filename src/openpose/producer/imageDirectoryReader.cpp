@@ -122,7 +122,7 @@ namespace op
                 return -1.;
             else
             {
-                log("Unknown property", Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                opLog("Unknown property", Priority::Max, __LINE__, __FUNCTION__, __FILE__);
                 return -1.;
             }
         }
@@ -144,9 +144,9 @@ namespace op
             else if (capProperty == CV_CAP_PROP_POS_FRAMES)
                 mFrameNameCounter = fastTruncate((long long)value, 0ll, (long long)mFilePaths.size()-1);
             else if (capProperty == CV_CAP_PROP_FRAME_COUNT || capProperty == CV_CAP_PROP_FPS)
-                log("This property is read-only.", Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                opLog("This property is read-only.", Priority::Max, __LINE__, __FUNCTION__, __FILE__);
             else
-                log("Unknown property", Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                opLog("Unknown property", Priority::Max, __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
         {

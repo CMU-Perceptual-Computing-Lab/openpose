@@ -61,7 +61,7 @@ namespace op
                 if (tDatums->size() > 1)
                     error("Function only ready for tDatums->size() == 1", __LINE__, __FUNCTION__, __FILE__);
                 // Debugging log
-                dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLogIfDebug("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // T* to T
@@ -73,7 +73,7 @@ namespace op
                 Profiler::timerEnd(profilerKey);
                 Profiler::printAveragedTimeMsOnIterationX(profilerKey, __LINE__, __FUNCTION__, __FILE__);
                 // Debugging log
-                dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLogIfDebug("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             }
         }
         catch (const std::exception& e)

@@ -188,24 +188,26 @@ namespace op
     {
         try
         {
-            check(fpsMode == ProducerFpsMode::RetrievalFps || fpsMode == ProducerFpsMode::OriginalFps,
-                  "Unknown ProducerFpsMode.", __LINE__, __FUNCTION__, __FILE__);
+            checkBool(
+                fpsMode == ProducerFpsMode::RetrievalFps || fpsMode == ProducerFpsMode::OriginalFps,
+                "Unknown ProducerFpsMode.", __LINE__, __FUNCTION__, __FILE__);
             // For webcam, ProducerFpsMode::OriginalFps == ProducerFpsMode::RetrievalFps, since the internal webcam
             // cache will overwrite frames after it gets full
             if (mType == ProducerType::Webcam)
             {
                 mProducerFpsMode = {ProducerFpsMode::RetrievalFps};
                 if (fpsMode == ProducerFpsMode::OriginalFps)
-                    log("The producer fps mode set to `OriginalFps` (flag `process_real_time` on the demo) is not"
+                    opLog("The producer fps mode set to `OriginalFps` (flag `process_real_time` on the demo) is not"
                         " necessary, it is already assumed for webcam.",
                         Priority::Max, __LINE__, __FUNCTION__, __FILE__);
             }
             // If no webcam
             else
             {
-                check(fpsMode == ProducerFpsMode::RetrievalFps || get(CV_CAP_PROP_FPS) > 0,
-                      "Selected to keep the source fps but get(CV_CAP_PROP_FPS) <= 0, i.e., the source did not set"
-                      " its fps property.", __LINE__, __FUNCTION__, __FILE__);
+                checkBool(
+                    fpsMode == ProducerFpsMode::RetrievalFps || get(CV_CAP_PROP_FPS) > 0,
+                    "Selected to keep the source fps but get(CV_CAP_PROP_FPS) <= 0, i.e., the source did not set"
+                    " its fps property.", __LINE__, __FUNCTION__, __FILE__);
                 mProducerFpsMode = {fpsMode};
             }
             reset(mNumberEmptyFrames, mTrackingFps);
@@ -244,15 +246,17 @@ namespace op
                 // Individual checks
                 if (property == ProducerProperty::AutoRepeat)
                 {
-                    check(value != 1. || (mType == ProducerType::ImageDirectory || mType == ProducerType::Video),
-                          "ProducerProperty::AutoRepeat only implemented for ProducerType::ImageDirectory and"
-                          " Video.", __LINE__, __FUNCTION__, __FILE__);
+                    checkBool(
+                        value != 1. || (mType == ProducerType::ImageDirectory || mType == ProducerType::Video),
+                        "ProducerProperty::AutoRepeat only implemented for ProducerType::ImageDirectory and"
+                        " Video.", __LINE__, __FUNCTION__, __FILE__);
                 }
                 else if (property == ProducerProperty::Rotation)
                 {
-                    check(value == 0. || value == 90. || value == 180. || value == 270.,
-                          "ProducerProperty::Rotation only implemented for {0, 90, 180, 270} degrees.",
-                          __LINE__, __FUNCTION__, __FILE__);
+                    checkBool(
+                        value == 0. || value == 90. || value == 180. || value == 270.,
+                        "ProducerProperty::Rotation only implemented for {0, 90, 180, 270} degrees.",
+                        __LINE__, __FUNCTION__, __FILE__);
                 }
                 else if (property == ProducerProperty::FrameStep)
                 {
@@ -281,7 +285,7 @@ namespace op
             // Process wrong frames
             if (frame.empty())
             {
-                log("Empty frame detected, frame number " + std::to_string((int)get(CV_CAP_PROP_POS_FRAMES))
+                opLog("Empty frame detected, frame number " + std::to_string((int)get(CV_CAP_PROP_POS_FRAMES))
                     + " of " + std::to_string((int)get(CV_CAP_PROP_FRAME_COUNT)) + ".",
                     Priority::Max, __LINE__, __FUNCTION__, __FILE__);
                 mNumberEmptyFrames++;
@@ -294,7 +298,7 @@ namespace op
                       && ((frame.cols() != get(CV_CAP_PROP_FRAME_WIDTH) && get(CV_CAP_PROP_FRAME_WIDTH) > 0)
                           || (frame.rows() != get(CV_CAP_PROP_FRAME_HEIGHT) && get(CV_CAP_PROP_FRAME_HEIGHT) > 0)))
                 {
-                    log("Frame size changed. Returning empty frame.\nExpected vs. received sizes: "
+                    opLog("Frame size changed. Returning empty frame.\nExpected vs. received sizes: "
                         + std::to_string(positiveIntRound(get(CV_CAP_PROP_FRAME_WIDTH)))
                         + "x" + std::to_string(positiveIntRound(get(CV_CAP_PROP_FRAME_HEIGHT)))
                         + " vs. " + std::to_string(frame.cols()) + "x" + std::to_string(frame.rows()),
@@ -411,7 +415,7 @@ namespace op
     {
         try
         {
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
             // Directory of images
             if (producerType == ProducerType::ImageDirectory)
@@ -453,7 +457,7 @@ namespace op
                             undistortImage);
                         if (webcamReader->isOpened())
                         {
-                            log("Auto-detecting camera index... Detected and opened camera " + std::to_string(index)
+                            opLog("Auto-detecting camera index... Detected and opened camera " + std::to_string(index)
                                 + ".", Priority::High);
                             return webcamReader;
                         }

@@ -53,7 +53,7 @@ public:
         // Close program when empty frame
         if (mClosed || mImageFiles.size() <= mCounter)
         {
-            op::log("Last frame read and added to queue. Closing program after it is processed.", op::Priority::High);
+            op::opLog("Last frame read and added to queue. Closing program after it is processed.", op::Priority::High);
             // This funtion stops this worker, which will eventually stop the whole thread system once all the frames
             // have been processed
             mClosed = true;
@@ -74,7 +74,7 @@ public:
             // If empty frame -> return nullptr
             if (datumPtr->cvInputData.empty())
             {
-                op::log("Empty frame detected on path: " + mImageFiles.at(mCounter-1) + ". Closing program.",
+                op::opLog("Empty frame detected on path: " + mImageFiles.at(mCounter-1) + ". Closing program.",
                         op::Priority::High);
                 mClosed = true;
                 datumsPtr = nullptr;
@@ -113,7 +113,7 @@ public:
                 cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", cvMat);
             }
             else
-                op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
+                op::opLog("Nullptr or empty datumsPtr found.", op::Priority::High);
             const auto key = (char)cv::waitKey(1);
             return (key == 27);
         }
@@ -128,51 +128,51 @@ public:
         // Example: How to use the pose keypoints
         if (datumsPtr != nullptr && !datumsPtr->empty())
         {
-            op::log("\nKeypoints:");
+            op::opLog("\nKeypoints:");
             // Accesing each element of the keypoints
             const auto& poseKeypoints = datumsPtr->at(0)->poseKeypoints;
-            op::log("Person pose keypoints:");
+            op::opLog("Person pose keypoints:");
             for (auto person = 0 ; person < poseKeypoints.getSize(0) ; person++)
             {
-                op::log("Person " + std::to_string(person) + " (x, y, score):");
+                op::opLog("Person " + std::to_string(person) + " (x, y, score):");
                 for (auto bodyPart = 0 ; bodyPart < poseKeypoints.getSize(1) ; bodyPart++)
                 {
                     std::string valueToPrint;
                     for (auto xyscore = 0 ; xyscore < poseKeypoints.getSize(2) ; xyscore++)
                         valueToPrint += std::to_string(   poseKeypoints[{person, bodyPart, xyscore}]   ) + " ";
-                    op::log(valueToPrint);
+                    op::opLog(valueToPrint);
                 }
             }
-            op::log(" ");
+            op::opLog(" ");
             // Alternative: just getting std::string equivalent
-            op::log("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString(), op::Priority::High);
-            op::log("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString(), op::Priority::High);
-            op::log("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString(), op::Priority::High);
+            op::opLog("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString(), op::Priority::High);
+            op::opLog("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString(), op::Priority::High);
+            op::opLog("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString(), op::Priority::High);
             // Heatmaps
             const auto& poseHeatMaps = datumsPtr->at(0)->poseHeatMaps;
             if (!poseHeatMaps.empty())
             {
-                op::log("Pose heatmaps size: [" + std::to_string(poseHeatMaps.getSize(0)) + ", "
+                op::opLog("Pose heatmaps size: [" + std::to_string(poseHeatMaps.getSize(0)) + ", "
                         + std::to_string(poseHeatMaps.getSize(1)) + ", "
                         + std::to_string(poseHeatMaps.getSize(2)) + "]");
                 const auto& faceHeatMaps = datumsPtr->at(0)->faceHeatMaps;
-                op::log("Face heatmaps size: [" + std::to_string(faceHeatMaps.getSize(0)) + ", "
+                op::opLog("Face heatmaps size: [" + std::to_string(faceHeatMaps.getSize(0)) + ", "
                         + std::to_string(faceHeatMaps.getSize(1)) + ", "
                         + std::to_string(faceHeatMaps.getSize(2)) + ", "
                         + std::to_string(faceHeatMaps.getSize(3)) + "]");
                 const auto& handHeatMaps = datumsPtr->at(0)->handHeatMaps;
-                op::log("Left hand heatmaps size: [" + std::to_string(handHeatMaps[0].getSize(0)) + ", "
+                op::opLog("Left hand heatmaps size: [" + std::to_string(handHeatMaps[0].getSize(0)) + ", "
                         + std::to_string(handHeatMaps[0].getSize(1)) + ", "
                         + std::to_string(handHeatMaps[0].getSize(2)) + ", "
                         + std::to_string(handHeatMaps[0].getSize(3)) + "]");
-                op::log("Right hand heatmaps size: [" + std::to_string(handHeatMaps[1].getSize(0)) + ", "
+                op::opLog("Right hand heatmaps size: [" + std::to_string(handHeatMaps[1].getSize(0)) + ", "
                         + std::to_string(handHeatMaps[1].getSize(1)) + ", "
                         + std::to_string(handHeatMaps[1].getSize(2)) + ", "
                         + std::to_string(handHeatMaps[1].getSize(3)) + "]");
             }
         }
         else
-            op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
+            op::opLog("Nullptr or empty datumsPtr found.", op::Priority::High);
     }
 };
 
@@ -183,8 +183,9 @@ void configureWrapper(op::WrapperT<UserDatum>& opWrapperT)
         // Configuring OpenPose
 
         // logging_level
-        op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
-                  __LINE__, __FUNCTION__, __FILE__);
+        op::checkBool(
+            0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
+            __LINE__, __FUNCTION__, __FILE__);
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
         op::Profiler::setDefaultX(FLAGS_profile_speed);
 
@@ -203,8 +204,9 @@ void configureWrapper(op::WrapperT<UserDatum>& opWrapperT)
         const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
         // JSON saving
         if (!FLAGS_write_keypoint.empty())
-            op::log("Flag `write_keypoint` is deprecated and will eventually be removed."
-                    " Please, use `write_json` instead.", op::Priority::Max);
+            op::opLog(
+                "Flag `write_keypoint` is deprecated and will eventually be removed. Please, use `write_json`"
+                " instead.", op::Priority::Max);
         // keypointScaleMode
         const auto keypointScaleMode = op::flagsToScaleMode(FLAGS_keypoint_scale);
         // heatmaps to add
@@ -267,16 +269,16 @@ int tutorialApiCpp()
 {
     try
     {
-        op::log("Starting OpenPose demo...", op::Priority::High);
+        op::opLog("Starting OpenPose demo...", op::Priority::High);
         const auto opTimer = op::getTimerInit();
 
         // Configuring OpenPose
-        op::log("Configuring OpenPose...", op::Priority::High);
+        op::opLog("Configuring OpenPose...", op::Priority::High);
         op::WrapperT<UserDatum> opWrapperT{op::ThreadManagerMode::Asynchronous};
         configureWrapper(opWrapperT);
 
         // Start, run, and stop processing - exec() blocks this thread until OpenPose wrapper has finished
-        op::log("Starting thread(s)...", op::Priority::High);
+        op::opLog("Starting thread(s)...", op::Priority::High);
         opWrapperT.start();
 
         // User processing
@@ -299,11 +301,11 @@ int tutorialApiCpp()
                     userOutputClass.printKeypoints(datumProcessed);
                 }
                 else
-                    op::log("Processed datum could not be emplaced.", op::Priority::High);
+                    op::opLog("Processed datum could not be emplaced.", op::Priority::High);
             }
         }
 
-        op::log("Stopping thread(s)", op::Priority::High);
+        op::opLog("Stopping thread(s)", op::Priority::High);
         opWrapperT.stop();
 
         // Measuring total time

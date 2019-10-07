@@ -109,7 +109,7 @@ namespace op
             spImpl->mCameraIntrinsics.clear();
             spImpl->mCameraExtrinsics.clear();
             spImpl->mCameraExtrinsicsInitial.clear();
-            // log("Camera matrices:");
+            // opLog("Camera matrices:");
             for (auto i = 0ull ; i < spImpl->mSerialNumbers.size() ; i++)
             {
                 const auto parameterPath = cameraParameterPath + spImpl->mSerialNumbers.at(i);
@@ -148,23 +148,23 @@ namespace op
                 const cv::Mat cvCameraMatrices = OP_OP2CVCONSTMAT(spImpl->mCameraIntrinsics.back()) * OP_OP2CVCONSTMAT(spImpl->mCameraExtrinsics.back());
                 const Matrix opCameraMatrices = OP_CV2OPCONSTMAT(cvCameraMatrices);
                 spImpl->mCameraMatrices.emplace_back(opCameraMatrices);
-                // log(cameraParameters.at(0));
+                // opLog(cameraParameters.at(0));
             }
             // Undistortion Mats
             spImpl->mRemoveDistortionMaps1.resize(getNumberCameras());
             spImpl->mRemoveDistortionMaps2.resize(getNumberCameras());
             // // spImpl->mCameraMatrices
-            // log("\nFull camera matrices:");
+            // opLog("\nFull camera matrices:");
             // for (const auto& cvMat : spImpl->mCameraMatrices)
-            //     log(cvMat);
+            //     opLog(cvMat);
             // // spImpl->mCameraIntrinsics
-            // log("\nCamera intrinsic parameters:");
+            // opLog("\nCamera intrinsic parameters:");
             // for (const auto& cvMat : spImpl->mCameraIntrinsics)
-            //     log(cvMat);
+            //     opLog(cvMat);
             // // spImpl->mCameraDistortions
-            // log("\nCamera distortion parameters:");
+            // opLog("\nCamera distortion parameters:");
             // for (const auto& cvMat : spImpl->mCameraDistortions)
-            //     log(cvMat);
+            //     opLog(cvMat);
         }
         catch (const std::exception& e)
         {
@@ -360,7 +360,7 @@ namespace op
                     // // http://docs.opencv.org/2.4/modules/imgproc/doc/geometric_transformations.html#undistort
                     // cv::undistort(cvMatDistorted, mCvMats[i], cvCameraIntrinsics, cvCameraDistorsions);
                     // // In OpenCV 2.4, cv::undistort is exactly equal than cv::initUndistortRectifyMap
-                    // (with CV_16SC2) + cv::remap (with LINEAR). I.e., log(cv::norm(cvMatMethod1-cvMatMethod2)) = 0.
+                    // (with CV_16SC2) + cv::remap (with LINEAR). I.e., opLog(cv::norm(cvMatMethod1-cvMatMethod2)) = 0.
                     // Option b - 15 ms / 3 images (LINEAR) or 25 ms (CUBIC)
                     // Distorsion removal - not required and more expensive (applied to the whole image instead of
                     // only to our interest points)

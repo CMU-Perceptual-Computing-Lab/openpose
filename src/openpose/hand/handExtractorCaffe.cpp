@@ -278,7 +278,7 @@ namespace op
         {
             #ifdef USE_CAFFE
                 // Logging
-                log("Starting initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("Starting initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Initialize Caffe net
                 upImpl->spNetCaffe->initializationOnThread();
                 #ifdef USE_CUDA
@@ -292,7 +292,7 @@ namespace op
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 #endif
                 // Logging
-                log("Finished initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("Finished initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             #endif
         }
         catch (const std::exception& e)

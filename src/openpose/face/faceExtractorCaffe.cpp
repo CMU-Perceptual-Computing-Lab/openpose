@@ -148,7 +148,7 @@ namespace op
         {
             #ifdef USE_CAFFE
                 // Logging
-                log("Starting initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("Starting initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Initialize Caffe net
                 upImpl->spNetCaffe->initializationOnThread();
                 #ifdef USE_CUDA
@@ -162,7 +162,7 @@ namespace op
                     cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 #endif
                 // Logging
-                log("Finished initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("Finished initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             #endif
         }
         catch (const std::exception& e)
@@ -210,7 +210,7 @@ namespace op
                         // Only consider faces with a minimum pixel area
                         const auto minFaceSize = fastMin(faceRectangle.width, faceRectangle.height);
                         // // Debugging -> red rectangle
-                        // log(std::to_string(cvInputData.cols) + " " + std::to_string(cvInputData.rows));
+                        // opLog(std::to_string(cvInputData.cols) + " " + std::to_string(cvInputData.rows));
                         // cv::rectangle(cvInputDataCopy,
                         //               cv::Point{(int)faceRectangle.x, (int)faceRectangle.y},
                         //               cv::Point{(int)faceRectangle.bottomRight().x,
@@ -220,7 +220,7 @@ namespace op
                         if (minFaceSize > 40)
                         {
                             // // Debugging -> green rectangle overwriting red one
-                            // log(std::to_string(cvInputData.cols) + " " + std::to_string(cvInputData.rows));
+                            // opLog(std::to_string(cvInputData.cols) + " " + std::to_string(cvInputData.rows));
                             // cv::rectangle(cvInputDataCopy,
                             //               cv::Point{(int)faceRectangle.x, (int)faceRectangle.y},
                             //               cv::Point{(int)faceRectangle.bottomRight().x,

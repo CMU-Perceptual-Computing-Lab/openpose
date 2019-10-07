@@ -129,7 +129,7 @@ namespace op
     {
         try
         {
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
             // Shortcut
             typedef std::shared_ptr<TDatums> TDatumsPtr;
@@ -160,7 +160,7 @@ namespace op
                 // Reset initial GPU to 0 (we want them all)
                 gpuNumberStart = 0;
                 // Logging message
-                log("Auto-detecting GPUs... Detected " + std::to_string(gpuNumber) + " GPU(s), using them all.", Priority::High);
+                opLog("Auto-detecting GPUs... Detected " + std::to_string(gpuNumber) + " GPU(s), using them all.", Priority::High);
             }
 
             // Proper format
@@ -168,8 +168,9 @@ namespace op
 
             // Common parameters
             const auto finalOutputSize = wrapperStructPose.outputSize;
-            const Point<int> producerSize{(int)producerSharedPtr->get(CV_CAP_PROP_FRAME_WIDTH),
-                                          (int)producerSharedPtr->get(CV_CAP_PROP_FRAME_HEIGHT)};
+            const Point<int> producerSize{
+                (int)producerSharedPtr->get(getCvCapPropFrameWidth()),
+                (int)producerSharedPtr->get(getCvCapPropFrameHeight())};
             if (finalOutputSize.x == -1 || finalOutputSize.y == -1)
             {
                 const auto message = "Output resolution cannot be (-1 x -1) unless producerSharedPtr is also set.";
@@ -267,7 +268,7 @@ namespace op
                 );
                 spWGui = {std::make_shared<WGui<TDatumsPtr>>(gui)};
             }
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
         {
@@ -363,7 +364,7 @@ namespace op
             // Thread Y+1, queues Q+1 -> Q+2
             if (spWGui != nullptr)
                 mThreadManager.add(threadId++, spWGui, queueIn++, queueOut++);
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
         {

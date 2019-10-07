@@ -23,9 +23,9 @@
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
 // executable. E.g., for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
 // Debugging/Other
-DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any log() message, while"
-                                                        " 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for"
-                                                        " low priority messages and 4 for important ones.");
+DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any opLog() message,"
+                                                        " while 255 will not output any. Current OpenPose library messages are in the range 0-4:"
+                                                        " 1 for low priority messages and 4 for important ones.");
 // Producer
 DEFINE_string(image_dir,                "examples/media/",      "Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).");
 // Consumer
@@ -71,8 +71,8 @@ public:
             // Close program when empty frame
             if (mImageFiles.size() <= mCounter)
             {
-                op::log("Last frame read and added to queue. Closing program after it is processed.",
-                        op::Priority::High);
+                op::opLog(
+                    "Last frame read and added to queue. Closing program after it is processed.", op::Priority::High);
                 // This funtion stops this worker, which will eventually stop the whole thread system once all the
                 // frames have been processed
                 this->stop();
@@ -93,7 +93,7 @@ public:
                 // If empty frame -> return nullptr
                 if (datumPtr->cvInputData.empty())
                 {
-                    op::log("Empty frame detected on path: " + mImageFiles.at(mCounter-1) + ". Closing program.",
+                    op::opLog("Empty frame detected on path: " + mImageFiles.at(mCounter-1) + ". Closing program.",
                         op::Priority::High);
                     this->stop();
                     datumsPtr = nullptr;
@@ -104,7 +104,7 @@ public:
         }
         catch (const std::exception& e)
         {
-            op::log("Some kind of unexpected error happened.");
+            op::opLog("Some kind of unexpected error happened.");
             this->stop();
             op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
             return nullptr;
@@ -145,7 +145,7 @@ public:
         }
         catch (const std::exception& e)
         {
-            op::log("Some kind of unexpected error happened.");
+            op::opLog("Some kind of unexpected error happened.");
             this->stop();
             op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
@@ -175,7 +175,7 @@ public:
         }
         catch (const std::exception& e)
         {
-            op::log("Some kind of unexpected error happened.");
+            op::opLog("Some kind of unexpected error happened.");
             this->stop();
             op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
@@ -186,15 +186,16 @@ int openPoseTutorialThread2()
 {
     try
     {
-        op::log("Starting OpenPose demo...", op::Priority::High);
+        op::opLog("Starting OpenPose demo...", op::Priority::High);
         const auto opTimer = op::getTimerInit();
 
         // ------------------------- INITIALIZATION -------------------------
         // Step 1 - Set logging level
             // - 0 will output all the logging messages
             // - 255 will output nothing
-        op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
-                  __LINE__, __FUNCTION__, __FILE__);
+        op::checkBool(
+            0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
+            __LINE__, __FUNCTION__, __FILE__);
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
         // Step 2 - Setting thread workers && manager
         typedef std::shared_ptr<std::vector<std::shared_ptr<UserDatum>>> TypedefDatumsSP;
@@ -223,7 +224,7 @@ int openPoseTutorialThread2()
         threadManager.add(threadId++, wUserOutput, queueIn++, queueOut++);      // Thread 2, queues 2 -> 3
 
         // ------------------------- STARTING AND STOPPING THREADING -------------------------
-        op::log("Starting thread(s)...", op::Priority::High);
+        op::opLog("Starting thread(s)...", op::Priority::High);
         // Two different ways of running the program on multithread environment
             // Option a) Using the main thread (this thread) for processing (it saves 1 thread, recommended)
         threadManager.exec();
@@ -237,7 +238,7 @@ int openPoseTutorialThread2()
         // while (threadManager.isRunning())
         //     std::this_thread::sleep_for(std::chrono::milliseconds{33});
         // // Stop and join threads
-        // op::log("Stopping thread(s)", op::Priority::High);
+        // op::opLog("Stopping thread(s)", op::Priority::High);
         // threadManager.stop();
 
         // Measuring total time

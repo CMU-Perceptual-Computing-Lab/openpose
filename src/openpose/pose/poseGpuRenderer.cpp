@@ -34,7 +34,7 @@ namespace op
         try
         {
             // Free CUDA pointers - Note that if pointers are 0 (i.e., nullptr), no operation is performed.
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             #ifdef USE_CUDA
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
                 if (pGpuPose != nullptr)
@@ -59,7 +59,7 @@ namespace op
                 }
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
             #endif
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
         {
@@ -71,7 +71,7 @@ namespace op
     {
         try
         {
-            log("Starting initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("Starting initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // GPU memory allocation for rendering
             #ifdef USE_CUDA
                 cudaMalloc((void**)(&pGpuPose),
@@ -81,7 +81,7 @@ namespace op
                 cudaMalloc((void**)&pScalePtr, sizeof(float) * POSE_MAX_PEOPLE);
                 cudaCheck(__LINE__, __FUNCTION__, __FILE__);
             #endif
-            log("Finished initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("Finished initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
         {

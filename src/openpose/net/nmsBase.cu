@@ -266,15 +266,15 @@ namespace op
             const dim3 numBlocks1D{getNumberCudaBlocks(imageOffset, threadsPerBlock1D.x)};
             // const dim3 threadsPerBlockSort{128};
             // const dim3 numBlocksSort{getNumberCudaBlocks(channels, threadsPerBlockSort.x)};
-            // log("num_b: " + std::to_string(sourceSize[0]));       // = 1
-            // log("channel_b: " + std::to_string(sourceSize[1]));   // = 57 = 18 body parts + bkg + 19x2 PAFs
-            // log("height_b: " + std::to_string(sourceSize[2]));    // = 368 = height
-            // log("width_b: " + std::to_string(sourceSize[3]));     // = 656 = width
-            // log("num_t: " + std::to_string(targetSize[0]));       // = 1
-            // log("channel_t: " + std::to_string(targetSize[1]));   // = 18 = numberParts
-            // log("height_t: " + std::to_string(targetSize[2]));    // = 128 = maxPeople + 1
-            // log("width_t: " + std::to_string(targetSize[3]));     // = 3 = [x, y, score]
-            // log("");
+            // opLog("num_b: " + std::to_string(sourceSize[0]));       // = 1
+            // opLog("channel_b: " + std::to_string(sourceSize[1]));   // = 57 = 18 body parts + bkg + 19x2 PAFs
+            // opLog("height_b: " + std::to_string(sourceSize[2]));    // = 368 = height
+            // opLog("width_b: " + std::to_string(sourceSize[3]));     // = 656 = width
+            // opLog("num_t: " + std::to_string(targetSize[0]));       // = 1
+            // opLog("channel_t: " + std::to_string(targetSize[1]));   // = 18 = numberParts
+            // opLog("height_t: " + std::to_string(targetSize[2]));    // = 128 = maxPeople + 1
+            // opLog("width_t: " + std::to_string(targetSize[3]));     // = 3 = [x, y, score]
+            // opLog("");
 
             // // Old code: Running 3 kernels per channel
             // // const auto REPS = 1;
@@ -286,7 +286,7 @@ namespace op
             // {
             //     for (auto c = 0; c < channels; c++)
             //     {
-            //         // log("channel: " + std::to_string(c));
+            //         // opLog("channel: " + std::to_string(c));
             //         const auto offsetChannel = (n * channels + c);
             //         auto* kernelPtrOffsetted = kernelPtr + offsetChannel * imageOffset;
             //         const auto* const sourcePtrOffsetted = sourcePtr + offsetChannel * imageOffset;
@@ -338,8 +338,8 @@ namespace op
 
             // // Profiling code
             // OP_CUDA_PROFILE_END(timeNormalize2, 1e3, REPS);
-            // log("  NMS1(or)=" + std::to_string(timeNormalize1) + "ms");
-            // log("  NMS2(1k)=" + std::to_string(timeNormalize2) + "ms");
+            // opLog("  NMS1(or)=" + std::to_string(timeNormalize1) + "ms");
+            // opLog("  NMS2(1k)=" + std::to_string(timeNormalize2) + "ms");
 
             // Sanity check
             cudaCheck(__LINE__, __FUNCTION__, __FILE__);

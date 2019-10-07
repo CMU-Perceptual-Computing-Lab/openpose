@@ -405,7 +405,7 @@ namespace op
     {
         try
         {
-            log("Person tracking (`tracking` flag) is in experimental phase. Please, let us know if you"
+            opLog("Person tracking (`tracking` flag) is in experimental phase. Please, let us know if you"
                 " find any bug on this alpha version.", op::Priority::High);
         }
         catch (const std::exception& e)

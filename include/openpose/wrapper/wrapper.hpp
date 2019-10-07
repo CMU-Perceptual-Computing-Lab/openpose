@@ -416,7 +416,7 @@ namespace op
                 mThreadManager, mMultiThreadEnabled, mThreadManagerMode, mWrapperStructPose, mWrapperStructFace,
                 mWrapperStructHand, mWrapperStructExtra, mWrapperStructInput, mWrapperStructOutput, mWrapperStructGui,
                 mUserWs, mUserWsOnNewThread);
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             mThreadManager.exec();
         }
         catch (const std::exception& e)
@@ -434,7 +434,7 @@ namespace op
                 mThreadManager, mMultiThreadEnabled, mThreadManagerMode, mWrapperStructPose, mWrapperStructFace,
                 mWrapperStructHand, mWrapperStructExtra, mWrapperStructInput, mWrapperStructOutput, mWrapperStructGui,
                 mUserWs, mUserWsOnNewThread);
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             mThreadManager.start();
         }
         catch (const std::exception& e)

@@ -19,15 +19,15 @@ namespace op
             const auto numberParts = targetSize[2];
             const auto numberSubparts = targetSize[3];
 
-            // log("sourceSize[0]: " + std::to_string(sourceSize[0])); // = 1
-            // log("sourceSize[1]: " + std::to_string(sourceSize[1])); // = #body_parts+bck=22(hands) or 71(face)
-            // log("sourceSize[2]: " + std::to_string(sourceSize[2])); // = 368 = height
-            // log("sourceSize[3]: " + std::to_string(sourceSize[3])); // = 368 = width
-            // log("targetSize[0]: " + std::to_string(targetSize[0])); // = 1
-            // log("targetSize[1]: " + std::to_string(targetSize[1])); // = 1
-            // log("targetSize[2]: " + std::to_string(targetSize[2])); // = 21(hands) or 70 (face)
-            // log("targetSize[3]: " + std::to_string(targetSize[3])); // = 3 = [x, y, score]
-            // log(" ");
+            // opLog("sourceSize[0]: " + std::to_string(sourceSize[0])); // = 1
+            // opLog("sourceSize[1]: " + std::to_string(sourceSize[1])); // = #body_parts+bck=22(hands) or 71(face)
+            // opLog("sourceSize[2]: " + std::to_string(sourceSize[2])); // = 368 = height
+            // opLog("sourceSize[3]: " + std::to_string(sourceSize[3])); // = 368 = width
+            // opLog("targetSize[0]: " + std::to_string(targetSize[0])); // = 1
+            // opLog("targetSize[1]: " + std::to_string(targetSize[1])); // = 1
+            // opLog("targetSize[2]: " + std::to_string(targetSize[2])); // = 21(hands) or 70 (face)
+            // opLog("targetSize[3]: " + std::to_string(targetSize[3])); // = 3 = [x, y, score]
+            // opLog(" ");
 
             for (auto n = 0; n < num; n++)
             {

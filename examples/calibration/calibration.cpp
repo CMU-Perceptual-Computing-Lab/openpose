@@ -38,12 +38,13 @@ int openPoseDemo()
 {
     try
     {
-        op::log("Starting OpenPose calibration toolbox...", op::Priority::High);
+        op::opLog("Starting OpenPose calibration toolbox...", op::Priority::High);
         const auto opTimer = op::getTimerInit();
 
         // logging_level
-        op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
-                  __LINE__, __FUNCTION__, __FILE__);
+        op::checkBool(
+            0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
+            __LINE__, __FUNCTION__, __FILE__);
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
 
         // Common parameters
@@ -54,7 +55,7 @@ int openPoseDemo()
         // Calibration - Intrinsics
         if (FLAGS_mode == 1)
         {
-            op::log("Running calibration (intrinsic parameters)...", op::Priority::High);
+            op::opLog("Running calibration (intrinsic parameters)...", op::Priority::High);
             // Parameters
             // const auto flags = 0;                                                                   // 5 parameters
             const auto flags = cv::CALIB_RATIONAL_MODEL;                                            // 8 parameters
@@ -67,25 +68,25 @@ int openPoseDemo()
                 gridInnerCorners, gridSqureSizeMm, flags,
                 op::formatAsDirectory(FLAGS_camera_parameter_folder), calibrationImageDir, FLAGS_camera_serial_number,
                 saveImagesWithCorners);
-            op::log("Intrinsic calibration completed!", op::Priority::High);
+            op::opLog("Intrinsic calibration completed!", op::Priority::High);
         }
 
         // Calibration - Extrinsics
         else if (FLAGS_mode == 2)
         {
-            op::log("Running calibration (extrinsic parameters)...", op::Priority::High);
+            op::opLog("Running calibration (extrinsic parameters)...", op::Priority::High);
             // Run calibration
             op::estimateAndSaveExtrinsics(
                 FLAGS_camera_parameter_folder, calibrationImageDir, gridInnerCorners, gridSqureSizeMm,
                 FLAGS_cam0, FLAGS_cam1, FLAGS_omit_distortion, FLAGS_combine_cam0_extrinsics);
             // Logging
-            op::log("Extrinsic calibration completed!", op::Priority::High);
+            op::opLog("Extrinsic calibration completed!", op::Priority::High);
         }
 
         // Calibration - Extrinsics - Bundle Adjustment (BA)
         else if (FLAGS_mode == 3)
         {
-            op::log("Running calibration (bundle adjustment over extrinsic parameters)...", op::Priority::High);
+            op::opLog("Running calibration (bundle adjustment over extrinsic parameters)...", op::Priority::High);
             // Sanity check
             if (!FLAGS_omit_distortion)
                 op::error("This mode assumes that the images are already undistorted (add flag `--omit_distortion`.",
@@ -97,20 +98,20 @@ int openPoseDemo()
                 FLAGS_camera_parameter_folder, calibrationImageDir, gridInnerCorners, gridSqureSizeMm,
                 FLAGS_number_cameras, FLAGS_omit_distortion, saveImagesWithCorners);
             // Logging
-            op::log("Extrinsic calibration (bundle adjustment) completed!", op::Priority::High);
+            op::opLog("Extrinsic calibration (bundle adjustment) completed!", op::Priority::High);
         }
 
         // // Calibration - Extrinsics Refinement with Visual SFM
         // else if (FLAGS_mode == 4)
         // {
-        //     op::log("Running calibration (intrinsic parameters)...", op::Priority::High);
+        //     op::opLog("Running calibration (intrinsic parameters)...", op::Priority::High);
         //     // Obtain & save intrinsics
         //     const auto saveImagesWithCorners = false;
         //     // const auto saveImagesWithCorners = true;
         //     // Run camera calibration code
         //     op::estimateAndSaveSiftFile(
         //         gridInnerCorners, calibrationImageDir, FLAGS_number_cameras, saveImagesWithCorners);
-        //     op::log("Intrinsic calibration completed!", op::Priority::High);
+        //     op::opLog("Intrinsic calibration completed!", op::Priority::High);
         // }
 
         else

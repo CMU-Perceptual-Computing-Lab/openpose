@@ -335,7 +335,7 @@ namespace op
         try
         {
             auto& propertyElement = mProperties.at((int)property);
-            log("Property " + std::to_string((int)property)
+            opLog("Property " + std::to_string((int)property)
                 + " set from " + std::to_string(propertyElement)
                 + " to " + std::to_string(value), Priority::High);
             propertyElement = {value};

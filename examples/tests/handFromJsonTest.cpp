@@ -30,12 +30,13 @@ int handFromJsonTest()
 {
     try
     {
-        op::log("Starting OpenPose demo...", op::Priority::High);
+        op::opLog("Starting OpenPose demo...", op::Priority::High);
         const auto timerBegin = std::chrono::high_resolution_clock::now();
 
         // logging_level
-        op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
-                  __LINE__, __FUNCTION__, __FILE__);
+        op::checkBool(
+            0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
+            __LINE__, __FUNCTION__, __FILE__);
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
 
         // Applying user defined configuration - GFlags to program variables
@@ -45,7 +46,7 @@ int handFromJsonTest()
         const auto producerSharedPtr = op::createProducer(op::ProducerType::ImageDirectory, FLAGS_image_dir);
 
         // OpenPose wrapper
-        op::log("Configuring OpenPose...", op::Priority::High);
+        op::opLog("Configuring OpenPose...", op::Priority::High);
         op::WrapperHandFromJsonTest<op::Datum> opWrapper;
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
         op::WrapperStructPose wrapperStructPose{
@@ -62,7 +63,7 @@ int handFromJsonTest()
                             FLAGS_write_json, op::flagsToDisplayMode(FLAGS_display, false));
 
         // Start processing
-        op::log("Starting thread(s)...", op::Priority::High);
+        op::opLog("Starting thread(s)...", op::Priority::High);
         opWrapper.exec();
 
         // Measuring total time
@@ -71,7 +72,7 @@ int handFromJsonTest()
             std::chrono::duration_cast<std::chrono::nanoseconds>(now-timerBegin).count()* 1e-9);
         const auto message = "OpenPose demo successfully finished. Total time: "
                            + std::to_string(totalTimeSec) + " seconds.";
-        op::log(message, op::Priority::High);
+        op::opLog(message, op::Priority::High);
 
         return 0;
     }

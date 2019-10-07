@@ -693,8 +693,8 @@ namespace op
                     // OP_CUDA_PROFILE_END(timeNormalize1, 1e3, REPS);
 
                     // // Profiling code
-                    // log("  renderOld=" + std::to_string(timeNormalize0) + "ms");
-                    // log("  renderNew=" + std::to_string(timeNormalize1) + "ms");
+                    // opLog("  renderOld=" + std::to_string(timeNormalize0) + "ms");
+                    // opLog("  renderNew=" + std::to_string(timeNormalize1) + "ms");
                 }
                 else if (poseModel == PoseModel::COCO_18)
                     renderPoseCoco<<<threadsPerBlock, numBlocks>>>(
@@ -745,8 +745,8 @@ namespace op
                     // OP_CUDA_PROFILE_END(timeNormalize2, 1e3, REPS);
 
                     // // Profiling code
-                    // log("  renderOld=" + std::to_string(timeNormalize1) + "ms");
-                    // log("  renderNew=" + std::to_string(timeNormalize2) + "ms");
+                    // opLog("  renderOld=" + std::to_string(timeNormalize1) + "ms");
+                    // opLog("  renderNew=" + std::to_string(timeNormalize2) + "ms");
                 }
                 else if (poseModel == PoseModel::MPI_15 || poseModel == PoseModel::MPI_15_4)
                     renderPoseMpi29Parts<<<threadsPerBlock, numBlocks>>>(

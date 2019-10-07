@@ -95,7 +95,7 @@ namespace op
     {
         try
         {
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
             // Create producer
             auto producerSharedPtr = createProducer(
@@ -182,7 +182,7 @@ namespace op
                     numberGpuThreads = totalGpuNumber - gpuNumberStart;
                     // Reset initial GPU to 0 (we want them all)
                     // Logging message
-                    log("Auto-detecting all available GPUs... Detected " + std::to_string(totalGpuNumber)
+                    opLog("Auto-detecting all available GPUs... Detected " + std::to_string(totalGpuNumber)
                         + " GPU(s), using " + std::to_string(numberGpuThreads) + " of them starting at GPU "
                         + std::to_string(gpuNumberStart) + ".", Priority::High);
                 }
@@ -334,7 +334,7 @@ namespace op
                             cpuRenderers.emplace_back(std::make_shared<WPoseRenderer<TDatumsSP>>(poseCpuRenderer));
                         }
                     }
-                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                    opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
                     // Pose extractor(s)
                     poseExtractorsWs.resize(poseExtractorNets.size());
@@ -399,12 +399,12 @@ namespace op
                     //         wPose.emplace_back(std::make_shared<WKeepTopNPeople<TDatumsSP>>(keepTopNPeople));
                     // }
                 }
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
                 // Pose renderer(s)
                 if (!poseGpuRenderers.empty())
                 {
-                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                    opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     for (auto i = 0u; i < poseExtractorsWs.size(); i++)
                     {
                         poseExtractorsWs.at(i).emplace_back(std::make_shared<WPoseRenderer<TDatumsSP>>(
@@ -415,12 +415,12 @@ namespace op
                                 cvMatToOpOutputs.at(i)->getSharedParameters());
                     }
                 }
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
                 // Face extractor(s)
                 if (wrapperStructFace.enable)
                 {
-                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                    opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     // Face detector
                     // OpenPose body-based face detector
                     if (wrapperStructFace.detector == Detector::Body)
@@ -438,7 +438,7 @@ namespace op
                     // OpenCV face detector
                     else if (wrapperStructFace.detector == Detector::OpenCV)
                     {
-                        log("Body keypoint detection is disabled. Hence, using OpenCV face detector (much less"
+                        opLog("Body keypoint detection is disabled. Hence, using OpenCV face detector (much less"
                             " accurate but faster).", Priority::High);
                         for (auto& wPose : poseExtractorsWs)
                         {
@@ -469,12 +469,12 @@ namespace op
                             std::make_shared<WFaceExtractorNet<TDatumsSP>>(faceExtractorNet));
                     }
                 }
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
                 // Hand extractor(s)
                 if (wrapperStructHand.enable)
                 {
-                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                    opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     const auto handDetector = std::make_shared<HandDetector>(wrapperStructPose.poseModel);
                     for (auto gpu = 0u; gpu < poseExtractorsWs.size(); gpu++)
                     {
@@ -521,12 +521,12 @@ namespace op
                                 std::make_shared<WHandDetectorUpdate<TDatumsSP>>(handDetector));
                     }
                 }
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
                 // Face renderer(s)
                 if (renderFace)
                 {
-                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                    opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     // CPU rendering
                     if (renderModeFace == RenderMode::Cpu)
                     {
@@ -565,12 +565,12 @@ namespace op
                     else
                         error("Unknown RenderMode.", __LINE__, __FUNCTION__, __FILE__);
                 }
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
                 // Hand renderer(s)
                 if (renderHand)
                 {
-                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                    opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     // CPU rendering
                     if (renderModeHand == RenderMode::Cpu)
                     {
@@ -609,7 +609,7 @@ namespace op
                     else
                         error("Unknown RenderMode.", __LINE__, __FUNCTION__, __FILE__);
                 }
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
                 // Frames processor (OpenPose format -> cv::Mat format)
                 if (addCvMatToOpOutput && !addCvMatToOpOutputInCpu)
@@ -626,13 +626,13 @@ namespace op
                             cvMatToOpOutputs.at(i)->getSharedParameters());
                     }
                 }
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
                 // 3-D reconstruction
                 poseTriangulationsWs.clear();
                 if (wrapperStructExtra.reconstruct3d)
                 {
-                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                    opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     // For all (body/face/hands): PoseTriangulations ~30 msec, 8 GPUS ~30 msec for keypoint estimation
                     poseTriangulationsWs.resize(fastMax(1, int(poseExtractorsWs.size() / 4)));
                     for (auto i = 0u ; i < poseTriangulationsWs.size() ; i++)
@@ -643,7 +643,7 @@ namespace op
                             poseTriangulation)};
                     }
                 }
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Itermediate workers (e.g., OpenPose format to cv::Mat, json & frames recorder, ...)
                 postProcessingWs.clear();
                 // // Person ID identification (when no multi-thread and no dependency on tracking)
@@ -657,12 +657,12 @@ namespace op
                 // Frames processor (OpenPose format -> cv::Mat format)
                 if (addCvMatToOpOutputInCpu)
                 {
-                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                    opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     postProcessingWs = mergeVectors(postProcessingWs, cpuRenderers);
                     const auto opOutputToCvMat = std::make_shared<OpOutputToCvMat>();
                     postProcessingWs.emplace_back(std::make_shared<WOpOutputToCvMat<TDatumsSP>>(opOutputToCvMat));
                 }
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Re-scale pose if desired
                 // If desired scale is not the current input
                 if (wrapperStructPose.keypointScaleMode != ScaleMode::InputResolution
@@ -678,7 +678,7 @@ namespace op
                     postProcessingWs.emplace_back(std::make_shared<WKeypointScaler<TDatumsSP>>(keypointScaler));
                 }
             }
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
             // IK/Adam
             const auto displayAdam = wrapperStructGui.displayMode == DisplayMode::DisplayAdam
@@ -688,7 +688,7 @@ namespace op
 #ifdef USE_3D_ADAM_MODEL
             if (wrapperStructExtra.ikThreads > 0)
             {
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 jointAngleEstimationsWs.resize(wrapperStructExtra.ikThreads);
                 // Pose extractor(s)
                 for (auto i = 0u; i < jointAngleEstimationsWs.size(); i++)
@@ -698,7 +698,7 @@ namespace op
                         jointAngleEstimation)};
                 }
             }
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 #endif
 
             // Output workers
@@ -706,28 +706,28 @@ namespace op
             // Print verbose
             if (wrapperStructOutput.verbose > 0.)
             {
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto verbosePrinter = std::make_shared<VerbosePrinter>(
                     wrapperStructOutput.verbose, uLongLongRound(producerSharedPtr->get(getCvCapPropFrameCount())));
                 outputWs.emplace_back(std::make_shared<WVerbosePrinter<TDatumsSP>>(verbosePrinter));
             }
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Send information (e.g., to Unity) though UDP client-server communication
 
 #ifdef USE_3D_ADAM_MODEL
             if (!wrapperStructOutput.udpHost.empty() && !wrapperStructOutput.udpPort.empty())
             {
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto udpSender = std::make_shared<UdpSender>(wrapperStructOutput.udpHost,
                                                                    wrapperStructOutput.udpPort);
                 outputWs.emplace_back(std::make_shared<WUdpSender<TDatumsSP>>(udpSender));
             }
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 #endif
             // Write people pose data on disk (json for OpenCV >= 3, xml, yml...)
             if (!writeKeypointCleaned.empty())
             {
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto keypointSaver = std::make_shared<KeypointSaver>(writeKeypointCleaned,
                                                                            wrapperStructOutput.writeKeypointFormat);
                 outputWs.emplace_back(std::make_shared<WPoseSaver<TDatumsSP>>(keypointSaver));
@@ -736,20 +736,20 @@ namespace op
                 if (wrapperStructHand.enable)
                     outputWs.emplace_back(std::make_shared<WHandSaver<TDatumsSP>>(keypointSaver));
             }
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Write OpenPose output data on disk in JSON format (body/hand/face keypoints, body part locations if
             // enabled, etc.)
             if (!writeJsonCleaned.empty())
             {
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto peopleJsonSaver = std::make_shared<PeopleJsonSaver>(writeJsonCleaned);
                 outputWs.emplace_back(std::make_shared<WPeopleJsonSaver<TDatumsSP>>(peopleJsonSaver));
             }
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Write people pose/foot/face/hand/etc. data on disk (COCO validation JSON format)
             if (!wrapperStructOutput.writeCocoJson.empty())
             {
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // If humanFormat: bigger size (& maybe slower to process), but easier for user to read it
                 const auto humanFormat = true;
                 const auto cocoJsonSaver = std::make_shared<CocoJsonSaver>(
@@ -761,22 +761,22 @@ namespace op
                     wrapperStructOutput.writeCocoJsonVariant);
                 outputWs.emplace_back(std::make_shared<WCocoJsonSaver<TDatumsSP>>(cocoJsonSaver));
             }
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Write frames as desired image format on hard disk
             if (!writeImagesCleaned.empty())
             {
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto imageSaver = std::make_shared<ImageSaver>(writeImagesCleaned,
                                                                      wrapperStructOutput.writeImagesFormat);
                 outputWs.emplace_back(std::make_shared<WImageSaver<TDatumsSP>>(imageSaver));
             }
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             auto originalVideoFps = 0.;
             if (!wrapperStructOutput.writeVideo.empty() || !wrapperStructOutput.writeVideo3D.empty()
                 || !wrapperStructOutput.writeBvh.empty())
             {
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 if (wrapperStructOutput.writeVideoFps <= 0
                     && (!oPProducer || producerSharedPtr->get(getCvCapPropFrameFps()) <= 0))
                     error("The frame rate of the frames producer is unknown. Set `--write_video_fps` to your desired"
@@ -788,11 +788,11 @@ namespace op
                     wrapperStructOutput.writeVideoFps > 0 ?
                     wrapperStructOutput.writeVideoFps : producerSharedPtr->get(getCvCapPropFrameFps()));
             }
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Write frames as *.avi video on hard disk
             if (!wrapperStructOutput.writeVideo.empty())
             {
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Sanity checks
                 if (!oPProducer)
                     error("Video file can only be recorded inside `wrapper/wrapper.hpp` if the producer"
@@ -808,28 +808,28 @@ namespace op
                     (wrapperStructOutput.writeVideoWithAudio ? wrapperStructInput.producerString : ""));
                 outputWs.emplace_back(std::make_shared<WVideoSaver<TDatumsSP>>(videoSaver));
             }
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Write joint angles as *.bvh file on hard disk
 #ifdef USE_3D_ADAM_MODEL
             if (!wrapperStructOutput.writeBvh.empty())
             {
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto bvhSaver = std::make_shared<BvhSaver>(
                     wrapperStructOutput.writeBvh, JointAngleEstimation::getTotalModel(), originalVideoFps
                 );
                 outputWs.emplace_back(std::make_shared<WBvhSaver<TDatumsSP>>(bvhSaver));
             }
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 #endif
             // Write heat maps as desired image format on hard disk
             if (!writeHeatMapsCleaned.empty())
             {
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto heatMapSaver = std::make_shared<HeatMapSaver>(
                     writeHeatMapsCleaned, wrapperStructOutput.writeHeatMapsFormat);
                 outputWs.emplace_back(std::make_shared<WHeatMapSaver<TDatumsSP>>(heatMapSaver));
             }
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Add frame information for GUI
             const bool guiEnabled = (wrapperStructGui.displayMode != DisplayMode::NoDisplay);
             // If this WGuiInfoAdder instance is placed before the WImageSaver or WVideoSaver, then the resulting
@@ -838,17 +838,17 @@ namespace op
                                                 || threadManagerMode == ThreadManagerMode::Asynchronous
                                                 || threadManagerMode == ThreadManagerMode::AsynchronousOut))
             {
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto guiInfoAdder = std::make_shared<GuiInfoAdder>(numberGpuThreads, guiEnabled);
                 outputWs.emplace_back(std::make_shared<WGuiInfoAdder<TDatumsSP>>(guiInfoAdder));
             }
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Minimal graphical user interface (GUI)
             TWorker guiW;
             TWorker videoSaver3DW;
             if (guiEnabled)
             {
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // PoseRenderers to Renderers
                 std::vector<std::shared_ptr<Renderer>> renderers;
                 if (renderModePose == RenderMode::Cpu)
@@ -866,7 +866,7 @@ namespace op
                 if (displayAdam)
                 {
 #ifdef USE_3D_ADAM_MODEL
-                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                    opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     // Gui
                     const auto gui = std::make_shared<GuiAdam>(
                         finalOutputSizeGui, wrapperStructGui.fullScreen, threadManager.getIsRunningSharedPtr(),
@@ -886,7 +886,7 @@ namespace op
                 else if (wrapperStructGui.displayMode == DisplayMode::Display3D
                     || wrapperStructGui.displayMode == DisplayMode::DisplayAll)
                 {
-                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                    opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     // Gui
                     const auto gui = std::make_shared<Gui3D>(
                         finalOutputSizeGui, wrapperStructGui.fullScreen, threadManager.getIsRunningSharedPtr(),
@@ -907,7 +907,7 @@ namespace op
                 // 2-D display
                 else if (wrapperStructGui.displayMode == DisplayMode::Display2D)
                 {
-                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                    opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     // Gui
                     const auto gui = std::make_shared<Gui>(
                         finalOutputSizeGui, wrapperStructGui.fullScreen, threadManager.getIsRunningSharedPtr(),
@@ -923,13 +923,13 @@ namespace op
                 else
                     error("Unknown DisplayMode.", __LINE__, __FUNCTION__, __FILE__);
             }
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Set FpsMax
             TWorker wFpsMax;
             if (wrapperStructPose.fpsMax > 0.)
                 wFpsMax = std::make_shared<WFpsMax<TDatumsSP>>(wrapperStructPose.fpsMax);
             // Set wrapper as configured
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
 
 
@@ -970,7 +970,7 @@ namespace op
             {
                 // If custom user Worker in its own thread
                 if (userPreProcessingWsOnNewThread)
-                    log("You chose to add your pre-processing function in a new thread. However, OpenPose will"
+                    opLog("You chose to add your pre-processing function in a new thread. However, OpenPose will"
                         " add it in the same thread than the input frame producer.",
                         Priority::High, __LINE__, __FUNCTION__, __FILE__);
                 workersAux = mergeVectors(workersAux, {userPreProcessingWs});
@@ -990,7 +990,7 @@ namespace op
             if (!userInputWs.empty() && userInputWsOnNewThread)
             {
                 // Thread 0, queues 0 -> 1
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 threadManager.add(threadId, userInputWs, queueIn++, queueOut++);
                 threadIdPP(threadId, multiThreadEnabled);
             }
@@ -1005,7 +1005,7 @@ namespace op
                      && threadManagerMode != ThreadManagerMode::AsynchronousIn)
                 error("No input selected.", __LINE__, __FUNCTION__, __FILE__);
             // Thread 0 or 1, queues 0 -> 1
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             threadManager.add(threadId, workersAux, queueIn++, queueOut++);
             // Increase thread
             threadIdPP(threadId, multiThreadEnabled);
@@ -1018,7 +1018,7 @@ namespace op
                 {
                     for (auto& wPose : poseExtractorsWs)
                     {
-                        log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                        opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                         threadManager.add(threadId, wPose, queueIn, queueOut);
                         threadIdPP(threadId, multiThreadEnabled);
                     }
@@ -1028,7 +1028,7 @@ namespace op
                     if (poseExtractorsWs.size() > 1u)
                     {
                         const auto wQueueOrderer = std::make_shared<WQueueOrderer<TDatumsSP>>();
-                        log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                        opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                         threadManager.add(threadId, wQueueOrderer, queueIn++, queueOut++);
                         threadIdPP(threadId, multiThreadEnabled);
                     }
@@ -1036,10 +1036,10 @@ namespace op
                 else
                 {
                     if (poseExtractorsWs.size() > 1)
-                        log("Multi-threading disabled, only 1 thread running. All GPUs have been disabled but the"
+                        opLog("Multi-threading disabled, only 1 thread running. All GPUs have been disabled but the"
                             " first one, which is defined by gpuNumberStart (e.g., in the OpenPose demo, it is set"
                             " with the `--num_gpu_start` flag).", Priority::High);
-                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                    opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     threadManager.add(threadId, poseExtractorsWs.at(0), queueIn++, queueOut++);
                 }
             }
@@ -1049,7 +1049,7 @@ namespace op
             if (!poseTriangulationsWs.empty())
             {
                 // Assemble frames
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 threadManager.add(threadId, wQueueAssembler, queueIn++, queueOut++);
                 threadIdPP(threadId, multiThreadEnabled);
                 // 3-D reconstruction
@@ -1057,7 +1057,7 @@ namespace op
                 {
                     for (auto& wPoseTriangulations : poseTriangulationsWs)
                     {
-                        log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                        opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                         threadManager.add(threadId, wPoseTriangulations, queueIn, queueOut);
                         threadIdPP(threadId, multiThreadEnabled);
                     }
@@ -1067,7 +1067,7 @@ namespace op
                     if (poseTriangulationsWs.size() > 1u)
                     {
                         const auto wQueueOrderer = std::make_shared<WQueueOrderer<TDatumsSP>>();
-                        log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                        opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                         threadManager.add(threadId, wQueueOrderer, queueIn++, queueOut++);
                         threadIdPP(threadId, multiThreadEnabled);
                     }
@@ -1075,9 +1075,9 @@ namespace op
                 else
                 {
                     if (poseTriangulationsWs.size() > 1)
-                        log("Multi-threading disabled, only 1 thread running for 3-D triangulation.",
+                        opLog("Multi-threading disabled, only 1 thread running for 3-D triangulation.",
                             Priority::High);
-                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                    opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     threadManager.add(threadId, poseTriangulationsWs.at(0), queueIn++, queueOut++);
                 }
             }
@@ -1090,7 +1090,7 @@ namespace op
                 {
                     for (auto& wJointAngleEstimator : jointAngleEstimationsWs)
                     {
-                        log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                        opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                         threadManager.add(threadId, wJointAngleEstimator, queueIn, queueOut);
                         threadIdPP(threadId, multiThreadEnabled);
                     }
@@ -1100,7 +1100,7 @@ namespace op
                     if (jointAngleEstimationsWs.size() > 1)
                     {
                         const auto wQueueOrderer = std::make_shared<WQueueOrderer<TDatumsSP>>();
-                        log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                        opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                         threadManager.add(threadId, wQueueOrderer, queueIn++, queueOut++);
                         threadIdPP(threadId, multiThreadEnabled);
                     }
@@ -1108,9 +1108,9 @@ namespace op
                 else
                 {
                     if (jointAngleEstimationsWs.size() > 1)
-                        log("Multi-threading disabled, only 1 thread running for joint angle estimation.",
+                        opLog("Multi-threading disabled, only 1 thread running for joint angle estimation.",
                             Priority::High);
-                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                    opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     threadManager.add(threadId, jointAngleEstimationsWs.at(0), queueIn++, queueOut++);
                 }
             }
@@ -1120,7 +1120,7 @@ namespace op
                 // Combining postProcessingWs and outputWs
                 outputWs = mergeVectors(postProcessingWs, outputWs);
                 // // If I wanna split them
-                // log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                // opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // threadManager.add(threadId, postProcessingWs, queueIn++, queueOut++);
                 // threadIdPP(threadId, multiThreadEnabled);
             }
@@ -1130,7 +1130,7 @@ namespace op
                 // If custom user Worker in its own thread
                 if (userPostProcessingWsOnNewThread)
                 {
-                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                    opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     threadManager.add(threadId, userPostProcessingWs, queueIn++, queueOut++);
                     threadIdPP(threadId, multiThreadEnabled);
                 }
@@ -1143,7 +1143,7 @@ namespace op
             if (!outputWs.empty())
             {
                 // Thread 4 or 5, queues 4 -> 5
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 threadManager.add(threadId, outputWs, queueIn++, queueOut++);
                 threadIdPP(threadId, multiThreadEnabled);
             }
@@ -1153,13 +1153,13 @@ namespace op
             {
                 if (userOutputWsOnNewThread)
                 {
-                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                    opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     threadManager.add(threadId, userOutputWs, queueIn++, queueOut++);
                     threadIdPP(threadId, multiThreadEnabled);
                 }
                 else
                 {
-                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                    opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     threadManager.add(threadId-1, userOutputWs, queueIn++, queueOut++);
                 }
             }
@@ -1167,18 +1167,18 @@ namespace op
             if (guiW != nullptr)
             {
                 // Thread Y+1, queues Q+1 -> Q+2
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 threadManager.add(threadId, guiW, queueIn++, queueOut++);
                 // Saving 3D output
                 if (videoSaver3DW != nullptr)
                     threadManager.add(threadId, videoSaver3DW, queueIn++, queueOut++);
                 threadIdPP(threadId, multiThreadEnabled);
             }
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Setting maximum speed
             if (wFpsMax != nullptr)
             {
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 threadManager.add(threadId, wFpsMax, queueIn++, queueOut++);
                 threadIdPP(threadId, multiThreadEnabled);
             }

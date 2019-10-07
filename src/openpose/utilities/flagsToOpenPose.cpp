@@ -8,7 +8,7 @@ namespace op
     {
         try
         {
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             if (poseModeInt >= 0 && poseModeInt < (int)PoseMode::Size)
                 return (PoseMode)poseModeInt;
             else
@@ -29,7 +29,7 @@ namespace op
     {
         try
         {
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Body pose
             if (poseModeString == "BODY_25")
                 return PoseModel::BODY_25;
@@ -78,7 +78,7 @@ namespace op
     {
         try
         {
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             if (keypointScaleMode == 0)
                 return ScaleMode::InputResolution;
             else if (keypointScaleMode == 1)
@@ -107,7 +107,7 @@ namespace op
     {
         try
         {
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             if (heatMapScaleMode == 0)
                 return ScaleMode::PlusMinusOne;
             else if (heatMapScaleMode == 1)
@@ -133,7 +133,7 @@ namespace op
     {
         try
         {
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             if (detector >= 0 && detector < (int)Detector::Size)
                 return (Detector)detector;
             else
@@ -156,7 +156,7 @@ namespace op
     {
         try
         {
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Avoid duplicates (e.g., selecting at the time camera & video)
             if (int(!imageDirectory.empty()) + int(!videoPath.empty()) + int(webcamIndex > 0)
                 + int(flirCamera) + int(!ipCameraPath.empty()) > 1)
@@ -193,7 +193,7 @@ namespace op
     {
         try
         {
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             const auto type = flagsToProducerType(imageDirectory, videoPath, ipCameraPath, webcamIndex, flirCamera);
 
             if (type == ProducerType::ImageDirectory)
@@ -312,8 +312,9 @@ namespace op
         {
             Point<int> point;
             const auto nRead = sscanf(pointString.c_str(), "%dx%d", &point.x, &point.y);
-            checkE(nRead, 2, "Invalid resolution format: `" +  pointString + "`, it should be e.g., `" + pointExample
-                   + "`.", __LINE__, __FUNCTION__, __FILE__);
+            checkEqual(
+                nRead, 2, "Invalid resolution format: `" +  pointString + "`, it should be e.g., `" + pointExample
+                + "`.", __LINE__, __FUNCTION__, __FILE__);
             return point;
         }
         catch (const std::exception& e)

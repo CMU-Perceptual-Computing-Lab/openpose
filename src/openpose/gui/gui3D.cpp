@@ -303,7 +303,7 @@ namespace op
                 else  //zoom out
                     gGViewDistance -= 10 * gScaleForMouseMotion;
                 if (LOG_VERBOSE_3D_RENDERER)
-                    log("gGViewDistance: " + std::to_string(gGViewDistance));
+                    opLog("gGViewDistance: " + std::to_string(gGViewDistance));
             }
             else
             {
@@ -319,7 +319,7 @@ namespace op
                         gCameraMode = CameraMode::CAM_ROTATE;
                 }
                 if (LOG_VERBOSE_3D_RENDERER)
-                    log("Clicked: [" + std::to_string(gXClick) + "," + std::to_string(gYClick) + "]");
+                    opLog("Clicked: [" + std::to_string(gXClick) + "," + std::to_string(gYClick) + "]");
             }
             glutPostRedisplay();
         }
@@ -354,11 +354,11 @@ namespace op
                 glutPostRedisplay();
                 if (LOG_VERBOSE_3D_RENDERER)
                 {
-                    log("gMouseXRotateDeg = " + std::to_string(gMouseXRotateDeg));
-                    log("gMouseYRotateDeg = " + std::to_string(gMouseYRotateDeg));
-                    log("gMouseXPan = " + std::to_string(gMouseXPan));
-                    log("gMouseYPan = " + std::to_string(gMouseYPan));
-                    log("gMouseZPan = " + std::to_string(gMouseZPan));
+                    opLog("gMouseXRotateDeg = " + std::to_string(gMouseXRotateDeg));
+                    opLog("gMouseYRotateDeg = " + std::to_string(gMouseYRotateDeg));
+                    opLog("gMouseXPan = " + std::to_string(gMouseXPan));
+                    opLog("gMouseYPan = " + std::to_string(gMouseYPan));
+                    opLog("gMouseZPan = " + std::to_string(gMouseZPan));
                 }
             }
         }

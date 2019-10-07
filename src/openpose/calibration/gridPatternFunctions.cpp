@@ -119,7 +119,7 @@ namespace op
                     }
                     if (chessboardFound && image.size().width != tempImage.size().width)
                     {
-                        log("Chessboard found at lower resolution (" + std::to_string(tempImage.cols) + "x"
+                        opLog("Chessboard found at lower resolution (" + std::to_string(tempImage.cols) + "x"
                             + std::to_string(tempImage.rows) + ").", Priority::High);
                         for (auto& point : points2DVector)
                             point *= (image.size().width / tempImage.size().width);
@@ -330,7 +330,7 @@ namespace op
             {
                 // Warning
                 if (showWarning)
-                    log("For maximum multi-view accuracy: The number of corners of the chessboard should be even in"
+                    opLog("For maximum multi-view accuracy: The number of corners of the chessboard should be even in"
                         " 1 dimension and odd in the other (e.g., 1x2, 2x1, 1x4, 3x8, 6x9, 9x6, etc.). Otherwise,"
                         " extrinsics calibration results might be affected.", Priority::High);
                 // Old method
@@ -389,13 +389,13 @@ namespace op
                     / 4.;
                 // Debugging
                 if (debugging)
-                    log("\naverageSquareSizePx: " + std::to_string(averageSquareSizePx));
+                    opLog("\naverageSquareSizePx: " + std::to_string(averageSquareSizePx));
                 // How many pixels does the outter square has?
                 // 0.67 is a threshold to be safe
                 const auto diagonalLength = 0.67 * std::sqrt(2) * averageSquareSizePx;
                 // Debugging
                 if (debugging)
-                    log("diagonalLength: " + std::to_string(diagonalLength));
+                    opLog("diagonalLength: " + std::to_string(diagonalLength));
 
                 // In which direction do I have to look?
                 // Normal vector between corners 0-1, 0-2, 1-3?
@@ -405,13 +405,13 @@ namespace op
                 // Debugging
                 if (debugging)
                 {
-                    log("\npoint01Direction:");
-                    log(point01Direction);
-                    log("point02Direction:");
-                    log(point02Direction);
-                    log("point13Direction:");
-                    log(point13Direction);
-                    log(" ");
+                    opLog("\npoint01Direction:");
+                    opLog(point01Direction);
+                    opLog("point02Direction:");
+                    opLog(point02Direction);
+                    opLog("point13Direction:");
+                    opLog(point13Direction);
+                    opLog(" ");
                 }
 
                 auto pointDirection = fourPointsVector; // Initialization
@@ -427,10 +427,10 @@ namespace op
                 {
                     for (auto i = 0u ; i < fourPointsVector.size() ; i++)
                     {
-                        log("pointDirection[" + std::to_string(i) + "]:");
-                        log(pointDirection[i]);
+                        opLog("pointDirection[" + std::to_string(i) + "]:");
+                        opLog(pointDirection[i]);
                     }
-                    log(" ");
+                    opLog(" ");
                 }
 
                 // Get line to check whether outter grid color is black
@@ -461,7 +461,7 @@ namespace op
                     meanPxValues[i] = sum/count;
                 // Debugging
                 if (debugging)
-                    log("meanPxValues[" + std::to_string(i) + "]: " + std::to_string(meanPxValues[i]));
+                    opLog("meanPxValues[" + std::to_string(i) + "]: " + std::to_string(meanPxValues[i]));
                 }
 
                 // Get black indexes
@@ -476,9 +476,9 @@ namespace op
                     for (auto i = 0u ; i < fourPointsVector.size() ; i++)
                     cv::line(imageToPlot, fourPointsVector[i], pointLimit[i], cv::Scalar{0,0,255}, 10);
                     // Black indexes
-                    log(" ");
-                    log("blackIs0: " + std::to_string(blackIs0));
-                    log("blackIs1: " + std::to_string(blackIs1));
+                    opLog(" ");
+                    opLog("blackIs0: " + std::to_string(blackIs0));
+                    opLog("blackIs1: " + std::to_string(blackIs1));
                     // Plotting results
                     // Chessboard before
                     drawGridCorners(imageToPlot, gridInnerCorners, points2DVector);
@@ -494,7 +494,7 @@ namespace op
                     blackIs1 = !blackIs1;
                     // Debugging
                     if (debugging)
-                        log("Swapping 0 and 3 so 0 is black.");
+                        opLog("Swapping 0 and 3 so 0 is black.");
                 }
                 // Lead is 0 or 1||2 (depending on blackIs1)?
                 const auto outterCornerIndicesAfter = getOutterCornerIndices(points2DVector, gridInnerCorners);
@@ -509,20 +509,20 @@ namespace op
                 const auto crossProduct = fourPointsVectorAfter[0].cross(fourPointsVectorAfter[(blackIs1 ? 1 : 2)]);
                 // Debugging
                 if (debugging)
-                    log("crossProduct: " + std::to_string(crossProduct));
+                    opLog("crossProduct: " + std::to_string(crossProduct));
                 const auto leadIs0 = crossProduct < 0;
                 // Second transformation
                 if (!leadIs0)
                 {
                     // Debugging
                     if (debugging)
-                        log("Lead is not 0.");
+                        opLog("Lead is not 0.");
                     // Second black is 1
                     if (blackIs1)
                     {
                         // Debugging
                         if (debugging)
-                            log("Lead was 1.");
+                            opLog("Lead was 1.");
                         invertXPositionsIndices(points2DVector, gridInnerCorners); // 1->0
                     }
                     // Second black is 2
@@ -530,7 +530,7 @@ namespace op
                     {
                         // Debugging
                         if (debugging)
-                            log("Lead was 2.");
+                            opLog("Lead was 2.");
                         std::reverse(points2DVector.begin(), points2DVector.end()); // 2->3
                         invertXPositionsIndices(points2DVector, gridInnerCorners); // 3->0
                     }

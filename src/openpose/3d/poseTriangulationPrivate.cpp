@@ -20,7 +20,7 @@ namespace op
                 imageX /= imageX.at<double>(2,0);
                 const auto error = std::sqrt(std::pow(imageX.at<double>(0,0) -  pointsOnEachCamera[i].x,2)
                                              + std::pow(imageX.at<double>(1,0) - pointsOnEachCamera[i].y,2));
-                // log("Error: " + std::to_string(error));
+                // opLog("Error: " + std::to_string(error));
                 averageError += error;
             }
             return averageError / cameraMatrices.size();
@@ -102,7 +102,7 @@ namespace op
                 residuals[0] = std::sqrt(std::pow(predicted[0] / predicted[2] - observed_x,2)
                                          + std::pow(predicted[1] / predicted[2] - observed_y,2));
 
-                // log("Residuals:");
+                // opLog("Residuals:");
                 // residuals[0]= pow(predicted[0] - (observed_x),2);
                 // residuals[1]= pow(predicted[1] - (observed_y),2);
 

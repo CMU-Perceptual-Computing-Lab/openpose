@@ -151,7 +151,7 @@ namespace op
     {
         try
         {
-            log("\nCalibrating camera (intrinsics) with points from " + std::to_string(points2DVectors.size())
+            opLog("\nCalibrating camera (intrinsics) with points from " + std::to_string(points2DVectors.size())
                 + " images...", Priority::High);
 
             //Find intrinsic and extrinsic camera parameters
@@ -173,14 +173,14 @@ namespace op
             std::tie(totalAvgErr, reprojectionErrors) = calcReprojectionErrors(
                 objects3DVectors, points2DVectors, rVecs, tVecs, intrinsics);
 
-            log("\nIntrinsics:", Priority::High);
-            log("Re-projection error - cv::calibrateCamera vs. calcReprojectionErrors:\t" + std::to_string(rms)
+            opLog("\nIntrinsics:", Priority::High);
+            opLog("Re-projection error - cv::calibrateCamera vs. calcReprojectionErrors:\t" + std::to_string(rms)
                 + " vs. " + std::to_string(totalAvgErr), Priority::High);
-            log("Intrinsics_K:", Priority::High);
-            log(intrinsics.cameraMatrix, Priority::High);
-            log("Intrinsics_distCoeff:", Priority::High);
-            log(intrinsics.distortionCoefficients, Priority::High);
-            log(" ", Priority::High);
+            opLog("Intrinsics_K:", Priority::High);
+            opLog(intrinsics.cameraMatrix, Priority::High);
+            opLog("Intrinsics_distCoeff:", Priority::High);
+            opLog(intrinsics.distortionCoefficients, Priority::High);
+            opLog(" ", Priority::High);
 
             return intrinsics;
         }
@@ -304,7 +304,7 @@ namespace op
                 if (maxElement - minElement >= PI)
                 {
                     resultIsOK = {false};
-                    log("There are outliers in the angles.", Priority::High);
+                    opLog("There are outliers in the angles.", Priority::High);
                 }
 
                 // If the difference between them is <= 180 degrees, then we just return the traditional average.
@@ -376,7 +376,7 @@ namespace op
                 {
                     const auto pairAverageAngle = estimateAverageAngle(rotationVectors.at(i));
                     if (!pairAverageAngle.first)
-                        log("Outlies in the result. Something went wrong when estimating the average of different"
+                        opLog("Outlies in the result. Something went wrong when estimating the average of different"
                               " projection matrices.", Priority::High);
                     rotationVector.at<double>(i,0) = {pairAverageAngle.second};
                 }
@@ -442,7 +442,7 @@ namespace op
         {
             try
             {
-                // log("Solving 2D-3D correspondences (extrinsics)", Priority::High);
+                // opLog("Solving 2D-3D correspondences (extrinsics)", Priority::High);
                 cv::Mat rVec(3, 1, cv::DataType<double>::type);
                 cv::Mat tVec(3, 1, cv::DataType<double>::type);
 
@@ -563,7 +563,7 @@ namespace op
                 for (auto i = 0u ; i < cameraPaths.size() ; i++)
                 {
                     if (coutAndPlotGridCorners)
-                        log("getExtrinsicParameters(...), iteration with: " + cameraPaths[i], Priority::High);
+                        opLog("getExtrinsicParameters(...), iteration with: " + cameraPaths[i], Priority::High);
                     // Loading images
                     const cv::Mat image = cv::imread(cameraPaths[i]);
                     if (image.empty())
@@ -639,20 +639,20 @@ namespace op
             {
                 const Eigen::Vector3d tCam1WrtCam0 = MCam1ToCam0.block<3,1>(0,3) / MCam1ToCam0(3,3);
                 const Eigen::Matrix3d RCam1WrtCam0 = MCam1ToCam0.block<3,3>(0,0);
-                log("M_gb:", Priority::High);
-                log(MGridToCam1, Priority::High);
-                log("M_gf:", Priority::High);
-                log(MGridToCam0, Priority::High);
-                log("M_bf:", Priority::High);
-                log(MCam1ToCam0, Priority::High);
+                opLog("M_gb:", Priority::High);
+                opLog(MGridToCam1, Priority::High);
+                opLog("M_gf:", Priority::High);
+                opLog(MGridToCam0, Priority::High);
+                opLog("M_bf:", Priority::High);
+                opLog(MCam1ToCam0, Priority::High);
 
-                log("########## Secondary camera position w.r.t. main camera ##########", Priority::High);
-                log("tCam1WrtCam0:", Priority::High);
-                log(tCam1WrtCam0, Priority::High);
-                log("RCam1WrtCam0:", Priority::High);
-                log(RCam1WrtCam0, Priority::High);
-                log("MCam0WrtCam1:", Priority::High);
-                log((- RCam1WrtCam0.transpose() * tCam1WrtCam0), Priority::High);
+                opLog("########## Secondary camera position w.r.t. main camera ##########", Priority::High);
+                opLog("tCam1WrtCam0:", Priority::High);
+                opLog(tCam1WrtCam0, Priority::High);
+                opLog("RCam1WrtCam0:", Priority::High);
+                opLog(RCam1WrtCam0, Priority::High);
+                opLog("MCam0WrtCam1:", Priority::High);
+                opLog((- RCam1WrtCam0.transpose() * tCam1WrtCam0), Priority::High);
             }
 
             return MCam1ToCam0;
@@ -715,7 +715,7 @@ namespace op
         }
         // Couldn't write
         else
-            log("Cannot write on " + fileName, Priority::High);
+            opLog("Cannot write on " + fileName, Priority::High);
     }
 
     std::string getFileNameFromCameraIndex(const int cameraIndex)
@@ -762,7 +762,7 @@ namespace op
                 const auto& image = imageAndPath.first;
 
                 if (viewIndex % std::max(1, int(numberViews/4)) == 0)
-                    log("Camera " + std::to_string(cameraIndex) + " - Image view "
+                    opLog("Camera " + std::to_string(cameraIndex) + " - Image view "
                         + std::to_string(viewIndex+1) + "/" + std::to_string(numberViews),
                         Priority::High);
 
@@ -787,7 +787,7 @@ namespace op
                 {
                     points2DVector.clear();
                     points2DVector.resize(numberCorners, cv::Point2f{-1.f,-1.f});
-                    log("Camera " + std::to_string(cameraIndex) + " - Image view "
+                    opLog("Camera " + std::to_string(cameraIndex) + " - Image view "
                         + std::to_string(viewIndex+1) + "/" + std::to_string(numberViews)
                         + " - Chessboard not found.", Priority::High);
                 }
@@ -863,21 +863,21 @@ namespace op
         try
         {
             // Point<int> --> cv::Size
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             const cv::Size gridInnerCornersCvSize{gridInnerCorners.x, gridInnerCorners.y};
 
             // Read images in folder
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             const auto imageAndPaths = getImageAndPaths(imageFolder);
 
             // Get 2D grid corners of each image
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             std::vector<std::vector<cv::Point2f>> points2DVectors;
             std::vector<cv::Mat> imagesWithCorners;
             const auto imageSize = imageAndPaths.at(0).first.size();
             for (auto i = 0u ; i < imageAndPaths.size() ; i++)
             {
-                log("\nImage " + std::to_string(i+1) + "/" + std::to_string(imageAndPaths.size()), Priority::High);
+                opLog("\nImage " + std::to_string(i+1) + "/" + std::to_string(imageAndPaths.size()), Priority::High);
                 const auto& image = imageAndPaths.at(i).first;
 
                 // Sanity check
@@ -899,7 +899,7 @@ namespace op
                     points2DVectors.emplace_back(points2DVector);
                 }
                 else
-                    log("Chessboard not found in image " + imageAndPaths.at(i).second + ".", Priority::High);
+                    opLog("Chessboard not found in image " + imageAndPaths.at(i).second + ".", Priority::High);
 
                 // Debugging (optional) - Show image (with chessboard corners if found)
                 if (saveImagesWithCorners)
@@ -918,14 +918,14 @@ namespace op
                 error(sEmptyErrorMessage, __LINE__, __FUNCTION__, __FILE__);
 
             // Run calibration
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // objects3DVector is the same one for each image
             const std::vector<std::vector<cv::Point3f>> objects3DVectors(
                 points2DVectors.size(), getObjects3DVector(gridInnerCornersCvSize, gridSquareSizeMm));
             const auto intrinsics = calcIntrinsicParameters(imageSize, points2DVectors, objects3DVectors, flags);
 
             // Save intrinsics/results
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             Matrix opCameraMatrix = OP_CV2OPMAT(intrinsics.cameraMatrix);
             Matrix opDistortionCoefficients = OP_CV2OPMAT(intrinsics.distortionCoefficients);
             CameraParameterReader cameraParameterReader{
@@ -933,7 +933,7 @@ namespace op
             cameraParameterReader.writeParameters(outputParameterFolder);
 
             // Debugging (optional) - Save images with corners
-            log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             if (saveImagesWithCorners)
             {
                 const auto folderWhereSavingImages = imageFolder + "images_with_corners/";
@@ -973,7 +973,7 @@ namespace op
         {
             #ifdef USE_EIGEN
                 // For debugging
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto coutResults = false;
                 // const auto coutResults = true;
                 const bool coutAndImshowVerbose = false;
@@ -982,7 +982,7 @@ namespace op
                 const cv::Size gridInnerCornersCvSize{gridInnerCorners.x, gridInnerCorners.y};
 
                 // Load intrinsic parameters
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 CameraParameterReader cameraParameterReader;
                 cameraParameterReader.readParameters(parameterFolder);
                 const auto cameraSerialNumbers = cameraParameterReader.getCameraSerialNumbers();
@@ -994,11 +994,11 @@ namespace op
                     std::vector<cv::Mat>{realCameraDistortions.size()}
                     : realCameraDistortions);
                 // Only use the 2 desired ones
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 cameraIntrinsicsSubset = {cameraIntrinsicsSubset.at(index0), cameraIntrinsicsSubset.at(index1)};
                 cameraDistortionsSubset = {cameraDistortionsSubset.at(index0), cameraDistortionsSubset.at(index1)};
                 // Base extrinsics
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 cv::Mat extrinsicsCam0 = cv::Mat::eye(4, 4, realCameraDistortions.at(0).type());
                 bool cam0IsOrigin = true;
                 if (combineCam0Extrinsics)
@@ -1010,9 +1010,9 @@ namespace op
                 }
 
                 // Number cameras and image paths
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto numberCameras = cameraParameterReader.getNumberCameras();
-                log("\nDetected " + std::to_string(numberCameras) + " cameras from your XML files on:\n"
+                opLog("\nDetected " + std::to_string(numberCameras) + " cameras from your XML files on:\n"
                     + parameterFolder + "\nRemove wrong/extra XML files if this number of cameras does not"
                     + " correspond with the number of cameras recorded in:\n" + imageFolder + "\n",
                     Priority::High);
@@ -1026,19 +1026,19 @@ namespace op
                           __LINE__, __FUNCTION__, __FILE__);
 
                 // Estimate extrinsic parameters per image
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-                log("Calibrating camera " + cameraSerialNumbers.at(index1) + " with respect to camera "
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("Calibrating camera " + cameraSerialNumbers.at(index1) + " with respect to camera "
                     + cameraSerialNumbers.at(index0) + "...", Priority::High);
                 const auto numberViews = imagePaths.size() / numberCameras;
                 auto counterValidImages = 0u;
                 std::vector<Eigen::Matrix4d> MCam1ToCam0s;
                 for (auto i = 0u ; i < imagePaths.size() ; i+=numberCameras)
                 {
-                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                    opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     const auto pathCam0 = imagePaths[i+index0];
                     const auto pathCam1 = imagePaths[i+index1];
                     if (coutResults || i/numberCameras % int(numberViews/10) == 0)
-                        log("It " + std::to_string(i/numberCameras+1) + "/" + std::to_string(numberViews) + ": "
+                        opLog("It " + std::to_string(i/numberCameras+1) + "/" + std::to_string(numberViews) + ": "
                             + getFileNameAndExtension(pathCam0) + " & "
                             + getFileNameAndExtension(pathCam1) + "...", Priority::High);
 
@@ -1058,21 +1058,21 @@ namespace op
                         counterValidImages++;
                         if (coutAndImshowVerbose)
                         {
-                            log("########## Extrinsic parameters extractor ##########", Priority::High);
-                            log("R_gf", Priority::High);
-                            log(RGridToMainCam0, Priority::High);
-                            log("t_gf", Priority::High);
-                            log(tGridToMainCam0, Priority::High);
-                            log("R_gb", Priority::High);
-                            log(RGridToMainCam1, Priority::High);
-                            log("t_gb", Priority::High);
-                            log(tGridToMainCam1, Priority::High);
-                            log("\n", Priority::High);
+                            opLog("########## Extrinsic parameters extractor ##########", Priority::High);
+                            opLog("R_gf", Priority::High);
+                            opLog(RGridToMainCam0, Priority::High);
+                            opLog("t_gf", Priority::High);
+                            opLog(tGridToMainCam0, Priority::High);
+                            opLog("R_gb", Priority::High);
+                            opLog(RGridToMainCam1, Priority::High);
+                            opLog("t_gb", Priority::High);
+                            opLog(tGridToMainCam1, Priority::High);
+                            opLog("\n", Priority::High);
                         }
 
                         // MCam1ToCam0 - Projection matrix estimator
                         if (coutAndImshowVerbose)
-                            log("########## Projection Matrix from secondary camera to main camera ##########",
+                            opLog("########## Projection Matrix from secondary camera to main camera ##########",
                                 Priority::High);
                         MCam1ToCam0s.emplace_back(
                             getMFromCam1ToCam0(RGridToMainCam0, tGridToMainCam0, RGridToMainCam1, tGridToMainCam1,
@@ -1080,92 +1080,92 @@ namespace op
                         if (coutResults)
                         {
                             if (coutAndImshowVerbose)
-                                log("M_bg:", Priority::High);
-                            log(MCam1ToCam0s.back(), Priority::High);
-                            log(" ", Priority::High);
+                                opLog("M_bg:", Priority::High);
+                            opLog(MCam1ToCam0s.back(), Priority::High);
+                            opLog(" ", Priority::High);
                         }
                     }
                     else
                     {
                         if (coutResults)
-                            log("Invalid frame (chessboard not found).", Priority::High);
+                            opLog("Invalid frame (chessboard not found).", Priority::High);
                     }
                 }
                 // Sanity check
                 if (MCam1ToCam0s.empty())
                     error(sEmptyErrorMessage, __LINE__, __FUNCTION__, __FILE__);
-                log("Finished processing images.", Priority::High);
+                opLog("Finished processing images.", Priority::High);
 
                 // Pseudo RANSAC calibration
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto MCam1ToCam0Noisy = getMAverage(MCam1ToCam0s);
-                log("Estimated initial (noisy?) projection matrix.", Priority::High);
+                opLog("Estimated initial (noisy?) projection matrix.", Priority::High);
                 auto MCam1ToCam0 = getMAverage(MCam1ToCam0s, MCam1ToCam0Noisy);
                 while ((MCam1ToCam0 - getMAverage(MCam1ToCam0s, MCam1ToCam0)).norm() > 1e-3)
                 {
                     if (coutResults)
-                        log("Repeated robustness method...", Priority::High);
+                        opLog("Repeated robustness method...", Priority::High);
                     MCam1ToCam0 = getMAverage(MCam1ToCam0s, MCam1ToCam0);
                 }
-                log("Estimated robust projection matrix.", Priority::High);
-                log("norm(M_robust-M_noisy): " + std::to_string((MCam1ToCam0Noisy - MCam1ToCam0).norm()),
+                opLog("Estimated robust projection matrix.", Priority::High);
+                opLog("norm(M_robust-M_noisy): " + std::to_string((MCam1ToCam0Noisy - MCam1ToCam0).norm()),
                     Priority::High);
 
 
 
                 // Show errors
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 if (coutAndImshowVerbose)
                 {
-                    log("\n-----------------------------------------------------------------------------------"
+                    opLog("\n-----------------------------------------------------------------------------------"
                         "-------------------\nErrors:", Priority::High);
                     // Errors
-                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                    opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     for (auto i = 0u ; i < MCam1ToCam0s.size() ; i++)
                     {
-                        log("tCam1WrtCam0:", Priority::High);
-                        log(MCam1ToCam0s.at(i).block<3,1>(0,3).transpose(), Priority::High);
+                        opLog("tCam1WrtCam0:", Priority::High);
+                        opLog(MCam1ToCam0s.at(i).block<3,1>(0,3).transpose(), Priority::High);
                     }
-                    log(" ", Priority::High);
+                    opLog(" ", Priority::High);
 
-                    log("tCam1WrtCam0:", Priority::High);
-                    log(MCam1ToCam0.block<3,1>(0,3).transpose(), Priority::High);
-                    log(" ", Priority::High);
+                    opLog("tCam1WrtCam0:", Priority::High);
+                    opLog(MCam1ToCam0.block<3,1>(0,3).transpose(), Priority::High);
+                    opLog(" ", Priority::High);
 
                     // Rotation matrix in degrees Rodrigues(InputArray src, OutputArray dst
-                    log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                    opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                     const auto rad2deg = 180 / PI;
                     for (auto i = 0u ; i < MCam1ToCam0s.size() ; i++)
                     {
                         Eigen::Matrix3d R_secondaryToMain = MCam1ToCam0s.at(i).block<3,3>(0,0);
-                        log("rodrigues:", Priority::High);
-                        log((getRodriguesVector(R_secondaryToMain).t() * rad2deg), Priority::High);
+                        opLog("rodrigues:", Priority::High);
+                        opLog((getRodriguesVector(R_secondaryToMain).t() * rad2deg), Priority::High);
                     }
                     Eigen::Matrix3d R_secondaryToMain = MCam1ToCam0.block<3,3>(0,0);
-                    log("rodrigues:", Priority::High);
-                    log((getRodriguesVector(R_secondaryToMain).t() * rad2deg), Priority::High);
+                    opLog("rodrigues:", Priority::High);
+                    opLog((getRodriguesVector(R_secondaryToMain).t() * rad2deg), Priority::High);
                 }
 
                 // Show final result
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 if (coutResults)
                 {
-                    log("\n\n\n---------------------------------------------------------------------------"
+                    opLog("\n\n\n---------------------------------------------------------------------------"
                         "---------------------------", Priority::High);
-                    log(std::to_string(counterValidImages) + " valid images.", Priority::High);
-                    log("Initial (noisy?) projection matrix:", Priority::High);
-                    log(MCam1ToCam0Noisy, Priority::High);
-                    log("\nFinal projection matrix (mm):", Priority::High);
-                    log(MCam1ToCam0, Priority::High);
-                    log(" ", Priority::High);
+                    opLog(std::to_string(counterValidImages) + " valid images.", Priority::High);
+                    opLog("Initial (noisy?) projection matrix:", Priority::High);
+                    opLog(MCam1ToCam0Noisy, Priority::High);
+                    opLog("\nFinal projection matrix (mm):", Priority::High);
+                    opLog(MCam1ToCam0, Priority::High);
+                    opLog(" ", Priority::High);
                 }
 
                 // mm --> m
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 MCam1ToCam0.block<3,1>(0,3) *= 1e-3;
 
                 // Eigen --> cv::Mat
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 cv::Mat cvMatExtrinsics;
                 Eigen::MatrixXd eigenExtrinsics = MCam1ToCam0.block<3,4>(0,0);
                 cv::eigen2cv(eigenExtrinsics, cvMatExtrinsics);
@@ -1176,13 +1176,13 @@ namespace op
                     cvMatExtrinsics *= extrinsicsCam0;
 
                 // Final projection matrix
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-                log("\nFinal projection matrix w.r.t. global origin (meters):", Priority::High);
-                log(cvMatExtrinsics, Priority::High);
-                log(" ", Priority::High);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("\nFinal projection matrix w.r.t. global origin (meters):", Priority::High);
+                opLog(cvMatExtrinsics, Priority::High);
+                opLog(" ", Priority::High);
 
                 // Save result
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 CameraParameterReader cameraParameterReaderFinal{
                     cameraSerialNumbers.at(index1),
                     OP_CV2OPMAT(cameraIntrinsicsSubset.at(1)),
@@ -1192,7 +1192,7 @@ namespace op
                 cameraParameterReaderFinal.writeParameters(parameterFolder);
 
                 // Let the rendered image to be displayed
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 if (coutAndImshowVerbose)
                     cv::waitKey(0);
             #else
@@ -1268,7 +1268,7 @@ namespace op
                           __LINE__, __FUNCTION__, __FILE__);
                 // Debugging
                 if (verbose)
-                    log("Reprojection Error info: Max error: " + std::to_string(maxError) + ";\t in cam idx "
+                    opLog("Reprojection Error info: Max error: " + std::to_string(maxError) + ";\t in cam idx "
                         + std::to_string(maxCamIdx) + " with pt idx: " + std::to_string(maxPtIdx) + " & pt 2D: "
                         + std::to_string(points2DVectorsExtrinsic[maxCamIdx][maxPtIdx].x) + "x"
                         + std::to_string(points2DVectorsExtrinsic[maxCamIdx][maxPtIdx].y), Priority::High);
@@ -1440,7 +1440,7 @@ namespace op
                     reprojectionError = computeReprojectionErrorInPixels(
                         points2DVectorsExtrinsic, BAValid, points3D, cameraExtrinsics, cameraIntrinsics);
                     // Verbose
-                    log("Reprojection Error (after outlier removal iteration): "
+                    opLog("Reprojection Error (after outlier removal iteration): "
                         + std::to_string(reprojectionError) + " pixels,\twith error threshold of "
                         + std::to_string(errorThreshold) + " pixels.", Priority::High);
                 }
@@ -1925,7 +1925,7 @@ namespace op
                 // Ceres verbose
                 ceres::Solver::Summary summary;
                 ceres::Solve(options, &problem, &summary);
-                log(summary.FullReport(), Priority::High);
+                opLog(summary.FullReport(), Priority::High);
                 // Sanity check
                 normCam0Identity = cv::norm(
                     refinedExtrinsics[0] - cv::Mat::eye(3, 4, refinedExtrinsics[0].type()));
@@ -1948,7 +1948,7 @@ namespace op
                 }
                 const auto reprojectionError = computeReprojectionErrorInPixels(
                     points2DVectorsExtrinsic, BAValid, points3D, refinedExtrinsics, cameraIntrinsics);
-                log("Reprojection Error (after Bundle Adjustment): " + std::to_string(reprojectionError)
+                opLog("Reprojection Error (after Bundle Adjustment): " + std::to_string(reprojectionError)
                     + " pixels.", Priority::High);
             }
             catch (const std::exception& e)
@@ -2019,7 +2019,7 @@ namespace op
                         }
                 }
                 const double scalingFactor = 0.001f * gridSquareSizeMm * sumLength / sumSquareLength;
-                log("Scaling factor: " + std::to_string(scalingFactor) + ",\tMin grid length: "
+                opLog("Scaling factor: " + std::to_string(scalingFactor) + ",\tMin grid length: "
                     + std::to_string(minLength) + ",\tMax grid length: " + std::to_string(maxLength), Priority::High);
                 // Scale extrinsics: Scale the translation (and the 3D point)
                 for (auto cameraIndex = 1; cameraIndex < numberCameras; cameraIndex++)
@@ -2033,7 +2033,7 @@ namespace op
                 // Final reprojection error
                 const auto reprojectionError = computeReprojectionErrorInPixels(
                     points2DVectorsExtrinsic, BAValid, points3D, refinedExtrinsics, cameraIntrinsics);
-                log("Reprojection Error (after rescaling): " + std::to_string(reprojectionError) + " pixels.",
+                opLog("Reprojection Error (after rescaling): " + std::to_string(reprojectionError) + " pixels.",
                     Priority::High);
             }
             catch (const std::exception& e)
@@ -2058,21 +2058,21 @@ namespace op
                 {
                     const auto reprojectionError = computeReprojectionErrorInPixels(
                         points2DVectorsExtrinsic, BAValid, points3D, refinedExtrinsics, cameraIntrinsics);
-                    log("Reprojection Error (initial): " + std::to_string(reprojectionError), Priority::High);
-                    log(" ", Priority::High);
+                    opLog("Reprojection Error (initial): " + std::to_string(reprojectionError), Priority::High);
+                    opLog(" ", Priority::High);
                 }
 
                 // Outlier removal
-                log("Applying outlier removal...", Priority::High);
+                opLog("Applying outlier removal...", Priority::High);
                 removeOutliersReprojectionErrorIterative(
                     points2DVectorsExtrinsic, BAValid, points3D, refinedExtrinsics, cameraIntrinsics, pixelThreshold);
-                log(" ", Priority::High);
+                opLog(" ", Priority::High);
 
                 // Bundle Adjustment
-                log("Running bundle adjustment...", Priority::High);
+                opLog("Running bundle adjustment...", Priority::High);
                 runBundleAdjustment(
                     refinedExtrinsics, points3D, points2DVectorsExtrinsic, BAValid, cameraIntrinsics, numberCameras);
-                log(" ", Priority::High);
+                opLog(" ", Priority::High);
             }
             catch (const std::exception& e)
             {
@@ -2119,15 +2119,15 @@ namespace op
                     error("This mode assumes that the images are already undistorted (add flag `--omit_distortion`).",
                           __LINE__, __FUNCTION__, __FILE__);
 
-                log("Loading images...", Priority::High);
+                opLog("Loading images...", Priority::High);
                 const auto imageAndPaths = getImageAndPaths(imageFolder);
-                log("Images loaded.", Priority::High);
+                opLog("Images loaded.", Priority::High);
 
                 // Point<int> --> cv::Size
                 const cv::Size gridInnerCornersCvSize{gridInnerCorners.x, gridInnerCorners.y};
 
                 // Load parameters (distortion, intrinsics, initial extrinsics)
-                log("Loading parameters...", Priority::High);
+                opLog("Loading parameters...", Priority::High);
                 CameraParameterReader cameraParameterReader;
                 cameraParameterReader.readParameters(parameterFolder);
                 const auto opCameraExtrinsicsInitial = cameraParameterReader.getCameraExtrinsicsInitial();
@@ -2145,9 +2145,9 @@ namespace op
                         break;
                     }
                 }
-                log("Parameters loaded.", Priority::High);
+                opLog("Parameters loaded.", Priority::High);
                 // Camera extrinsics
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 auto opCameraExtrinsics = (initialEmpty
                     ? cameraParameterReader.getCameraExtrinsics() : opCameraExtrinsicsInitial);
                 OP_OP2CVVECTORMAT(cameraExtrinsics, opCameraExtrinsics)
@@ -2161,18 +2161,18 @@ namespace op
                     imagesAreUndistorted
                     ? std::vector<Matrix>{cameraIntrinsics.size()} : cameraParameterReader.getCameraDistortions());
                 // Read images in folder
-                log("Reading images in folder...", Priority::High);
+                opLog("Reading images in folder...", Priority::High);
                 const auto numberCorners = gridInnerCorners.area();
                 std::vector<std::vector<cv::Point2f>> points2DVectorsExtrinsic(numberCameras); // camera - keypoints
                 std::vector<std::vector<unsigned int>> matchIndexes(numberCameras); // camera - indixes found
                 if (imageAndPaths.empty())
                     error("imageAndPaths.empty()!.", __LINE__, __FUNCTION__, __FILE__);
-                log("Images read.", Priority::High);
+                opLog("Images read.", Priority::High);
                 // Get 2D grid corners of each image
                 std::vector<cv::Mat> imagesWithCorners;
                 const auto imageSize = imageAndPaths.at(0).first.size();
                 const auto numberViews = (unsigned int)(imageAndPaths.size() / numberCameras);
-                log("Processing cameras...", Priority::High);
+                opLog("Processing cameras...", Priority::High);
                 std::vector<std::thread> threads;
                 for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
                 {
@@ -2224,11 +2224,11 @@ namespace op
                     }
                 }
                 // ofstreamMatches.close();
-                log("Number points (i.e., timestamps) fully obtained: "
+                opLog("Number points (i.e., timestamps) fully obtained: "
                     + std::to_string(points2DVectorsExtrinsic[0].size()), Priority::High);
-                log("Number views (i.e., cameras) fully obtained: "
+                opLog("Number views (i.e., cameras) fully obtained: "
                     + std::to_string(points2DVectorsExtrinsic[0].size() / numberCorners), Priority::High);
-                log(" ", Priority::High);
+                opLog(" ", Priority::High);
 
                 // Sanity check
                 for (auto i = 1 ; i < numberCameras ; i++)
@@ -2254,7 +2254,7 @@ namespace op
                 // Last note: For quick debugging, set saveVisualSFMFiles = true and check the generated FeatureMatches.txt
                 // (note that *.sift files are actually in binary format, so quite hard to read.)
 
-                log("Estimating initial 3D points...", Priority::High);
+                opLog("Estimating initial 3D points...", Priority::High);
                 // Run triangulation to obtain the initial 3D points
                 const auto initialPoints3D = reconstruct3DPoints(
                     points2DVectorsExtrinsic, cameraIntrinsics, cameraExtrinsics, numberCameras, imageSize);
@@ -2280,7 +2280,7 @@ namespace op
 
                 // Revert back to refinedExtrinsics[0] = cameraExtrinsics[0] (rather than [I,0])
                 // Note: Given that inv([R,t;0,1]) is another [R',t';0,1], scaling is maintained
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 cv::Mat cameraOriginInv2;
                 cameraXAsOrigin(refinedExtrinsics, cameraOriginInv2, cameraOriginInv);
                 // Sanity check
@@ -2290,22 +2290,22 @@ namespace op
                           + std::to_string(normCam0Identity), __LINE__, __FUNCTION__, __FILE__);
 
                 // Final projection matrix
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-                log("\nFinal projection matrix w.r.t. global origin (meters):", Priority::High);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("\nFinal projection matrix w.r.t. global origin (meters):", Priority::High);
                 for (auto cameraIndex = 0; cameraIndex < numberCameras; cameraIndex++)
                 {
-                    log("Camera " + std::to_string(cameraIndex) + ":", Priority::High);
-                    log(refinedExtrinsics[cameraIndex], Priority::High);
-                    // log("Initial camera " + std::to_string(cameraIndex) + ":", Priority::High);
-                    // log(cameraExtrinsics[cameraIndex], Priority::High);
+                    opLog("Camera " + std::to_string(cameraIndex) + ":", Priority::High);
+                    opLog(refinedExtrinsics[cameraIndex], Priority::High);
+                    // opLog("Initial camera " + std::to_string(cameraIndex) + ":", Priority::High);
+                    // opLog(cameraExtrinsics[cameraIndex], Priority::High);
                     const auto normDifference = cv::norm(
                         refinedExtrinsics[cameraIndex] - cameraExtrinsics[cameraIndex]);
-                    log("Norm difference w.r.t. original extrinsics: " + std::to_string(normDifference),
+                    opLog("Norm difference w.r.t. original extrinsics: " + std::to_string(normDifference),
                         Priority::High);
                 }
 
                 // Save new extrinsics
-                log("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+                opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto cameraSerialNumbers = cameraParameterReader.getCameraSerialNumbers();
                 const auto opRealCameraDistortions = cameraParameterReader.getCameraDistortions();
                 for (auto i = 0 ; i < numberCameras ; i++)
@@ -2318,7 +2318,7 @@ namespace op
                         (initialEmpty ? OP_CV2OPCONSTMAT(cameraExtrinsics.at(i)) : opCameraExtrinsicsInitial.at(i))};
                     cameraParameterReaderFinal.writeParameters(parameterFolder);
                 }
-                log(" ", Priority::High);
+                opLog(" ", Priority::High);
             #else
                 UNUSED(parameterFolder);
                 UNUSED(imageFolder);
@@ -2342,9 +2342,9 @@ namespace op
     {
         try
         {
-            log("Loading images...", Priority::High);
+            opLog("Loading images...", Priority::High);
             const auto imageAndPaths = getImageAndPaths(imageFolder);
-            log("Images loaded.", Priority::High);
+            opLog("Images loaded.", Priority::High);
 
             // Point<int> --> cv::Size
             const cv::Size gridInnerCornersCvSize{gridInnerCorners.x, gridInnerCorners.y};
@@ -2360,7 +2360,7 @@ namespace op
             std::vector<cv::Mat> imagesWithCorners;
             const auto imageSize = imageAndPaths.at(0).first.size();
             const auto numberViews = (unsigned int)(imageAndPaths.size() / numberCameras);
-            log("Processing cameras...", Priority::High);
+            opLog("Processing cameras...", Priority::High);
             std::vector<std::thread> threads;
             for (auto cameraIndex = 0 ; cameraIndex < numberCameras ; cameraIndex++)
             {
@@ -2408,8 +2408,8 @@ namespace op
                 }
             }
             ofstreamMatches.close();
-            log("Number points fully obtained: " + std::to_string(points2DVectorsExtrinsic[0].size()), Priority::High);
-            log("Number views fully obtained: " + std::to_string(points2DVectorsExtrinsic[0].size() / numberCorners),
+            opLog("Number points fully obtained: " + std::to_string(points2DVectorsExtrinsic[0].size()), Priority::High);
+            opLog("Number views fully obtained: " + std::to_string(points2DVectorsExtrinsic[0].size() / numberCorners),
                 Priority::High);
             // Sanity check
             for (auto i = 1 ; i < numberCameras ; i++)

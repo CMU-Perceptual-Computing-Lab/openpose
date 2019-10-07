@@ -874,7 +874,7 @@ namespace op
                     true, peaksPtr);
                 // // Debugging
                 // if (numberPeople > 0)
-                //     log("Found " + std::to_string(numberPeople) + " people in second iteration");
+                //     opLog("Found " + std::to_string(numberPeople) + " people in second iteration");
             }
         }
         catch (const std::exception& e)

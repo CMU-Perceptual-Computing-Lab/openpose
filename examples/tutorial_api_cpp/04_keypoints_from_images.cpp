@@ -34,7 +34,7 @@ bool display(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& dat
             cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", cvMat);
         }
         else
-            op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
+            op::opLog("Nullptr or empty datumsPtr found.", op::Priority::High);
         const auto key = (char)cv::waitKey(1);
         return (key == 27);
     }
@@ -52,13 +52,13 @@ void printKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>
         // Example: How to use the pose keypoints
         if (datumsPtr != nullptr && !datumsPtr->empty())
         {
-            op::log("Body keypoints: " + datumsPtr->at(0)->poseKeypoints.toString(), op::Priority::High);
-            op::log("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString(), op::Priority::High);
-            op::log("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString(), op::Priority::High);
-            op::log("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString(), op::Priority::High);
+            op::opLog("Body keypoints: " + datumsPtr->at(0)->poseKeypoints.toString(), op::Priority::High);
+            op::opLog("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString(), op::Priority::High);
+            op::opLog("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString(), op::Priority::High);
+            op::opLog("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString(), op::Priority::High);
         }
         else
-            op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
+            op::opLog("Nullptr or empty datumsPtr found.", op::Priority::High);
     }
     catch (const std::exception& e)
     {
@@ -73,8 +73,9 @@ void configureWrapper(op::Wrapper& opWrapper)
         // Configuring OpenPose
 
         // logging_level
-        op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
-                  __LINE__, __FUNCTION__, __FILE__);
+        op::checkBool(
+            0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
+            __LINE__, __FUNCTION__, __FILE__);
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
         op::Profiler::setDefaultX(FLAGS_profile_speed);
 
@@ -93,8 +94,9 @@ void configureWrapper(op::Wrapper& opWrapper)
         const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
         // JSON saving
         if (!FLAGS_write_keypoint.empty())
-            op::log("Flag `write_keypoint` is deprecated and will eventually be removed."
-                    " Please, use `write_json` instead.", op::Priority::Max);
+            op::opLog(
+                "Flag `write_keypoint` is deprecated and will eventually be removed. Please, use `write_json`"
+                " instead.", op::Priority::Max);
         // keypointScaleMode
         const auto keypointScaleMode = op::flagsToScaleMode(FLAGS_keypoint_scale);
         // heatmaps to add
@@ -157,16 +159,16 @@ int tutorialApiCpp()
 {
     try
     {
-        op::log("Starting OpenPose demo...", op::Priority::High);
+        op::opLog("Starting OpenPose demo...", op::Priority::High);
         const auto opTimer = op::getTimerInit();
 
         // Configuring OpenPose
-        op::log("Configuring OpenPose...", op::Priority::High);
+        op::opLog("Configuring OpenPose...", op::Priority::High);
         op::Wrapper opWrapper{op::ThreadManagerMode::Asynchronous};
         configureWrapper(opWrapper);
 
         // Starting OpenPose
-        op::log("Starting thread(s)...", op::Priority::High);
+        op::opLog("Starting thread(s)...", op::Priority::High);
         opWrapper.start();
 
         // Read frames on directory
@@ -186,13 +188,13 @@ int tutorialApiCpp()
                     const auto userWantsToExit = display(datumProcessed);
                     if (userWantsToExit)
                     {
-                        op::log("User pressed Esc to exit demo.", op::Priority::High);
+                        op::opLog("User pressed Esc to exit demo.", op::Priority::High);
                         break;
                     }
                 }
             }
             else
-                op::log("Image " + imagePath + " could not be processed.", op::Priority::High);
+                op::opLog("Image " + imagePath + " could not be processed.", op::Priority::High);
         }
 
         // Measuring total time

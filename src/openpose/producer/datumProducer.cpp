@@ -127,7 +127,7 @@ namespace op
                 // Grey to RGB if required
                 if (inputDataMatrix.channels() == 1)
                 {
-                    log(commonMessage + " Converting grey image into BGR.", Priority::High);
+                    opLog(commonMessage + " Converting grey image into BGR.", Priority::High);
                     cv::Mat inputData = OP_OP2CVMAT(inputDataMatrix);
                     cv::cvtColor(inputData, inputData, CV_GRAY2BGR);
                     // Diferent memory size --> new cv::Mat raw ptr memory --> new Matrix

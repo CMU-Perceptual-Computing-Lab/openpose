@@ -33,7 +33,7 @@ void display(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& dat
             cv::waitKey(0);
         }
         else
-            op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
+            op::opLog("Nullptr or empty datumsPtr found.", op::Priority::High);
     }
     catch (const std::exception& e)
     {
@@ -48,13 +48,13 @@ void printKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>
         // Example: How to use the pose keypoints
         if (datumsPtr != nullptr && !datumsPtr->empty())
         {
-            op::log("Body keypoints: " + datumsPtr->at(0)->poseKeypoints.toString(), op::Priority::High);
-            op::log("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString(), op::Priority::High);
-            op::log("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString(), op::Priority::High);
-            op::log("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString(), op::Priority::High);
+            op::opLog("Body keypoints: " + datumsPtr->at(0)->poseKeypoints.toString(), op::Priority::High);
+            op::opLog("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString(), op::Priority::High);
+            op::opLog("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString(), op::Priority::High);
+            op::opLog("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString(), op::Priority::High);
         }
         else
-            op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
+            op::opLog("Nullptr or empty datumsPtr found.", op::Priority::High);
     }
     catch (const std::exception& e)
     {
@@ -66,11 +66,11 @@ int tutorialApiCpp()
 {
     try
     {
-        op::log("Starting OpenPose demo...", op::Priority::High);
+        op::opLog("Starting OpenPose demo...", op::Priority::High);
         const auto opTimer = op::getTimerInit();
 
         // Configuring OpenPose
-        op::log("Configuring OpenPose...", op::Priority::High);
+        op::opLog("Configuring OpenPose...", op::Priority::High);
         op::Wrapper opWrapper{op::ThreadManagerMode::Asynchronous};
         // Add hand and face
         opWrapper.configure(op::WrapperStructFace{true});
@@ -80,7 +80,7 @@ int tutorialApiCpp()
             opWrapper.disableMultiThreading();
 
         // Starting OpenPose
-        op::log("Starting thread(s)...", op::Priority::High);
+        op::opLog("Starting thread(s)...", op::Priority::High);
         opWrapper.start();
 
         // Process and display image
@@ -94,7 +94,7 @@ int tutorialApiCpp()
                 display(datumProcessed);
         }
         else
-            op::log("Image could not be processed.", op::Priority::High);
+            op::opLog("Image could not be processed.", op::Priority::High);
 
         // Measuring total time
         op::printTime(opTimer, "OpenPose demo successfully finished. Total time: ", " seconds.", op::Priority::High);

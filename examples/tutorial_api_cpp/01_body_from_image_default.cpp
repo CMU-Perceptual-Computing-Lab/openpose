@@ -33,7 +33,7 @@ void display(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& dat
             cv::waitKey(0);
         }
         else
-            op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
+            op::opLog("Nullptr or empty datumsPtr found.", op::Priority::High);
     }
     catch (const std::exception& e)
     {
@@ -49,33 +49,33 @@ void printKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>
         if (datumsPtr != nullptr && !datumsPtr->empty())
         {
             // Alternative 1
-            op::log("Body keypoints: " + datumsPtr->at(0)->poseKeypoints.toString(), op::Priority::High);
+            op::opLog("Body keypoints: " + datumsPtr->at(0)->poseKeypoints.toString(), op::Priority::High);
 
             // // Alternative 2
-            // op::log(datumsPtr->at(0).poseKeypoints, op::Priority::High);
+            // op::opLog(datumsPtr->at(0).poseKeypoints, op::Priority::High);
 
             // // Alternative 3
             // std::cout << datumsPtr->at(0).poseKeypoints << std::endl;
 
             // // Alternative 4 - Accesing each element of the keypoints
-            // op::log("\nKeypoints:", op::Priority::High);
+            // op::opLog("\nKeypoints:", op::Priority::High);
             // const auto& poseKeypoints = datumsPtr->at(0).poseKeypoints;
-            // op::log("Person pose keypoints:", op::Priority::High);
+            // op::opLog("Person pose keypoints:", op::Priority::High);
             // for (auto person = 0 ; person < poseKeypoints.getSize(0) ; person++)
             // {
-            //     op::log("Person " + std::to_string(person) + " (x, y, score):", op::Priority::High);
+            //     op::opLog("Person " + std::to_string(person) + " (x, y, score):", op::Priority::High);
             //     for (auto bodyPart = 0 ; bodyPart < poseKeypoints.getSize(1) ; bodyPart++)
             //     {
             //         std::string valueToPrint;
             //         for (auto xyscore = 0 ; xyscore < poseKeypoints.getSize(2) ; xyscore++)
             //             valueToPrint += std::to_string(   poseKeypoints[{person, bodyPart, xyscore}]   ) + " ";
-            //         op::log(valueToPrint, op::Priority::High);
+            //         op::opLog(valueToPrint, op::Priority::High);
             //     }
             // }
-            // op::log(" ", op::Priority::High);
+            // op::opLog(" ", op::Priority::High);
         }
         else
-            op::log("Nullptr or empty datumsPtr found.", op::Priority::High);
+            op::opLog("Nullptr or empty datumsPtr found.", op::Priority::High);
     }
     catch (const std::exception& e)
     {
@@ -87,18 +87,18 @@ int tutorialApiCpp()
 {
     try
     {
-        op::log("Starting OpenPose demo...", op::Priority::High);
+        op::opLog("Starting OpenPose demo...", op::Priority::High);
         const auto opTimer = op::getTimerInit();
 
         // Configuring OpenPose
-        op::log("Configuring OpenPose...", op::Priority::High);
+        op::opLog("Configuring OpenPose...", op::Priority::High);
         op::Wrapper opWrapper{op::ThreadManagerMode::Asynchronous};
         // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
         if (FLAGS_disable_multi_thread)
             opWrapper.disableMultiThreading();
 
         // Starting OpenPose
-        op::log("Starting thread(s)...", op::Priority::High);
+        op::opLog("Starting thread(s)...", op::Priority::High);
         opWrapper.start();
 
         // Process and display image
@@ -112,7 +112,7 @@ int tutorialApiCpp()
                 display(datumProcessed);
         }
         else
-            op::log("Image could not be processed.", op::Priority::High);
+            op::opLog("Image could not be processed.", op::Priority::High);
 
         // Measuring total time
         op::printTime(opTimer, "OpenPose demo successfully finished. Total time: ", " seconds.", op::Priority::High);

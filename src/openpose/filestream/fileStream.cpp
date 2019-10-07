@@ -364,7 +364,7 @@ namespace op
         {
             cv::Mat cvMat = cv::imread(fullFilePath, openCvFlags);
             if (cvMat.empty())
-                log("Empty image on path: " + fullFilePath + ".", Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                opLog("Empty image on path: " + fullFilePath + ".", Priority::Max, __LINE__, __FUNCTION__, __FILE__);
             return OP_CV2OPMAT(cvMat);
         }
         catch (const std::exception& e)

@@ -34,7 +34,7 @@ namespace op
                             + std::to_string(mResolution.y) + " could not being set. Final resolution: "
                             + std::to_string(positiveIntRound(get(CV_CAP_PROP_FRAME_WIDTH))) + "x"
                             + std::to_string(positiveIntRound(get(CV_CAP_PROP_FRAME_HEIGHT))) };
-                        log(logMessage, Priority::Max, __LINE__, __FUNCTION__, __FILE__);
+                        opLog(logMessage, Priority::Max, __LINE__, __FUNCTION__, __FILE__);
                     }
                 }
                 // Set resolution
@@ -204,7 +204,7 @@ namespace op
                 {
                     mDisconnectedCounter++;
                     if (mDisconnectedCounter > 1 && opMat.empty())
-                        log("Camera frame empty (it has occurred for the last " + std::to_string(mDisconnectedCounter)
+                        opLog("Camera frame empty (it has occurred for the last " + std::to_string(mDisconnectedCounter)
                             + " consecutive frames).", Priority::Max);
                 }
                 else
@@ -246,7 +246,7 @@ namespace op
         try
         {
             // If unplugged
-            log("Webcam was unplugged, trying to reconnect it.", Priority::Max);
+            opLog("Webcam was unplugged, trying to reconnect it.", Priority::Max);
             // Sleep
             std::this_thread::sleep_for(std::chrono::milliseconds{1000});
             // Reset camera

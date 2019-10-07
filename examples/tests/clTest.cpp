@@ -203,7 +203,7 @@ int clTest()
         //            cv::imshow("gpuImg", gpuImg);
         //            cv::imshow("cpuImg", cpuImg);
 
-        //            op::log("Done");
+        //            op::opLog("Done");
         //            cv::waitKey(0);
 
         return 0;

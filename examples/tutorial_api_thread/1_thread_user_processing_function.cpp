@@ -46,7 +46,7 @@ public:
         }
         catch (const std::exception& e)
         {
-            op::log("Some kind of unexpected error happened.");
+            op::opLog("Some kind of unexpected error happened.");
             this->stop();
             op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
@@ -57,15 +57,16 @@ int openPoseTutorialThread1()
 {
     try
     {
-        op::log("Starting OpenPose demo...", op::Priority::High);
+        op::opLog("Starting OpenPose demo...", op::Priority::High);
         const auto opTimer = op::getTimerInit();
 
         // ------------------------- INITIALIZATION -------------------------
         // Step 1 - Set logging level
             // - 0 will output all the logging messages
             // - 255 will output nothing
-        op::check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
-                  __LINE__, __FUNCTION__, __FILE__);
+        op::checkBool(
+            0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
+            __LINE__, __FUNCTION__, __FILE__);
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
         // Step 2 - Read GFlags (user defined configuration)
         // cameraSize
@@ -83,7 +84,7 @@ int openPoseTutorialThread1()
             producerType, producerString, cameraSize, FLAGS_camera_parameter_path, FLAGS_frame_undistort,
             FLAGS_3d_views);
         producerSharedPtr->setProducerFpsMode(displayProducerFpsMode);
-        op::log("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+        op::opLog("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);
         // Step 3 - Setting producer
         auto videoSeekSharedPtr = std::make_shared<std::pair<std::atomic<bool>, std::atomic<int>>>();
         videoSeekSharedPtr->first = false;
@@ -138,7 +139,7 @@ int openPoseTutorialThread1()
         // threadManager.add(threadId, wGui, queueIn++, queueOut++);               // Thread 0, queues 2 -> 3
 
         // ------------------------- STARTING AND STOPPING THREADING -------------------------
-        op::log("Starting thread(s)...", op::Priority::High);
+        op::opLog("Starting thread(s)...", op::Priority::High);
         // Two different ways of running the program on multithread environment
             // Option a) Using the main thread (this thread) for processing (it saves 1 thread, recommended)
         threadManager.exec();
@@ -152,7 +153,7 @@ int openPoseTutorialThread1()
         // while (threadManager.isRunning())
         //     std::this_thread::sleep_for(std::chrono::milliseconds{33});
         // // Stop and join threads
-        // op::log("Stopping thread(s)", op::Priority::High);
+        // op::opLog("Stopping thread(s)", op::Priority::High);
         // threadManager.stop();
 
         // Measuring total time

@@ -362,7 +362,7 @@ namespace op
 
 //                    for (auto c = 0; c < channels; c++)
 //                    {
-//                        // log("channel: " + std::to_string(c));
+//                        // opLog("channel: " + std::to_string(c));
 //                        const auto offsetChannel = (n * channels + c);
 
 //                        // CL Data
