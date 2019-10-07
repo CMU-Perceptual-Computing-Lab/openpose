@@ -80,7 +80,7 @@ public:
 
     WrapperPython(int mode = 0)
     {
-        log("Starting OpenPose Python Wrapper...", Priority::High);
+        opLog("Starting OpenPose Python Wrapper...", Priority::High);
 
         // Construct opWrapper
         opWrapper = std::unique_ptr<Wrapper>(new Wrapper(static_cast<ThreadManagerMode>(mode)));
@@ -93,8 +93,9 @@ public:
             if(params.size()) init_int(params);
 
             // logging_level
-            check(0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
-                      __LINE__, __FUNCTION__, __FILE__);
+            checkBool(
+                0 <= FLAGS_logging_level && FLAGS_logging_level <= 255, "Wrong logging_level value.",
+                __LINE__, __FUNCTION__, __FILE__);
             ConfigureLog::setPriorityThreshold((Priority)FLAGS_logging_level);
             Profiler::setDefaultX(FLAGS_profile_speed);
 
@@ -113,7 +114,7 @@ public:
             const auto poseModel = flagsToPoseModel(FLAGS_model_pose);
             // JSON saving
             if (!FLAGS_write_keypoint.empty())
-                log("Flag `write_keypoint` is deprecated and will eventually be removed."
+                opLog("Flag `write_keypoint` is deprecated and will eventually be removed."
                         " Please, use `write_json` instead.", Priority::Max);
             // keypointScaleMode
             const auto keypointScaleMode = flagsToScaleMode(FLAGS_keypoint_scale);
