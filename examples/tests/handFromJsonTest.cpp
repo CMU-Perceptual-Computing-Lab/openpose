@@ -53,7 +53,7 @@ int handFromJsonTest()
             op::PoseMode::Disabled, op::flagsToPoint("656x368"), op::flagsToPoint("1280x720"), op::ScaleMode::InputResolution,
             FLAGS_num_gpu, FLAGS_num_gpu_start, 1, 0.15f, op::RenderMode::None, op::PoseModel::BODY_25, true, 0.f, 0.f,
             0, "models/", {}, op::ScaleMode::ZeroToOne, false, 0.05f, -1, false};
-        wrapperStructPose.modelFolder = FLAGS_model_folder;
+        wrapperStructPose.modelFolder = op::String(FLAGS_model_folder);
         // Hand configuration (use op::WrapperStructHand{} to disable it)
         const op::WrapperStructHand wrapperStructHand{
             FLAGS_hand, op::Detector::Provided, handNetInputSize, FLAGS_hand_scale_number,

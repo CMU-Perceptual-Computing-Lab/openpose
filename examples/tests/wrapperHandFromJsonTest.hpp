@@ -214,7 +214,7 @@ namespace op
                     // Hand keypoint extractor
                     const auto netOutputSize = wrapperStructHand.netInputSize;
                     const auto handExtractor = std::make_shared<HandExtractorCaffe>(
-                        wrapperStructHand.netInputSize, netOutputSize, wrapperStructPose.modelFolder,
+                        wrapperStructHand.netInputSize, netOutputSize, wrapperStructPose.modelFolder.getStdString(),
                         gpuId + gpuNumberStart, wrapperStructHand.scalesNumber, wrapperStructHand.scaleRange
                     );
                     spWPoses.at(gpuId).emplace_back(std::make_shared<WHandExtractorNet<TDatumsPtr>>(handExtractor));
