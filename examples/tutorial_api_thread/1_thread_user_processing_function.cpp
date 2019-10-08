@@ -70,18 +70,19 @@ int openPoseTutorialThread1()
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
         // Step 2 - Read GFlags (user defined configuration)
         // cameraSize
-        const auto cameraSize = op::flagsToPoint(FLAGS_camera_resolution, "-1x-1");
+        const auto cameraSize = op::flagsToPoint(op::String(FLAGS_camera_resolution), "-1x-1");
         // outputSize
-        const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
+        const auto outputSize = op::flagsToPoint(op::String(FLAGS_output_resolution), "-1x-1");
         // producerType
         op::ProducerType producerType;
-        std::string producerString;
+        op::String producerString;
         std::tie(producerType, producerString) = op::flagsToProducer(
-            FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera, FLAGS_flir_camera, FLAGS_flir_camera_index);
+            op::String(FLAGS_image_dir), op::String(FLAGS_video), op::String(FLAGS_ip_camera), FLAGS_camera,
+            FLAGS_flir_camera, FLAGS_flir_camera_index);
         const auto displayProducerFpsMode = (FLAGS_process_real_time
                                           ? op::ProducerFpsMode::OriginalFps : op::ProducerFpsMode::RetrievalFps);
         auto producerSharedPtr = createProducer(
-            producerType, producerString, cameraSize, FLAGS_camera_parameter_path, FLAGS_frame_undistort,
+            producerType, producerString.getStdString(), cameraSize, FLAGS_camera_parameter_path, FLAGS_frame_undistort,
             FLAGS_3d_views);
         producerSharedPtr->setProducerFpsMode(displayProducerFpsMode);
         op::opLog("", op::Priority::Low, __LINE__, __FUNCTION__, __FILE__);

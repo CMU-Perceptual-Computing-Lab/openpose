@@ -24,7 +24,7 @@ namespace op
          * camera index for Webcam and FlirCamera, URL for IPCamera, etc.).
          * Default: "".
          */
-        std::string producerString;
+        String producerString;
 
         /**
          * First image to process.
@@ -75,7 +75,7 @@ namespace op
          * Directory path for the camera parameters (intrinsic and extrinsic parameters) or optionally XML file
          * full path (if only 1 view).
          */
-        std::string cameraParameterPath;
+        String cameraParameterPath;
 
         /**
          * Whether to undistort the image given the camera parameters.
@@ -97,12 +97,12 @@ namespace op
          * Since all the elements of the struct are public, they can also be manually filled.
          */
         WrapperStructInput(
-            const ProducerType producerType = ProducerType::None, const std::string& producerString = "",
+            const ProducerType producerType = ProducerType::None, const String& producerString = "",
             const unsigned long long frameFirst = 0, const unsigned long long frameStep = 1,
             const unsigned long long frameLast = std::numeric_limits<unsigned long long>::max(),
             const bool realTimeProcessing = false, const bool frameFlip = false, const int frameRotate = 0,
             const bool framesRepeat = false, const Point<int>& cameraResolution = Point<int>{-1,-1},
-            const std::string& cameraParameterPath = "models/cameraParameters/",
+            const String& cameraParameterPath = "models/cameraParameters/",
             const bool undistortImage = false, const int numberViews = -1);
     };
 }

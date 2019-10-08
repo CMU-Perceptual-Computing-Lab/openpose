@@ -27,9 +27,10 @@ void parse_gflags(const std::vector<std::string>& argv)
     try
     {
         std::vector<char*> argv_vec;
-        for(auto& arg : argv) argv_vec.emplace_back((char*)arg.c_str());
+        for (auto& arg : argv)
+            argv_vec.emplace_back((char*)arg.c_str());
         char** cast = &argv_vec[0];
-        int size = argv_vec.size();
+        int size = (int)argv_vec.size();
         gflags::ParseCommandLineFlags(&size, &cast, true);
     }
     catch (const std::exception& e)
@@ -90,7 +91,8 @@ public:
     {
         try
         {
-            if(params.size()) init_int(params);
+            if (params.size())
+                init_int(params);
 
             // logging_level
             checkBool(
@@ -101,17 +103,17 @@ public:
 
             // Applying user defined configuration - GFlags to program variables
             // outputSize
-            const auto outputSize = flagsToPoint(FLAGS_output_resolution, "-1x-1");
+            const auto outputSize = flagsToPoint(op::String(FLAGS_output_resolution), "-1x-1");
             // netInputSize
-            const auto netInputSize = flagsToPoint(FLAGS_net_resolution, "-1x368");
+            const auto netInputSize = flagsToPoint(op::String(FLAGS_net_resolution), "-1x368");
             // faceNetInputSize
-            const auto faceNetInputSize = flagsToPoint(FLAGS_face_net_resolution, "368x368 (multiples of 16)");
+            const auto faceNetInputSize = flagsToPoint(op::String(FLAGS_face_net_resolution), "368x368 (multiples of 16)");
             // handNetInputSize
-            const auto handNetInputSize = flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
+            const auto handNetInputSize = flagsToPoint(op::String(FLAGS_hand_net_resolution), "368x368 (multiples of 16)");
             // poseMode
             const auto poseMode = flagsToPoseMode(FLAGS_body);
             // poseModel
-            const auto poseModel = flagsToPoseModel(FLAGS_model_pose);
+            const auto poseModel = flagsToPoseModel(op::String(FLAGS_model_pose));
             // JSON saving
             if (!FLAGS_write_keypoint.empty())
                 opLog("Flag `write_keypoint` is deprecated and will eventually be removed."
@@ -131,13 +133,14 @@ public:
             const bool enableGoogleLogging = true;
 
             // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
-            const WrapperStructPose wrapperStructPose{
+            const op::WrapperStructPose wrapperStructPose{
                 poseMode, netInputSize, outputSize, keypointScaleMode, FLAGS_num_gpu, FLAGS_num_gpu_start,
-                FLAGS_scale_number, (float)FLAGS_scale_gap, flagsToRenderMode(FLAGS_render_pose, multipleView),
+                FLAGS_scale_number, (float)FLAGS_scale_gap, op::flagsToRenderMode(FLAGS_render_pose, multipleView),
                 poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
-                FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, heatMapScaleMode, FLAGS_part_candidates,
+                FLAGS_part_to_show, op::String(FLAGS_model_folder), heatMapTypes, heatMapScaleMode, FLAGS_part_candidates,
                 (float)FLAGS_render_threshold, FLAGS_number_people_max, FLAGS_maximize_positives, FLAGS_fps_max,
-                FLAGS_prototxt_path, FLAGS_caffemodel_path, (float)FLAGS_upsampling_ratio, enableGoogleLogging};
+                op::String(FLAGS_prototxt_path), op::String(FLAGS_caffemodel_path),
+                (float)FLAGS_upsampling_ratio, enableGoogleLogging};
             opWrapper->configure(wrapperStructPose);
             // Face configuration (use WrapperStructFace{} to disable it)
             const WrapperStructFace wrapperStructFace{
@@ -157,11 +160,13 @@ public:
             opWrapper->configure(wrapperStructExtra);
             // Output (comment or use default argument to disable any output)
             const WrapperStructOutput wrapperStructOutput{
-                FLAGS_cli_verbose, FLAGS_write_keypoint, stringToDataFormat(FLAGS_write_keypoint_format),
-                FLAGS_write_json, FLAGS_write_coco_json, FLAGS_write_coco_json_variants, FLAGS_write_coco_json_variant,
-                FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video, FLAGS_write_video_fps,
-                FLAGS_write_video_with_audio, FLAGS_write_heatmaps, FLAGS_write_heatmaps_format, FLAGS_write_video_3d,
-                FLAGS_write_video_adam, FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
+                FLAGS_cli_verbose, op::String(FLAGS_write_keypoint), op::stringToDataFormat(FLAGS_write_keypoint_format),
+                op::String(FLAGS_write_json), op::String(FLAGS_write_coco_json), FLAGS_write_coco_json_variants,
+                FLAGS_write_coco_json_variant, op::String(FLAGS_write_images), op::String(FLAGS_write_images_format),
+                op::String(FLAGS_write_video), FLAGS_write_video_fps, FLAGS_write_video_with_audio,
+                op::String(FLAGS_write_heatmaps), op::String(FLAGS_write_heatmaps_format), op::String(FLAGS_write_video_3d),
+                op::String(FLAGS_write_video_adam), op::String(FLAGS_write_bvh), op::String(FLAGS_udp_host),
+                op::String(FLAGS_udp_port)};
             opWrapper->configure(wrapperStructOutput);
             // No GUI. Equivalent to: opWrapper.configure(WrapperStructGui{});
             // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
@@ -202,16 +207,17 @@ public:
     {
         try
         {
-            const auto cameraSize = flagsToPoint(FLAGS_camera_resolution, "-1x-1");
+            const auto cameraSize = flagsToPoint(op::String(FLAGS_camera_resolution), "-1x-1");
             ProducerType producerType;
-            std::string producerString;
+            op::String producerString;
             std::tie(producerType, producerString) = flagsToProducer(
-                FLAGS_image_dir, FLAGS_video, FLAGS_ip_camera, FLAGS_camera, FLAGS_flir_camera, FLAGS_flir_camera_index);
+                op::String(FLAGS_image_dir), op::String(FLAGS_video), op::String(FLAGS_ip_camera), FLAGS_camera,
+                FLAGS_flir_camera, FLAGS_flir_camera_index);
             // Producer (use default to disable any input)
             const WrapperStructInput wrapperStructInput{
                 producerType, producerString, FLAGS_frame_first, FLAGS_frame_step, FLAGS_frame_last,
                 FLAGS_process_real_time, FLAGS_frame_flip, FLAGS_frame_rotate, FLAGS_frames_repeat,
-                cameraSize, FLAGS_camera_parameter_path, FLAGS_frame_undistort, FLAGS_3d_views};
+                cameraSize, op::String(FLAGS_camera_parameter_path), FLAGS_frame_undistort, FLAGS_3d_views};
             opWrapper->configure(wrapperStructInput);
             // GUI (comment or use default argument to disable any visual output)
             const WrapperStructGui wrapperStructGui{
@@ -381,6 +387,7 @@ template <> struct type_caster<op::Array<float>> {
         {
             try
             {
+                UNUSED(imp);
                 // array b(src, true);
                 array b = reinterpret_borrow<array>(src);
                 buffer_info info = b.request();
@@ -409,6 +416,7 @@ template <> struct type_caster<op::Array<float>> {
         // Cast op::Array<float> to numpy
         static handle cast(const op::Array<float> &m, return_value_policy, handle defval)
         {
+            UNUSED(defval);
             std::string format = format_descriptor<float>::format();
             return array(buffer_info(
                 m.getPseudoConstPtr(),/* Pointer to buffer */
@@ -439,32 +447,36 @@ template <> struct type_caster<cv::Mat> {
             array b = reinterpret_borrow<array>(src);
             buffer_info info = b.request();
 
-            int ndims = info.ndim;
+            const int ndims = (int)info.ndim;
 
             decltype(CV_32F) dtype;
             size_t elemsize;
-            if (info.format == format_descriptor<float>::format()) {
-                if (ndims == 3) {
+            if (info.format == format_descriptor<float>::format())
+            {
+                if (ndims == 3)
                     dtype = CV_32FC3;
-                } else {
+                else
                     dtype = CV_32FC1;
-                }
                 elemsize = sizeof(float);
-            } else if (info.format == format_descriptor<double>::format()) {
-                if (ndims == 3) {
+            }
+            else if (info.format == format_descriptor<double>::format())
+            {
+                if (ndims == 3)
                     dtype = CV_64FC3;
-                } else {
+                else
                     dtype = CV_64FC1;
-                }
                 elemsize = sizeof(double);
-            } else if (info.format == format_descriptor<unsigned char>::format()) {
-                if (ndims == 3) {
+            }
+            else if (info.format == format_descriptor<unsigned char>::format())
+            {
+                if (ndims == 3)
                     dtype = CV_8UC3;
-                } else {
+                else
                     dtype = CV_8UC1;
-                }
                 elemsize = sizeof(unsigned char);
-            } else {
+            }
+            else
+            {
                 throw std::logic_error("Unsupported type");
                 return false;
             }
@@ -478,6 +490,7 @@ template <> struct type_caster<cv::Mat> {
         // Cast cv::Mat to numpy
         static handle cast(const cv::Mat &m, return_value_policy, handle defval)
         {
+            UNUSED(defval);
             std::string format = format_descriptor<unsigned char>::format();
             size_t elemsize = sizeof(unsigned char);
             int dim;

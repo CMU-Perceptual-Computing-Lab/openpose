@@ -99,8 +99,8 @@ namespace op
 
             // Create producer
             auto producerSharedPtr = createProducer(
-                wrapperStructInput.producerType, wrapperStructInput.producerString,
-                wrapperStructInput.cameraResolution, wrapperStructInput.cameraParameterPath,
+                wrapperStructInput.producerType, wrapperStructInput.producerString.getStdString(),
+                wrapperStructInput.cameraResolution, wrapperStructInput.cameraParameterPath.getStdString(),
                 wrapperStructInput.undistortImage, wrapperStructInput.numberViews);
 
             // Editable arguments
@@ -197,11 +197,11 @@ namespace op
             }
 
             // Proper format
-            const auto writeImagesCleaned = formatAsDirectory(wrapperStructOutput.writeImages);
-            const auto writeKeypointCleaned = formatAsDirectory(wrapperStructOutput.writeKeypoint);
-            const auto writeJsonCleaned = formatAsDirectory(wrapperStructOutput.writeJson);
-            const auto writeHeatMapsCleaned = formatAsDirectory(wrapperStructOutput.writeHeatMaps);
-            const auto modelFolder = formatAsDirectory(wrapperStructPose.modelFolder);
+            const auto writeImagesCleaned = formatAsDirectory(wrapperStructOutput.writeImages.getStdString());
+            const auto writeKeypointCleaned = formatAsDirectory(wrapperStructOutput.writeKeypoint.getStdString());
+            const auto writeJsonCleaned = formatAsDirectory(wrapperStructOutput.writeJson.getStdString());
+            const auto writeHeatMapsCleaned = formatAsDirectory(wrapperStructOutput.writeHeatMaps.getStdString());
+            const auto modelFolder = formatAsDirectory(wrapperStructPose.modelFolder.getStdString());
 
             // Common parameters
             auto finalOutputSize = wrapperStructPose.outputSize;
@@ -298,7 +298,7 @@ namespace op
                             wrapperStructPose.poseModel, modelFolder, gpuId + gpuNumberStart,
                             wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScaleMode,
                             wrapperStructPose.addPartCandidates, wrapperStructPose.maximizePositives,
-                            wrapperStructPose.protoTxtPath, wrapperStructPose.caffeModelPath,
+                            wrapperStructPose.protoTxtPath.getStdString(), wrapperStructPose.caffeModelPath.getStdString(),
                             wrapperStructPose.upsamplingRatio, wrapperStructPose.poseMode == PoseMode::Enabled,
                             wrapperStructPose.enableGoogleLogging
                         ));
@@ -747,13 +747,13 @@ namespace op
             }
             opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Write people pose/foot/face/hand/etc. data on disk (COCO validation JSON format)
-            if (!wrapperStructOutput.writeCocoJson.empty())
+            if (!wrapperStructOutput.writeCocoJson.getStdString().empty())
             {
                 opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // If humanFormat: bigger size (& maybe slower to process), but easier for user to read it
                 const auto humanFormat = true;
                 const auto cocoJsonSaver = std::make_shared<CocoJsonSaver>(
-                    wrapperStructOutput.writeCocoJson, wrapperStructPose.poseModel, humanFormat,
+                    wrapperStructOutput.writeCocoJson.getStdString(), wrapperStructPose.poseModel, humanFormat,
                     wrapperStructOutput.writeCocoJsonVariants,
                     (wrapperStructPose.poseModel != PoseModel::CAR_22
                         && wrapperStructPose.poseModel != PoseModel::CAR_12
@@ -767,14 +767,14 @@ namespace op
             if (!writeImagesCleaned.empty())
             {
                 opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-                const auto imageSaver = std::make_shared<ImageSaver>(writeImagesCleaned,
-                                                                     wrapperStructOutput.writeImagesFormat);
+                const auto imageSaver = std::make_shared<ImageSaver>(
+                    writeImagesCleaned, wrapperStructOutput.writeImagesFormat.getStdString());
                 outputWs.emplace_back(std::make_shared<WImageSaver<TDatumsSP>>(imageSaver));
             }
             opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             auto originalVideoFps = 0.;
-            if (!wrapperStructOutput.writeVideo.empty() || !wrapperStructOutput.writeVideo3D.empty()
-                || !wrapperStructOutput.writeBvh.empty())
+            if (!wrapperStructOutput.writeVideo.getStdString().empty() || !wrapperStructOutput.writeVideo3D.getStdString().empty()
+                || !wrapperStructOutput.writeBvh.getStdString().empty())
             {
                 opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 if (wrapperStructOutput.writeVideoFps <= 0
@@ -790,7 +790,7 @@ namespace op
             }
             opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Write frames as *.avi video on hard disk
-            if (!wrapperStructOutput.writeVideo.empty())
+            if (!wrapperStructOutput.writeVideo.getStdString().empty())
             {
                 opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Sanity checks
@@ -804,8 +804,8 @@ namespace op
                           __LINE__, __FUNCTION__, __FILE__);
                 // Create video saver worker
                 const auto videoSaver = std::make_shared<VideoSaver>(
-                    wrapperStructOutput.writeVideo, getCvFourcc('M','J','P','G'), originalVideoFps,
-                    (wrapperStructOutput.writeVideoWithAudio ? wrapperStructInput.producerString : ""));
+                    wrapperStructOutput.writeVideo.getStdString(), getCvFourcc('M','J','P','G'), originalVideoFps,
+                    (wrapperStructOutput.writeVideoWithAudio ? wrapperStructInput.producerString.getStdString() : ""));
                 outputWs.emplace_back(std::make_shared<WVideoSaver<TDatumsSP>>(videoSaver));
             }
             opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
@@ -826,7 +826,7 @@ namespace op
             {
                 opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 const auto heatMapSaver = std::make_shared<HeatMapSaver>(
-                    writeHeatMapsCleaned, wrapperStructOutput.writeHeatMapsFormat);
+                    writeHeatMapsCleaned, wrapperStructOutput.writeHeatMapsFormat.getStdString());
                 outputWs.emplace_back(std::make_shared<WHeatMapSaver<TDatumsSP>>(heatMapSaver));
             }
             opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
@@ -892,15 +892,15 @@ namespace op
                         finalOutputSizeGui, wrapperStructGui.fullScreen, threadManager.getIsRunningSharedPtr(),
                         spVideoSeek, poseExtractorNets, faceExtractorNets, handExtractorNets, renderers,
                         wrapperStructPose.poseModel, wrapperStructGui.displayMode,
-                        !wrapperStructOutput.writeVideo3D.empty()
+                        !wrapperStructOutput.writeVideo3D.getStdString().empty()
                     );
                     // WGui
                     guiW = {std::make_shared<WGui3D<TDatumsSP>>(gui)};
                     // Write 3D frames as *.avi video on hard disk
-                    if (!wrapperStructOutput.writeVideo3D.empty())
+                    if (!wrapperStructOutput.writeVideo3D.getStdString().empty())
                     {
                         const auto videoSaver = std::make_shared<VideoSaver>(
-                            wrapperStructOutput.writeVideo3D, getCvFourcc('M','J','P','G'), originalVideoFps, "");
+                            wrapperStructOutput.writeVideo3D.getStdString(), getCvFourcc('M','J','P','G'), originalVideoFps, "");
                         videoSaver3DW = std::make_shared<WVideoSaver3D<TDatumsSP>>(videoSaver);
                     }
                 }
@@ -916,7 +916,7 @@ namespace op
                     // WGui
                     guiW = {std::make_shared<WGui<TDatumsSP>>(gui)};
                     // Write 3D frames as *.avi video on hard disk
-                    if (!wrapperStructOutput.writeVideo3D.empty())
+                    if (!wrapperStructOutput.writeVideo3D.getStdString().empty())
                         error("3D video can only be recorded if 3D render is enabled.",
                               __LINE__, __FUNCTION__, __FILE__);
                 }

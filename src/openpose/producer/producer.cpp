@@ -408,10 +408,9 @@ namespace op
         }
     }
 
-    std::shared_ptr<Producer> createProducer(const ProducerType producerType, const std::string& producerString,
-                                             const Point<int>& cameraResolution,
-                                             const std::string& cameraParameterPath, const bool undistortImage,
-                                             const int numberViews)
+    std::shared_ptr<Producer> createProducer(
+        const ProducerType producerType, const std::string& producerString, const Point<int>& cameraResolution,
+        const std::string& cameraParameterPath, const bool undistortImage, const int numberViews)
     {
         try
         {

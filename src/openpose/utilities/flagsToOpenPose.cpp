@@ -25,45 +25,46 @@ namespace op
         }
     }
 
-    PoseModel flagsToPoseModel(const std::string& poseModeString)
+    PoseModel flagsToPoseModel(const String& poseModeString)
     {
         try
         {
+            const std::string& poseModeStdString = poseModeString.getStdString();
             opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Body pose
-            if (poseModeString == "BODY_25")
+            if (poseModeStdString == "BODY_25")
                 return PoseModel::BODY_25;
-            else if (poseModeString == "COCO")
+            else if (poseModeStdString == "COCO")
                 return PoseModel::COCO_18;
-            else if (poseModeString == "MPI")
+            else if (poseModeStdString == "MPI")
                 return PoseModel::MPI_15;
-            else if (poseModeString == "MPI_4_layers")
+            else if (poseModeStdString == "MPI_4_layers")
                 return PoseModel::MPI_15_4;
-            else if (poseModeString == "BODY_19")
+            else if (poseModeStdString == "BODY_19")
                 return PoseModel::BODY_19;
-            else if (poseModeString == "BODY_19E")
+            else if (poseModeStdString == "BODY_19E")
                 return PoseModel::BODY_19E;
-            else if (poseModeString == "BODY_19N")
+            else if (poseModeStdString == "BODY_19N")
                 return PoseModel::BODY_19N;
-            else if (poseModeString == "BODY_19_X2")
+            else if (poseModeStdString == "BODY_19_X2")
                 return PoseModel::BODY_19_X2;
-            else if (poseModeString == "BODY_23")
+            else if (poseModeStdString == "BODY_23")
                 return PoseModel::BODY_23;
-            else if (poseModeString == "BODY_25B")
+            else if (poseModeStdString == "BODY_25B")
                 return PoseModel::BODY_25B;
-            else if (poseModeString == "BODY_25D")
+            else if (poseModeStdString == "BODY_25D")
                 return PoseModel::BODY_25D;
-            else if (poseModeString == "BODY_25E")
+            else if (poseModeStdString == "BODY_25E")
                 return PoseModel::BODY_25E;
-            else if (poseModeString == "BODY_135")
+            else if (poseModeStdString == "BODY_135")
                 return PoseModel::BODY_135;
             // Car pose
-            else if (poseModeString == "CAR_12")
+            else if (poseModeStdString == "CAR_12")
                 return PoseModel::CAR_12;
-            else if (poseModeString == "CAR_22")
+            else if (poseModeStdString == "CAR_22")
                 return PoseModel::CAR_22;
             // else
-            error("String (`" + poseModeString + "`) does not correspond to any model (BODY_25, COCO, MPI,"
+            error("String (`" + poseModeStdString + "`) does not correspond to any model (BODY_25, COCO, MPI,"
                   " MPI_4_layers).", __LINE__, __FUNCTION__, __FILE__);
             return PoseModel::BODY_25;
         }
@@ -150,30 +151,33 @@ namespace op
         }
     }
 
-    ProducerType flagsToProducerType(const std::string& imageDirectory, const std::string& videoPath,
-                                     const std::string& ipCameraPath, const int webcamIndex,
-                                     const bool flirCamera)
+    ProducerType flagsToProducerType(
+        const String& imageDirectory, const String& videoPath, const String& ipCameraPath,
+        const int webcamIndex, const bool flirCamera)
     {
         try
         {
             opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            const std::string& imageDirectoryStd = imageDirectory.getStdString();
+            const std::string& videoPathStd = videoPath.getStdString();
+            const std::string& ipCameraPathStd = ipCameraPath.getStdString();
             // Avoid duplicates (e.g., selecting at the time camera & video)
-            if (int(!imageDirectory.empty()) + int(!videoPath.empty()) + int(webcamIndex > 0)
-                + int(flirCamera) + int(!ipCameraPath.empty()) > 1)
+            if (int(!imageDirectoryStd.empty()) + int(!videoPathStd.empty()) + int(webcamIndex > 0)
+                + int(flirCamera) + int(!ipCameraPathStd.empty()) > 1)
                 error("Selected simultaneously"
-                      " image directory (seletected: " + (imageDirectory.empty() ? "no" : imageDirectory) + "),"
-                      " video (seletected: " + (videoPath.empty() ? "no" : videoPath) + "),"
+                      " image directory (seletected: " + (imageDirectoryStd.empty() ? "no" : imageDirectoryStd) + "),"
+                      " video (seletected: " + (videoPathStd.empty() ? "no" : videoPathStd) + "),"
                       " camera (selected: " + (webcamIndex > 0 ? std::to_string(webcamIndex) : "no") + "),"
                       " flirCamera (selected: " + (flirCamera ? "yes" : "no") + ","
-                      " and/or IP camera (selected: " + (ipCameraPath.empty() ? "no" : ipCameraPath) + ")."
+                      " and/or IP camera (selected: " + (ipCameraPathStd.empty() ? "no" : ipCameraPathStd) + ")."
                       " Please, select only one.", __LINE__, __FUNCTION__, __FILE__);
 
             // Get desired ProducerType
-            if (!imageDirectory.empty())
+            if (!imageDirectoryStd.empty())
                 return ProducerType::ImageDirectory;
-            else if (!videoPath.empty())
+            else if (!videoPathStd.empty())
                 return ProducerType::Video;
-            else if (!ipCameraPath.empty())
+            else if (!ipCameraPathStd.empty())
                 return ProducerType::IPCamera;
             else if (flirCamera)
                 return ProducerType::FlirCamera;
@@ -187,14 +191,15 @@ namespace op
         }
     }
 
-    std::pair<ProducerType, std::string> flagsToProducer(
-        const std::string& imageDirectory, const std::string& videoPath, const std::string& ipCameraPath,
+    std::pair<ProducerType, String> flagsToProducer(
+        const String& imageDirectory, const String& videoPath, const String& ipCameraPath,
         const int webcamIndex, const bool flirCamera, const int flirCameraIndex)
     {
         try
         {
             opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
-            const auto type = flagsToProducerType(imageDirectory, videoPath, ipCameraPath, webcamIndex, flirCamera);
+            const auto type = flagsToProducerType(
+                imageDirectory, videoPath, ipCameraPath, webcamIndex, flirCamera);
 
             if (type == ProducerType::ImageDirectory)
                 return std::make_pair(ProducerType::ImageDirectory, imageDirectory);
@@ -204,10 +209,10 @@ namespace op
                 return std::make_pair(ProducerType::IPCamera, ipCameraPath);
             // Flir camera
             else if (type == ProducerType::FlirCamera)
-                return std::make_pair(ProducerType::FlirCamera, std::to_string(flirCameraIndex));
+                return std::make_pair(ProducerType::FlirCamera, String(std::to_string(flirCameraIndex)));
             // Webcam
             else if (type == ProducerType::Webcam)
-                return std::make_pair(ProducerType::Webcam, std::to_string(webcamIndex));
+                return std::make_pair(ProducerType::Webcam, String(std::to_string(webcamIndex)));
             // else
             error("Undefined Producer selected.", __LINE__, __FUNCTION__, __FILE__);
             return std::make_pair(ProducerType::None, "");
@@ -306,15 +311,17 @@ namespace op
         }
     }
 
-    Point<int> flagsToPoint(const std::string& pointString, const std::string& pointExample)
+    Point<int> flagsToPoint(const String& pointString, const String& pointExample)
     {
         try
         {
+            const std::string& pointStringStd = pointString.getStdString();
+            const std::string& pointExampleStd = pointExample.getStdString();
             Point<int> point;
-            const auto nRead = sscanf(pointString.c_str(), "%dx%d", &point.x, &point.y);
+            const auto nRead = sscanf(pointStringStd.c_str(), "%dx%d", &point.x, &point.y);
             checkEqual(
-                nRead, 2, "Invalid resolution format: `" +  pointString + "`, it should be e.g., `" + pointExample
-                + "`.", __LINE__, __FUNCTION__, __FILE__);
+                nRead, 2, "Invalid resolution format: `" +  pointStringStd + "`, it should be e.g., `"
+                + pointExampleStd + "`.", __LINE__, __FUNCTION__, __FILE__);
             return point;
         }
         catch (const std::exception& e)

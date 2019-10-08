@@ -110,17 +110,17 @@ void configureWrapper(op::Wrapper& opWrapper)
 
         // Applying user defined configuration - GFlags to program variables
         // outputSize
-        const auto outputSize = op::flagsToPoint(FLAGS_output_resolution, "-1x-1");
+        const auto outputSize = op::flagsToPoint(op::String(FLAGS_output_resolution), "-1x-1");
         // netInputSize
-        const auto netInputSize = op::flagsToPoint(FLAGS_net_resolution, "-1x368");
+        const auto netInputSize = op::flagsToPoint(op::String(FLAGS_net_resolution), "-1x368");
         // faceNetInputSize
-        const auto faceNetInputSize = op::flagsToPoint(FLAGS_face_net_resolution, "368x368 (multiples of 16)");
+        const auto faceNetInputSize = op::flagsToPoint(op::String(FLAGS_face_net_resolution), "368x368 (multiples of 16)");
         // handNetInputSize
-        const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
+        const auto handNetInputSize = op::flagsToPoint(op::String(FLAGS_hand_net_resolution), "368x368 (multiples of 16)");
         // poseMode
         const auto poseMode = op::flagsToPoseMode(FLAGS_body);
         // poseModel
-        const auto poseModel = op::flagsToPoseModel(FLAGS_model_pose);
+        const auto poseModel = op::flagsToPoseModel(op::String(FLAGS_model_pose));
         // JSON saving
         if (!FLAGS_write_keypoint.empty())
             op::opLog(
@@ -145,9 +145,10 @@ void configureWrapper(op::Wrapper& opWrapper)
             poseMode, netInputSize, outputSize, keypointScaleMode, FLAGS_num_gpu, FLAGS_num_gpu_start,
             FLAGS_scale_number, (float)FLAGS_scale_gap, op::flagsToRenderMode(FLAGS_render_pose, multipleView),
             poseModel, !FLAGS_disable_blending, (float)FLAGS_alpha_pose, (float)FLAGS_alpha_heatmap,
-            FLAGS_part_to_show, FLAGS_model_folder, heatMapTypes, heatMapScaleMode, FLAGS_part_candidates,
+            FLAGS_part_to_show, op::String(FLAGS_model_folder), heatMapTypes, heatMapScaleMode, FLAGS_part_candidates,
             (float)FLAGS_render_threshold, FLAGS_number_people_max, FLAGS_maximize_positives, FLAGS_fps_max,
-            FLAGS_prototxt_path, FLAGS_caffemodel_path, (float)FLAGS_upsampling_ratio, enableGoogleLogging};
+            op::String(FLAGS_prototxt_path), op::String(FLAGS_caffemodel_path),
+            (float)FLAGS_upsampling_ratio, enableGoogleLogging};
         opWrapper.configure(wrapperStructPose);
         // Face configuration (use op::WrapperStructFace{} to disable it)
         const op::WrapperStructFace wrapperStructFace{
@@ -167,11 +168,13 @@ void configureWrapper(op::Wrapper& opWrapper)
         opWrapper.configure(wrapperStructExtra);
         // Output (comment or use default argument to disable any output)
         const op::WrapperStructOutput wrapperStructOutput{
-            FLAGS_cli_verbose, FLAGS_write_keypoint, op::stringToDataFormat(FLAGS_write_keypoint_format),
-            FLAGS_write_json, FLAGS_write_coco_json, FLAGS_write_coco_json_variants, FLAGS_write_coco_json_variant,
-            FLAGS_write_images, FLAGS_write_images_format, FLAGS_write_video, FLAGS_write_video_fps,
-            FLAGS_write_video_with_audio, FLAGS_write_heatmaps, FLAGS_write_heatmaps_format, FLAGS_write_video_3d,
-            FLAGS_write_video_adam, FLAGS_write_bvh, FLAGS_udp_host, FLAGS_udp_port};
+            FLAGS_cli_verbose, op::String(FLAGS_write_keypoint), op::stringToDataFormat(FLAGS_write_keypoint_format),
+            op::String(FLAGS_write_json), op::String(FLAGS_write_coco_json), FLAGS_write_coco_json_variants,
+            FLAGS_write_coco_json_variant, op::String(FLAGS_write_images), op::String(FLAGS_write_images_format),
+            op::String(FLAGS_write_video), FLAGS_write_video_fps, FLAGS_write_video_with_audio,
+            op::String(FLAGS_write_heatmaps), op::String(FLAGS_write_heatmaps_format), op::String(FLAGS_write_video_3d),
+            op::String(FLAGS_write_video_adam), op::String(FLAGS_write_bvh), op::String(FLAGS_udp_host),
+            op::String(FLAGS_udp_port)};
         opWrapper.configure(wrapperStructOutput);
         // No GUI. Equivalent to: opWrapper.configure(op::WrapperStructGui{});
         // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)

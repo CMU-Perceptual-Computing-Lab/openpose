@@ -19,6 +19,7 @@
 #include <openpose/core/rectangle.hpp>
 #include <openpose/core/renderer.hpp>
 #include <openpose/core/scaleAndSizeExtractor.hpp>
+#include <openpose/core/string.hpp>
 #include <openpose/core/verbosePrinter.hpp>
 #include <openpose/core/wCvMatToOpInput.hpp>
 #include <openpose/core/wCvMatToOpOutput.hpp>

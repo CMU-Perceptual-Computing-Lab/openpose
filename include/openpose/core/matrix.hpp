@@ -6,31 +6,31 @@
 
 namespace op
 {
-    // Convert from Mat into cv::Mat. Usage example:
+    // Convert from Matrix into cv::Mat. Usage example:
         // #include <opencv2/core/core.hpp>
         // ...
         // cv::Mat opMat = OP2CVMAT(cv::Mat());
     #define OP_OP2CVMAT(opMat) \
         (*((cv::Mat*)((opMat).getCvMat())))
 
-    // Convert from Mat into const cv::Mat. Usage example:
+    // Convert from Matrix into const cv::Mat. Usage example:
         // #include <opencv2/core/core.hpp>
         // ...
         // cv::Mat opMat = OP2CVCONSTMAT(cv::Mat());
     #define OP_OP2CVCONSTMAT(opMat) \
         (*((cv::Mat*)((opMat).getConstCvMat())))
 
-    // Convert from cv::Mat into Mat. Usage example:
+    // Convert from cv::Mat into Matrix. Usage example:
         // #include <opencv2/core/core.hpp>
         // ...
-        // Mat opMat = CV2OPMAT(Mat());
+        // Matrix opMat = CV2OPMAT(Matrix());
     #define OP_CV2OPMAT(cvMat) \
         (op::Matrix((void*)&(cvMat)))
 
-    // Convert from cv::Mat into const Mat. Usage example:
+    // Convert from cv::Mat into const Matrix. Usage example:
         // #include <opencv2/core/core.hpp>
         // ...
-        // Mat opMat = CV2OPCONSTMAT(Mat());
+        // Matrix opMat = CV2OPCONSTMAT(Matrix());
     #define OP_CV2OPCONSTMAT(cvMat) \
         (op::Matrix((const void* const)&(cvMat)))
 
@@ -90,7 +90,7 @@ namespace op
         }
 
     /**
-     * Mat: Bind of cv::Mat to avoid OpenCV as dependency in the headers.
+     * Matrix: Bind of cv::Mat to avoid OpenCV as dependency in the headers.
      */
     class OP_API Matrix
     {
@@ -179,8 +179,8 @@ namespace op
     private:
         // PIMPL idiom
         // http://www.cppsamples.com/common-tasks/pimpl.html
-        struct ImplMat;
-        std::shared_ptr<ImplMat> spImpl;
+        struct ImplMatrix;
+        std::shared_ptr<ImplMatrix> spImpl;
     };
 }
 

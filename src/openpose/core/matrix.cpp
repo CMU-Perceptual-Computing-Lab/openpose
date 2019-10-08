@@ -4,18 +4,18 @@
 
 namespace op
 {
-    struct Matrix::ImplMat
+    struct Matrix::ImplMatrix
     {
         cv::Mat mCvMat;
     };
 
     Matrix::Matrix() :
-        spImpl{std::make_shared<ImplMat>()}
+        spImpl{std::make_shared<ImplMatrix>()}
     {
     }
 
     Matrix::Matrix(const void* cvMatPtr) :
-        spImpl{std::make_shared<ImplMat>()}
+        spImpl{std::make_shared<ImplMatrix>()}
     {
         try
         {
@@ -28,7 +28,7 @@ namespace op
     }
 
     Matrix::Matrix(const int rows, const int cols, const int type, void* cvMatPtr) :
-        spImpl{std::make_shared<ImplMat>()}
+        spImpl{std::make_shared<ImplMatrix>()}
     {
         try
         {

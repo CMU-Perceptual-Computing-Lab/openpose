@@ -48,7 +48,7 @@ int openPoseDemo()
         op::ConfigureLog::setPriorityThreshold((op::Priority)FLAGS_logging_level);
 
         // Common parameters
-        const auto gridInnerCorners = op::flagsToPoint(FLAGS_grid_number_inner_corners, "12x7");
+        const auto gridInnerCorners = op::flagsToPoint(op::String(FLAGS_grid_number_inner_corners), "12x7");
         const auto calibrationImageDir = op::formatAsDirectory(FLAGS_calibration_image_dir);
         const auto gridSqureSizeMm = (float)FLAGS_grid_square_size_mm;
 

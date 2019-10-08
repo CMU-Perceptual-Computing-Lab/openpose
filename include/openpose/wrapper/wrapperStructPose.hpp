@@ -118,7 +118,7 @@ namespace op
         /**
          * Folder where the pose Caffe models are located.
          */
-        std::string modelFolder;
+        String modelFolder;
 
         /**
          * Whether and which heat maps to save on the Array<float> Datum.heatmaps.
@@ -180,14 +180,14 @@ namespace op
          * The combination modelFolder + protoTxtPath represents the whole path to the prototxt file.
          * If empty, it will use the default OpenPose ProtoTxt file.
          */
-        std::string protoTxtPath;
+        String protoTxtPath;
 
         /**
          * Final path where the pose Caffe CaffeModel is located.
          * The combination modelFolder + caffeModelPath represents the whole path to the caffemodel file.
          * If empty, it will use the default OpenPose CaffeModel file.
          */
-        std::string caffeModelPath;
+        String caffeModelPath;
 
         /**
          * The image upsampling scale. 8 is the stride of the network, so the ideal value to maximize the
@@ -217,10 +217,10 @@ namespace op
             const RenderMode renderMode = RenderMode::Auto, const PoseModel poseModel = PoseModel::BODY_25,
             const bool blendOriginalFrame = true, const float alphaKeypoint = POSE_DEFAULT_ALPHA_KEYPOINT,
             const float alphaHeatMap = POSE_DEFAULT_ALPHA_HEAT_MAP, const int defaultPartToRender = 0,
-            const std::string& modelFolder = "models/", const std::vector<HeatMapType>& heatMapTypes = {},
+            const String& modelFolder = "models/", const std::vector<HeatMapType>& heatMapTypes = {},
             const ScaleMode heatMapScaleMode = ScaleMode::UnsignedChar, const bool addPartCandidates = false,
             const float renderThreshold = 0.05f, const int numberPeopleMax = -1, const bool maximizePositives = false,
-            const double fpsMax = -1., const std::string& protoTxtPath = "", const std::string& caffeModelPath = "",
+            const double fpsMax = -1., const String& protoTxtPath = "", const String& caffeModelPath = "",
             const float upsamplingRatio = 0.f, const bool enableGoogleLogging = true);
     };
 }

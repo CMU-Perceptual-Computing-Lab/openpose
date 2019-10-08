@@ -15,6 +15,7 @@ set(SOURCES_OP_CORE
     rectangle.cpp
     renderer.cpp
     scaleAndSizeExtractor.cpp
+    string.cpp
     verbosePrinter.cpp)
 
 include(${CMAKE_SOURCE_DIR}/cmake/Utils.cmake)

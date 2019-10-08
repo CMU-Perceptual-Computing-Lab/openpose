@@ -41,7 +41,7 @@ int handFromJsonTest()
 
         // Applying user defined configuration - GFlags to program variables
         // handNetInputSize
-        const auto handNetInputSize = op::flagsToPoint(FLAGS_hand_net_resolution, "368x368 (multiples of 16)");
+        const auto handNetInputSize = op::flagsToPoint(op::String(FLAGS_hand_net_resolution), "368x368 (multiples of 16)");
         // producerType
         const auto producerSharedPtr = op::createProducer(op::ProducerType::ImageDirectory, FLAGS_image_dir);
 

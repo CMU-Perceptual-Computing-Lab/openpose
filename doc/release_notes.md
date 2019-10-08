@@ -385,12 +385,14 @@ OpenPose Library - Release Notes
 
 ## Current version - Future OpenPose 1.6.0
 1. Main improvements:
-    1. Headers do not contain any 3rd-party library includes nor functions. This way, OpenPose can be exported without needing 3rd-party includes nor static library files (e.g., lib files in Windows), allowing people to use their own versions of OpenCV, Eigen, etc. without conflicting with OpenPose. Dynamic library files (e.g., `dll` files in Windows, `so` in Ubuntu) are still required.
-    2. Created the `openpose_private` directory with some internal headers that, if exported with OpenPose, would require including 3rd-party headers and static library files.
-    3. Default OpenCV version for Windows upgraded to version 4.1.1, extracted from their oficial website: section `Releases`, subsection `OpenCV - 4.1.1`, `Windows` version.
-    4. In all `*.cpp` files, their include of their analog `*.hpp` file has been moved to the first line of those `*.cpp` files to slightly speed up compiling time.
+    1. Created Matrix as container of cv::Mat, and String as container of std::string.
+    2. After replacing cv::Mat by Matrix, headers do not contain any 3rd-party library includes nor functions. This way, OpenPose can be exported without needing 3rd-party includes nor static library files (e.g., lib files in Windows), allowing people to use their own versions of OpenCV, Eigen, etc. without conflicting with OpenPose. Dynamic library files (e.g., `dll` files in Windows, `so` in Ubuntu) are still required.
+    3. Created the `openpose_private` directory with some internal headers that, if exported with OpenPose, would require including 3rd-party headers and static library files.
+    4. Default OpenCV version for Windows upgraded to version 4.1.1, extracted from their oficial website: section `Releases`, subsection `OpenCV - 4.1.1`, `Windows` version.
+    5. In all `*.cpp` files, their include of their analog `*.hpp` file has been moved to the first line of those `*.cpp` files to slightly speed up compiling time.
+    6. String is used in `include/openpose/wrapper/` to avoid std::string to cause errors for using diferent std DLLs.
 2. Functions or parameters renamed:
-    1. All headers moved into `openpose_private` and all 3rd-party library calls in headers.
+    1. All headers moved into `openpose_private`, all 3rd-party library calls in headers, and std::string calls in `include/openpose/wrapper/`.
     2. Renamed `dLog()` as `opLogIfDebug()`, `log()` as `opLog()`, `check()` as `checkBool()`, and also renamed all the `checkX()` functions in `include/openpose/utilities/check.hpp`. This avoids compiling crashes when exporting OpenPose to other projects which contain other 3rd-party libraries that define functions with the same popular names with `#define`.
 3. Main bugs fixed:
     1. Removed many Visual Studio (Windows) warnings.

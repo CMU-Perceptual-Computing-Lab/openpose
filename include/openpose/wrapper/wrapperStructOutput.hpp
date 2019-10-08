@@ -25,7 +25,7 @@ namespace op
          * If it is empty (default), it is disabled.
          * Select format with writeKeypointFormat.
          */
-        std::string writeKeypoint;
+        String writeKeypoint;
 
         /**
          * Data format to save Pose (x, y, score) locations.
@@ -42,13 +42,13 @@ namespace op
          *     - `part_candidates` field with body part candidates in (x, y, score) format (if enabled with
          *       `--part_candidates`).
          */
-        std::string writeJson;
+        String writeJson;
 
         /**
          * Pose (x, y, score) locations saving folder location in JSON COCO validation format.
          * If it is empty (default), it is disabled.
          */
-        std::string writeCocoJson;
+        String writeCocoJson;
 
         /**
          * It selects the COCO variants for cocoJsonSaver.
@@ -67,7 +67,7 @@ namespace op
          * Rendered image saving folder.
          * If it is empty (default), it is disabled.
          */
-        std::string writeImages;
+        String writeImages;
 
         /**
          * Rendered image saving folder format.
@@ -75,14 +75,14 @@ namespace op
          * E.g., png, jpg, etc.
          * If writeImages is empty (default), it makes no effect.
          */
-        std::string writeImagesFormat;
+        String writeImagesFormat;
 
         /**
          * Rendered images saving video path.
          * Please, use *.avi format.
          * If it is empty (default), it is disabled.
          */
-        std::string writeVideo;
+        String writeVideo;
 
         /**
          * Frame rate of the recorded video.
@@ -103,44 +103,44 @@ namespace op
          * In order to save the heatmaps, WrapperStructPose.heatMapTypes must also be filled.
          * If it is empty (default), it is disabled.
          */
-        std::string writeHeatMaps;
+        String writeHeatMaps;
 
         /**
          * Heat maps image saving format.
          * Analogous to writeImagesFormat.
          */
-        std::string writeHeatMapsFormat;
+        String writeHeatMapsFormat;
 
         /**
          * Rendered 3D images saving video path.
          * Please, use *.avi format.
          * If it is empty (default), it is disabled.
          */
-        std::string writeVideo3D;
+        String writeVideo3D;
 
         /**
          * Rendered Adam images saving video path.
          * Please, use *.avi format.
          * If it is empty (default), it is disabled.
          */
-        std::string writeVideoAdam;
+        String writeVideoAdam;
 
         /**
          * Path to save a 3-D joint angle BVH file.
          * Please, use *.bvh format.
          * If it is empty (default), it is disabled.
          */
-        std::string writeBvh;
+        String writeBvh;
 
         /**
          * Target server IP address for UDP client-server communication.
          */
-        std::string udpHost;
+        String udpHost;
 
         /**
          * Target server IP port for UDP client-server communication.
          */
-        std::string udpPort;
+        String udpPort;
 
         /**
          * Constructor of the struct.
@@ -148,16 +148,16 @@ namespace op
          * Since all the elements of the struct are public, they can also be manually filled.
          */
         WrapperStructOutput(
-            const double verbose = -1, const std::string& writeKeypoint = "",
-            const DataFormat writeKeypointFormat = DataFormat::Xml, const std::string& writeJson = "",
-            const std::string& writeCocoJson = "", const int writeCocoJsonVariants = 1,
-            const int writeCocoJsonVariant = 1, const std::string& writeImages = "",
-            const std::string& writeImagesFormat = "png", const std::string& writeVideo = "",
+            const double verbose = -1, const String& writeKeypoint = "",
+            const DataFormat writeKeypointFormat = DataFormat::Xml, const String& writeJson = "",
+            const String& writeCocoJson = "", const int writeCocoJsonVariants = 1,
+            const int writeCocoJsonVariant = 1, const String& writeImages = "",
+            const String& writeImagesFormat = "png", const String& writeVideo = "",
             const double writeVideoFps = -1., const bool writeVideoWithAudio = false,
-            const std::string& writeHeatMaps = "", const std::string& writeHeatMapsFormat = "png",
-            const std::string& writeVideo3D = "", const std::string& writeVideoAdam = "",
-            const std::string& writeBvh = "", const std::string& udpHost = "",
-            const std::string& udpPort = "8051");
+            const String& writeHeatMaps = "", const String& writeHeatMapsFormat = "png",
+            const String& writeVideo3D = "", const String& writeVideoAdam = "",
+            const String& writeBvh = "", const String& udpHost = "",
+            const String& udpPort = "8051");
     };
 }
 
