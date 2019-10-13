@@ -24,21 +24,21 @@ namespace op
             if (wrapperStructPose.scaleGap <= 0.f && wrapperStructPose.scalesNumber > 1)
                 error("The scale gap must be greater than 0 (it has no effect if the number of scales is 1).",
                       __LINE__, __FUNCTION__, __FILE__);
-            if (!renderOutput && (!wrapperStructOutput.writeImages.getStdString().empty()
-                || !wrapperStructOutput.writeVideo.getStdString().empty()))
+            if (!renderOutput && (!wrapperStructOutput.writeImages.empty()
+                || !wrapperStructOutput.writeVideo.empty()))
             {
                 const auto message = "In order to save the rendered frames (`--write_images` or `--write_video`), you"
                                      " cannot disable `--render_pose`.";
                 opLog(message, Priority::High);
             }
-            if (!wrapperStructOutput.writeHeatMaps.getStdString().empty() && wrapperStructPose.heatMapTypes.empty())
+            if (!wrapperStructOutput.writeHeatMaps.empty() && wrapperStructPose.heatMapTypes.empty())
             {
                 const auto message = "In order to save the heatmaps (`--write_heatmaps`), you need to pick which heat"
                                      " maps you want to save: `--heatmaps_add_X` flags or fill the"
                                      " wrapperStructPose.heatMapTypes.";
                 error(message, __LINE__, __FUNCTION__, __FILE__);
             }
-            if (!wrapperStructOutput.writeHeatMaps.getStdString().empty()
+            if (!wrapperStructOutput.writeHeatMaps.empty()
                 && (wrapperStructPose.heatMapScaleMode != ScaleMode::UnsignedChar &&
                         wrapperStructOutput.writeHeatMapsFormat.getStdString() != "float"))
             {
@@ -56,12 +56,12 @@ namespace op
                     " own output worker class before calling this function."
                 };
                 const auto savingSomething = (
-                    !wrapperStructOutput.writeImages.getStdString().empty() || !wrapperStructOutput.writeVideo.getStdString().empty()
-                        || !wrapperStructOutput.writeKeypoint.getStdString().empty() || !wrapperStructOutput.writeJson.getStdString().empty()
-                        || !wrapperStructOutput.writeCocoJson.getStdString().empty() || !wrapperStructOutput.writeHeatMaps.getStdString().empty()
+                    !wrapperStructOutput.writeImages.empty() || !wrapperStructOutput.writeVideo.empty()
+                        || !wrapperStructOutput.writeKeypoint.empty() || !wrapperStructOutput.writeJson.empty()
+                        || !wrapperStructOutput.writeCocoJson.empty() || !wrapperStructOutput.writeHeatMaps.empty()
                 );
                 const auto savingCvOutput = (
-                    !wrapperStructOutput.writeImages.getStdString().empty() || !wrapperStructOutput.writeVideo.getStdString().empty()
+                    !wrapperStructOutput.writeImages.empty() || !wrapperStructOutput.writeVideo.empty()
                 );
                 const bool guiEnabled = (wrapperStructGui.displayMode != DisplayMode::NoDisplay);
                 if (!guiEnabled && !savingCvOutput && renderOutput)
@@ -102,7 +102,7 @@ namespace op
                     opLog(message, Priority::High);
                 }
             }
-            if (!wrapperStructOutput.writeVideo.getStdString().empty() && producerSharedPtr == nullptr)
+            if (!wrapperStructOutput.writeVideo.empty() && producerSharedPtr == nullptr)
                 error("Writting video (`--write_video`) is only available if the OpenPose producer is used (i.e."
                       " producerSharedPtr cannot be a nullptr). Otherwise, OpenPose would not know the frame rate"
                       " of that output video nor whether all the images maintain the same resolution. You might"

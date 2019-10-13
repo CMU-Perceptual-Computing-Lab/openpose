@@ -105,6 +105,19 @@ namespace op
         }
     }
 
+    unsigned char* Matrix::dataPseudoConst() const
+    {
+        try
+        {
+            return spImpl->mCvMat.data;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return nullptr;
+        }
+    }
+
     Matrix Matrix::eye(const int rows, const int cols, const int type)
     {
         try

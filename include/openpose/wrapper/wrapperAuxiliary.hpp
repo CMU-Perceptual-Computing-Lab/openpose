@@ -747,7 +747,7 @@ namespace op
             }
             opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Write people pose/foot/face/hand/etc. data on disk (COCO validation JSON format)
-            if (!wrapperStructOutput.writeCocoJson.getStdString().empty())
+            if (!wrapperStructOutput.writeCocoJson.empty())
             {
                 opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // If humanFormat: bigger size (& maybe slower to process), but easier for user to read it
@@ -773,8 +773,8 @@ namespace op
             }
             opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             auto originalVideoFps = 0.;
-            if (!wrapperStructOutput.writeVideo.getStdString().empty() || !wrapperStructOutput.writeVideo3D.getStdString().empty()
-                || !wrapperStructOutput.writeBvh.getStdString().empty())
+            if (!wrapperStructOutput.writeVideo.empty() || !wrapperStructOutput.writeVideo3D.empty()
+                || !wrapperStructOutput.writeBvh.empty())
             {
                 opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 if (wrapperStructOutput.writeVideoFps <= 0
@@ -790,7 +790,7 @@ namespace op
             }
             opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Write frames as *.avi video on hard disk
-            if (!wrapperStructOutput.writeVideo.getStdString().empty())
+            if (!wrapperStructOutput.writeVideo.empty())
             {
                 opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Sanity checks
@@ -892,12 +892,12 @@ namespace op
                         finalOutputSizeGui, wrapperStructGui.fullScreen, threadManager.getIsRunningSharedPtr(),
                         spVideoSeek, poseExtractorNets, faceExtractorNets, handExtractorNets, renderers,
                         wrapperStructPose.poseModel, wrapperStructGui.displayMode,
-                        !wrapperStructOutput.writeVideo3D.getStdString().empty()
+                        !wrapperStructOutput.writeVideo3D.empty()
                     );
                     // WGui
                     guiW = {std::make_shared<WGui3D<TDatumsSP>>(gui)};
                     // Write 3D frames as *.avi video on hard disk
-                    if (!wrapperStructOutput.writeVideo3D.getStdString().empty())
+                    if (!wrapperStructOutput.writeVideo3D.empty())
                     {
                         const auto videoSaver = std::make_shared<VideoSaver>(
                             wrapperStructOutput.writeVideo3D.getStdString(), getCvFourcc('M','J','P','G'), originalVideoFps, "");
@@ -916,7 +916,7 @@ namespace op
                     // WGui
                     guiW = {std::make_shared<WGui<TDatumsSP>>(gui)};
                     // Write 3D frames as *.avi video on hard disk
-                    if (!wrapperStructOutput.writeVideo3D.getStdString().empty())
+                    if (!wrapperStructOutput.writeVideo3D.empty())
                         error("3D video can only be recorded if 3D render is enabled.",
                               __LINE__, __FUNCTION__, __FILE__);
                 }

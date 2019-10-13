@@ -74,14 +74,14 @@ All the Python examples from the Tutorial API Python module can be found in `bui
 cd build/examples/tutorial_api_python
 
 # Python 3 (default version)
-python3 1_body_from_image.py
-python3 2_whole_body_from_image.py
-# python3 [any_other_example.py]
+python3 01_body_from_image.py
+python3 02_whole_body_from_image.py
+# python3 [any_other_python_example.py]
 
 # Python 2
-python2 1_body_from_image.py
-python2 2_whole_body_from_image.py
-# python2 [any_other_example.py]
+python2 01_body_from_image.py
+python2 02_whole_body_from_image.py
+# python2 [any_other_python_example.py]
 ```
 
 
@@ -91,8 +91,8 @@ Note: This step is only required if you are moving the `*.py` files outside thei
 
 Ubuntu/OSX:
 
-- Option a, installing OpenPose: On an Ubuntu or OSX based system, you could install OpenPose by running `sudo make install`, you could then set the OpenPose path in your python scripts to the OpenPose installation path (default: `/usr/local/python`) and start using OpenPose at any location. Take a look at `build/examples/tutorial_api_python/1_body_from_image.py` for an example.
-- Option b, not installing OpenPose: To move the OpenPose Python API demos to a different folder, ensure that the line `sys.path.append('{OpenPose_path}/python')` is properly set in your `*.py` files, where `{OpenPose_path}` points to your build folder of OpenPose. Take a look at `build/examples/tutorial_api_python/1_body_from_image.py` for an example.
+- Option a, installing OpenPose: On an Ubuntu or OSX based system, you could install OpenPose by running `sudo make install`, you could then set the OpenPose path in your python scripts to the OpenPose installation path (default: `/usr/local/python`) and start using OpenPose at any location. Take a look at `build/examples/tutorial_api_python/01_body_from_image.py` for an example.
+- Option b, not installing OpenPose: To move the OpenPose Python API demos to a different folder, ensure that the line `sys.path.append('{OpenPose_path}/python')` is properly set in your `*.py` files, where `{OpenPose_path}` points to your build folder of OpenPose. Take a look at `build/examples/tutorial_api_python/01_body_from_image.py` for an example.
 
 Windows:
 

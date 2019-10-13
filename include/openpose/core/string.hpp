@@ -30,6 +30,8 @@ namespace op
 
         const std::string& getStdString() const;
 
+        bool empty() const;
+
     private:
         // PIMPL idiom
         // http://www.cppsamples.com/common-tasks/pimpl.html

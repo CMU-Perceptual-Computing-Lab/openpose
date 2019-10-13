@@ -44,4 +44,17 @@ namespace op
             return spImpl->mString;
         }
     }
+
+    bool String::empty() const
+    {
+        try
+        {
+            return spImpl->mString.empty();
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return true;
+        }
+    }
 }

@@ -126,13 +126,20 @@ namespace op
 
         /**
          * Equivalent to cv::Mat::data
+         * @return A raw pointer to the internal data of cv::Mat.
          */
-
         unsigned char* data();
         /**
          * Equivalent to cv::Mat::data
+         * @return A raw pointer to the internal data of cv::Mat.
          */
         const unsigned char* dataConst() const;
+        /**
+         * Similar to dataConst(), but it allows the data to be edited.
+         * This function is only implemented for Pybind11 usage.
+         * @return A raw pointer to the internal data of cv::Mat.
+         */
+        unsigned char* dataPseudoConst() const;
 
         /**
          * Equivalent to cv::Mat::eye
