@@ -53,7 +53,9 @@ This installation section is only intended if you plan to modify the OpenPose co
 ## Community-Based Work
 We add links to some community-based work based on OpenPose. Note: We do not support them, and we will remove GitHub issues opened asking about them as well as block those users from posting again. If you face any issue, comment only in the comment IDs especified below and/or on their respective GitHubs.
 
-- [ROS example](https://github.com/firephinx/openpose_ros) (based on a very old OpenPose version). For questions and more details, read and post ONLY on [issue thread #51](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/51).
+- ROS examples:
+    - [ROS example 1](https://github.com/ravijo/ros_openpose). For questions and more details, read and post ONLY on [issue thread #891](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/891).
+    - [ROS example 2](https://github.com/firephinx/openpose_ros) (based on a very old OpenPose version). For questions and more details, read and post ONLY on [issue thread #51](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/51).
 
 - Docker Images. For questions and more details, read and post ONLY on [issue thread #347](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/347).
     - Dockerfile working also with CUDA 10:
