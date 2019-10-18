@@ -18,35 +18,38 @@ namespace op
 {
     bool compareNat(const std::string& a, const std::string& b)
     {
-        if (a.empty())
-            return true;
-        else if (b.empty())
-            return false;
-        else if (std::isdigit(a[0]) && !std::isdigit(b[0]))
-            return true;
-        else if (!std::isdigit(a[0]) && std::isdigit(b[0]))
-            return false;
-        else if (!std::isdigit(a[0]) && !std::isdigit(b[0]))
+        std::string a_(a), b_(b);
+        int aExp(0), bExp(0);
+        bool comparingNumbers = false;
+        while (! (a_.empty() && b_.empty()) )
         {
-            if (std::toupper(a[0]) == std::toupper(b[0]))
-                return compareNat(a.substr(1), b.substr(1));
-            return (std::toupper(a[0]) < std::toupper(b[0]));
+            if (a_.empty())
+                return comparingNumbers ? aExp < bExp : true;
+            else if (b_.empty())
+                return comparingNumbers ? aExp < bExp : false;
+            else if (std::isdigit(a_[0]) && !std::isdigit(b_[0]))
+                return comparingNumbers ? aExp < bExp : true;
+            else if (!std::isdigit(a_[0]) && std::isdigit(b_[0]))
+                return comparingNumbers ? aExp < bExp : false;
+            else if (!std::isdigit(a_[0]) && !std::isdigit(b_[0]))
+            {
+                if (std::toupper(a_[0]) != std::toupper(b_[0]))
+                    return (std::toupper(a_[0]) < std::toupper(b_[0]));
+                comparingNumbers = false;
+                aExp = bExp = 0;
+                a_ = a_.substr(1);
+                b_ = b_.substr(1);
+            } else
+            {
+                comparingNumbers = true;
+                aExp += (a_[0] == '0') ? 0 : 1;
+                bExp += (b_[0] == '0') ? 0 : 1;
+                if (a_[0] != b_[0])
+                    return a_[0] < b_[0];
+                a_ = a_.substr(1);
+                b_ = b_.substr(1);
+            }
         }
-
-        // Both strings begin with digit --> parse both numbers
-        std::istringstream issa(a);
-        std::istringstream issb(b);
-        int ia, ib;
-        issa >> ia;
-        issb >> ib;
-        if (ia != ib)
-            return ia < ib;
-
-        // Numbers are the same --> remove numbers and recurse
-        std::string anew, bnew;
-        std::getline(issa, anew);
-        std::getline(issb, bnew);
-        return (compareNat(anew, bnew));
     }
 
     void makeDirectory(const std::string& directoryPath)
