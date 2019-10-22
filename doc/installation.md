@@ -172,11 +172,18 @@ Note: If you prefer to use your own custom Caffe or OpenCV versions, see [Custom
 
 
 ### OpenPose Building
-#### Ubuntu and Mac
-Finally, build the project by running the following commands.
+#### Ubuntu
+Build the project by running the following commands.
 ```
 cd build/
 make -j`nproc`
+```
+
+#### Mac
+Build the project by running the following commands.
+```
+cd build/
+make -j`sysctl -n hw.physicalcpu`
 ```
 
 #### Windows
