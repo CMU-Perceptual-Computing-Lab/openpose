@@ -7,7 +7,7 @@
 namespace op
 {
     inline Rectangle<float> getHandFromPoseIndexes(const Array<float>& poseKeypoints, const unsigned int person, const unsigned int wrist,
-                                                   const unsigned int elbow, const unsigned int shoulder, const float threshold)
+                                                   const unsigned int elbow, const unsigned int shoulder, const unsigned int other_shoulder, const float threshold)
     {
         try
         {
@@ -26,7 +26,8 @@ namespace op
                 handRectangle.y = posePtr[wrist*3+1] + ratioWristElbow * (posePtr[wrist*3+1] - posePtr[elbow*3+1]);
                 const auto distanceWristElbow = getDistance(poseKeypoints, person, wrist, elbow);
                 const auto distanceElbowShoulder = getDistance(poseKeypoints, person, elbow, shoulder);
-                handRectangle.width = 1.5f * fastMax(distanceWristElbow, 0.9f * distanceElbowShoulder);
+                const auto distanceShoulder = getDistance(poseKeypoints, person, other_shoulder, shoulder);
+                handRectangle.width = 1.5f * fastMax(fastMax(distanceWristElbow, 0.9f * distanceElbowShoulder),0.8f * distanceShoulder);
             }
             // height = width
             handRectangle.height = handRectangle.width;
@@ -50,8 +51,8 @@ namespace op
     {
         try
         {
-            return {getHandFromPoseIndexes(poseKeypoints, person, lWrist, lElbow, lShoulder, threshold),
-                    getHandFromPoseIndexes(poseKeypoints, person, rWrist, rElbow, rShoulder, threshold)};
+            return {getHandFromPoseIndexes(poseKeypoints, person, lWrist, lElbow, lShoulder, rShoulder, threshold),
+                    getHandFromPoseIndexes(poseKeypoints, person, rWrist, rElbow, rShoulder, lShoulder, threshold)};
         }
         catch (const std::exception& e)
         {
