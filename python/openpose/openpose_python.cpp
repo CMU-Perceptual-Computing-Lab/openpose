@@ -293,6 +293,17 @@ namespace op
         m.def("get_gpu_number", &getGpuNumber, "Get Total GPU");
         m.def("get_images_on_directory", &getImagesFromDirectory, "Get Images On Directory");
 
+        // Pose Mapping
+        m.def("getPoseBodyPartMapping", &getPoseBodyPartMapping, "getPoseBodyPartMapping");
+        m.def("getPoseNumberBodyParts", &getPoseNumberBodyParts, "getPoseNumberBodyParts");
+        m.def("getPosePartPairs", &getPosePartPairs, "getPosePartPairs");
+        m.def("getPoseMapIndex", &getPoseMapIndex, "getPoseMapIndex");
+        py::enum_<PoseModel>(m, "PoseModel", py::arithmetic())
+                .value("BODY_25", PoseModel::BODY_25)
+                .value("COCO_18", PoseModel::COCO_18)
+                .value("MPI_15", PoseModel::MPI_15)
+                .export_values();
+
         // OpenposePython
         py::class_<WrapperPython>(m, "WrapperPython")
             .def(py::init<>())
