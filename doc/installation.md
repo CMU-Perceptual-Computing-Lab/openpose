@@ -395,6 +395,8 @@ To use a NVIDIA's NVCaffe docker image instead of the standard Caffe, set the fo
 2. Set the `BUILD_CAFFE` variable to `OFF`.
 3. Set the correct `Caffe_INCLUDE_DIRS` and `Caffe_LIBS` paths following [Custom Caffe](#custom-caffe).
 
+In addition, [peter-uhrig.de/openpose-with-nvcaffe-in-a-singularity-container-with-support-for-multiple-architectures/](http://peter-uhrig.de/openpose-with-nvcaffe-in-a-singularity-container-with-support-for-multiple-architectures/) contains a detailed step-by-step guide to install a portable container with NVCaffe and support for multiple NVidia cards as well as CPU.
+
 
 
 #### Custom OpenCV
