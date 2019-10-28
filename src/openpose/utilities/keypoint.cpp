@@ -1,7 +1,7 @@
-#include <openpose/utilities/keypoint.hpp>
 #include <limits> // std::numeric_limits
 #include <opencv2/imgproc/imgproc.hpp> // cv::line, cv::circle
 #include <openpose/utilities/fastMath.hpp>
+#include <openpose/utilities/keypoint.hpp>
 
 namespace op
 {
@@ -185,17 +185,16 @@ namespace op
             {
                 // Array<T> --> cv::Mat
                 auto frame = frameArray.getCvMat();
-                cv::Mat cvFrame = OP_OP2CVMAT(frame);
 
                 // Sanity check
-                if (cvFrame.channels() != 3)
+                if (frame.channels() != 3)
                     error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
 
                 // Get frame channels
-                const auto width = cvFrame.size[1];
-                const auto height = cvFrame.size[0];
+                const auto width = frame.size[1];
+                const auto height = frame.size[0];
                 const auto area = width * height;
-                cv::Mat frameBGR(height, width, CV_32FC3, cvFrame.data);
+                cv::Mat frameBGR(height, width, CV_32FC3, frame.data);
 
                 // Parameters
                 const auto lineType = 8;
@@ -311,13 +310,29 @@ namespace op
             T maxX = std::numeric_limits<T>::lowest();
             T minY = minX;
             T maxY = maxX;
-            for (auto part = firstIndex ; part < lastIndexClean ; part++)
+            float dist = 550.0;
+//            for (auto part = firstIndex ; part < lastIndexClean ; part++)
+            for (auto part = 0 ; part < 9 ; part++)
             {
+                if (part == 3 || part == 4 || part == 6 || part == 7)
+                {
+                    continue;
+                }
                 const auto score = keypointPtr[3*part + 2];
+                if (part == 0)
+                {
+                    if (score < threshold)
+                        return Rectangle<T>{};
+                }
                 if (score > threshold)
                 {
                     const auto x = keypointPtr[3*part];
                     const auto y = keypointPtr[3*part + 1];
+                    if (part == 1) {
+//                        if (score < threshold)
+//                            return Rectangle<T>{};
+                        dist = sqrt(pow(x - 480.0, 2) + pow(y - 270.0, 2)) + 0.001;
+                    }
                     // Set X
                     if (maxX < x)
                         maxX = x;
@@ -331,7 +346,7 @@ namespace op
                 }
             }
             if (maxX >= minX && maxY >= minY)
-                return Rectangle<T>{minX, minY, maxX-minX, maxY-minY};
+                return Rectangle<T>{minX, minY, (maxX-minX)/dist, (maxY-minY)/dist};
             else
                 return Rectangle<T>{};
         }
@@ -435,7 +450,7 @@ namespace op
                     error("Person index out of range.", __LINE__, __FUNCTION__, __FILE__);
                 // Count keypoints
                 auto nonZeroCounter = 0;
-                const auto baseIndex = person * (int)keypoints.getVolume(1,2);
+                const auto baseIndex = person * keypoints.getVolume(1,2);
                 for (auto part = 0 ; part < keypoints.getSize(1) ; part++)
                     if (keypoints[baseIndex + 3*part + 2] >= threshold)
                         nonZeroCounter++;
@@ -487,8 +502,8 @@ namespace op
             // Get total distance
             T totalDistance = 0;
             int nonZeroCounter = 0;
-            const auto baseIndexA = personA * (int)keypointsA.getVolume(1,2);
-            const auto baseIndexB = personB * (int)keypointsB.getVolume(1,2);
+            const auto baseIndexA = personA * keypointsA.getVolume(1,2);
+            const auto baseIndexB = personB * keypointsB.getVolume(1,2);
             for (auto part = 0 ; part < keypointsA.getSize(1) ; part++)
             {
                 if (keypointsA[baseIndexA+3*part+2] >= threshold && keypointsB[baseIndexB+3*part+2] >= threshold)

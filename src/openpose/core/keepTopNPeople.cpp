@@ -1,7 +1,5 @@
-#include <openpose/core/keepTopNPeople.hpp>
-#include <algorithm> // std::sort
-#include <cmath> // std::sqrt
 #include <openpose/utilities/keypoint.hpp>
+#include <openpose/core/keepTopNPeople.hpp>
 
 namespace op
 {
@@ -32,7 +30,8 @@ namespace op
                 // Get poseFinalScores
                 auto poseFinalScores = poseScores.clone();
                 for (auto person = 0 ; person < (int)poseFinalScores.getVolume() ; person ++)
-                    poseFinalScores[person] *= std::sqrt(getKeypointsArea(peopleArray, person, 0.05f));
+//                    poseFinalScores[person] *= std::sqrt(getKeypointsArea(peopleArray, person, 0.05f)); // modified
+                    poseFinalScores[person] = std::sqrt(getKeypointsArea(peopleArray, person, 0.2f)); // modified
 
                 // Get threshold
                 auto poseScoresSorted = poseFinalScores.clone();
@@ -47,14 +46,14 @@ namespace op
                         numberPeopleAboveThreshold++;
 
                 // Remove extra people - Fille topPeopleArray
-                // assignedPeopleOnThreshold avoids that people with repeated threshold remove higher elements.
+                // assignedPeopleOnThreshold avoids that people with repeated threshold remove higher elements. 
                 // In our case, it will keep the first N people with score = threshold, while keeping all the
                 // people with higher scores.
                 // E.g., poseFinalScores = [0, 0.5, 0.5, 0.5, 1.0]; mNumberPeopleMax = 2
                 // Naively, we could accidentally keep the first 2x 0.5 and remove the 1.0 threshold.
                 // Our method keeps the first 0.5 and 1.0.
                 Array<float> topPeopleArray({mNumberPeopleMax, peopleArray.getSize(1), peopleArray.getSize(2)});
-                const auto personArea = (int)peopleArray.getVolume(1, 2);
+                const auto personArea = peopleArray.getVolume(1, 2);
                 auto assignedPeopleOnThreshold = 0;
                 auto nextPersonIndex = 0;
                 const auto numberPeopleOnThresholdToBeAdded = mNumberPeopleMax - numberPeopleAboveThreshold;
