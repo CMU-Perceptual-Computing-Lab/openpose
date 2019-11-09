@@ -103,7 +103,7 @@ We add links to some community-based work based on OpenPose. Note: We do not sup
 The first step is to clone the OpenPose repository.
 
 1. Windows: You might use [GitHub Desktop](https://desktop.github.com/).
-2. Ubuntu:
+2. Ubuntu/Mac:
 ```bash
 git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose
 ```
@@ -180,10 +180,10 @@ make -j`nproc`
 ```
 
 #### Mac
-Build the project by running the following commands.
+Build the project by running the following commands (note that Mac provides both `logicalcpu` and `physicalcpu`, but we want the logical number for maximum speed).
 ```
 cd build/
-make -j`sysctl -n hw.physicalcpu`
+make -j`sysctl -n hw.logicalcpu`
 ```
 
 #### Windows
