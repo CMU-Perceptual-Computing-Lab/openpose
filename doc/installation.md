@@ -180,7 +180,7 @@ make -j`nproc`
 ```
 
 #### Mac
-Build the project by running the following commands.
+Build the project by running the following commands (note that Mac provides both `logicalcpu` and `physicalcpu`, but we want the logical number for maximum speed).
 ```
 cd build/
 make -j`sysctl -n hw.logicalcpu`
