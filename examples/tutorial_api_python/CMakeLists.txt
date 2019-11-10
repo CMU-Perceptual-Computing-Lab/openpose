@@ -8,5 +8,3 @@ configure_file(07_hand_from_image.py 07_hand_from_image.py)
 configure_file(08_heatmaps_from_image.py 08_heatmaps_from_image.py)
 configure_file(09_keypoints_from_heatmaps.py 09_keypoints_from_heatmaps.py)
 configure_file(openpose_python.py openpose_python.py)
-configure_file(10_test_pose_params.py 10_test_pose_params.py)
-
