@@ -294,6 +294,7 @@ namespace op
         m.def("get_images_on_directory", &getImagesFromDirectory, "Get Images On Directory");
 
         // Pose Mapping
+        // Code example in doc/output.md, section Keypoint Ordering in C++/Python
         m.def("getPoseBodyPartMapping", &getPoseBodyPartMapping, "getPoseBodyPartMapping");
         m.def("getPoseNumberBodyParts", &getPoseNumberBodyParts, "getPoseNumberBodyParts");
         m.def("getPosePartPairs", &getPosePartPairs, "getPosePartPairs");
@@ -302,6 +303,9 @@ namespace op
                 .value("BODY_25", PoseModel::BODY_25)
                 .value("COCO_18", PoseModel::COCO_18)
                 .value("MPI_15", PoseModel::MPI_15)
+                .value("MPI_15_4", PoseModel::MPI_15_4)
+                .value("BODY_25B", PoseModel::BODY_25B)
+                .value("BODY_135", PoseModel::BODY_135)
                 .export_values();
 
         // OpenposePython
@@ -317,7 +321,7 @@ namespace op
             .def("waitAndPop", &WrapperPython::waitAndPop)
             ;
 
-        // Datum Object
+        // Datum Objectcd D:
         py::class_<Datum, std::shared_ptr<Datum>>(m, "Datum")
             .def(py::init<>())
             .def_readwrite("id", &Datum::id)
