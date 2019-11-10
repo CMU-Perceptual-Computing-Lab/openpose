@@ -5,7 +5,7 @@ OpenPose Demo - Output
 
 ## Contents
 1. [Output Format](#output-format)
-    1. [Keypoint Ordering](#keypoint-ordering)
+    1. [Keypoint Ordering in C++/Python](#keypoint-ordering-in-c-python)
     2. [Heatmap Ordering](#heatmap-ordering)
     3. [Heatmap Saving in Float Format](#heatmap-saving-in-float-format)
     4. [Heatmap Scaling](#heatmap-scaling)
@@ -70,11 +70,11 @@ There are 2 alternatives to save the OpenPose output.
 
 2. (Deprecated) The `write_keypoint` flag uses the OpenCV cv::FileStorage default formats, i.e., JSON (available after OpenCV 3.0), XML, and YML. Note that it does not include any other information othern than keypoints.
 
-Both of them follow the keypoint ordering described in the [Keypoint Ordering](#keypoint-ordering) section.
+Both of them follow the keypoint ordering described in the [Keypoint Ordering in C++/Python](#keypoint-ordering-in-c-python) section.
 
 
 
-### Keypoint Ordering
+### Keypoint Ordering in C++/Python
 The body part mapping order of any body model (e.g., COCO, MPI) can be extracted from the C++ API by using the `getPoseBodyPartMapping(const PoseModel poseModel)` function available in [poseParameters.hpp](../include/openpose/pose/poseParameters.hpp):
 ```
 // C++ API call
@@ -82,6 +82,8 @@ The body part mapping order of any body model (e.g., COCO, MPI) can be extracted
 const auto& poseBodyPartMappingBody25 = getPoseBodyPartMapping(PoseModel::BODY_25);
 const auto& poseBodyPartMappingCoco = getPoseBodyPartMapping(PoseModel::COCO_18);
 const auto& poseBodyPartMappingMpi = getPoseBodyPartMapping(PoseModel::MPI_15);
+const auto& poseBodyPartMappingBody25B = getPoseBodyPartMapping(PoseModel::BODY_25B);
+const auto& poseBodyPartMappingBody135 = getPoseBodyPartMapping(PoseModel::BODY_135);
 
 // Result for BODY_25 (25 body parts consisting of COCO + foot)
 // const std::map<unsigned int, std::string> POSE_BODY_25_BODY_PARTS {
@@ -112,6 +114,15 @@ const auto& poseBodyPartMappingMpi = getPoseBodyPartMapping(PoseModel::MPI_15);
 //     {24, "RHeel"},
 //     {25, "Background"}
 // };
+```
+
+In Python, you can check them with the following code:
+```
+poseModel = op.PoseModel.BODY_25
+print(op.getPoseBodyPartMapping(poseModel))
+print(op.getPoseNumberBodyParts(poseModel))
+print(op.getPosePartPairs(poseModel))
+print(op.getPoseMapIndex(poseModel))
 ```
 
 

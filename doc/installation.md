@@ -421,13 +421,13 @@ cd build
 
 The next step is to generate the Makefiles. Now there can be multiple scenarios based on what the user already has e.x. Caffe might be already installed and the user might be interested in building OpenPose against that version of Caffe instead of requiring OpenPose to build Caffe from scratch.
 
-##### SCENARIO 1 -- Caffe not installed and OpenCV installed using `apt-get`
+##### Scenario 1 - Caffe not installed and OpenCV installed using `apt-get`
 In the build directory, run the below command --
 ```bash
 cmake ..
 ```
 
-##### SCENARIO 2 -- Caffe installed and OpenCV build from source
+##### Scenario 2 - Caffe installed and OpenCV build from source
 In this example, we assume that Caffe and OpenCV are already present. The user needs to supply the paths of the libraries and the include directories to CMake. For OpenCV, specify the include directories and the libraries directory using `OpenCV_INCLUDE_DIRS` and `OpenCV_LIBS_DIR` variables respectively. Alternatively, the user can also specify the path to the `OpenCVConfig.cmake` file by setting the `OpenCV_CONFIG_FILE` variable. For Caffe, specify the include directory and library using the `Caffe_INCLUDE_DIRS` and `Caffe_LIBS` variables. This will be where you installed Caffe. Below is an example of the same.
 ```bash
 cmake -DOpenCV_INCLUDE_DIRS=/home/"${USER}"/softwares/opencv/build/install/include \
@@ -442,7 +442,7 @@ cmake -DOpenCV_CONFIG_FILE=/home/"${USER}"/softwares/opencv/build/install/share/
   -DCaffe_LIBS=/home/"${USER}"/softwares/caffe/build/install/lib/libcaffe.so -DBUILD_CAFFE=OFF ..
 ```
 
-##### SCENARIO 3 -- OpenCV already installed
+##### Scenario 3 - OpenCV already installed
 If Caffe is not already present but OpenCV is, then use the below command.
 ```bash
 cmake -DOpenCV_INCLUDE_DIRS=/home/"${USER}"/softwares/opencv/build/install/include \
@@ -452,3 +452,6 @@ cmake -DOpenCV_INCLUDE_DIRS=/home/"${USER}"/softwares/opencv/build/install/inclu
 ```bash
 cmake -DOpenCV_CONFIG_FILE=/home/"${USER}"/softwares/opencv/build/install/share/OpenCV/OpenCVConfig.cmake ..
 ```
+
+##### Any Other Scenario
+You can check the CMake online documentation to check all the options that CMake provides and its analogs to the CMake-gui ones that we show on this document.

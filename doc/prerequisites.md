@@ -30,7 +30,7 @@ git submodule update --init --recursive --remote
 ### Ubuntu Prerequisites
 1. Ubuntu - **Anaconda should not be installed** on your system. Anaconda includes a Protobuf version that is incompatible with Caffe. Either you uninstall anaconda and install protobuf via apt-get, or you compile your own Caffe and link it to OpenPose.
 2. Install **CMake GUI**:
-    - Ubuntu 14 or 16: run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [CMake Command Line Configuration (Ubuntu Only)](#cmake-command-line-configuration-ubuntu-only).
+    - Ubuntu 14 or 16: run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [doc/installation.md#CMake Command Line Configuration (Ubuntu Only)](./installation.md#cmake-command-line-configuration-ubuntu-only).
     - Ubuntu 18: **Download and compile CMake-gui from source**. The default CMake-gui version (3.10) installed via `sudo apt-get install cmake-qt-gui` provokes some compiling errors. Required CMake version >= 3.12.
         - Uninstall your current Cmake-gui version by running `sudo apt purge cmake-qt-gui`.
         - Run `sudo apt-get install qtbase5-dev`.
