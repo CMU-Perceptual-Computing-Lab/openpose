@@ -321,7 +321,7 @@ namespace op
             .def("waitAndPop", &WrapperPython::waitAndPop)
             ;
 
-        // Datum Objectcd D:
+        // Datum Object
         py::class_<Datum, std::shared_ptr<Datum>>(m, "Datum")
             .def(py::init<>())
             .def_readwrite("id", &Datum::id)
