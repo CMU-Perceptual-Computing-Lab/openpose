@@ -293,6 +293,21 @@ namespace op
         m.def("get_gpu_number", &getGpuNumber, "Get Total GPU");
         m.def("get_images_on_directory", &getImagesFromDirectory, "Get Images On Directory");
 
+        // Pose Mapping
+        // Code example in doc/output.md, section Keypoint Ordering in C++/Python
+        m.def("getPoseBodyPartMapping", &getPoseBodyPartMapping, "getPoseBodyPartMapping");
+        m.def("getPoseNumberBodyParts", &getPoseNumberBodyParts, "getPoseNumberBodyParts");
+        m.def("getPosePartPairs", &getPosePartPairs, "getPosePartPairs");
+        m.def("getPoseMapIndex", &getPoseMapIndex, "getPoseMapIndex");
+        py::enum_<PoseModel>(m, "PoseModel", py::arithmetic())
+                .value("BODY_25", PoseModel::BODY_25)
+                .value("COCO_18", PoseModel::COCO_18)
+                .value("MPI_15", PoseModel::MPI_15)
+                .value("MPI_15_4", PoseModel::MPI_15_4)
+                .value("BODY_25B", PoseModel::BODY_25B)
+                .value("BODY_135", PoseModel::BODY_135)
+                .export_values();
+
         // OpenposePython
         py::class_<WrapperPython>(m, "WrapperPython")
             .def(py::init<>())
