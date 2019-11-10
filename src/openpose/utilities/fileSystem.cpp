@@ -18,35 +18,45 @@ namespace op
 {
     bool compareNat(const std::string& a, const std::string& b)
     {
+        // If any is empty, that one is shorter
         if (a.empty())
             return true;
         else if (b.empty())
             return false;
+        // If one is digit, return that one
         else if (std::isdigit(a[0]) && !std::isdigit(b[0]))
             return true;
         else if (!std::isdigit(a[0]) && std::isdigit(b[0]))
             return false;
+        // If none is digit, compare those strings
         else if (!std::isdigit(a[0]) && !std::isdigit(b[0]))
         {
             if (std::toupper(a[0]) == std::toupper(b[0]))
                 return compareNat(a.substr(1), b.substr(1));
             return (std::toupper(a[0]) < std::toupper(b[0]));
         }
-
-        // Both strings begin with digit --> parse both numbers
-        std::istringstream issa(a);
-        std::istringstream issb(b);
-        int ia, ib;
-        issa >> ia;
-        issb >> ib;
-        if (ia != ib)
-            return ia < ib;
-
-        // Numbers are the same --> remove numbers and recurse
-        std::string anew, bnew;
-        std::getline(issa, anew);
-        std::getline(issb, bnew);
-        return (compareNat(anew, bnew));
+        // Both strings begin with digit
+        else
+        {
+            // Remove 0s at the beginning
+            const std::string aNo0s = remove0sFromString(a);
+            const std::string bNo0s = remove0sFromString(b);
+            // Get only number
+            const std::string aNumberAsString = getFirstNumberOnString(aNo0s);
+            const std::string bNumberAsString = getFirstNumberOnString(bNo0s);
+            // 1 number is longer --> it is bigger
+            if (aNumberAsString.size() != bNumberAsString.size())
+                return aNumberAsString.size() < bNumberAsString.size();
+            // Both same length --> Compare them
+            for (auto i = 0 ; i < aNumberAsString.size() ; ++i)
+                if (aNumberAsString[i] != bNumberAsString[i])
+                    return aNumberAsString[i] < bNumberAsString[i];
+            // Both same number --> Remove and return compareNat after removing those characters
+            const std::string aWithoutFirstNumber = aNo0s.substr(aNumberAsString.size(), aNo0s.size());
+            const std::string bWithoutFirstNumber = bNo0s.substr(bNumberAsString.size(), bNo0s.size());
+            // Number removed, compared the rest of the string
+            return compareNat(aWithoutFirstNumber, bWithoutFirstNumber);
+        }
     }
 
     void makeDirectory(const std::string& directoryPath)

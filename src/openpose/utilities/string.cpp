@@ -117,4 +117,48 @@ namespace op
             return "";
         }
     }
+
+    std::string remove0sFromString(const std::string& string)
+    {
+        try
+        {
+            std::string stringNo0s;
+            if (string[0] == '0')
+            {
+                // Find first not 0
+                const std::size_t found = string.find_first_not_of("0");
+                if (found == std::string::npos)
+                    error("This should not happen.", __LINE__, __FUNCTION__, __FILE__);
+                // Make sure that 0 is not the only digit
+                if (string.size() > found && std::isdigit(string[found]))
+                    stringNo0s = string.substr(found);
+                else
+                    stringNo0s = string.substr(found-1);
+            }
+            else
+                stringNo0s = string;
+            return stringNo0s;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return "";
+        }
+    }
+
+    std::string getFirstNumberOnString(const std::string& string)
+    {
+        try
+        {
+            const std::size_t found = string.find_first_not_of("0123456789");
+            if (found == std::string::npos)
+                error("This should not happen.", __LINE__, __FUNCTION__, __FILE__);
+            return string.substr(0, found);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return "";
+        }
+    }
 }

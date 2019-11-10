@@ -397,6 +397,7 @@ OpenPose Library - Release Notes
     2. Renamed `dLog()` as `opLogIfDebug()`, `log()` as `opLog()`, `check()` as `checkBool()`, and also renamed all the `checkX()` functions in `include/openpose/utilities/check.hpp`. This avoids compiling crashes when exporting OpenPose to other projects which contain other 3rd-party libraries that define functions with the same popular names with `#define`.
 3. Main bugs fixed:
     1. Removed many Visual Studio (Windows) warnings.
+    2. Natural sort now works properly with filenames containining numbers longer than the limit of an int.
 4. Changes/additions that affect the compatibility with the OpenPose Unity Plugin:
 
 

@@ -22,6 +22,10 @@ namespace op
     OP_API std::string toLower(const std::string& string);
 
     OP_API std::string toUpper(const std::string& string);
+
+    OP_API std::string remove0sFromString(const std::string& string);
+
+    OP_API std::string getFirstNumberOnString(const std::string& string);
 }
 
 #endif // OPENPOSE_UTILITIES_STRING_HPP
