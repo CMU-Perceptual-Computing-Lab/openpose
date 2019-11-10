@@ -57,7 +57,8 @@ namespace op
                     std::copy(heatMapsGpuPtr, heatMapsGpuPtr + volumeBodyParts, heatMapsPtr);
                 #endif
                 // Change from [0,1] to [-1,1]
-                if (heatMapScaleMode == ScaleMode::PlusMinusOne)
+                if (heatMapScaleMode == ScaleMode::PlusMinusOne
+                    || heatMapScaleMode == ScaleMode::PlusMinusOneFixedAspect)
                     for (auto i = 0u ; i < volumeBodyParts ; i++)
                         heatMapsPtr[i] = fastTruncate(heatMapsPtr[i]) * 2.f - 1.f;
                 // [0, 255]

@@ -13,7 +13,7 @@ namespace op
     public:
         PoseExtractorNet(const PoseModel poseModel,
                          const std::vector<HeatMapType>& heatMapTypes = {},
-                         const ScaleMode heatMapScaleMode = ScaleMode::ZeroToOne,
+                         const ScaleMode heatMapScaleMode = ScaleMode::ZeroToOneFixedAspect,
                          const bool addPartCandidates = false,
                          const bool maximizePositives = false);
 

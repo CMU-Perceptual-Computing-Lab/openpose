@@ -1,4 +1,5 @@
 #include <openpose/core/keypointScaler.hpp>
+#include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/keypoint.hpp>
 
 namespace op
@@ -19,10 +20,22 @@ namespace op
             else if (scaleMode == ScaleMode::ZeroToOne)
                 return Rectangle<float>{0.f, 0.f, 1.f / ((float)producerSize.x - 1.f),
                                         1.f / ((float)producerSize.y - 1.f)};
+            // [0,1]
+            else if (scaleMode == ScaleMode::ZeroToOneFixedAspect)
+            {
+                const float invMaxProducerSize = 1.f / ((float)fastMax(producerSize.x, producerSize.y) - 1.f);
+                return Rectangle<float>{0.f, 0.f, invMaxProducerSize, invMaxProducerSize};
+            }
             // [-1,1]
             else if (scaleMode == ScaleMode::PlusMinusOne)
                 return Rectangle<float>{-1.f, -1.f, 2.f / ((float)producerSize.x - 1.f),
                                         2.f / ((float)producerSize.y - 1.f)};
+            // [-1,1]
+            else if (scaleMode == ScaleMode::PlusMinusOneFixedAspect)
+            {
+                const float invMaxProducerSize = 2.f / ((float)fastMax(producerSize.x, producerSize.y) - 1.f);
+                return Rectangle<float>{-1.f, -1.f, invMaxProducerSize, invMaxProducerSize};
+            }
             // InputResolution
             else if (scaleMode == ScaleMode::InputResolution)
                 return Rectangle<float>{0.f, 0.f, 1.f, 1.f};

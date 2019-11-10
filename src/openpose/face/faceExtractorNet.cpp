@@ -15,10 +15,13 @@ namespace op
         try
         {
             // Error check
-            if (mHeatMapScaleMode != ScaleMode::ZeroToOne && mHeatMapScaleMode != ScaleMode::PlusMinusOne
+            if (mHeatMapScaleMode != ScaleMode::ZeroToOne
+                && mHeatMapScaleMode != ScaleMode::ZeroToOneFixedAspect
+                && mHeatMapScaleMode != ScaleMode::PlusMinusOne
+                && mHeatMapScaleMode != ScaleMode::PlusMinusOneFixedAspect
                 && mHeatMapScaleMode != ScaleMode::UnsignedChar)
-                error("The ScaleMode heatMapScaleMode must be ZeroToOne, PlusMinusOne or UnsignedChar.",
-                      __LINE__, __FUNCTION__, __FILE__);
+                error("The ScaleMode heatMapScaleMode must be ZeroToOne(FixedAspect), PlusMinusOne(FixedAspect)"
+                    " or UnsignedChar.", __LINE__, __FUNCTION__, __FILE__);
             checkEqual(
                 netOutputSize.x, netInputSize.x, "Net input and output size must be equal.",
                 __LINE__, __FUNCTION__, __FILE__);

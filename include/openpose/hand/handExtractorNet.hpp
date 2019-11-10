@@ -24,7 +24,7 @@ namespace op
         explicit HandExtractorNet(const Point<int>& netInputSize, const Point<int>& netOutputSize,
                                   const int numberScales = 1, const float rangeScales = 0.4f,
                                   const std::vector<HeatMapType>& heatMapTypes = {},
-                                  const ScaleMode heatMapScaleMode = ScaleMode::ZeroToOne);
+                                  const ScaleMode heatMapScaleMode = ScaleMode::ZeroToOneFixedAspect);
 
         /**
          * Virtual destructor of the HandExtractorNet class.

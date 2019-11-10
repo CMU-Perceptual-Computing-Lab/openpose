@@ -43,7 +43,7 @@ namespace op
          * Final scale of the Array<float> Datum.poseKeypoints and the writen pose data.
          * The final Datum.poseKeypoints can be scaled with respect to input size (ScaleMode::InputResolution), net
          * output size (ScaleMode::NetOutputResolution), output rendering size (ScaleMode::OutputResolution), from 0 to
-         * 1 (ScaleMode::ZeroToOne), and -1 to 1 (ScaleMode::PlusMinusOne).
+         * 1 (ScaleMode::ZeroToOne(FixedAspect)), and -1 to 1 (ScaleMode::PlusMinusOne(FixedAspect)).
          */
         ScaleMode keypointScaleMode;
 
@@ -129,8 +129,8 @@ namespace op
 
         /**
          * Scale of the Datum.heatmaps.
-         * Select ScaleMode::ZeroToOne for range [0,1], ScaleMode::PlusMinusOne for [-1,1] and ScaleMode::UnsignedChar
-         * for [0, 255].
+         * Select ScaleMode::ZeroToOne(FixedAspect) for range [0,1], ScaleMode::PlusMinusOne(FixedAspect) for [-1,1]
+         * and ScaleMode::UnsignedChar for [0, 255].
          * If heatMapTypes.empty(), then this parameters makes no effect.
          */
         ScaleMode heatMapScaleMode;
