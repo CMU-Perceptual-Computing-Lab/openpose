@@ -3,16 +3,17 @@ OpenPose - Installation
 
 ## Contents
 1. [Windows Portable Demo](#windows-portable-demo)
-2. [Operating Systems](#operating-systems)
-3. [Community-Based Work](#community-based-work)
-4. [Requirements and Dependencies](#requirements-and-dependencies)
-5. [Clone OpenPose](#clone-openpose)
-6. [Update OpenPose](#update-openpose)
-7. [Installation](#installation)
-8. [Reinstallation](#reinstallation)
-9. [Uninstallation](#uninstallation)
-10. [Deploying OpenPose (Exporting OpenPose to Other Projects)](#desploying-openpose-exporting-openpose-to-other-projects)
-11. [Optional Settings](#optional-settings)
+2. [Installation Video Tutorials](#windows-portable-demo)
+3. [Operating Systems](#operating-systems)
+4. [Community-Based Work](#community-based-work)
+5. [Requirements and Dependencies](#requirements-and-dependencies)
+6. [Clone OpenPose](#clone-openpose)
+7. [Update OpenPose](#update-openpose)
+8. [Installation](#installation)
+9. [Reinstallation](#reinstallation)
+10. [Uninstallation](#uninstallation)
+11. [Deploying OpenPose (Exporting OpenPose to Other Projects)](#desploying-openpose-exporting-openpose-to-other-projects)
+12. [Optional Settings](#optional-settings)
     1. [Maximum Speed](#maximum-speed)
     2. [COCO and MPI Models](#coco-and-mpi-models)
     3. [Python API](#python-api)
@@ -32,9 +33,18 @@ OpenPose - Installation
 
 
 ## Windows Portable Demo
-This installation section is only intended if you plan to modify the OpenPose code or integrate it with another library or project. If you just want to use the OpenPose demo in Windows, simply use the latest version of the OpenPose binaries which you can find in the [Releases](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases) section.
+**If you just want to use the OpenPose demo in Windows**, simply use the latest version of the OpenPose portable binaries which you can download in the [Releases](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases) section. Read the `Instructions.txt` inside the downloaded files to learn to download the models required by OpenPose (about 500 Mb).
 
-**NOTE**: Read the `Instructions.txt` to learn to download the models required by OpenPose (about 500 Mb).
+The installation documentation in the following sections is only intended if you plan to modify the OpenPose code or integrate it with another library or project. You can stop reading this document if you just wanted to run OpenPose on Windows.
+
+
+
+
+## Installation Video Tutorials
+User-created tutorial videos:
+- OpenPose + Visual Studio 2017 + CUDA 10.0 + cuDNN 7.5 (no portable demo): [https://youtu.be/QC9GTb6Wsb4](https://youtu.be/QC9GTb6Wsb4).
+
+We welcome users to send us their installation videos (e.g., sharing them as GitHub issue or doing a pull request) and we will post them here.
 
 
 
