@@ -137,8 +137,8 @@ namespace op
                 if (!upImpl->mAddAudioFromThisVideo.empty())
                 {
                     const auto tempOutput = upImpl->mVideoSaverPath + RANDOM_TEXT + ".mp4";
-                    const auto audioCommand = "ffmpeg -y -i " + upImpl->mVideoSaverPath
-                        + " -i " + upImpl->mAddAudioFromThisVideo + " -codec copy -shortest " + tempOutput;
+                    const auto audioCommand = "ffmpeg -y -i '" + upImpl->mVideoSaverPath
+                        + "' -i '" + upImpl->mAddAudioFromThisVideo + "' -codec copy -shortest " + tempOutput;
                     opLog("Adding audio to video by running:\n" + audioCommand, op::Priority::High);
                     auto codeAnswerAudio = system(audioCommand.c_str());
                     // Move temp output to real output
