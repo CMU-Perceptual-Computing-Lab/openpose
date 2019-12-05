@@ -116,9 +116,9 @@ namespace op
                 // Very important: Either FPS flag must go before `-i`!!! Otherwise, it would either not work (`-r`)
                 // or do a weird resample (`-framerate`)
                 const std::string imageToVideoCommand = "ffmpeg -y -framerate " + std::to_string(upImpl->mFps)
-                    + " -i " + upImpl->mTempImageFolder + "/%12d_rendered.jpg"
-                    + " -c:v libx264 -pix_fmt yuv420p "
-                    + upImpl->mVideoSaverPath;
+                    + " -i '" + upImpl->mTempImageFolder + "/%12d_rendered.jpg'"
+                    + " -c:v libx264 -pix_fmt yuv420p '"
+                    + upImpl->mVideoSaverPath + "'";
                 opLog("Creating MP4 video out of JPG images by running:\n" + imageToVideoCommand + "\n",
                     op::Priority::High);
                 auto codeAnswerVideo = system(imageToVideoCommand.c_str());
