@@ -86,7 +86,7 @@ namespace op
                 if (upImpl->mUseFfmpeg)
                     error("MP4 recording requires an Ubuntu or Mac machine.", __LINE__, __FUNCTION__, __FILE__);
             #endif
-            if (upImpl->mUseFfmpeg && system("ffmpeg --help") != 0)
+            if (upImpl->mUseFfmpeg && system("ffmpeg -version") != 0)
                 error("In order to save the video in MP4 format, FFmpeg must be installed on your system."
                       " Please, use an `avi` output format (e.g., `--write_video output.avi`) or install FFmpeg"
                       " by running `sudo apt-get install ffmpeg` (Ubuntu) or an analogous command.",
