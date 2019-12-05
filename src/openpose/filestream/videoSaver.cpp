@@ -143,7 +143,7 @@ namespace op
                     auto codeAnswerAudio = system(audioCommand.c_str());
                     // Move temp output to real output
                     if (codeAnswerAudio == 0)
-                        codeAnswerAudio = system(("mv '" + tempOutput + "' '" + upImpl->mVideoSaverPath).c_str() + "'");
+                        codeAnswerAudio = system(("mv '" + tempOutput + "' '" + upImpl->mVideoSaverPath + "'").c_str());
                     // Sanity check
                     if (codeAnswerAudio != 0)
                         opLog("\nVideo " + upImpl->mVideoSaverPath + " could not be saved with audio (exit code: "
