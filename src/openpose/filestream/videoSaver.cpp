@@ -125,7 +125,7 @@ namespace op
                 // Remove temporary images
                 if (codeAnswerVideo == 0)
                 {
-                    codeAnswerVideo = system(("rm -rf " + upImpl->mTempImageFolder).c_str());
+                    codeAnswerVideo = system(("rm -rf '" + upImpl->mTempImageFolder + "'").c_str());
                     opLog("Video saved and temporary image folder removed.", op::Priority::High);
                 }
                 // Sanity check
