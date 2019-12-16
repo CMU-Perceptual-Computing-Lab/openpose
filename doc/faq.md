@@ -18,7 +18,7 @@ OpenPose - Frequently Asked Question (FAQ)
         12. [CUDA_cublas_device_LIBRARY Not Found](#cuda_cublas_device_library-not-found)
         13. [CMake-GUI Error While Getting Default Caffe](#cmake-gui-error-while-getting-default-caffe)
         14. [Libgomp Out of Memory Error](#libgomp-out-of-memory-error)
-        15. [Runtime Error with Turing GPU (Tesla T4) or Volta GPU][#runtime-error-with-turing-gpu-teslat4-or-volta-gpu)
+        15. [Runtime Error with Turing GPU (Tesla T4) or Volta GPU](#runtime-error-with-turing-gpu-teslat4-or-volta-gpu)
         16. [Obscure CMake Error about Caffe or Pybind](#obscure-cmake-error-about-caffe-or-pybind).
     2. [Speed Performance Issues](#speed-performance-issues)
         1. [Speed Up, Memory Reduction, and Benchmark](#speed-up-memory-reduction-and-benchmark)
