@@ -184,7 +184,7 @@ Just comment on GitHub or make a pull request and we will answer as soon as poss
 
 
 ## Citation
-Please cite these papers in your publications if it helps your research. The body-foot model and any additional functionality (calibration, 3-D reconstruction, etc.) use `[Cao et al. 2018]`; the hand and face keypoint detectors use `[Simon et al. 2017]` (the face detector was trained using the same procedure than for hands); and the old (deprecated) body-only model uses `[Cao et al. 2017]`.
+Please cite these papers in your publications if it helps your research. The body-foot model and any additional functionality (calibration, 3-D reconstruction, etc.) use `[Cao et al. 2018]`; the hand and face keypoint detectors use `[Cao et al. 2018]` and `[Simon et al. 2017]` (the face detector was trained using the same procedure than for hands); and the old (deprecated) body-only model uses `[Cao et al. 2017]`.
 
     @inproceedings{cao2018openpose,
       author = {Zhe Cao and Gines Hidalgo and Tomas Simon and Shih-En Wei and Yaser Sheikh},
