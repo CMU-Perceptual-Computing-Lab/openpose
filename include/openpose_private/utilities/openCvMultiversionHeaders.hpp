@@ -39,23 +39,12 @@
     #define CV_WINDOW_NORMAL cv::WINDOW_NORMAL
     #define CV_WINDOW_OPENGL cv::WINDOW_OPENGL
     #define CV_WND_PROP_FULLSCREEN cv::WND_PROP_FULLSCREEN
-    // Required for alpha and beta versions, but not for rc version
     #include <opencv2/imgcodecs/imgcodecs.hpp>
-    #ifndef CV_IMWRITE_JPEG_QUALITY
-        #define CV_IMWRITE_JPEG_QUALITY cv::IMWRITE_JPEG_QUALITY
-    #endif
-    #ifndef CV_IMWRITE_PNG_COMPRESSION
-        #define CV_IMWRITE_PNG_COMPRESSION cv::IMWRITE_PNG_COMPRESSION
-    #endif
-    #ifndef CV_LOAD_IMAGE_ANYDEPTH
-        #define CV_LOAD_IMAGE_ANYDEPTH cv::IMREAD_ANYDEPTH
-    #endif
-    #ifndef CV_LOAD_IMAGE_COLOR
-        #define CV_LOAD_IMAGE_COLOR cv::IMREAD_COLOR
-    #endif
-    #ifndef CV_LOAD_IMAGE_GRAYSCALE
-        #define CV_LOAD_IMAGE_GRAYSCALE cv::IMREAD_GRAYSCALE
-    #endif
+    #define CV_IMWRITE_JPEG_QUALITY cv::IMWRITE_JPEG_QUALITY
+    #define CV_IMWRITE_PNG_COMPRESSION cv::IMWRITE_PNG_COMPRESSION
+    #define CV_LOAD_IMAGE_ANYDEPTH cv::IMREAD_ANYDEPTH
+    #define CV_LOAD_IMAGE_COLOR cv::IMREAD_COLOR
+    #define CV_LOAD_IMAGE_GRAYSCALE cv::IMREAD_GRAYSCALE
 #endif
 
 #endif // OPENPOSE_PRIVATE_UTILITIES_OPENCV_MULTIVERSION_HEADERS_HPP
