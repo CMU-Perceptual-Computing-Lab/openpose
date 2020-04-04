@@ -186,7 +186,12 @@ Just comment on GitHub or make a pull request and we will answer as soon as poss
 ## Citation
 Please cite these papers in your publications if it helps your research. For standard OpenPose, cite `[Cao et al. 2018]`. If you also use the hand and face keypoint detectors, then cite `[Cao et al. 2018]` and `[Simon et al. 2017]` (the face detector was trained using the same procedure than the hand detector).
 
-    @article{8765346, author={Z. {Cao} and G. {Hidalgo Martinez} and T. {Simon} and S. {Wei} and Y. A. {Sheikh}}, journal={IEEE Transactions on Pattern Analysis and Machine Intelligence}, title={OpenPose: Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields}, year={2019}, volume={}, number={}, pages={1-1},}
+    @article{8765346,
+      author={Z. {Cao} and G. {Hidalgo Martinez} and T. {Simon} and S. {Wei} and Y. A. {Sheikh}},
+      journal={IEEE Transactions on Pattern Analysis and Machine Intelligence},
+      title={OpenPose: Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields},
+      year={2019}, volume={}, number={}, pages={1-1}
+    }
 
     @inproceedings{simon2017hand,
       author = {Tomas Simon and Hanbyul Joo and Iain Matthews and Yaser Sheikh},

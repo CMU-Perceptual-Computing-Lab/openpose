@@ -388,7 +388,7 @@ OpenPose Library - Release Notes
     1. Created Matrix as container of cv::Mat, and String as container of std::string.
     2. After replacing cv::Mat by Matrix, headers do not contain any 3rd-party library includes nor functions. This way, OpenPose can be exported without needing 3rd-party includes nor static library files (e.g., lib files in Windows), allowing people to use their own versions of OpenCV, Eigen, etc. without conflicting with OpenPose. Dynamic library files (e.g., `dll` files in Windows, `so` in Ubuntu) are still required.
     3. Created the `openpose_private` directory with some internal headers that, if exported with OpenPose, would require including 3rd-party headers and static library files.
-    4. Default OpenCV version for Windows upgraded to version 4.1.1, extracted from their oficial website: section `Releases`, subsection `OpenCV - 4.1.1`, `Windows` version.
+    4. Default OpenCV version for Windows upgraded to version 4.2.0, extracted from their oficial website: section `Releases`, subsection `OpenCV - 4.2.0`, `Windows` version.
     5. In all `*.cpp` files, their include of their analog `*.hpp` file has been moved to the first line of those `*.cpp` files to slightly speed up compiling time.
     6. String is used in `include/openpose/wrapper/` to avoid std::string to cause errors for using diferent std DLLs.
     7. Added `ScaleMode::ZeroToOneFixedAspect` and `ScaleMode::PlusMinusOneFixedAspect`. Compared to `ZeroToOne` and `PlusMinusOne`, the new ones also preserve the aspect ratio of each axis.
