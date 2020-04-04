@@ -60,6 +60,11 @@ namespace op
      * Wrapper of CV_LOAD_IMAGE_ANYDEPTH to avoid leaving OpenCV dependencies on headers.
      */
     OP_API int getCvLoadImageAnydepth();
+
+    /**
+     * Wrapper of CV_LOAD_IMAGE_GRAYSCALE to avoid leaving OpenCV dependencies on headers.
+     */
+    OP_API int getCvLoadImageGrayScale();
 }
 
 #endif // OPENPOSE_UTILITIES_OPEN_CV_HPP

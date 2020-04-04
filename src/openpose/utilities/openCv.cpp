@@ -372,4 +372,17 @@ namespace op
             return -1;
         }
     }
+
+    int getCvLoadImageGrayScale()
+    {
+        try
+        {
+            return CV_LOAD_IMAGE_GRAYSCALE;
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            return -1;
+        }
+    }
 }
