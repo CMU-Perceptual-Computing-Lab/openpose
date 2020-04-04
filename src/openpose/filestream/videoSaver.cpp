@@ -86,7 +86,7 @@ namespace op
                 if (upImpl->mUseFfmpeg)
                     error("MP4 recording requires an Ubuntu or Mac machine.", __LINE__, __FUNCTION__, __FILE__);
             #endif
-            if (upImpl->mUseFfmpeg && system("ffmpeg --help") != 0)
+            if (upImpl->mUseFfmpeg && system("ffmpeg -version") != 0)
                 error("In order to save the video in MP4 format, FFmpeg must be installed on your system."
                       " Please, use an `avi` output format (e.g., `--write_video output.avi`) or install FFmpeg"
                       " by running `sudo apt-get install ffmpeg` (Ubuntu) or an analogous command.",
@@ -116,16 +116,16 @@ namespace op
                 // Very important: Either FPS flag must go before `-i`!!! Otherwise, it would either not work (`-r`)
                 // or do a weird resample (`-framerate`)
                 const std::string imageToVideoCommand = "ffmpeg -y -framerate " + std::to_string(upImpl->mFps)
-                    + " -i " + upImpl->mTempImageFolder + "/%12d_rendered.jpg"
-                    + " -c:v libx264 -pix_fmt yuv420p "
-                    + upImpl->mVideoSaverPath;
+                    + " -i '" + upImpl->mTempImageFolder + "/%12d_rendered.jpg'"
+                    + " -c:v libx264 -pix_fmt yuv420p '"
+                    + upImpl->mVideoSaverPath + "'";
                 opLog("Creating MP4 video out of JPG images by running:\n" + imageToVideoCommand + "\n",
                     op::Priority::High);
                 auto codeAnswerVideo = system(imageToVideoCommand.c_str());
                 // Remove temporary images
                 if (codeAnswerVideo == 0)
                 {
-                    codeAnswerVideo = system(("rm -rf " + upImpl->mTempImageFolder).c_str());
+                    codeAnswerVideo = system(("rm -rf '" + upImpl->mTempImageFolder + "'").c_str());
                     opLog("Video saved and temporary image folder removed.", op::Priority::High);
                 }
                 // Sanity check
@@ -137,13 +137,13 @@ namespace op
                 if (!upImpl->mAddAudioFromThisVideo.empty())
                 {
                     const auto tempOutput = upImpl->mVideoSaverPath + RANDOM_TEXT + ".mp4";
-                    const auto audioCommand = "ffmpeg -y -i " + upImpl->mVideoSaverPath
-                        + " -i " + upImpl->mAddAudioFromThisVideo + " -codec copy -shortest " + tempOutput;
+                    const auto audioCommand = "ffmpeg -y -i '" + upImpl->mVideoSaverPath
+                        + "' -i '" + upImpl->mAddAudioFromThisVideo + "' -codec copy -shortest '" + tempOutput + "'";
                     opLog("Adding audio to video by running:\n" + audioCommand, op::Priority::High);
                     auto codeAnswerAudio = system(audioCommand.c_str());
                     // Move temp output to real output
                     if (codeAnswerAudio == 0)
-                        codeAnswerAudio = system(("mv " + tempOutput + " " + upImpl->mVideoSaverPath).c_str());
+                        codeAnswerAudio = system(("mv '" + tempOutput + "' '" + upImpl->mVideoSaverPath + "'").c_str());
                     // Sanity check
                     if (codeAnswerAudio != 0)
                         opLog("\nVideo " + upImpl->mVideoSaverPath + " could not be saved with audio (exit code: "
