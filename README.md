@@ -184,7 +184,7 @@ Just comment on GitHub or make a pull request and we will answer as soon as poss
 
 
 ## Citation
-Please cite these papers in your publications if it helps your research. For standard OpenPose, cite `[8765346]`. If you also use the hand and face keypoint detectors, then cite `[8765346]` and `[Simon et al. 2017]` (the face detector was trained using the same procedure than the hand detector).
+Please cite these papers in your publications if it helps your research. Most of OpenPose is based on `[8765346]`. In addition, the hand and face keypoint detectors are a combination of `[8765346]` and `[Simon et al. 2017]` (the face detector was trained using the same procedure than the hand detector).
 
     @article{8765346,
       author = {Z. {Cao} and G. {Hidalgo Martinez} and T. {Simon} and S. {Wei} and Y. A. {Sheikh}},
