@@ -662,7 +662,10 @@ if (WIN32)
 
   # Auto copy DLLs
   if (BUILD_BIN_FOLDER)
-    # Locate DLLs
+    # Copy DLLs into same folder
+    set(BIN_FOLDER ${CMAKE_BINARY_DIR}/bin)
+    file(MAKE_DIRECTORY ${BIN_FOLDER})
+    # Locate and copy DLLs
     # Caffe DLLs
     if (${GPU_MODE} MATCHES "CUDA")
       file(GLOB CAFFE_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe/bin/*.dll")
@@ -671,22 +674,23 @@ if (WIN32)
     elseif (${GPU_MODE} MATCHES "CPU_ONLY")
       file(GLOB CAFFE_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe_cpu/bin/*.dll")
     endif ()
+    file(COPY ${CAFFE_DLL} DESTINATION ${BIN_FOLDER})
     # Caffe 3rd-party DLLs
     file(GLOB CAFFE_3RD_PARTY_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/*.dll")
+    file(COPY ${CAFFE_3RD_PARTY_DLL} DESTINATION ${BIN_FOLDER})
     # OpenCV DLLs
     file(GLOB OPENCV_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv/x64/vc${VS_VERSION}/bin/*.dll")
-    # GLUT DLLs
-    file(GLOB GLUT_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/freeglut/bin/*.dll")
-    # Spinnaker DLLs and other files
-    file(GLOB SPINNAKER_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/spinnaker/bin/*")
-    # Copy DLLs into same folder
-    set(BIN_FOLDER ${CMAKE_BINARY_DIR}/bin)
-    file(MAKE_DIRECTORY ${BIN_FOLDER})
-    file(COPY ${CAFFE_DLL} DESTINATION ${BIN_FOLDER})
     file(COPY ${OPENCV_DLL} DESTINATION ${BIN_FOLDER})
-    file(COPY ${CAFFE_3RD_PARTY_DLL} DESTINATION ${BIN_FOLDER})
-    file(COPY ${GLUT_DLL} DESTINATION ${BIN_FOLDER})
-    file(COPY ${SPINNAKER_DLL} DESTINATION ${BIN_FOLDER})
+    # GLUT DLLs
+    if (WITH_3D_RENDERER OR WITH_3D_ADAM_MODEL)
+      file(GLOB GLUT_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/freeglut/bin/*.dll")
+      file(COPY ${GLUT_DLL} DESTINATION ${BIN_FOLDER})
+    endif (WITH_3D_RENDERER OR WITH_3D_ADAM_MODEL)
+    # Spinnaker DLLs and other files
+    if (WITH_FLIR_CAMERA)
+      file(GLOB SPINNAKER_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/spinnaker/bin/*")
+      file(COPY ${SPINNAKER_DLL} DESTINATION ${BIN_FOLDER})
+    endif (WITH_FLIR_CAMERA)
   endif (BUILD_BIN_FOLDER)
 
 endif (WIN32)
