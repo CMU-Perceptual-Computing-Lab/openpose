@@ -491,7 +491,26 @@ namespace op
             if (!mUserWs[int(WorkerType::Input)].empty())
                 error("Emplace cannot be called if an input worker was already selected.",
                       __LINE__, __FUNCTION__, __FILE__);
-            return mThreadManager.tryEmplace(tDatums);
+            // tryEmplace for 1 camera
+            if (tDatums->size() < 2)
+            {
+                return mThreadManager.tryEmplace(tDatums);
+            }
+            // tryEmplace for multiview
+            else
+            {
+                bool successfulEmplace = true;
+                for (auto datumIndex = 0u; datumIndex < tDatums->size(); ++datumIndex)
+                {
+                    auto tDatumsSingle = std::make_shared<TDatums>(TDatums({ tDatums->at(datumIndex) }));
+                    if (!tryEmplace(tDatumsSingle))
+                    {
+                        successfulEmplace = false;
+                        break;
+                    }
+                }
+                return successfulEmplace;
+            }
         }
         catch (const std::exception& e)
         {
@@ -508,7 +527,28 @@ namespace op
             if (!mUserWs[int(WorkerType::Input)].empty())
                 error("Emplace cannot be called if an input worker was already selected.",
                       __LINE__, __FUNCTION__, __FILE__);
-            return mThreadManager.waitAndEmplace(tDatums);
+            // waitAndEmplace for 1 camera
+            if (tDatums->size() < 2)
+            {
+                return mThreadManager.waitAndEmplace(tDatums);
+            }
+            // waitAndEmplace for multiview
+            else
+            {
+                bool successfulEmplace = true;
+                for (auto datumIndex = 0u ; datumIndex < tDatums->size() ; ++datumIndex)
+                {
+                    auto tDatumsSingle = std::make_shared<TDatums>(TDatums({tDatums->at(datumIndex)}));
+                    if (!waitAndEmplace(tDatumsSingle))
+                    {
+                        successfulEmplace = false;
+                        opLog("Waiting to emplace for multi-camera failed.",
+                            Priority::High, __LINE__, __FUNCTION__, __FILE__);
+                        break;
+                    }
+                }
+                return successfulEmplace;
+            }
         }
         catch (const std::exception& e)
         {

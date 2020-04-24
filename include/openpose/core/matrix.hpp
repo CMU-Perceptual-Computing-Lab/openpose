@@ -95,6 +95,15 @@ namespace op
     class OP_API Matrix
     {
     public:
+        /**
+         * @param matrixesResized For 3-D OpenPose, if >1, it will assume the image is composed of
+         * numberImagesStackedHorizontally horizontally stacked images. It must be already resized to avoid
+         * internally allocating/removing elements of std::vector (to avoid errors if using different std DLLs)
+         * @param cvMatPtr should be a cv::Mat element or it will provoke a core dumped. Done to
+         * avoid explicitly exposing 3rdparty libraries on the headers.
+         */
+        static void splitCvMatIntoVectorMatrix(std::vector<Matrix>& matrixesResized, const void* const cvMatPtr);
+
         Matrix();
 
         /**

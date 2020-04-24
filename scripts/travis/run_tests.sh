@@ -58,32 +58,37 @@ if [[ $RUN_EXAMPLES == true ]] ; then
   ./build/examples/tutorial_api_cpp/10_asynchronous_custom_input.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
   echo " "
 
-  echo "Tutorial API C++: Example 11..."
-  ./build/examples/tutorial_api_cpp/11_asynchronous_custom_output.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --no_display
-  echo " "
+  # # Note: Example 11 would require 3D video and camera parameters
+  # echo "Tutorial API C++: Example 11..."
+  # ./build/examples/tutorial_api_cpp/11_asynchronous_custom_input_multi_camera.bin
+  # echo " "
 
   echo "Tutorial API C++: Example 12..."
-  ./build/examples/tutorial_api_cpp/12_asynchronous_custom_input_output_and_datum.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --no_display
+  ./build/examples/tutorial_api_cpp/12_asynchronous_custom_output.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --no_display
   echo " "
 
   echo "Tutorial API C++: Example 13..."
-  ./build/examples/tutorial_api_cpp/13_synchronous_custom_input.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
+  ./build/examples/tutorial_api_cpp/13_asynchronous_custom_input_output_and_datum.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --no_display
   echo " "
 
   echo "Tutorial API C++: Example 14..."
-  ./build/examples/tutorial_api_cpp/14_synchronous_custom_preprocessing.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
+  ./build/examples/tutorial_api_cpp/14_synchronous_custom_input.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
   echo " "
 
   echo "Tutorial API C++: Example 15..."
-  ./build/examples/tutorial_api_cpp/15_synchronous_custom_postprocessing.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
+  ./build/examples/tutorial_api_cpp/15_synchronous_custom_preprocessing.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
   echo " "
 
   echo "Tutorial API C++: Example 16..."
-  ./build/examples/tutorial_api_cpp/16_synchronous_custom_output.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --no_display
+  ./build/examples/tutorial_api_cpp/16_synchronous_custom_postprocessing.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
   echo " "
 
   echo "Tutorial API C++: Example 17..."
-  ./build/examples/tutorial_api_cpp/17_synchronous_custom_all_and_datum.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --no_display
+  ./build/examples/tutorial_api_cpp/17_synchronous_custom_output.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --no_display
+  echo " "
+
+  echo "Tutorial API C++: Example 18..."
+  ./build/examples/tutorial_api_cpp/18_synchronous_custom_all_and_datum.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --no_display
   echo " "
 
   # Python examples

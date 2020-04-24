@@ -81,7 +81,7 @@ namespace op
                 opLogIfDebug("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             }
             // Equivalent to WQueueSplitter
-            // Queued elements - Multiple views --> Split views into different share pointers
+            // Queued elements - Multiple views --> Split views into different shared pointers
             if (tDatums != nullptr && tDatums->size() > 1)
             {
                 // Add tDatums to mQueuedElements

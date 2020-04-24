@@ -9,6 +9,33 @@ namespace op
         cv::Mat mCvMat;
     };
 
+    void Matrix::splitCvMatIntoVectorMatrix(std::vector<Matrix>& matrixesResized, const void* const cvMatPtr)
+    {
+        try
+        {
+            const auto numberImagesStackedHorizontally = matrixesResized.size();
+            // Sanity check
+            if (numberImagesStackedHorizontally < 1)
+                error("matrixesResized.size() must be greater than 0.", __LINE__, __FUNCTION__, __FILE__);
+            // Split cv::Mat
+            cv::Mat matConcatenated = *((cv::Mat*) cvMatPtr);
+            const auto individualWidth = matConcatenated.cols/numberImagesStackedHorizontally;
+            for (auto i = 0u ; i < numberImagesStackedHorizontally ; i++)
+            {
+                cv::Mat cvMat(
+                    matConcatenated,
+                    cv::Rect{
+                        (int)(i*individualWidth), 0,
+                        (int)individualWidth, (int)matConcatenated.rows });
+                matrixesResized[i] = OP_CV2OPMAT(cvMat);
+            }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
     Matrix::Matrix() :
         spImpl{std::make_shared<ImplMatrix>()}
     {

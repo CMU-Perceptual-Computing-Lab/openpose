@@ -385,19 +385,26 @@ OpenPose Library - Release Notes
 
 ## Current version - Future OpenPose 1.6.0
 1. Main improvements:
-    1. Created Matrix as container of cv::Mat, and String as container of std::string.
-    2. After replacing cv::Mat by Matrix, headers do not contain any 3rd-party library includes nor functions. This way, OpenPose can be exported without needing 3rd-party includes nor static library files (e.g., lib files in Windows), allowing people to use their own versions of OpenCV, Eigen, etc. without conflicting with OpenPose. Dynamic library files (e.g., `dll` files in Windows, `so` in Ubuntu) are still required.
-    3. Created the `openpose_private` directory with some internal headers that, if exported with OpenPose, would require including 3rd-party headers and static library files.
-    4. Default OpenCV version for Windows upgraded to version 4.2.0, extracted from their oficial website: section `Releases`, subsection `OpenCV - 4.2.0`, `Windows` version.
-    5. In all `*.cpp` files, their include of their analog `*.hpp` file has been moved to the first line of those `*.cpp` files to slightly speed up compiling time.
-    6. String is used in `include/openpose/wrapper/` to avoid std::string to cause errors for using diferent std DLLs.
-    7. Added `ScaleMode::ZeroToOneFixedAspect` and `ScaleMode::PlusMinusOneFixedAspect`. Compared to `ZeroToOne` and `PlusMinusOne`, the new ones also preserve the aspect ratio of each axis.
+    1. Multi-camera (3D) working on Asynchronous mode.
+        1. Functions `WrapperT::waitAndEmplace()` and `WrapperT::tryEmplace()` improved, allowing multi-camera/3-D (`TDatums` of size > 1).
+        2. Added `createMultiviewTDatum()` to auto-generate a `TDatums` for multi-camera/3-D from a single cv::Mat (that is splitted) and the desired camera parameter matrices.
+        3. Added `examples/tutorial_api_cpp/11_asynchronous_custom_input_multi_camera.cpp` for a test example.
+    2. Created Matrix as container of cv::Mat, and String as container of std::string.
+    3. After replacing cv::Mat by Matrix, headers do not contain any 3rd-party library includes nor functions. This way, OpenPose can be exported without needing 3rd-party includes nor static library files (e.g., lib files in Windows), allowing people to use their own versions of OpenCV, Eigen, etc. without conflicting with OpenPose. Dynamic library files (e.g., `dll` files in Windows, `so` in Ubuntu) are still required.
+    4. Created the `openpose_private` directory with some internal headers that, if exported with OpenPose, would require including 3rd-party headers and static library files.
+    5. Default OpenCV version for Windows upgraded to version 4.2.0, extracted from their oficial website: section `Releases`, subsection `OpenCV - 4.2.0`, `Windows` version.
+    6. In all `*.cpp` files, their include of their analog `*.hpp` file has been moved to the first line of those `*.cpp` files to slightly speed up compiling time.
+    7. String is used in `include/openpose/wrapper/` to avoid std::string to cause errors for using diferent std DLLs.
+    8. Added `ScaleMode::ZeroToOneFixedAspect` and `ScaleMode::PlusMinusOneFixedAspect`. Compared to `ZeroToOne` and `PlusMinusOne`, the new ones also preserve the aspect ratio of each axis.
 2. Functions or parameters renamed:
     1. All headers moved into `openpose_private`, all 3rd-party library calls in headers, and std::string calls in `include/openpose/wrapper/`.
     2. Renamed `dLog()` as `opLogIfDebug()`, `log()` as `opLog()`, `check()` as `checkBool()`, and also renamed all the `checkX()` functions in `include/openpose/utilities/check.hpp`. This avoids compiling crashes when exporting OpenPose to other projects which contain other 3rd-party libraries that define functions with the same popular names with `#define`.
 3. Main bugs fixed:
-    1. Removed many Visual Studio (Windows) warnings.
-    2. Natural sort now works properly with filenames containining numbers longer than the limit of an int.
+    1. Debug version of OpenPose actually targets debug lib/DLL files of 3rd-party libraries.
+    2. Debug version no longer prints on console a huge log message from Caffe with the network when starting OpenPose (fixed by using the right debug libraries).
+    3. Removed many Visual Studio (Windows) warnings.
+    4. Natural sort now works properly with filenames containining numbers longer than the limit of an int.
+    5. Optionally auto-generated bin folder only contains the required DLLs (depending on the CMake configuration), instead of all of them.
 4. Changes/additions that affect the compatibility with the OpenPose Unity Plugin:
 
 

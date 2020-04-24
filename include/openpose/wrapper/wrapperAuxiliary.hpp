@@ -62,6 +62,17 @@ namespace op
         const WrapperStructOutput& wrapperStructOutput, const WrapperStructGui& wrapperStructGui,
         const std::array<std::vector<TWorker>, int(WorkerType::Size)>& userWs,
         const std::array<bool, int(WorkerType::Size)>& userWsOnNewThread);
+
+    /**
+     * It fills camera parameters and splits the cvMat depending on how many camera parameter matrices are found.
+     * For example usage, check `examples/tutorial_api_cpp/11_asynchronous_custom_input_multi_camera.cpp`
+     */
+    template<typename TDatum,
+             typename TDatums = std::vector<std::shared_ptr<TDatum>>,
+             typename TDatumsSP = std::shared_ptr<TDatums>>
+    void createMultiviewTDatum(
+        TDatumsSP& tDatumsSP, unsigned long long& frameCounter,
+        const CameraParameterReader& cameraParameterReader, const void* const cvMatPtr);
 }
 
 
@@ -1182,6 +1193,55 @@ namespace op
                 threadManager.add(threadId, wFpsMax, queueIn++, queueOut++);
                 threadIdPP(threadId, multiThreadEnabled);
             }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename TDatum, typename TDatums, typename TDatumsSP>
+    void createMultiviewTDatum(
+        TDatumsSP& tDatumsSP, unsigned long long& frameCounter,
+        const CameraParameterReader& cameraParameterReader, const void* const cvMatPtr)
+    {
+        try
+        {
+            // Sanity check
+            if (tDatumsSP == nullptr)
+                op::error("tDatumsSP was nullptr, it must be initialized.", __LINE__, __FUNCTION__, __FILE__);
+            // Camera parameters
+            const std::vector<op::Matrix>& cameraMatrices = cameraParameterReader.getCameraMatrices();
+            const std::vector<op::Matrix>& cameraIntrinsics = cameraParameterReader.getCameraIntrinsics();
+            const std::vector<op::Matrix>& cameraExtrinsics = cameraParameterReader.getCameraExtrinsics();
+            const auto matrixesSize = cameraMatrices.size();
+            // More sanity checks
+            if (cameraMatrices.size() < 2)
+                op::error("There is less than 2 camera parameter matrices.",
+                    __LINE__, __FUNCTION__, __FILE__);
+            if (cameraMatrices.size() != cameraIntrinsics.size() || cameraMatrices.size() != cameraExtrinsics.size())
+                op::error("Camera parameters must have the same size.", __LINE__, __FUNCTION__, __FILE__);
+            // Split image to process
+            std::vector<op::Matrix> imagesToProcess(matrixesSize);
+            op::Matrix::splitCvMatIntoVectorMatrix(imagesToProcess, cvMatPtr);
+            // Fill tDatumsSP
+            tDatumsSP->resize(cameraMatrices.size());
+            for (auto datumIndex = 0 ; datumIndex < matrixesSize ; ++datumIndex)
+            {
+                auto& datumPtr = tDatumsSP->at(datumIndex);
+                datumPtr = std::make_shared<op::Datum>();
+                datumPtr->frameNumber = frameCounter;
+                datumPtr->cvInputData = imagesToProcess[datumIndex];
+                if (matrixesSize > 1)
+                {
+                    datumPtr->subId = datumIndex;
+                    datumPtr->subIdMax = matrixesSize-1;
+                    datumPtr->cameraMatrix = cameraMatrices[datumIndex];
+                    datumPtr->cameraExtrinsics = cameraExtrinsics[datumIndex];
+                    datumPtr->cameraIntrinsics = cameraIntrinsics[datumIndex];
+                }
+            }
+            ++frameCounter;
         }
         catch (const std::exception& e)
         {

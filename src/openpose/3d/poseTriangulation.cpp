@@ -218,7 +218,7 @@ namespace op
             // Sanity checks
             if (cvCameraMatrices.size() < 2)
                 error("3-D reconstruction (`--3d`) requires at least 2 camera views, only found "
-                    + std::to_string(cvCameraMatrices.size()) + "camera parameter matrices." + sFlirErrorMessage,
+                    + std::to_string(cvCameraMatrices.size()) + " camera parameter matrices." + sFlirErrorMessage,
                     __LINE__, __FUNCTION__, __FILE__);
             for (const auto& cameraMatrix : cvCameraMatrices)
                 if (cameraMatrix.empty())
