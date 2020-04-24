@@ -396,6 +396,7 @@ OpenPose Library - Release Notes
     6. In all `*.cpp` files, their include of their analog `*.hpp` file has been moved to the first line of those `*.cpp` files to slightly speed up compiling time.
     7. String is used in `include/openpose/wrapper/` to avoid std::string to cause errors for using diferent std DLLs.
     8. Added `ScaleMode::ZeroToOneFixedAspect` and `ScaleMode::PlusMinusOneFixedAspect`. Compared to `ZeroToOne` and `PlusMinusOne`, the new ones also preserve the aspect ratio of each axis.
+    9. Added more verbose to wrapper when it is been configured, showing the values of some of its parameters.
 2. Functions or parameters renamed:
     1. All headers moved into `openpose_private`, all 3rd-party library calls in headers, and std::string calls in `include/openpose/wrapper/`.
     2. Renamed `dLog()` as `opLogIfDebug()`, `log()` as `opLog()`, `check()` as `checkBool()`, and also renamed all the `checkX()` functions in `include/openpose/utilities/check.hpp`. This avoids compiling crashes when exporting OpenPose to other projects which contain other 3rd-party libraries that define functions with the same popular names with `#define`.
