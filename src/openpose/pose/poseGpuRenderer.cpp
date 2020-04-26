@@ -74,8 +74,8 @@ namespace op
             opLog("Starting initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // GPU memory allocation for rendering
             #ifdef USE_CUDA
-                cudaMalloc((void**)(&pGpuPose),
-                    POSE_MAX_PEOPLE * getPoseNumberBodyParts(mPoseModel) * 3 * sizeof(float));
+                const auto gpuPoseVolume = POSE_MAX_PEOPLE * getPoseNumberBodyParts(mPoseModel) * 3 * sizeof(float);
+                cudaMalloc((void**)(&pGpuPose), gpuPoseVolume);
                 cudaMalloc((void**)&pMaxPtr, sizeof(float) * 2 * POSE_MAX_PEOPLE);
                 cudaMalloc((void**)&pMinPtr, sizeof(float) * 2 * POSE_MAX_PEOPLE);
                 cudaMalloc((void**)&pScalePtr, sizeof(float) * POSE_MAX_PEOPLE);
@@ -119,9 +119,11 @@ namespace op
                         scaleKeypoints(poseKeypointsRescaled, scaleInputToOutput);
                         // Render keypoints
                         if (!poseKeypoints.empty())
+                        {
+                            const auto gpuPoseVolume = numberPeople * numberBodyParts * 3 * sizeof(float);
                             cudaMemcpy(
-                                pGpuPose, poseKeypointsRescaled.getConstPtr(),
-                                numberPeople * numberBodyParts * 3 * sizeof(float), cudaMemcpyHostToDevice);
+                                pGpuPose, poseKeypointsRescaled.getConstPtr(), gpuPoseVolume, cudaMemcpyHostToDevice);
+                        }
                         renderPoseKeypointsGpu(
                             *spGpuMemory, pMaxPtr, pMinPtr, pScalePtr, mPoseModel, numberPeople, frameSize, pGpuPose,
                             mRenderThreshold, mShowGooglyEyes, mBlendOriginalFrame, getAlphaKeypoint());

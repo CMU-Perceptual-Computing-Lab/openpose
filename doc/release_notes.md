@@ -407,6 +407,7 @@ OpenPose Library - Release Notes
     4. Natural sort now works properly with filenames containining numbers longer than the limit of an int.
     5. Optionally auto-generated bin folder only contains the required DLLs (depending on the CMake configuration), instead of all of them.
     6. When WrapperStructFace and WrapperStructHand are not called and configured for Wrapper, setting body to CPU rendering was not working.
+    7. Skelton rendering: All or some skeletons were not properly displayed or completely missing on images with many people.
 4. Changes/additions that affect the compatibility with the OpenPose Unity Plugin:
 
 
