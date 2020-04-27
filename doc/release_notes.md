@@ -383,7 +383,7 @@ OpenPose Library - Release Notes
 
 
 
-## Current version - Future OpenPose 1.6.0
+## OpenPose 1.6.0 (Apr 26, 2020)
 1. Main improvements:
     1. Multi-camera (3D) working on Asynchronous mode.
         1. Functions `WrapperT::waitAndEmplace()` and `WrapperT::tryEmplace()` improved, allowing multi-camera/3-D (`TDatums` of size > 1).
@@ -411,6 +411,13 @@ OpenPose Library - Release Notes
         1. All or some skeletons were not properly displayed or completely missing on images with many people (e.g., videos with about 32 people).
         2. All or some skeletons were not properly displayed or completely missing on images where the multiplication of people and image resolution was too big (e.g., videos with about 32 people on 4k resolution).
         3. Flag `output_resolution` was not working with GPU resize, redirected to CPU in those cases.
+
+
+
+## Current version - Future OpenPose 1.6.1
+1. Main improvements:
+2. Functions or parameters renamed:
+3. Main bugs fixed:
 4. Changes/additions that affect the compatibility with the OpenPose Unity Plugin:
 
 
