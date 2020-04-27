@@ -309,7 +309,9 @@ namespace op
                 // Note: We realized that somehow doing it on GPU for any number of GPUs does speedup the whole OP
                 resizeOnCpu = false;
                 addCvMatToOpOutputInCpu = addCvMatToOpOutput
-                    && (resizeOnCpu || !renderOutputGpu || wrapperStructPose.poseMode != PoseMode::Enabled);
+                    && (resizeOnCpu || !renderOutputGpu || wrapperStructPose.poseMode != PoseMode::Enabled
+                        // Resize in GPU causing bug
+                        || wrapperStructPose.outputSize.x != -1 || wrapperStructPose.outputSize.y != -1);
                 if (addCvMatToOpOutputInCpu)
                 {
                     const auto gpuResize = false;
@@ -329,7 +331,8 @@ namespace op
                             wrapperStructPose.poseModel, modelFolder, gpuId + gpuNumberStart,
                             wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScaleMode,
                             wrapperStructPose.addPartCandidates, wrapperStructPose.maximizePositives,
-                            wrapperStructPose.protoTxtPath.getStdString(), wrapperStructPose.caffeModelPath.getStdString(),
+                            wrapperStructPose.protoTxtPath.getStdString(),
+                            wrapperStructPose.caffeModelPath.getStdString(),
                             wrapperStructPose.upsamplingRatio, wrapperStructPose.poseMode == PoseMode::Enabled,
                             wrapperStructPose.enableGoogleLogging
                         ));
