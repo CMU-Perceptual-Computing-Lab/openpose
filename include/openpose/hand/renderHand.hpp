@@ -10,7 +10,7 @@ namespace op
         Array<float>& frameArray, const std::array<Array<float>, 2>& handKeypoints, const float renderThreshold);
 
     void renderHandKeypointsGpu(
-        float* framePtr, float* maxPtr, float* minPtr, float* scalePtr, const Point<int>& frameSize,
+        float* framePtr, float* maxPtr, float* minPtr, float* scalePtr, const Point<unsigned int>& frameSize,
         const float* const handsPtr, const int numberHands, const float renderThreshold,
         const float alphaColorToAdd = HAND_DEFAULT_ALPHA_KEYPOINT);
 }

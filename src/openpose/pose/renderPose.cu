@@ -119,7 +119,7 @@ namespace op
     }
 
     __global__ void getBoundingBoxPerPersonPose(
-        float* maxPtr, float* minPtr, float* scalePtr,const int targetWidth, const int targetHeight,
+        float* maxPtr, float* minPtr, float* scalePtr,const unsigned int targetWidth, const unsigned int targetHeight,
         const float* const keypointsPtr, const int numberPeople, const int numberParts, const float threshold)
     {
         getBoundingBoxPerPerson(
@@ -127,9 +127,9 @@ namespace op
     }
 
     __global__ void renderPoseCoco(
-        float* targetPtr, float* minPtr, float* maxPtr, float* scalePtr, const int targetWidth, const int targetHeight,
-        const float* const posePtr, const int numberPeople, const float threshold, const bool googlyEyes,
-        const bool blendOriginalFrame, const float alphaColorToAdd)
+        float* targetPtr, float* minPtr, float* maxPtr, float* scalePtr, const unsigned int targetWidth,
+        const unsigned int targetHeight, const float* const posePtr, const int numberPeople, const float threshold,
+        const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -159,9 +159,9 @@ namespace op
     }
 
     __global__ void renderPoseBody19(
-        float* targetPtr, float* minPtr, float* maxPtr, float* scalePtr, const int targetWidth, const int targetHeight,
-        const float* const posePtr, const int numberPeople, const float threshold, const bool googlyEyes,
-        const bool blendOriginalFrame, const float alphaColorToAdd)
+        float* targetPtr, float* minPtr, float* maxPtr, float* scalePtr, const unsigned int targetWidth,
+        const unsigned int targetHeight, const float* const posePtr, const int numberPeople, const float threshold,
+        const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -192,9 +192,9 @@ namespace op
     }
 
     __global__ void renderPoseBody23(
-        float* targetPtr, float* minPtr, float* maxPtr, float* scalePtr, const int targetWidth, const int targetHeight,
-        const float* const posePtr, const int numberPeople, const float threshold, const bool googlyEyes,
-        const bool blendOriginalFrame, const float alphaColorToAdd)
+        float* targetPtr, float* minPtr, float* maxPtr, float* scalePtr, const unsigned int targetWidth,
+        const unsigned int targetHeight, const float* const posePtr, const int numberPeople, const float threshold,
+        const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -257,9 +257,9 @@ namespace op
     }
 
     __global__ void renderPoseBody25b(
-        float* targetPtr, float* minPtr, float* maxPtr, float* scalePtr, const int targetWidth, const int targetHeight,
-        const float* const posePtr, const int numberPeople, const float threshold, const bool googlyEyes,
-        const bool blendOriginalFrame, const float alphaColorToAdd)
+        float* targetPtr, float* minPtr, float* maxPtr, float* scalePtr, const unsigned int targetWidth,
+        const unsigned int targetHeight, const float* const posePtr, const int numberPeople, const float threshold,
+        const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -289,9 +289,9 @@ namespace op
     }
 
     __global__ void renderPoseBody135(
-        float* targetPtr, float* minPtr, float* maxPtr, float* scalePtr, const int targetWidth, const int targetHeight,
-        const float* const posePtr, const int numberPeople, const float threshold, const bool googlyEyes,
-        const bool blendOriginalFrame, const float alphaColorToAdd)
+        float* targetPtr, float* minPtr, float* maxPtr, float* scalePtr, const unsigned int targetWidth,
+        const unsigned int targetHeight, const float* const posePtr, const int numberPeople, const float threshold,
+        const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -321,9 +321,9 @@ namespace op
     }
 
     __global__ void renderPoseMpi29Parts(
-        float* targetPtr, float* minPtr, float* maxPtr, float* scalePtr, const int targetWidth, const int targetHeight,
-        const float* const posePtr, const int numberPeople, const float threshold, const bool blendOriginalFrame,
-        const float alphaColorToAdd)
+        float* targetPtr, float* minPtr, float* maxPtr, float* scalePtr, const unsigned int targetWidth,
+        const unsigned int targetHeight, const float* const posePtr, const int numberPeople, const float threshold,
+        const bool blendOriginalFrame, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -353,9 +353,9 @@ namespace op
     }
 
     __global__ void renderPoseCar12(
-        float* targetPtr, float* minPtr, float* maxPtr, float* scalePtr, const int targetWidth, const int targetHeight,
-        const float* const posePtr, const int numberPeople, const float threshold, const bool googlyEyes,
-        const bool blendOriginalFrame, const float alphaColorToAdd)
+        float* targetPtr, float* minPtr, float* maxPtr, float* scalePtr, const unsigned int targetWidth,
+        const unsigned int targetHeight, const float* const posePtr, const int numberPeople, const float threshold,
+        const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -385,9 +385,9 @@ namespace op
     }
 
     __global__ void renderPoseCar22(
-        float* targetPtr, float* minPtr, float* maxPtr, float* scalePtr, const int targetWidth, const int targetHeight,
-        const float* const posePtr, const int numberPeople, const float threshold, const bool googlyEyes,
-        const bool blendOriginalFrame, const float alphaColorToAdd)
+        float* targetPtr, float* minPtr, float* maxPtr, float* scalePtr, const unsigned int targetWidth,
+        const unsigned int targetHeight, const float* const posePtr, const int numberPeople, const float threshold,
+        const bool googlyEyes, const bool blendOriginalFrame, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -416,10 +416,10 @@ namespace op
             blendOriginalFrame, (googlyEyes ? 6 : -1), (googlyEyes ? 7 : -1));
     }
 
-    __global__ void renderBodyPartHeatMaps(float* targetPtr, const int targetWidth, const int targetHeight,
-                                           const float* const heatMapPtr, const int widthHeatMap,
-                                           const int heightHeatMap, const float scaleToKeepRatio,
-                                           const int numberBodyParts, const float alphaColorToAdd)
+    __global__ void renderBodyPartHeatMaps(
+        float* targetPtr, const unsigned int targetWidth, const unsigned int targetHeight,
+        const float* const heatMapPtr, const int widthHeatMap, const int heightHeatMap, const float scaleToKeepRatio,
+        const int numberBodyParts, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -451,10 +451,10 @@ namespace op
         }
     }
 
-    __global__ void renderBodyPartHeatMap(float* targetPtr, const int targetWidth, const int targetHeight,
-                                          const float* const heatMapPtr, const int widthHeatMap,
-                                          const int heightHeatMap, const float scaleToKeepRatio, const unsigned int part,
-                                          const float alphaColorToAdd, const bool absValue = false)
+    __global__ void renderBodyPartHeatMap(
+        float* targetPtr, const unsigned int targetWidth, const unsigned int targetHeight,
+        const float* const heatMapPtr, const int widthHeatMap, const int heightHeatMap, const float scaleToKeepRatio,
+        const unsigned int part, const float alphaColorToAdd, const bool absValue = false)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -479,10 +479,10 @@ namespace op
         }
     }
 
-    __global__ void renderPartAffinities(float* targetPtr, const int targetWidth, const int targetHeight,
-                                         const float* const heatMapPtr, const int widthHeatMap,
-                                         const int heightHeatMap, const float scaleToKeepRatio,
-                                         const int partsToRender, const int initPart, const float alphaColorToAdd)
+    __global__ void renderPartAffinities(
+        float* targetPtr, const unsigned int targetWidth, const unsigned int targetHeight,
+        const float* const heatMapPtr, const int widthHeatMap, const int heightHeatMap,
+        const float scaleToKeepRatio, const int partsToRender, const int initPart, const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -546,10 +546,11 @@ namespace op
         }
     }
 
-    __global__ void renderDistance(float* targetPtr, const int targetWidth, const int targetHeight,
-                                   const float* const heatMapPtr, const int widthHeatMap, const int heightHeatMap,
-                                   const float scaleToKeepRatio, const int part, const int numberBodyParts,
-                                   const int numberBodyPAFChannels, const float alphaColorToAdd)
+    __global__ void renderDistance(
+        float* targetPtr, const unsigned int targetWidth, const unsigned int targetHeight,
+        const float* const heatMapPtr, const int widthHeatMap, const int heightHeatMap,
+        const float scaleToKeepRatio, const int part, const int numberBodyParts, const int numberBodyPAFChannels,
+        const float alphaColorToAdd)
     {
         const auto x = (blockIdx.x * blockDim.x) + threadIdx.x;
         const auto y = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -580,7 +581,7 @@ namespace op
             error("Alpha must be in the range [0, 1].", __LINE__, __FUNCTION__, __FILE__);
     }
 
-    inline void renderPosePAFGpuAux(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize,
+    inline void renderPosePAFGpuAux(float* framePtr, const PoseModel poseModel, const Point<unsigned int>& frameSize,
                                     const float* const heatMapPtr, const Point<int>& heatMapSize,
                                     const float scaleToKeepRatio, const int part, const int partsToRender,
                                     const float alphaBlending)
@@ -607,7 +608,7 @@ namespace op
 
     void renderPoseKeypointsGpu(
         float* framePtr, float* maxPtr, float* minPtr, float* scalePtr, const PoseModel poseModel,
-        const int numberPeople, const Point<int>& frameSize, const float* const posePtr,
+        const int numberPeople, const Point<unsigned int>& frameSize, const float* const posePtr,
         const float renderThreshold, const bool googlyEyes, const bool blendOriginalFrame, const float alphaBlending)
     {
         try
@@ -747,9 +748,9 @@ namespace op
         }
     }
 
-    void renderPoseHeatMapGpu(float* framePtr, const Point<int>& frameSize, const float* const heatMapPtr,
-                              const Point<int>& heatMapSize, const float scaleToKeepRatio, const unsigned int part,
-                              const float alphaBlending)
+    void renderPoseHeatMapGpu(
+        float* framePtr, const Point<unsigned int>& frameSize, const float* const heatMapPtr,
+        const Point<int>& heatMapSize, const float scaleToKeepRatio, const unsigned int part, const float alphaBlending)
     {
         try
         {
@@ -772,7 +773,7 @@ namespace op
         }
     }
 
-    void renderPoseHeatMapsGpu(float* framePtr, const PoseModel poseModel, const Point<int>& frameSize,
+    void renderPoseHeatMapsGpu(float* framePtr, const PoseModel poseModel, const Point<unsigned int>& frameSize,
                                const float* const heatMapPtr, const Point<int>& heatMapSize,
                                const float scaleToKeepRatio, const float alphaBlending)
     {
@@ -800,7 +801,7 @@ namespace op
     }
 
     void renderPosePAFGpu(
-        float* framePtr, const PoseModel poseModel, const Point<int>& frameSize, const float* const heatMapPtr,
+        float* framePtr, const PoseModel poseModel, const Point<unsigned int>& frameSize, const float* const heatMapPtr,
         const Point<int>& heatMapSize, const float scaleToKeepRatio, const int part, const float alphaBlending)
     {
         try
@@ -815,7 +816,7 @@ namespace op
     }
 
     void renderPosePAFsGpu(
-        float* framePtr, const PoseModel poseModel, const Point<int>& frameSize, const float* const heatMapPtr,
+        float* framePtr, const PoseModel poseModel, const Point<unsigned int>& frameSize, const float* const heatMapPtr,
         const Point<int>& heatMapSize, const float scaleToKeepRatio, const float alphaBlending)
     {
         try
@@ -833,7 +834,7 @@ namespace op
     }
 
     void renderPoseDistanceGpu(
-        float* framePtr, const Point<int>& frameSize, const float* const heatMapPtr, const Point<int>& heatMapSize,
+        float* framePtr, const Point<unsigned int>& frameSize, const float* const heatMapPtr, const Point<int>& heatMapSize,
         const float scaleToKeepRatio, const unsigned int part, const float alphaBlending)
     {
         try

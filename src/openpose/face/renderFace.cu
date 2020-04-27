@@ -46,7 +46,7 @@ namespace op
     }
 
     void renderFaceKeypointsGpu(
-        float* framePtr, float* maxPtr, float* minPtr, float* scalePtr, const Point<int>& frameSize,
+        float* framePtr, float* maxPtr, float* minPtr, float* scalePtr, const Point<unsigned int>& frameSize,
         const float* const facePtr, const int numberPeople, const float renderThreshold, const float alphaColorToAdd)
     {
         try

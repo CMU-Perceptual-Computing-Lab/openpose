@@ -19,7 +19,7 @@ namespace op
     }
 
     OP_API void getNumberCudaThreadsAndBlocks(
-        dim3& numberCudaThreads, dim3& numberCudaBlocks, const Point<int>& frameSize);
+        dim3& numberCudaThreads, dim3& numberCudaBlocks, const Point<unsigned int>& frameSize);
 
     template <typename T>
     void reorderAndNormalize(

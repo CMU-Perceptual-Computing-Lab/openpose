@@ -4,10 +4,10 @@
 namespace op
 {
     __inline__ __device__ void getBoundingBoxPerPerson(
-        float* maxPtr, float* minPtr, float* scalePtr,const int targetWidth, const int targetHeight,
+        float* maxPtr, float* minPtr, float* scalePtr,const unsigned int targetWidth, const unsigned int targetHeight,
         const float* const keypointsPtr, const int numberPeople, const int numberParts, const float threshold)
     {
-        const auto globalIdx = threadIdx.x;
+        const unsigned long globalIdx = threadIdx.x;
 
         // Fill shared parameters
         if (globalIdx < numberPeople)
@@ -18,10 +18,10 @@ namespace op
             float maxValueY = 0.f;
             for (auto part = 0 ; part < numberParts ; part++)
             {
-                const auto index = 3 * (globalIdx*numberParts + part);
-                const auto x = keypointsPtr[index];
-                const auto y = keypointsPtr[index+1];
-                const auto score = keypointsPtr[index+2];
+                const unsigned long index = 3u * (globalIdx*numberParts + part);
+                const float x = keypointsPtr[index];
+                const float y = keypointsPtr[index+1];
+                const float score = keypointsPtr[index+2];
                 if (score > threshold)
                 {
                     if (x < minValueX)
@@ -62,7 +62,7 @@ namespace op
     __inline__ __device__ void renderKeypoints(
         float* targetPtr, float* sharedMaxs, float* sharedMins, float* sharedScaleF, const float* const maxPtr,
         const float* const minPtr, const float* const scalePtr, const int globalIdx, const int x, const int y,
-        const int targetWidth, const int targetHeight, const float* const keypointsPtr,
+        const unsigned int targetWidth, const unsigned int targetHeight, const float* const keypointsPtr,
         const unsigned int* const partPairsPtr, const int numberPeople, const int numberParts,
         const int numberPartPairs, const float* const rgbColorsPtr, const int numberColors, const float radius,
         const float lineWidth, const float* const keypointScalePtr, const int numberScales, const float threshold,
@@ -82,7 +82,7 @@ namespace op
         // Fill each (x,y) target pixel
         if (x < targetWidth && y < targetHeight)
         {
-            const auto baseIndex = 3*(y * targetWidth + x);
+            const unsigned long baseIndex = 3u*(y * (unsigned long)targetWidth + x);
             float b = targetPtr[baseIndex];
             float g = targetPtr[baseIndex+1];
             float r = targetPtr[baseIndex+2];
@@ -208,7 +208,7 @@ namespace op
 
     __inline__ __device__ void renderKeypointsOld(
         float* targetPtr, float2* sharedMaxs, float2* sharedMins, float* sharedScaleF, const int globalIdx,
-        const int x, const int y, const int targetWidth, const int targetHeight, const float* const keypointsPtr,
+        const int x, const int y, const unsigned int targetWidth, const unsigned int targetHeight, const float* const keypointsPtr,
         const unsigned int* const partPairsPtr, const int numberPeople, const int numberParts,
         const int numberPartPairs, const float* const rgbColorsPtr, const int numberColors, const float radius,
         const float lineWidth, const float* const keypointScalePtr, const int numberScales, const float threshold,
@@ -224,10 +224,10 @@ namespace op
             float maxValueY = 0.f;
             for (auto part = 0 ; part < numberParts ; part++)
             {
-                const auto index = 3 * (globalIdx*numberParts + part);
-                const auto x = keypointsPtr[index];
-                const auto y = keypointsPtr[index+1];
-                const auto score = keypointsPtr[index+2];
+                const unsigned long index = 3u * (((unsigned long)globalIdx)*numberParts + part);
+                const float x = keypointsPtr[index];
+                const float y = keypointsPtr[index+1];
+                const float score = keypointsPtr[index+2];
                 if (score > threshold)
                 {
                     if (x < minValueX)
@@ -263,7 +263,7 @@ namespace op
         // Fill each (x,y) target pixel
         if (x < targetWidth && y < targetHeight)
         {
-            const auto baseIndex = 3*(y * targetWidth + x);
+            const unsigned long baseIndex = 3u*(y * (unsigned long)targetWidth + x);
             float b = targetPtr[baseIndex];
             float g = targetPtr[baseIndex+1];
             float r = targetPtr[baseIndex+2];

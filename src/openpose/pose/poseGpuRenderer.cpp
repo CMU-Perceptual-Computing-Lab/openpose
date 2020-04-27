@@ -110,7 +110,7 @@ namespace op
                     const auto hasBkg = addBkgChannel(mPoseModel);
                     const auto numberBodyPartsPlusBkg = numberBodyParts + (hasBkg ? 1 : 0);
                     const auto numberBodyPAFChannels = getPosePartPairs(mPoseModel).size();
-                    const Point<int> frameSize{outputData.getSize(1), outputData.getSize(0)};
+                    const Point<unsigned int> frameSize{(unsigned int)outputData.getSize(1), (unsigned int)outputData.getSize(0)};
                     // Draw poseKeypoints
                     if (elementRendered == 0)
                     {
