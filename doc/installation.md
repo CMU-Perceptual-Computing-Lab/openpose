@@ -101,7 +101,7 @@ We add links to some community-based work based on OpenPose. Note: We do not sup
     - Highly recommended: a CPU with at least 8 cores.
 - **Dependencies**:
     - OpenCV (all 2.X and 3.X versions are compatible).
-    - Caffe and all its dependencies. Interesting in porting OpenPose to other DL frameworks (Tensorflow, Caffe2, Pytorch, ...)?. Email us (gines@cmu.edu) if you are interesting in joining the OpenPose team to do so or feel free to make a pull request if you implement any of those!
+    - Caffe and all its dependencies. Have you ported OpenPose into another DL framework (Tensorflow, Caffe2, Pytorch, ...)?. Email us (gines@alumni.cmu.edu) or feel free to make a pull request if you implemented any of those!
     - The demo and tutorials additionally use GFlags.
 
 
