@@ -446,6 +446,9 @@ template <> struct type_caster<op::Array<float>> {
         static handle cast(const op::Array<float> &m, return_value_policy, handle defval)
         {
             UNUSED(defval);
+            if (m.getSize().size() == 0) {
+                return none();
+            }
             std::string format = format_descriptor<float>::format();
             return array(buffer_info(
                 m.getPseudoConstPtr(),/* Pointer to buffer */
