@@ -463,6 +463,42 @@ template <> struct type_caster<op::Array<float>> {
     };
 }} // namespace pybind11::detail
 
+// Numpy - op::Array<long long> interop
+namespace pybind11 { namespace detail {
+
+template <> struct type_caster<op::Array<long long>> {
+    public:
+
+        PYBIND11_TYPE_CASTER(op::Array<long long>, _("numpy.ndarray"));
+
+        // Cast numpy to op::Array<long long>
+        bool load(handle src, bool imp)
+        {
+            op::error("op::Array<long long> is read only now", __LINE__, __FUNCTION__, __FILE__);
+            return false;
+        }
+
+        // Cast op::Array<long long> to numpy
+        static handle cast(const op::Array<long long> &m, return_value_policy, handle defval)
+        {
+            UNUSED(defval);
+            if (m.getSize().size() == 0) {
+                return none();
+            }
+            std::string format = format_descriptor<long long>::format();
+            return array(buffer_info(
+                m.getPseudoConstPtr(),/* Pointer to buffer */
+                sizeof(long long),    /* Size of one scalar */
+                format,               /* Python struct-style format descriptor */
+                m.getSize().size(),   /* Number of dimensions */
+                m.getSize(),          /* Buffer dimensions */
+                m.getStride()         /* Strides (in bytes) for each index */
+                )).release();
+        }
+
+    };
+}} // namespace pybind11::detail
+
 // Numpy - op::Matrix interop
 namespace pybind11 { namespace detail {
 
