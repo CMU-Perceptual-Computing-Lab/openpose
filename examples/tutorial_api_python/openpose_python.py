@@ -52,7 +52,7 @@ try:
     # oppython = op.OpenposePython()
 
     # Starting OpenPose
-    opWrapper = op.WrapperPython(3)
+    opWrapper = op.WrapperPython(op.ThreadManagerMode.Synchronous)
     opWrapper.configure(params)
     opWrapper.execute()
 except Exception as e:
