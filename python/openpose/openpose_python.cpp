@@ -7,9 +7,12 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/stl_bind.h>
 #include <pybind11/numpy.h>
 #include <opencv2/core/core.hpp>
 #include <stdexcept>
+
+PYBIND11_MAKE_OPAQUE(std::vector<std::shared_ptr<op::Datum>>);
 
 #ifdef _WIN32
     #define OP_EXPORT __declspec(dllexport)
@@ -231,29 +234,35 @@ namespace op
             }
         }
 
-        void emplaceAndPop(std::vector<std::shared_ptr<Datum>>& l)
+        bool emplaceAndPop(std::vector<std::shared_ptr<Datum>>& l)
         {
             try
             {
-                auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<Datum>>>(l);
-                opWrapper->emplaceAndPop(datumsPtr);
+                std::shared_ptr<std::vector<std::shared_ptr<Datum>>> datumsPtr(&l);
+                auto got = opWrapper->emplaceAndPop(datumsPtr);
+                if (got) {
+                    l.swap(*datumsPtr);
+                }
+                return got;
             }
             catch (const std::exception& e)
             {
                 error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                return false;
             }
         }
 
-        void waitAndEmplace(std::vector<std::shared_ptr<Datum>>& l)
+        bool waitAndEmplace(std::vector<std::shared_ptr<Datum>>& l)
         {
             try
             {
-                auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<Datum>>>(l);
-                opWrapper->waitAndEmplace(datumsPtr);
+                std::shared_ptr<std::vector<std::shared_ptr<Datum>>> datumsPtr(&l);
+                return opWrapper->waitAndEmplace(datumsPtr);
             }
             catch (const std::exception& e)
             {
                 error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                return false;
             }
         }
 
@@ -261,8 +270,12 @@ namespace op
         {
             try
             {
-                auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<Datum>>>(l);
-                return opWrapper->waitAndPop(datumsPtr);
+                std::shared_ptr<std::vector<std::shared_ptr<Datum>>> datumsPtr;
+                auto got = opWrapper->waitAndPop(datumsPtr);
+                if (got) {
+                    l.swap(*datumsPtr);
+                }
+                return got;
             }
             catch (const std::exception& e)
             {
@@ -359,6 +372,8 @@ namespace op
             .def_readwrite("scaleNetToOutput", &Datum::scaleNetToOutput)
             .def_readwrite("elementRendered", &Datum::elementRendered)
             ;
+
+        py::bind_vector<std::vector<std::shared_ptr<Datum>>>(m, "VectorDatum");
 
         // Rectangle
         py::class_<Rectangle<float>>(m, "Rectangle")
