@@ -82,7 +82,7 @@ namespace op
     public:
         std::unique_ptr<Wrapper> opWrapper;
 
-        WrapperPython(int mode = 0)
+        WrapperPython(ThreadManagerMode mode = ThreadManagerMode::Asynchronous)
         {
             opLog("Starting OpenPose Python Wrapper...", Priority::High);
 
@@ -324,7 +324,7 @@ namespace op
         // OpenposePython
         py::class_<WrapperPython>(m, "WrapperPython")
             .def(py::init<>())
-            .def(py::init<int>())
+            .def(py::init<ThreadManagerMode>())
             .def("configure", &WrapperPython::configure)
             .def("start", &WrapperPython::start)
             .def("stop", &WrapperPython::stop)
@@ -332,6 +332,14 @@ namespace op
             .def("emplaceAndPop", &WrapperPython::emplaceAndPop)
             .def("waitAndEmplace", &WrapperPython::waitAndEmplace)
             .def("waitAndPop", &WrapperPython::waitAndPop)
+            ;
+
+        // ThreadManagerMode
+        py::enum_<ThreadManagerMode>(m, "ThreadManagerMode")
+            .value("Asynchronous", ThreadManagerMode::Asynchronous)
+            .value("AsynchronousIn", ThreadManagerMode::AsynchronousIn)
+            .value("AsynchronousOut", ThreadManagerMode::AsynchronousOut)
+            .value("Synchronous", ThreadManagerMode::Synchronous)
             ;
 
         // Datum Object
