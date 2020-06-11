@@ -14,7 +14,7 @@ OpenPose - Prerequisites
 
 In addition, CMake automatically downloads all the OpenPose models. However, **some firewall or company networks block these downloads**. 
 
-- You might prefer to download them manually:
+You might prefer to download them manually:
     - [BODY_25 model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/body_25/pose_iter_584000.caffemodel): download in `models/pose/body_25/`.
     - [COCO model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/coco/pose_iter_440000.caffemodel): download in `models/pose/coco/`.
     - [MPI model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/mpi/pose_iter_160000.caffemodel): download in `models/pose/mpi/`.
