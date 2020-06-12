@@ -87,7 +87,7 @@ namespace op
             opLog("Starting OpenPose Python Wrapper...", Priority::High);
 
             // Construct opWrapper
-            opWrapper = std::unique_ptr<Wrapper>(new Wrapper(static_cast<ThreadManagerMode>(mode)));
+            opWrapper = std::unique_ptr<Wrapper>(new Wrapper(mode));
         }
 
         void configure(py::dict params = py::dict())
