@@ -81,6 +81,7 @@ namespace op
     class WrapperPython{
     public:
         std::unique_ptr<Wrapper> opWrapper;
+        bool synchronousIn;
 
         WrapperPython(ThreadManagerMode mode = ThreadManagerMode::Asynchronous)
         {
@@ -88,6 +89,12 @@ namespace op
 
             // Construct opWrapper
             opWrapper = std::unique_ptr<Wrapper>(new Wrapper(mode));
+
+            // Synchronous in
+            synchronousIn = (
+                mode == ThreadManagerMode::AsynchronousOut ||
+                mode == ThreadManagerMode::Synchronous
+            );
         }
 
         void configure(py::dict params = py::dict())
@@ -171,18 +178,22 @@ namespace op
                     op::String(FLAGS_write_video_adam), op::String(FLAGS_write_bvh), op::String(FLAGS_udp_host),
                     op::String(FLAGS_udp_port)};
                 opWrapper->configure(wrapperStructOutput);
-                // Producer (use default to disable any input)
-                const auto cameraSize = flagsToPoint(op::String(FLAGS_camera_resolution), "-1x-1");
-                ProducerType producerType;
-                op::String producerString;
-                std::tie(producerType, producerString) = flagsToProducer(
-                    op::String(FLAGS_image_dir), op::String(FLAGS_video), op::String(FLAGS_ip_camera), FLAGS_camera,
-                    FLAGS_flir_camera, FLAGS_flir_camera_index);
-                const WrapperStructInput wrapperStructInput{
-                    producerType, producerString, FLAGS_frame_first, FLAGS_frame_step, FLAGS_frame_last,
-                    FLAGS_process_real_time, FLAGS_frame_flip, FLAGS_frame_rotate, FLAGS_frames_repeat,
-                    cameraSize, op::String(FLAGS_camera_parameter_path), FLAGS_frame_undistort, FLAGS_3d_views};
-                opWrapper->configure(wrapperStructInput);
+                if (synchronousIn) {
+                    // SynchronousIn => We need a producer
+
+                    // Producer (use default to disable any input)
+                    const auto cameraSize = flagsToPoint(op::String(FLAGS_camera_resolution), "-1x-1");
+                    ProducerType producerType;
+                    op::String producerString;
+                    std::tie(producerType, producerString) = flagsToProducer(
+                        op::String(FLAGS_image_dir), op::String(FLAGS_video), op::String(FLAGS_ip_camera), FLAGS_camera,
+                        FLAGS_flir_camera, FLAGS_flir_camera_index);
+                    const WrapperStructInput wrapperStructInput{
+                        producerType, producerString, FLAGS_frame_first, FLAGS_frame_step, FLAGS_frame_last,
+                        FLAGS_process_real_time, FLAGS_frame_flip, FLAGS_frame_rotate, FLAGS_frames_repeat,
+                        cameraSize, op::String(FLAGS_camera_parameter_path), FLAGS_frame_undistort, FLAGS_3d_views};
+                    opWrapper->configure(wrapperStructInput);
+                }
                 // No GUI. Equivalent to: opWrapper.configure(WrapperStructGui{});
                 // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
                 if (FLAGS_disable_multi_thread)
