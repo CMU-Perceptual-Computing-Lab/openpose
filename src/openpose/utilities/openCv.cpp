@@ -224,14 +224,28 @@ namespace op
         }
     }
 
+    void transpose(Matrix& matrix)
+    {
+        cv::Mat cvMatrix = OP_OP2CVMAT(matrix);
+        Matrix matrixFinal(matrix.cols(), matrix.rows(), matrix.type());
+        cv::Mat cvMatrixFinal = OP_OP2CVMAT(matrixFinal);
+        cv::transpose(cvMatrix, cvMatrixFinal);
+        std::swap(matrix, matrixFinal);
+    }
+
     void rotateAndFlipFrame(Matrix& frame, const double rotationAngle, const bool flipFrame)
     {
         try
         {
-            cv::Mat cvMatFrame = OP_OP2CVMAT(frame);
-            if (!cvMatFrame.empty())
+            // cv::flip() does not moidify the memory location of the cv::Mat, but cv::transpose does
+            if (!frame.empty())
             {
                 const auto rotationAngleInt = (int)std::round(rotationAngle) % 360;
+                // Transposing
+                if (rotationAngleInt == 90 || rotationAngleInt == 270 || rotationAngleInt == -90 || rotationAngleInt == -270)
+                    transpose(frame);
+                // Mirroring (flipping)
+                cv::Mat cvMatFrame = OP_OP2CVMAT(frame);
                 if (rotationAngleInt == 0 || rotationAngleInt == 360)
                 {
                     if (flipFrame)
@@ -239,7 +253,6 @@ namespace op
                 }
                 else if (rotationAngleInt == 90 || rotationAngleInt == -270)
                 {
-                    cv::transpose(cvMatFrame, cvMatFrame);
                     if (!flipFrame)
                         cv::flip(cvMatFrame, cvMatFrame, 0);
                 }
@@ -252,7 +265,6 @@ namespace op
                 }
                 else if (rotationAngleInt == 270 || rotationAngleInt == -90)
                 {
-                    cv::transpose(cvMatFrame, cvMatFrame);
                     if (flipFrame)
                         cv::flip(cvMatFrame, cvMatFrame, -1);
                     else
@@ -260,7 +272,7 @@ namespace op
                 }
                 else
                     error("Rotation angle = " + std::to_string(rotationAngleInt)
-                          + " != {0, 90, 180, 270} degrees.", __LINE__, __FUNCTION__, __FILE__);
+                        + " != {0, 90, 180, 270} degrees.", __LINE__, __FUNCTION__, __FILE__);
             }
         }
         catch (const std::exception& e)

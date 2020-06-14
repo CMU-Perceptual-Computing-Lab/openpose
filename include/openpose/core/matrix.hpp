@@ -114,6 +114,11 @@ namespace op
 
         /**
          * Analog to cv::Mat(int rows, int cols, int type, void *data, size_t step=AUTO_STEP)
+         */
+        explicit Matrix(const int rows, const int cols, const int type);
+
+        /**
+         * Analog to cv::Mat(int rows, int cols, int type, void *data, size_t step=AUTO_STEP)
          * Very important: This Matrix will only "borrow" this pointer, so the caller must make sure to maintain the
          * memory allocated until this Matrix destructor is called and also to handle the ucharPtr memory deallocation.
          * @param ucharPtr should be a cv::Mat::data (or analog) element or it will provoke a core dumped. Done to

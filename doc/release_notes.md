@@ -418,6 +418,7 @@ OpenPose Library - Release Notes
 1. Main improvements:
 2. Functions or parameters renamed:
 3. Main bugs fixed:
+    1. 90 and 270-degree rotations working again.
 4. Changes/additions that affect the compatibility with the OpenPose Unity Plugin:
 
 

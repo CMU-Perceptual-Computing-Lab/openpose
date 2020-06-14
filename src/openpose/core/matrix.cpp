@@ -54,6 +54,19 @@ namespace op
         }
     }
 
+    Matrix::Matrix(const int rows, const int cols, const int type) :
+        spImpl{std::make_shared<ImplMatrix>()}
+    {
+        try
+        {
+            spImpl->mCvMat = cv::Mat(rows, cols, type);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
     Matrix::Matrix(const int rows, const int cols, const int type, void* cvMatPtr) :
         spImpl{std::make_shared<ImplMatrix>()}
     {
