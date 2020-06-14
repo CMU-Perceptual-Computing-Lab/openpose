@@ -10,10 +10,11 @@ OpenPose - Installation
 6. [Clone OpenPose](#clone-openpose)
 7. [Update OpenPose](#update-openpose)
 8. [Installation](#installation)
-9. [Reinstallation](#reinstallation)
-10. [Uninstallation](#uninstallation)
-11. [Deploying OpenPose (Exporting OpenPose to Other Projects)](#desploying-openpose-exporting-openpose-to-other-projects)
-12. [Optional Settings](#optional-settings)
+9. [Alternative Windows Instructions](#alternative-windows-instructions)
+10. [Reinstallation](#reinstallation)
+11. [Uninstallation](#uninstallation)
+12. [Deploying OpenPose (Exporting OpenPose to Other Projects)](#desploying-openpose-exporting-openpose-to-other-projects)
+13. [Optional Settings](#optional-settings)
     1. [Maximum Speed](#maximum-speed)
     2. [COCO and MPI Models](#coco-and-mpi-models)
     3. [Python API](#python-api)
@@ -223,6 +224,11 @@ In order to build the project, select and run only one of the 2 following altern
 
 ### Run OpenPose
 Check OpenPose was properly installed by running it on the default images, video, or webcam: [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
+
+
+
+## Alternative Windows Instructions
+If you are facing errors with these instructions, these are a set of alternative instructions created by the community for Windows 10, Visual Studio 2019, CMake, and Nvidia GPU: [https://github.com/quickgrid/Build-Guide/blob/master/README.md#windows-10-cmu-openpose-setup-visual-studio-2019-cmake-nvidia-gpu](https://github.com/quickgrid/Build-Guide/blob/master/README.md#windows-10-cmu-openpose-setup-visual-studio-2019-cmake-nvidia-gpu).
 
 
 
