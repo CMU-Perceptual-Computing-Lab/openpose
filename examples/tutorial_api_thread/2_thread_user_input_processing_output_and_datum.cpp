@@ -1,12 +1,9 @@
 // ------------------------- OpenPose Library Tutorial - Thread - Example 2 - User Input Processing And Output -------------------------
-// This fourth example shows the user how to:
-    // 1. Read folder of images / video / webcam  (`producer` module)
-    // 2. Use the processing implemented by the user
-    // 3. Display the rendered pose (`gui` module)
-    // Everything in a multi-thread scenario (`thread` module)
-// In addition to the previous OpenPose modules, we also need to use:
-    // 1. `core` module: for the Datum struct that the `thread` module sends between the queues
-    // 2. `utilities` module: for the error & logging functions, i.e., op::error & op::log respectively
+// This directory only provides examples for the basic OpenPose thread mechanism API, and it is only meant for people
+// interested in the multi-thread architecture without been interested in the OpenPose pose estimation algorithm.
+// You are most probably looking for the [examples/tutorial_api_cpp/](../tutorial_api_cpp/) or
+// [examples/tutorial_api_python/](../tutorial_api_python/), which provide examples of the thread API already applied
+// to body pose estimation.
 
 // Third-party dependencies
 #include <opencv2/opencv.hpp>

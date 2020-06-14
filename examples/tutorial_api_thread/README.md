@@ -1,4 +1,4 @@
 # Thread API Examples
-**NOTE**: This is an advanced API, you are most probably looking for the [examples/tutorial_api_python/](../tutorial_api_python/) examples folder, which provides examples of the thread API but applied to body pose estimation.
+**NOTE**: This directory only provides examples for the basic OpenPose thread mechanism API, and it is only meant for people interested in the multi-thread architecture without been interested in the OpenPose pose estimation algorithm.
 
-This folder provides examples to the basic OpenPose thread mechanism API. It is only meant for people interesed in the multi-thread architecture without been interesed in the OpenPose pose estimation algorithm.
+You are most probably looking for the [examples/tutorial_api_cpp/](../tutorial_api_cpp/) or [examples/tutorial_api_python/](../tutorial_api_python/), which provide examples of the thread API already applied to body pose estimation.
