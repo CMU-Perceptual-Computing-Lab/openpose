@@ -249,9 +249,12 @@ namespace op
         {
             try
             {
-                std::shared_ptr<std::vector<std::shared_ptr<Datum>>> datumsPtr(&l);
+                std::shared_ptr<std::vector<std::shared_ptr<Datum>>> datumsPtr(
+                    &l,
+                    [](std::vector<std::shared_ptr<Datum>>*){}
+                );
                 auto got = opWrapper->emplaceAndPop(datumsPtr);
-                if (got) {
+                if (got && datumsPtr.get() != &l) {
                     l.swap(*datumsPtr);
                 }
                 return got;
