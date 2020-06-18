@@ -72,7 +72,7 @@ We add links to some community-based work based on OpenPose. Note: We do not sup
     - Dockerfile working also with CUDA 10:
         - Option 1:
             - 1. (if necessary) Install the latest version of docker (There are extra steps, but if you're on Ubuntu, the main one is `sudo apt-get install docker-ce`.  Other steps can be found [here](https://phoenixnap.com/kb/how-to-install-docker-on-ubuntu-18-04) )
-            - 2. `docker pull exsidius/openpose`
+            - 2. `docker pull exsidius/openpose` - [Guide](https://github.com/gormonn/openpose-docker/blob/master/README.md)
             - 3. [more details](https://cloud.docker.com/repository/docker/exsidius/openpose/general) 
         - [Link 2](https://github.com/esemeniuc/openpose-docker), it claims to also include Python support. Read and post ONLY on [issue thread #1102](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/1102).
         - [Link 3](https://github.com/ExSidius/openpose-docker/blob/master/Dockerfile).
