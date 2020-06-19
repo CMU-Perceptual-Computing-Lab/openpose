@@ -106,6 +106,11 @@ Windows:
 
 
 ## Common Issues
+### Do not use PIL
+In order to read images in Python, make sure to use OpenCV (do not use PIL). We found that feeding a PIL image format to OpenPose results in the input image appearing in grey and duplicated 9 times (so the output skeleton appear 3 times smaller than they should be, and duplicated 9 times).
+
+
+### Cannot Import Name PyOpenPose
 The error in general is that PyOpenPose cannot be found (an error similar to: `ImportError: cannot import name pyopenpose`). Ensure first that `BUILD_PYTHON` flag is set to ON. If the error persists, check the following:
 
 In the script you are running, check for the following line, and run the following command in the same location as where the file is

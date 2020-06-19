@@ -34,8 +34,13 @@ void display(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& dat
         {
             // Display image
             const cv::Mat cvMat = OP_OP2CVCONSTMAT(datumsPtr->at(0)->cvOutputData);
-            cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", cvMat);
-            cv::waitKey(0);
+            if (!cvMat.empty())
+            {
+                cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", cvMat);
+                cv::waitKey(0);
+            }
+            else
+                op::opLog("Empty cv::Mat as output.", op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
         }
         else
             op::opLog("Nullptr or empty datumsPtr found.", op::Priority::High);

@@ -419,6 +419,7 @@ OpenPose Library - Release Notes
 2. Functions or parameters renamed:
 3. Main bugs fixed:
     1. 90 and 270-degree rotations working again.
+    2. C++ tutorial API demos only try to cv::imshow the image if it is not empty (avoding the assert that it would trigger otherwise).
 4. Changes/additions that affect the compatibility with the OpenPose Unity Plugin:
 
 

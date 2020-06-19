@@ -82,11 +82,16 @@ public:
                 {
                     // Display rendered output image
                     const cv::Mat cvMat = OP_OP2CVCONSTMAT(datumsPtr->at(0)->cvOutputData);
-                    cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", cvMat);
-                    // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
-                    const char key = (char)cv::waitKey(1);
-                    if (key == 27)
-                        this->stop();
+                    if (!cvMat.empty())
+                    {
+                        cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", cvMat);
+                        // Display image and sleeps at least 1 ms (it usually sleeps ~5-10 msec to display the image)
+                        const char key = (char)cv::waitKey(1);
+                        if (key == 27)
+                            this->stop();
+                    }
+                    else
+                        op::opLog("Empty cv::Mat as output.", op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
                 }
             }
         }
