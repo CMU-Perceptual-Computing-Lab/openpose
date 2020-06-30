@@ -110,7 +110,7 @@ Examples:
 
 ### Step 2 - Extrinsic Parameter Calibration
 1. **VERY IMPORTANT NOTE**: If you want to re-run the extrinsic parameter calibration over the same intrinsic XML files (e.g., if you move the camera location, but you know the instrinsics are the same), you must manually re-set to `1 0 0 0  0 1 0 0  0 0 1 0` the camera matrix of each XML file that will be used for `--combine_cam0_extrinsics`.
-2. After intrinsics calibration, save undirtoted images for all the camera views:
+2. After intrinsics calibration, save undistorted images for all the camera views:
 ```sh
 ./build/examples/openpose/openpose.bin --num_gpu 0 --flir_camera --frame_undistort --write_images ~/Desktop/extrinsics
 ```
