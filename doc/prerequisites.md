@@ -12,13 +12,14 @@ OpenPose - Prerequisites
 ### General Tips
 **Very important**: New Nvidia model GPUs (e.g., Nvidia V, GTX 2080, v100, any Nvidia with Volta or Turing architecture, etc.) require (at least) CUDA 10. CUDA 8 would fail!
 
-In addition, CMake automatically downloads all the OpenPose models. However, **some firewall or company networks block these downloads**. You might prefer to download them manually:
+In addition, CMake automatically downloads all the OpenPose models. However, **some firewall or company networks block these downloads**. 
 
-    - [BODY_25 model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/body_25/pose_iter_584000.caffemodel): download in `models/pose/body_25/`.
-    - [COCO model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/coco/pose_iter_440000.caffemodel): download in `models/pose/coco/`.
-    - [MPI model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/mpi/pose_iter_160000.caffemodel): download in `models/pose/mpi/`.
-    - [Face model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/face/pose_iter_116000.caffemodel): download in `models/face/`.
-    - [Hands model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/hand/pose_iter_102000.caffemodel): download in `models/hand/`.
+You might prefer to download them manually:
+- [BODY_25 model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/body_25/pose_iter_584000.caffemodel): download in `models/pose/body_25/`.
+- [COCO model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/coco/pose_iter_440000.caffemodel): download in `models/pose/coco/`.
+- [MPI model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/mpi/pose_iter_160000.caffemodel): download in `models/pose/mpi/`.
+- [Face model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/face/pose_iter_116000.caffemodel): download in `models/face/`.
+- [Hands model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/hand/pose_iter_102000.caffemodel): download in `models/hand/`.
 
 Finally, if some weird/obscure errors about Caffe and/or Pybind appear, run the following command. It will ensure that all submodules are iniatilised. Reason: OpenPose runs that command through CMake, but some firewalls might block it and we have to run it manually.
 ```
@@ -33,6 +34,7 @@ git submodule update --init --recursive --remote
     - Ubuntu 14 or 16: run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [doc/installation.md#CMake Command Line Configuration (Ubuntu Only)](./installation.md#cmake-command-line-configuration-ubuntu-only).
     - Ubuntu 18: **Download and compile CMake-gui from source**. The default CMake-gui version (3.10) installed via `sudo apt-get install cmake-qt-gui` provokes some compiling errors. Required CMake version >= 3.12.
         - Uninstall your current Cmake-gui version by running `sudo apt purge cmake-qt-gui`.
+        - Install OpenSSL for building CMake by running `sudo apt install libssl-dev`.
         - Run `sudo apt-get install qtbase5-dev`.
         - Download the `Latest Release` of `CMake Unix/Linux Source` from the [CMake download website](https://cmake.org/download/), called `cmake-X.X.X.tar.gz`.
         - Unzip it and go inside that folder from the terminal.
@@ -104,11 +106,11 @@ NOTE: These instructions are only required when compiling OpenPose brom source. 
         - Dependencies:
             - Note: Leave the zip files in `3rdparty/windows/` so that CMake does not try to download them again.
             - Caffe (if you are not sure which one you need, donwload the default one):
-                - [CUDA Caffe (Default)](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_15_2019_05_16.zip): Unzip as `3rdparty/windows/caffe/`.
+                - [CUDA Caffe (Default)](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_15_2020_04_05.zip): Unzip as `3rdparty/windows/caffe/`.
                 - [CPU Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_cpu_2018_05_27.zip): Unzip as `3rdparty/windows/caffe_cpu/`.
                 - [OpenCL Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_opencl_2018_02_13.zip): Unzip as `3rdparty/windows/caffe_opencl/`.
             - [Caffe dependencies](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe3rdparty_15_2019_03_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
-            - [OpenCV 4.1.1](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_411_v14_15_2019_09_24.zip): Unzip as `3rdparty/windows/opencv/`.
+            - [OpenCV 4.2.0](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_420_v14_15_2020_04_04.zip): Unzip as `3rdparty/windows/opencv/`.
 6. **Eigen prerequisite** (optional, only required for some specific extra functionality, such as extrinsic camera calibration):
     - Enable the `WITH_EIGEN` flag when running CMake, and set it to `BUILD`.
     - CMake will automatically download Eigen.

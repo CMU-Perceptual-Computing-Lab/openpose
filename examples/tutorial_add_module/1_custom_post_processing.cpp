@@ -20,7 +20,7 @@
 // 4. If extra classes and files are required, add those extra files inside the OpenPose include and src folders,
 // under a new folder (i.e., `include/newMethod/` and `src/newMethod/`), including `namespace op` on those files.
 
-// This example is a sub-case of `tutorial_api_cpp/15_synchronous_custom_postprocessing.cpp`, where only custom post-processing is
+// This example is a sub-case of `tutorial_api_cpp/16_synchronous_custom_postprocessing.cpp`, where only custom post-processing is
 // considered.
 
 // Command-line user interface

@@ -10,10 +10,11 @@ OpenPose - Installation
 6. [Clone OpenPose](#clone-openpose)
 7. [Update OpenPose](#update-openpose)
 8. [Installation](#installation)
-9. [Reinstallation](#reinstallation)
-10. [Uninstallation](#uninstallation)
-11. [Deploying OpenPose (Exporting OpenPose to Other Projects)](#desploying-openpose-exporting-openpose-to-other-projects)
-12. [Optional Settings](#optional-settings)
+9. [Alternative Windows Instructions](#alternative-windows-instructions)
+10. [Reinstallation](#reinstallation)
+11. [Uninstallation](#uninstallation)
+12. [Deploying OpenPose (Exporting OpenPose to Other Projects)](#desploying-openpose-exporting-openpose-to-other-projects)
+13. [Optional Settings](#optional-settings)
     1. [Maximum Speed](#maximum-speed)
     2. [COCO and MPI Models](#coco-and-mpi-models)
     3. [Python API](#python-api)
@@ -71,7 +72,7 @@ We add links to some community-based work based on OpenPose. Note: We do not sup
     - Dockerfile working also with CUDA 10:
         - Option 1:
             - 1. (if necessary) Install the latest version of docker (There are extra steps, but if you're on Ubuntu, the main one is `sudo apt-get install docker-ce`.  Other steps can be found [here](https://phoenixnap.com/kb/how-to-install-docker-on-ubuntu-18-04) )
-            - 2. `docker pull exsidius/openpose`
+            - 2. `docker pull exsidius/openpose` - [Guide](https://github.com/gormonn/openpose-docker/blob/master/README.md)
             - 3. [more details](https://cloud.docker.com/repository/docker/exsidius/openpose/general) 
         - [Link 2](https://github.com/esemeniuc/openpose-docker), it claims to also include Python support. Read and post ONLY on [issue thread #1102](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/1102).
         - [Link 3](https://github.com/ExSidius/openpose-docker/blob/master/Dockerfile).
@@ -101,7 +102,7 @@ We add links to some community-based work based on OpenPose. Note: We do not sup
     - Highly recommended: a CPU with at least 8 cores.
 - **Dependencies**:
     - OpenCV (all 2.X and 3.X versions are compatible).
-    - Caffe and all its dependencies. Interesting in porting OpenPose to other DL frameworks (Tensorflow, Caffe2, Pytorch, ...)?. Email us (gines@cmu.edu) if you are interesting in joining the OpenPose team to do so or feel free to make a pull request if you implement any of those!
+    - Caffe and all its dependencies. Have you ported OpenPose into another DL framework (Tensorflow, Caffe2, Pytorch, ...)?. Email us (gines@alumni.cmu.edu) or feel free to make a pull request if you implemented any of those!
     - The demo and tutorials additionally use GFlags.
 
 
@@ -223,6 +224,11 @@ In order to build the project, select and run only one of the 2 following altern
 
 ### Run OpenPose
 Check OpenPose was properly installed by running it on the default images, video, or webcam: [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
+
+
+
+## Alternative Windows Instructions
+If you are facing errors with these instructions, these are a set of alternative instructions created by the community for Windows 10, Visual Studio 2019, CMake, and Nvidia GPU: [https://github.com/quickgrid/Build-Guide/blob/master/README.md#windows-10-cmu-openpose-setup-visual-studio-2019-cmake-nvidia-gpu](https://github.com/quickgrid/Build-Guide/blob/master/README.md#windows-10-cmu-openpose-setup-visual-studio-2019-cmake-nvidia-gpu).
 
 
 

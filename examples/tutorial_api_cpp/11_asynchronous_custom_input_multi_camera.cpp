@@ -1,76 +1,81 @@
-// ----------------------- OpenPose C++ API Tutorial - Example 9 - Keypoints from heatmaps -----------------------
-// It reads a custom set of heatmaps and run the OpenPose greedy connection algorithm.
-// OpenPose will not run its internal body pose estimation network and will instead use
-// this data as the substitute of its network. The size of this element must match the size of the output of
-// its internal network, or it will lead to core dumped (segmentation) errors. You can modify the pose
-// estimation flags to match the dimension of both elements (e.g., `--net_resolution`, `--scale_number`, etc.).
+// ------------------------- OpenPose C++ API Tutorial - Example 10 - Custom Input -------------------------
+// Asynchronous mode: ideal for fast prototyping when performance is not an issue.
+// In this function, the user can implement its own way to create frames (e.g., reading his own folder of images)
+// and emplaces/pushes the frames to OpenPose.
 
 // Third-party dependencies
 #include <opencv2/opencv.hpp>
 // Command-line user interface
 #define OPENPOSE_FLAGS_DISABLE_PRODUCER
-#define OPENPOSE_FLAGS_DISABLE_DISPLAY
 #include <openpose/flags.hpp>
 // OpenPose dependencies
 #include <openpose/headers.hpp>
 
 // Custom OpenPose flags
 // Producer
-DEFINE_string(image_path, "examples/media/COCO_val2014_000000000294.jpg",
-    "Process an image. Read all standard formats (jpg, png, bmp, etc.).");
-// Display
-DEFINE_bool(no_display,                 false,
-    "Enable to disable the visual display.");
+DEFINE_string(video,                "3d_4camera_video.avi",
+    "Use a video file instead of the camera. Use `examples/media/video.avi` for our default example video.");
+DEFINE_string(camera_parameter_path,    "models/cameraParameters/flir/",
+    "String with the folder where the camera parameters are located. If there is only 1 XML file (for single"
+    " video, webcam, or images from the same camera), you must specify the whole XML file path (ending in .xml).");
 
-// This worker will just read and return all the jpg files in a directory
-void display(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr)
+// This worker will just read and return all the basic image file formats in a directory
+class UserInputClass
 {
-    try
+public:
+    UserInputClass(const std::string& videoPath, const std::string& cameraParameterPath) :
+        mClosed{false},
+        mFrameCounter{0ull},
+        mVideoCapture{videoPath}
     {
-        // User's displaying/saving/other processing here
-            // datum.cvOutputData: rendered frame with pose or heatmaps
-            // datum.poseKeypoints: Array<float> with the estimated pose
-        if (datumsPtr != nullptr && !datumsPtr->empty())
+        if (!mVideoCapture.isOpened())
         {
-            // Display image
-            const cv::Mat cvMat = OP_OP2CVCONSTMAT(datumsPtr->at(0)->cvOutputData);
-            if (!cvMat.empty())
-            {
-                cv::imshow(OPEN_POSE_NAME_AND_VERSION + " - Tutorial C++ API", cvMat);
-                cv::waitKey(0);
-            }
-            else
-                op::opLog("Empty cv::Mat as output.", op::Priority::High, __LINE__, __FUNCTION__, __FILE__);
+            mClosed = true;
+            op::error("No video " + videoPath + " opened.", __LINE__, __FUNCTION__, __FILE__);
         }
-        else
-            op::opLog("Nullptr or empty datumsPtr found.", op::Priority::High);
-    }
-    catch (const std::exception& e)
-    {
-        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-    }
-}
 
-void printKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>>& datumsPtr)
-{
-    try
+        // Create CameraParameterReader
+        mCameraParameterReader.readParameters(cameraParameterPath);
+    }
+
+    std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>> createDatum()
     {
-        // Example: How to use the pose keypoints
-        if (datumsPtr != nullptr && !datumsPtr->empty())
+        if (mClosed)
         {
-            op::opLog("Body keypoints: " + datumsPtr->at(0)->poseKeypoints.toString(), op::Priority::High);
-            op::opLog("Face keypoints: " + datumsPtr->at(0)->faceKeypoints.toString(), op::Priority::High);
-            op::opLog("Left hand keypoints: " + datumsPtr->at(0)->handKeypoints[0].toString(), op::Priority::High);
-            op::opLog("Right hand keypoints: " + datumsPtr->at(0)->handKeypoints[1].toString(), op::Priority::High);
+            op::opLog("Video already closed, nullptr returned.", op::Priority::High);
+            return nullptr;
         }
-        else
-            op::opLog("Nullptr or empty datumsPtr found.", op::Priority::High);
+
+        // Read cv::Mat
+        cv::Mat cvInputData;
+        mVideoCapture >> cvInputData;
+        // If empty frame -> return nullptr
+        if (cvInputData.empty())
+        {
+            // Close program when empty frame
+            op::opLog("Empty frame detected, closing program.", op::Priority::High);
+            mClosed = true;
+            return nullptr;
+        }
+
+        // Create new datum and add 3D information (cv::Mat splitted and camera parameters)
+        auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<op::Datum>>>();
+        op::createMultiviewTDatum<op::Datum>(datumsPtr, mFrameCounter, mCameraParameterReader, (void*)&cvInputData);
+
+        return datumsPtr;
     }
-    catch (const std::exception& e)
+
+    bool isFinished() const
     {
-        op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        return mClosed;
     }
-}
+
+private:
+    bool mClosed;
+    unsigned long long mFrameCounter;
+    cv::VideoCapture mVideoCapture;
+    op::CameraParameterReader mCameraParameterReader;
+};
 
 void configureWrapper(op::Wrapper& opWrapper)
 {
@@ -153,7 +158,10 @@ void configureWrapper(op::Wrapper& opWrapper)
             op::String(FLAGS_write_video_adam), op::String(FLAGS_write_bvh), op::String(FLAGS_udp_host),
             op::String(FLAGS_udp_port)};
         opWrapper.configure(wrapperStructOutput);
-        // No GUI. Equivalent to: opWrapper.configure(op::WrapperStructGui{});
+        // GUI (comment or use default argument to disable any visual output)
+        const op::WrapperStructGui wrapperStructGui{
+            op::flagsToDisplayMode(FLAGS_display, FLAGS_3d), !FLAGS_no_gui_verbose, FLAGS_fullscreen};
+        opWrapper.configure(wrapperStructGui);
         // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
         if (FLAGS_disable_multi_thread)
             opWrapper.disableMultiThreading();
@@ -171,77 +179,44 @@ int tutorialApiCpp()
         op::opLog("Starting OpenPose demo...", op::Priority::High);
         const auto opTimer = op::getTimerInit();
 
-        // Image to process
-        const cv::Mat cvImageToProcess = cv::imread(FLAGS_image_path);
-        const op::Matrix imageToProcess = OP_CV2OPCONSTMAT(cvImageToProcess);
-
-        // Required flags to disable the OpenPose network
-        FLAGS_body = 2;
+        // Required flags to enable 3-D
+        FLAGS_3d = true;
+        FLAGS_number_people_max = 1;
+        FLAGS_3d_min_views = 3;
+        FLAGS_output_resolution = "320x256"; // Optional, but otherwise it gets too big to render in real time
+        // FLAGS_3d_views = X; // Not required because it only affects OpenPose producers (rather than custom ones)
 
         // Configuring OpenPose
         op::opLog("Configuring OpenPose...", op::Priority::High);
-        op::Wrapper opWrapper{op::ThreadManagerMode::Asynchronous};
+        op::Wrapper opWrapper{op::ThreadManagerMode::AsynchronousIn};
         configureWrapper(opWrapper);
 
-        // Heatmap set selection
-        std::shared_ptr<std::vector<std::shared_ptr<op::Datum>>> datumHeatmaps;
-        // Using a random set of heatmaps
-        // Replace the following lines inside the try-catch block with your custom heatmap generator
-        try
-        {
-            op::opLog("Temporarily running another OpenPose instance to get the heatmaps...", op::Priority::High);
-            // Required flags to enable heatmaps
-            FLAGS_heatmaps_add_parts = true;
-            FLAGS_heatmaps_add_bkg = true;
-            FLAGS_heatmaps_add_PAFs = true;
-            FLAGS_heatmaps_scale = 3;
-            FLAGS_upsampling_ratio = 1;
-            FLAGS_body = 1;
-
-            // Configuring OpenPose
-            op::Wrapper opWrapperGetHeatMaps{op::ThreadManagerMode::Asynchronous};
-            configureWrapper(opWrapperGetHeatMaps);
-
-            // Starting OpenPose
-            opWrapperGetHeatMaps.start();
-
-            // Get heatmaps
-            datumHeatmaps = opWrapperGetHeatMaps.emplaceAndPop(imageToProcess);
-            if (datumHeatmaps == nullptr)
-                op::error("Image could not be processed.", __LINE__, __FUNCTION__, __FILE__);
-        }
-        catch (const std::exception& e)
-        {
-            op::error(e.what(), __LINE__, __FUNCTION__, __FILE__);
-        }
-
-        // Starting OpenPose
+        // Start, run, and stop processing - exec() blocks this thread until OpenPose wrapper has finished
         op::opLog("Starting thread(s)...", op::Priority::High);
         opWrapper.start();
 
-        // Create new datum
-        auto datumProcessed = std::make_shared<std::vector<std::shared_ptr<op::Datum>>>();
-        datumProcessed->emplace_back();
-        auto& datumPtr = datumProcessed->at(0);
-        datumPtr = std::make_shared<op::Datum>();
-
-        // Fill datum
-        datumPtr->cvInputData = imageToProcess;
-        datumPtr->poseNetOutput = datumHeatmaps->at(0)->poseHeatMaps;
-
-        // Display image
-        if (opWrapper.emplaceAndPop(datumProcessed))
+        // User processing
+        UserInputClass userInputClass(FLAGS_video, FLAGS_camera_parameter_path);
+        bool userWantsToExit = false;
+        while (!userWantsToExit && !userInputClass.isFinished())
         {
-            printKeypoints(datumProcessed);
-            if (!FLAGS_no_display)
-                display(datumProcessed);
+            if (!opWrapper.isRunning())
+            {
+                op::opLog("OpenPose wrapper is no longer running, exiting video.", op::Priority::High);
+                break;
+            }
+            // Push frame
+            auto datumToProcess = userInputClass.createDatum();
+            if (datumToProcess != nullptr)
+            {
+                auto successfullyEmplaced = opWrapper.waitAndEmplace(datumToProcess);
+                if (!successfullyEmplaced)
+                    op::opLog("Processed datum could not be emplaced.", op::Priority::High);
+            }
         }
-        else
-            op::opLog("Image could not be processed.", op::Priority::High);
 
-        // Info
-        op::opLog("NOTE: In addition with the user flags, this demo has auto-selected the following flags:\n"
-                "\t`--body 2`", op::Priority::High);
+        op::opLog("Stopping thread(s)", op::Priority::High);
+        opWrapper.stop();
 
         // Measuring total time
         op::printTime(opTimer, "OpenPose demo successfully finished. Total time: ", " seconds.", op::Priority::High);

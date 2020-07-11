@@ -74,8 +74,8 @@ namespace op
             opLog("Starting initialization on thread.", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // GPU memory allocation for rendering
             #ifdef USE_CUDA
-                cudaMalloc((void**)(&pGpuPose),
-                    POSE_MAX_PEOPLE * getPoseNumberBodyParts(mPoseModel) * 3 * sizeof(float));
+                const auto gpuPoseVolume = POSE_MAX_PEOPLE * getPoseNumberBodyParts(mPoseModel) * 3 * sizeof(float);
+                cudaMalloc((void**)(&pGpuPose), gpuPoseVolume);
                 cudaMalloc((void**)&pMaxPtr, sizeof(float) * 2 * POSE_MAX_PEOPLE);
                 cudaMalloc((void**)&pMinPtr, sizeof(float) * 2 * POSE_MAX_PEOPLE);
                 cudaMalloc((void**)&pScalePtr, sizeof(float) * POSE_MAX_PEOPLE);
@@ -110,7 +110,7 @@ namespace op
                     const auto hasBkg = addBkgChannel(mPoseModel);
                     const auto numberBodyPartsPlusBkg = numberBodyParts + (hasBkg ? 1 : 0);
                     const auto numberBodyPAFChannels = getPosePartPairs(mPoseModel).size();
-                    const Point<int> frameSize{outputData.getSize(1), outputData.getSize(0)};
+                    const Point<unsigned int> frameSize{(unsigned int)outputData.getSize(1), (unsigned int)outputData.getSize(0)};
                     // Draw poseKeypoints
                     if (elementRendered == 0)
                     {
@@ -119,9 +119,11 @@ namespace op
                         scaleKeypoints(poseKeypointsRescaled, scaleInputToOutput);
                         // Render keypoints
                         if (!poseKeypoints.empty())
+                        {
+                            const auto gpuPoseVolume = numberPeople * numberBodyParts * 3 * sizeof(float);
                             cudaMemcpy(
-                                pGpuPose, poseKeypointsRescaled.getConstPtr(),
-                                numberPeople * numberBodyParts * 3 * sizeof(float), cudaMemcpyHostToDevice);
+                                pGpuPose, poseKeypointsRescaled.getConstPtr(), gpuPoseVolume, cudaMemcpyHostToDevice);
+                        }
                         renderPoseKeypointsGpu(
                             *spGpuMemory, pMaxPtr, pMinPtr, pScalePtr, mPoseModel, numberPeople, frameSize, pGpuPose,
                             mRenderThreshold, mShowGooglyEyes, mBlendOriginalFrame, getAlphaKeypoint());

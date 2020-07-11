@@ -25,9 +25,13 @@ $OP_BIN --image_dir $IMAGE_FOLDER --display 0 --render_pose 0 --cli_verbose 0.2 
 $OP_BIN --image_dir $IMAGE_FOOT_FOLDER --display 0 --render_pose 0 --cli_verbose 0.2 --write_coco_json ${JSON_FOLDER}1.json --write_coco_json_variants 2
 
 #     # 4 scales
-# $OP_BIN --image_dir $IMAGE_FOLDER --display 0 --render_pose 0 --cli_verbose 0.2 --write_coco_json ${JSON_FOLDER}1_4.json --write_coco_json_variants 3 \
+# $OP_BIN --image_dir $IMAGE_FOLDER --display 0 --render_pose 0 --cli_verbose 0.2 --write_coco_json ${JSON_FOLDER}1_4.json --write_coco_json_variants 1 \
 #     --scale_number 4 --scale_gap 0.25 --net_resolution "1312x736"
-# $OP_BIN --image_dir $IMAGE_FOLDER --display 0 --render_pose 0 --cli_verbose 0.2 --write_coco_json ${JSON_FOLDER}1_4_max.json --write_coco_json_variants 3 \
-#     --scale_number 4 --scale_gap 0.25 --net_resolution "1312x736" --maximize_positives
-#     # \
-#     # --model_pose BODY_23 --model_folder ${JSON_FOLDER}
+
+
+
+# Additional settings:
+# 1. For maximum accuracy:
+#     --write_coco_json ${JSON_FOLDER}1_4_max.json --maximize_positives
+# 2. For custom models:
+#     --model_pose BODY_25B/BODY_23 --model_folder ${JSON_FOLDER}

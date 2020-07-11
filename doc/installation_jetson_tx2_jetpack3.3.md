@@ -29,10 +29,33 @@ Notes:
 
 
 ## Installation
-Use the following script for installation of both caffe and OpenPose: 
+Use the following script for installation of both caffe and OpenPose:
 ```
 bash ./scripts/ubuntu/install_caffe_and_openpose_JetsonTX2_JetPack3.3.sh
 ```
+
+Optional: If you want to build the Python libraries, then:
+1. Edit the `BUILD_PYTHON` flag on `CMakeLists.txt`:
+
+```option(BUILD_PYTHON "Build OpenPose python." ON)```
+
+2. In both places where this appears, set the flag to ON:
+```
+-DBUILD_python=ON
+-DBUILD_python_layer=ON
+````
+
+3. There are additional flags that need to be set: `PYTHON_EXECUTABLE=/usr/bin/python2.7` and `PYTHON_LIBRARY=/usr/lib/aarch64-linux-gnu/libpython2.7.so` for Python 2.7. Therefore, inside build, do:
+
+```cmake -DBUILD_PYTHON=ON -DPYTHON_EXECUTABLE=/usr/bin/python2.7 -DPYTHON_LIBRARY=/usr/lib/aarch64-linux-gnu/libpython2.7.so ..```
+
+4. Now run `make`.  You should see a file called "pyopenpose.so" if Python was set to 2.7, in
+`/home/nvidia/openpose/build/python/openpose`. Otherwise, it will be `pyopenpose.cpython-35m-aarch64-linux-gnu`.
+
+5. Finally, run `sudo make install` inside build to copy the files to /usr/local/python and set PYTHONPATH accordingly on .bashrc:
+
+```export PYTHONPATH="${PYTHONPATH}:/usr/local/python```
+
 
 
 ## Usage

@@ -1,7 +1,7 @@
 ### VERSION INFO
 set(OpenPose_VERSION_MAJOR 1)
-set(OpenPose_VERSION_MINOR 5)
-set(OpenPose_VERSION_PATCH 1)
+set(OpenPose_VERSION_MINOR 6)
+set(OpenPose_VERSION_PATCH 0)
 set(OpenPose_VERSION ${OpenPose_VERSION_MAJOR}.${OpenPose_VERSION_MINOR}.${OpenPose_VERSION_PATCH})
 
 
@@ -97,10 +97,6 @@ if (WIN32)
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ot /Oi /Gy /Z7")
 
   set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG:incremental /OPT:REF /OPT:ICF")
-
-  string(REPLACE "/MDd" "/MD" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
-  string(REPLACE "/Zi" "/Z7" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
-  string(REPLACE "/RTC1" "" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 elseif (UNIX)
   # Turn on C++11
   add_definitions(-std=c++11)
@@ -508,6 +504,7 @@ if (UNIX OR APPLE)
   if (${GPU_MODE} MATCHES "CUDA")
     # Set CUDA Flags
     set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11")
+    set(CUDA_NVCC_FLAGS_DEBUG "${CUDA_NVCC_FLAGS_DEBUG} -D_DEBUG -g")
 
     if (NOT CUDA_FOUND)
       message(STATUS "CUDA not found.")
@@ -554,7 +551,7 @@ if (WIN32)
   set(OP_WIN_DIR "${CMAKE_SOURCE_DIR}/3rdparty/windows")
 
   # Download required zip files
-  download_zip("opencv_411_v14_15_2019_09_24.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} cf080121a8189ecb7f53ac9b0fef36c6)
+  download_zip("opencv_420_v14_15_2020_04_04.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 59da628c17fe0f4755d22ff86dbb8c06)
   # download_zip("caffe3rdparty_2019_03_12.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 34c49be6a2418fd1670b46fc455eebc0)
   download_zip("caffe3rdparty_15_2019_03_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 9fcc6bdf4765db699d1a279c8d6b830b)
   if (${GPU_MODE} MATCHES "OPENCL")
@@ -563,7 +560,7 @@ if (WIN32)
     download_zip("caffe_cpu_2018_05_27.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 87E8401B6DFBAC5B8E909DD20E3B3390)
   else (${GPU_MODE} MATCHES "OPENCL")
     # download_zip("caffe_2019_03_12.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 859a592310f0928fd4f40da1456a217f)
-    download_zip("caffe_15_2019_05_16.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} 12F7A675A3276CD33C76B37D21C2F421)
+    download_zip("caffe_15_2020_04_05.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} cd4ec4d709a70c94aa6b151d2d040300)
   endif (${GPU_MODE} MATCHES "OPENCL")
   if (WITH_3D_RENDERER)
     download_zip("freeglut_2018_01_14.zip" ${OP_WIN_URL} ${FIND_LIB_PREFIX} BB182187285E06880F0EDE3A39530091)
@@ -572,7 +569,8 @@ if (WIN32)
 
   # set(VS_VERSION "14")
   set(VS_VERSION "15") # Note: VS2017 code seems to simply works in VS2015
-  find_library(OpenCV_LIBS opencv_world411 HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc${VS_VERSION}/lib)
+  find_library(OpenCV_LIBS_RELEASE opencv_world420 HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc${VS_VERSION}/lib)
+  find_library(OpenCV_LIBS_DEBUG opencv_world420d HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc${VS_VERSION}/lib)
   find_library(GFLAGS_LIBRARY_RELEASE gflags HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
   find_library(GFLAGS_LIBRARY_DEBUG gflagsd HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
   find_library(GLOG_LIBRARY_RELEASE glog HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
@@ -581,26 +579,32 @@ if (WIN32)
   # If OpenPose builds it
   if (BUILD_CAFFE)
     unset(Caffe_INCLUDE_DIRS CACHE)
-    unset(Caffe_LIB CACHE)
-    unset(Caffe_Proto_LIB CACHE)
+    unset(Caffe_LIB_RELEASE CACHE)
+    unset(Caffe_Proto_LIB_RELEASE CACHE)
   endif (BUILD_CAFFE)
   # OpenCL
   if (${GPU_MODE} MATCHES "OPENCL")
     set(VCXPROJ_FILE_GPU_MODE "_CL")
-    find_library(Caffe_LIB caffe HINTS ${FIND_LIB_PREFIX}/caffe_opencl/lib)
-    find_library(Caffe_Proto_LIB caffeproto HINTS ${FIND_LIB_PREFIX}/caffe_opencl/lib)
+    find_library(Caffe_LIB_RELEASE caffe HINTS ${FIND_LIB_PREFIX}/caffe_opencl/lib)
+    find_library(Caffe_Proto_LIB_RELEASE caffeproto HINTS ${FIND_LIB_PREFIX}/caffe_opencl/lib)
+    find_library(Caffe_LIB_DEBUG caffe-d HINTS ${FIND_LIB_PREFIX}/caffe_opencl/lib)
+    find_library(Caffe_Proto_LIB_DEBUG caffeproto-d HINTS ${FIND_LIB_PREFIX}/caffe_opencl/lib)
   # CPU & CUDA
   else (${GPU_MODE} MATCHES "OPENCL")
     # CPU
     if (${GPU_MODE} MATCHES "CPU_ONLY")
       set(VCXPROJ_FILE_GPU_MODE "_CPU")
-      find_library(Caffe_LIB caffe HINTS ${FIND_LIB_PREFIX}/caffe_cpu/lib)
-      find_library(Caffe_Proto_LIB caffeproto HINTS ${FIND_LIB_PREFIX}/caffe_cpu/lib)
+      find_library(Caffe_LIB_RELEASE caffe HINTS ${FIND_LIB_PREFIX}/caffe_cpu/lib)
+      find_library(Caffe_Proto_LIB_RELEASE caffeproto HINTS ${FIND_LIB_PREFIX}/caffe_cpu/lib)
+      find_library(Caffe_LIB_DEBUG caffe-d HINTS ${FIND_LIB_PREFIX}/caffe_cpu/lib)
+      find_library(Caffe_Proto_LIB_DEBUG caffeproto-d HINTS ${FIND_LIB_PREFIX}/caffe_cpu/lib)
     # CUDA
     else (${GPU_MODE} MATCHES "CPU_ONLY")
       set(VCXPROJ_FILE_GPU_MODE "")
-      find_library(Caffe_LIB caffe HINTS ${FIND_LIB_PREFIX}/caffe/lib)
-      find_library(Caffe_Proto_LIB caffeproto HINTS ${FIND_LIB_PREFIX}/caffe/lib)
+      find_library(Caffe_LIB_RELEASE caffe HINTS ${FIND_LIB_PREFIX}/caffe/lib)
+      find_library(Caffe_Proto_LIB_RELEASE caffeproto HINTS ${FIND_LIB_PREFIX}/caffe/lib)
+      find_library(Caffe_LIB_DEBUG caffe-d HINTS ${FIND_LIB_PREFIX}/caffe/lib)
+      find_library(Caffe_Proto_LIB_DEBUG caffeproto-d HINTS ${FIND_LIB_PREFIX}/caffe/lib)
     endif (${GPU_MODE} MATCHES "CPU_ONLY")
   endif (${GPU_MODE} MATCHES "OPENCL")
   # Boost DepCopy over required DLL F
@@ -622,7 +626,8 @@ if (WIN32)
   if (WITH_FLIR_CAMERA)
     find_library(SPINNAKER_LIB spinnaker_v140 HINTS ${FIND_LIB_PREFIX}/spinnaker/lib)
   endif (WITH_FLIR_CAMERA)
-  set(Caffe_LIBS ${Caffe_LIB};${Caffe_Proto_LIB})
+  set(Caffe_LIBS_RELEASE "${Caffe_LIB_RELEASE};${Caffe_Proto_LIB_RELEASE}")
+  set(Caffe_LIBS_DEBUG "${Caffe_LIB_DEBUG};${Caffe_Proto_LIB_DEBUG}")
   set(OpenCV_INCLUDE_DIRS "3rdparty/windows/opencv/include")
   # OpenCL
   if (${GPU_MODE} MATCHES "OPENCL")
@@ -657,7 +662,10 @@ if (WIN32)
 
   # Auto copy DLLs
   if (BUILD_BIN_FOLDER)
-    # Locate DLLs
+    # Copy DLLs into same folder
+    set(BIN_FOLDER ${CMAKE_BINARY_DIR}/bin)
+    file(MAKE_DIRECTORY ${BIN_FOLDER})
+    # Locate and copy DLLs
     # Caffe DLLs
     if (${GPU_MODE} MATCHES "CUDA")
       file(GLOB CAFFE_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe/bin/*.dll")
@@ -666,22 +674,23 @@ if (WIN32)
     elseif (${GPU_MODE} MATCHES "CPU_ONLY")
       file(GLOB CAFFE_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe_cpu/bin/*.dll")
     endif ()
+    file(COPY ${CAFFE_DLL} DESTINATION ${BIN_FOLDER})
     # Caffe 3rd-party DLLs
     file(GLOB CAFFE_3RD_PARTY_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/*.dll")
+    file(COPY ${CAFFE_3RD_PARTY_DLL} DESTINATION ${BIN_FOLDER})
     # OpenCV DLLs
     file(GLOB OPENCV_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv/x64/vc${VS_VERSION}/bin/*.dll")
-    # GLUT DLLs
-    file(GLOB GLUT_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/freeglut/bin/*.dll")
-    # Spinnaker DLLs and other files
-    file(GLOB SPINNAKER_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/spinnaker/bin/*")
-    # Copy DLLs into same folder
-    set(BIN_FOLDER ${CMAKE_BINARY_DIR}/bin)
-    file(MAKE_DIRECTORY ${BIN_FOLDER})
-    file(COPY ${CAFFE_DLL} DESTINATION ${BIN_FOLDER})
     file(COPY ${OPENCV_DLL} DESTINATION ${BIN_FOLDER})
-    file(COPY ${CAFFE_3RD_PARTY_DLL} DESTINATION ${BIN_FOLDER})
-    file(COPY ${GLUT_DLL} DESTINATION ${BIN_FOLDER})
-    file(COPY ${SPINNAKER_DLL} DESTINATION ${BIN_FOLDER})
+    # GLUT DLLs
+    if (WITH_3D_RENDERER OR WITH_3D_ADAM_MODEL)
+      file(GLOB GLUT_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/freeglut/bin/*.dll")
+      file(COPY ${GLUT_DLL} DESTINATION ${BIN_FOLDER})
+    endif (WITH_3D_RENDERER OR WITH_3D_ADAM_MODEL)
+    # Spinnaker DLLs and other files
+    if (WITH_FLIR_CAMERA)
+      file(GLOB SPINNAKER_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/spinnaker/bin/*")
+      file(COPY ${SPINNAKER_DLL} DESTINATION ${BIN_FOLDER})
+    endif (WITH_FLIR_CAMERA)
   endif (BUILD_BIN_FOLDER)
 
 endif (WIN32)
@@ -691,11 +700,11 @@ endif (WIN32)
 if (UNIX OR APPLE)
   if (${DL_FRAMEWORK} MATCHES "CAFFE" OR ${DL_FRAMEWORK} MATCHES "NV_CAFFE")
     # Check if the user specified caffe paths
-    if (Caffe_INCLUDE_DIRS AND Caffe_LIBS AND NOT BUILD_CAFFE)
+    if (Caffe_INCLUDE_DIRS AND Caffe_LIBS_RELEASE AND NOT BUILD_CAFFE)
       message(STATUS "\${Caffe_INCLUDE_DIRS} set by the user to " ${Caffe_INCLUDE_DIRS})
-      message(STATUS "\${Caffe_LIBS} set by the user to " ${Caffe_LIBS})
+      message(STATUS "\${Caffe_LIBS_RELEASE} set by the user to " ${Caffe_LIBS_RELEASE})
       set(Caffe_FOUND 1)
-    endif (Caffe_INCLUDE_DIRS AND Caffe_LIBS AND NOT BUILD_CAFFE)
+    endif (Caffe_INCLUDE_DIRS AND Caffe_LIBS_RELEASE AND NOT BUILD_CAFFE)
 
     # Else build from scratch
     if (BUILD_CAFFE)
@@ -907,17 +916,26 @@ endif (WIN32)
 
 
 ### COLLECT ALL 3RD-PARTY LIBRARIES TO BE LINKED AGAINST
-set(OpenPose_3rdparty_libraries ${OpenCV_LIBS} ${GLOG_LIBRARY})
 if (UNIX OR APPLE)
-  set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${GLOG_LIBRARY})
+  set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${OpenCV_LIBS} ${GLOG_LIBRARY})
 elseif (WIN32)
   set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries}
+      debug ${OpenCV_LIBS_DEBUG} optimized ${OpenCV_LIBS_RELEASE}
       debug ${GFLAGS_LIBRARY_DEBUG} optimized ${GFLAGS_LIBRARY_RELEASE}
       debug ${GLOG_LIBRARY_DEBUG} optimized ${GLOG_LIBRARY_RELEASE})
 endif (UNIX OR APPLE)
+# G Flags (for demos)
+if (UNIX OR APPLE)
+  set(examples_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${GFLAGS_LIBRARY})
+endif (UNIX OR APPLE)
 # Deep net Framework
 if (${DL_FRAMEWORK} MATCHES "CAFFE" OR ${DL_FRAMEWORK} MATCHES "NV_CAFFE")
-  set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${Caffe_LIBS} ${GFLAGS_LIBRARY})
+  if (UNIX OR APPLE)
+    set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${Caffe_LIBS})
+  elseif (WIN32)
+    set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries}
+      debug ${Caffe_LIBS_DEBUG} optimized ${Caffe_LIBS_RELEASE})
+  endif (UNIX OR APPLE)
 endif (${DL_FRAMEWORK} MATCHES "CAFFE" OR ${DL_FRAMEWORK} MATCHES "NV_CAFFE")
 # CPU vs. GPU
 if (USE_MKL)
@@ -954,7 +972,6 @@ if (UNIX OR APPLE)
   set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} pthread)
 endif (UNIX OR APPLE)
 
-set(examples_3rdparty_libraries ${OpenPose_3rdparty_libraries} ${GFLAGS_LIBRARY})
 
 
 ### ADD SUBDIRECTORIES

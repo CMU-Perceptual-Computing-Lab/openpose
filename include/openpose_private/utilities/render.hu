@@ -4,28 +4,24 @@
 namespace op
 {
     __inline__ __device__ void getBoundingBoxPerPerson(
-        float* maxPtr, float* minPtr, float* scalePtr,const int targetWidth, const int targetHeight,
+        float* maxPtr, float* minPtr, float* scalePtr,const unsigned int targetWidth, const unsigned int targetHeight,
         const float* const keypointsPtr, const int numberPeople, const int numberParts, const float threshold)
     {
-        const auto globalIdx = threadIdx.x;
-        // const auto xIndex = 2*globalIdx;
-        // const auto yIndex = xIndex+1;
-        const auto xIndex = globalIdx;
-        const auto yIndex = numberPeople+globalIdx;
+        const unsigned long globalIdx = threadIdx.x;
 
         // Fill shared parameters
-        // if (globalIdx < numberPeople)
+        if (globalIdx < numberPeople)
         {
-            auto minValueX = (float)targetWidth;
-            auto minValueY = (float)targetHeight;
-            auto maxValueX = 0.f;
-            auto maxValueY = 0.f;
+            float minValueX = (float)targetWidth;
+            float minValueY = (float)targetHeight;
+            float maxValueX = 0.f;
+            float maxValueY = 0.f;
             for (auto part = 0 ; part < numberParts ; part++)
             {
-                const auto index = 3 * (globalIdx*numberParts + part);
-                const auto x = keypointsPtr[index];
-                const auto y = keypointsPtr[index+1];
-                const auto score = keypointsPtr[index+2];
+                const unsigned long index = 3u * (globalIdx*numberParts + part);
+                const float x = keypointsPtr[index];
+                const float y = keypointsPtr[index+1];
+                const float score = keypointsPtr[index+2];
                 if (score > threshold)
                 {
                     if (x < minValueX)
@@ -51,6 +47,10 @@ namespace op
                 minValueY -= constantToAdd;
             }
 
+            // const auto xIndex = 2*globalIdx;
+            // const auto yIndex = xIndex+1;
+            const auto xIndex = globalIdx;
+            const auto yIndex = numberPeople+globalIdx;
             minPtr[xIndex] = minValueX;
             minPtr[yIndex] = minValueY;
             maxPtr[xIndex] = maxValueX;
@@ -58,10 +58,11 @@ namespace op
         }
     }
 
+    // Note: renderKeypoints is not working for videos with many people, renderKeypointsOld speed was slightly improved instead
     __inline__ __device__ void renderKeypoints(
         float* targetPtr, float* sharedMaxs, float* sharedMins, float* sharedScaleF, const float* const maxPtr,
         const float* const minPtr, const float* const scalePtr, const int globalIdx, const int x, const int y,
-        const int targetWidth, const int targetHeight, const float* const keypointsPtr,
+        const unsigned int targetWidth, const unsigned int targetHeight, const float* const keypointsPtr,
         const unsigned int* const partPairsPtr, const int numberPeople, const int numberParts,
         const int numberPartPairs, const float* const rgbColorsPtr, const int numberColors, const float radius,
         const float lineWidth, const float* const keypointScalePtr, const int numberScales, const float threshold,
@@ -81,10 +82,10 @@ namespace op
         // Fill each (x,y) target pixel
         if (x < targetWidth && y < targetHeight)
         {
-            const auto baseIndex = 3*(y * targetWidth + x);
-            auto b = targetPtr[baseIndex];
-            auto g = targetPtr[baseIndex+1];
-            auto r = targetPtr[baseIndex+2];
+            const unsigned long baseIndex = 3u*(y * (unsigned long)targetWidth + x);
+            float b = targetPtr[baseIndex];
+            float g = targetPtr[baseIndex+1];
+            float r = targetPtr[baseIndex+2];
             if (!blendOriginalFrame)
             {
                 b = 0.f;
@@ -104,7 +105,7 @@ namespace op
                 const auto xIndex = person;
                 const auto yIndex = numberPeople+person;
                 if (x <= sharedMaxs[xIndex] && x >= sharedMins[xIndex]
-                     && y <= sharedMaxs[yIndex] && y >= sharedMins[yIndex])
+                    && y <= sharedMaxs[yIndex] && y >= sharedMins[yIndex])
                 {
                     // Part pair connections
                     for (auto partPair = 0; partPair < numberPartPairs; partPair++)
@@ -195,7 +196,6 @@ namespace op
                                 if (minr2 <= dist2 && dist2 <= maxr2)
                                     addColorWeighted(r, g, b, &rgbColorsPtr[(part%numberColors)*3], alphaColorToAdd);
                             }
-
                         }
                     }
                 }
@@ -208,7 +208,7 @@ namespace op
 
     __inline__ __device__ void renderKeypointsOld(
         float* targetPtr, float2* sharedMaxs, float2* sharedMins, float* sharedScaleF, const int globalIdx,
-        const int x, const int y, const int targetWidth, const int targetHeight, const float* const keypointsPtr,
+        const int x, const int y, const unsigned int targetWidth, const unsigned int targetHeight, const float* const keypointsPtr,
         const unsigned int* const partPairsPtr, const int numberPeople, const int numberParts,
         const int numberPartPairs, const float* const rgbColorsPtr, const int numberColors, const float radius,
         const float lineWidth, const float* const keypointScalePtr, const int numberScales, const float threshold,
@@ -218,50 +218,55 @@ namespace op
         // Fill shared parameters
         if (globalIdx < numberPeople)
         {
-            sharedMins[globalIdx].x = targetWidth;
-            sharedMins[globalIdx].y = targetHeight;
-            sharedMaxs[globalIdx].x = 0.f;
-            sharedMaxs[globalIdx].y = 0.f;
+            float minValueX = (float)targetWidth;
+            float minValueY = (float)targetHeight;
+            float maxValueX = 0.f;
+            float maxValueY = 0.f;
             for (auto part = 0 ; part < numberParts ; part++)
             {
-                const auto index = 3 * (globalIdx*numberParts + part);
-                const auto x = keypointsPtr[index];
-                const auto y = keypointsPtr[index+1];
-                const auto score = keypointsPtr[index+2];
+                const unsigned long index = 3u * (((unsigned long)globalIdx)*numberParts + part);
+                const float x = keypointsPtr[index];
+                const float y = keypointsPtr[index+1];
+                const float score = keypointsPtr[index+2];
                 if (score > threshold)
                 {
-                    if (x < sharedMins[globalIdx].x)
-                        sharedMins[globalIdx].x = x;
-                    if (x > sharedMaxs[globalIdx].x)
-                        sharedMaxs[globalIdx].x = x;
-                    if (y < sharedMins[globalIdx].y)
-                        sharedMins[globalIdx].y = y;
-                    if (y > sharedMaxs[globalIdx].y)
-                        sharedMaxs[globalIdx].y = y;
+                    if (x < minValueX)
+                        minValueX = x;
+                    if (x > maxValueX)
+                        maxValueX = x;
+                    if (y < minValueY)
+                        minValueY = y;
+                    if (y > maxValueY)
+                        maxValueY = y;
                 }
             }
-            if (sharedMaxs[globalIdx].x != 0.f && sharedMaxs[globalIdx].y != 0.f)
+            if (maxValueX != 0.f && maxValueY != 0.f)
             {
-                const auto averageX = sharedMaxs[globalIdx].x - sharedMins[globalIdx].x;
-                const auto averageY = sharedMaxs[globalIdx].y - sharedMins[globalIdx].y;
+                const auto averageX = maxValueX - minValueX;
+                const auto averageY = maxValueY - minValueY;
                 // (averageX + averageY) / 2.f / 400.f
                 sharedScaleF[globalIdx] = fastTruncateCuda((averageX + averageY) / 400.f, 0.33f, 1.f);
                 const auto constantToAdd = 50.f;
-                sharedMaxs[globalIdx].x += constantToAdd;
-                sharedMaxs[globalIdx].y += constantToAdd;
-                sharedMins[globalIdx].x -= constantToAdd;
-                sharedMins[globalIdx].y -= constantToAdd;
+                maxValueX += constantToAdd;
+                maxValueY += constantToAdd;
+                minValueX -= constantToAdd;
+                minValueY -= constantToAdd;
             }
+
+            sharedMins[globalIdx].x = minValueX;
+            sharedMins[globalIdx].y = minValueY;
+            sharedMaxs[globalIdx].x = maxValueX;
+            sharedMaxs[globalIdx].y = maxValueY;
         }
         __syncthreads();
 
         // Fill each (x,y) target pixel
         if (x < targetWidth && y < targetHeight)
         {
-            const auto baseIndex = 3*(y * targetWidth + x);
-            auto& b = targetPtr[baseIndex];
-            auto& g = targetPtr[baseIndex+1];
-            auto& r = targetPtr[baseIndex+2];
+            const unsigned long baseIndex = 3u*(y * (unsigned long)targetWidth + x);
+            float b = targetPtr[baseIndex];
+            float g = targetPtr[baseIndex+1];
+            float r = targetPtr[baseIndex+2];
             if (!blendOriginalFrame)
             {
                 b = 0.f;
@@ -372,6 +377,9 @@ namespace op
                     }
                 }
             }
+            targetPtr[baseIndex] = b;
+            targetPtr[baseIndex+1] = g;
+            targetPtr[baseIndex+2] = r;
         }
     }
 }

@@ -62,6 +62,17 @@ namespace op
         const WrapperStructOutput& wrapperStructOutput, const WrapperStructGui& wrapperStructGui,
         const std::array<std::vector<TWorker>, int(WorkerType::Size)>& userWs,
         const std::array<bool, int(WorkerType::Size)>& userWsOnNewThread);
+
+    /**
+     * It fills camera parameters and splits the cvMat depending on how many camera parameter matrices are found.
+     * For example usage, check `examples/tutorial_api_cpp/11_asynchronous_custom_input_multi_camera.cpp`
+     */
+    template<typename TDatum,
+             typename TDatums = std::vector<std::shared_ptr<TDatum>>,
+             typename TDatumsSP = std::shared_ptr<TDatums>>
+    void createMultiviewTDatum(
+        TDatumsSP& tDatumsSP, unsigned long long& frameCounter,
+        const CameraParameterReader& cameraParameterReader, const void* const cvMatPtr);
 }
 
 
@@ -95,7 +106,7 @@ namespace op
     {
         try
         {
-            opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
+            opLog("Running configureThreadManager...", Priority::Normal);
 
             // Create producer
             auto producerSharedPtr = createProducer(
@@ -140,24 +151,37 @@ namespace op
             const auto renderOutput = renderModePose != RenderMode::None
                                         || renderModeFace != RenderMode::None
                                         || renderModeHand != RenderMode::None;
-            const auto renderOutputGpu = renderModePose == RenderMode::Gpu
-                || renderModeFace == RenderMode::Gpu
-                || renderModeHand == RenderMode::Gpu;
-            const auto renderFace = wrapperStructFace.enable && renderModeFace != RenderMode::None;
-            const auto renderHand = wrapperStructHand.enable && renderModeHand != RenderMode::None;
-            const auto renderHandGpu = wrapperStructHand.enable && renderModeHand == RenderMode::Gpu;
+            const bool renderOutputGpu = renderModePose == RenderMode::Gpu
+                || (wrapperStructFace.enable && renderModeFace == RenderMode::Gpu)
+                || (wrapperStructHand.enable && renderModeHand == RenderMode::Gpu);
+            const bool renderFace = wrapperStructFace.enable && renderModeFace != RenderMode::None;
+            const bool renderHand = wrapperStructHand.enable && renderModeHand != RenderMode::None;
+            const bool renderHandGpu = wrapperStructHand.enable && renderModeHand == RenderMode::Gpu;
+            opLog("renderModePose = " + std::to_string(int(renderModePose)), Priority::Normal);
+            opLog("renderModeFace = " + std::to_string(int(renderModeFace)), Priority::Normal);
+            opLog("renderModeHand = " + std::to_string(int(renderModeHand)), Priority::Normal);
+            opLog("renderOutput = " + std::to_string(int(renderOutput)), Priority::Normal);
+            opLog("renderOutputGpu = " + std::to_string(int(renderOutput)), Priority::Normal);
+            opLog("renderFace = " + std::to_string(int(renderFace)), Priority::Normal);
+            opLog("renderHand = " + std::to_string(int(renderHand)), Priority::Normal);
+            opLog("renderHandGpu = " + std::to_string(int(renderHandGpu)), Priority::Normal);
 
             // Check no wrong/contradictory flags enabled
-            const auto userInputAndPreprocessingWsEmpty = userInputWs.empty() && userPreProcessingWs.empty();
-            const auto userOutputWsEmpty = userOutputWs.empty();
+            const bool userInputAndPreprocessingWsEmpty = userInputWs.empty() && userPreProcessingWs.empty();
+            const bool userOutputWsEmpty = userOutputWs.empty();
             wrapperConfigureSanityChecks(
                 wrapperStructPose, wrapperStructFace, wrapperStructHand, wrapperStructExtra, wrapperStructInput,
                 wrapperStructOutput, wrapperStructGui, renderOutput, userInputAndPreprocessingWsEmpty,
                 userOutputWsEmpty, producerSharedPtr, threadManagerMode);
+            opLog("userInputAndPreprocessingWsEmpty = " + std::to_string(int(userInputAndPreprocessingWsEmpty)),
+                Priority::Normal);
+            opLog("userOutputWsEmpty = " + std::to_string(int(userOutputWsEmpty)), Priority::Normal);
 
             // Get number threads
             auto numberGpuThreads = wrapperStructPose.gpuNumber;
             auto gpuNumberStart = wrapperStructPose.gpuNumberStart;
+            opLog("numberGpuThreads = " + std::to_string(numberGpuThreads), Priority::Normal);
+            opLog("gpuNumberStart = " + std::to_string(gpuNumberStart), Priority::Normal);
             // CPU --> 1 thread or no pose extraction
             if (gpuMode == GpuMode::NoGpu)
             {
@@ -202,6 +226,11 @@ namespace op
             const auto writeJsonCleaned = formatAsDirectory(wrapperStructOutput.writeJson.getStdString());
             const auto writeHeatMapsCleaned = formatAsDirectory(wrapperStructOutput.writeHeatMaps.getStdString());
             const auto modelFolder = formatAsDirectory(wrapperStructPose.modelFolder.getStdString());
+            opLog("writeImagesCleaned = " + writeImagesCleaned, Priority::Normal);
+            opLog("writeKeypointCleaned = " + writeKeypointCleaned, Priority::Normal);
+            opLog("writeJsonCleaned = " + writeJsonCleaned, Priority::Normal);
+            opLog("writeHeatMapsCleaned = " + writeHeatMapsCleaned, Priority::Normal);
+            opLog("modelFolder = " + modelFolder, Priority::Normal);
 
             // Common parameters
             auto finalOutputSize = wrapperStructPose.outputSize;
@@ -223,6 +252,8 @@ namespace op
                 if (finalOutputSize.x == -1 || finalOutputSize.y == -1)
                     finalOutputSize = producerSize;
             }
+            opLog("finalOutputSize = [" + std::to_string(finalOutputSize.x) + "," + std::to_string(finalOutputSize.y)
+                + "]", Priority::Normal);
 
             // Producer
             TWorker datumProducerW;
@@ -278,7 +309,9 @@ namespace op
                 // Note: We realized that somehow doing it on GPU for any number of GPUs does speedup the whole OP
                 resizeOnCpu = false;
                 addCvMatToOpOutputInCpu = addCvMatToOpOutput
-                    && (resizeOnCpu || !renderOutputGpu || wrapperStructPose.poseMode != PoseMode::Enabled);
+                    && (resizeOnCpu || !renderOutputGpu || wrapperStructPose.poseMode != PoseMode::Enabled
+                        // Resize in GPU causing bug
+                        || wrapperStructPose.outputSize.x != -1 || wrapperStructPose.outputSize.y != -1);
                 if (addCvMatToOpOutputInCpu)
                 {
                     const auto gpuResize = false;
@@ -298,7 +331,8 @@ namespace op
                             wrapperStructPose.poseModel, modelFolder, gpuId + gpuNumberStart,
                             wrapperStructPose.heatMapTypes, wrapperStructPose.heatMapScaleMode,
                             wrapperStructPose.addPartCandidates, wrapperStructPose.maximizePositives,
-                            wrapperStructPose.protoTxtPath.getStdString(), wrapperStructPose.caffeModelPath.getStdString(),
+                            wrapperStructPose.protoTxtPath.getStdString(),
+                            wrapperStructPose.caffeModelPath.getStdString(),
                             wrapperStructPose.upsamplingRatio, wrapperStructPose.poseMode == PoseMode::Enabled,
                             wrapperStructPose.enableGoogleLogging
                         ));
@@ -1182,6 +1216,55 @@ namespace op
                 threadManager.add(threadId, wFpsMax, queueIn++, queueOut++);
                 threadIdPP(threadId, multiThreadEnabled);
             }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    template<typename TDatum, typename TDatums, typename TDatumsSP>
+    void createMultiviewTDatum(
+        TDatumsSP& tDatumsSP, unsigned long long& frameCounter,
+        const CameraParameterReader& cameraParameterReader, const void* const cvMatPtr)
+    {
+        try
+        {
+            // Sanity check
+            if (tDatumsSP == nullptr)
+                op::error("tDatumsSP was nullptr, it must be initialized.", __LINE__, __FUNCTION__, __FILE__);
+            // Camera parameters
+            const std::vector<op::Matrix>& cameraMatrices = cameraParameterReader.getCameraMatrices();
+            const std::vector<op::Matrix>& cameraIntrinsics = cameraParameterReader.getCameraIntrinsics();
+            const std::vector<op::Matrix>& cameraExtrinsics = cameraParameterReader.getCameraExtrinsics();
+            const auto matrixesSize = cameraMatrices.size();
+            // More sanity checks
+            if (cameraMatrices.size() < 2)
+                op::error("There is less than 2 camera parameter matrices.",
+                    __LINE__, __FUNCTION__, __FILE__);
+            if (cameraMatrices.size() != cameraIntrinsics.size() || cameraMatrices.size() != cameraExtrinsics.size())
+                op::error("Camera parameters must have the same size.", __LINE__, __FUNCTION__, __FILE__);
+            // Split image to process
+            std::vector<op::Matrix> imagesToProcess(matrixesSize);
+            op::Matrix::splitCvMatIntoVectorMatrix(imagesToProcess, cvMatPtr);
+            // Fill tDatumsSP
+            tDatumsSP->resize(cameraMatrices.size());
+            for (auto datumIndex = 0 ; datumIndex < matrixesSize ; ++datumIndex)
+            {
+                auto& datumPtr = tDatumsSP->at(datumIndex);
+                datumPtr = std::make_shared<op::Datum>();
+                datumPtr->frameNumber = frameCounter;
+                datumPtr->cvInputData = imagesToProcess[datumIndex];
+                if (matrixesSize > 1)
+                {
+                    datumPtr->subId = datumIndex;
+                    datumPtr->subIdMax = matrixesSize-1;
+                    datumPtr->cameraMatrix = cameraMatrices[datumIndex];
+                    datumPtr->cameraExtrinsics = cameraExtrinsics[datumIndex];
+                    datumPtr->cameraIntrinsics = cameraIntrinsics[datumIndex];
+                }
+            }
+            ++frameCounter;
         }
         catch (const std::exception& e)
         {

@@ -13,13 +13,15 @@ namespace op
 
     OP_API void keepRoiInside(Rectangle<int>& roi, const int imageWidth, const int imageHeight);
 
+    OP_API void transpose(Matrix& matrix);
+
     /**
      * It performs rotation and flipping over the desired Mat.
      * @param cvMat Mat with the frame matrix to be rotated and/or flipped.
      * @param rotationAngle How much the cvMat element should be rotated. 0 would mean no rotation.
      * @param flipFrame Whether to flip the cvMat element. Set to false to disable it.
      */
-    OP_API void rotateAndFlipFrame(Matrix& cvMat, const double rotationAngle, const bool flipFrame = false);
+    OP_API void rotateAndFlipFrame(Matrix& frame, const double rotationAngle, const bool flipFrame = false);
 
     /**
      * Wrapper of CV_CAP_PROP_FRAME_COUNT to avoid leaving OpenCV dependencies on headers.
@@ -60,6 +62,11 @@ namespace op
      * Wrapper of CV_LOAD_IMAGE_ANYDEPTH to avoid leaving OpenCV dependencies on headers.
      */
     OP_API int getCvLoadImageAnydepth();
+
+    /**
+     * Wrapper of CV_LOAD_IMAGE_GRAYSCALE to avoid leaving OpenCV dependencies on headers.
+     */
+    OP_API int getCvLoadImageGrayScale();
 }
 
 #endif // OPENPOSE_UTILITIES_OPEN_CV_HPP

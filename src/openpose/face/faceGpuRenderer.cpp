@@ -83,7 +83,7 @@ namespace op
                 // I prefer std::round(T&) over positiveIntRound(T) for std::atomic
                 const auto elementRendered = spElementToRender->load();
                 const auto numberPeople = faceKeypoints.getSize(0);
-                const Point<int> frameSize{outputData.getSize(1), outputData.getSize(0)};
+                const Point<unsigned int> frameSize{(unsigned int)outputData.getSize(1), (unsigned int)outputData.getSize(0)};
                 if (numberPeople > 0 && elementRendered == 0)
                 {
                     // Draw faceKeypoints

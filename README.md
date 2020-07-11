@@ -184,13 +184,13 @@ Just comment on GitHub or make a pull request and we will answer as soon as poss
 
 
 ## Citation
-Please cite these papers in your publications if it helps your research. The body-foot model and any additional functionality (calibration, 3-D reconstruction, etc.) use `[Cao et al. 2018]`; the hand and face keypoint detectors use `[Cao et al. 2018]` and `[Simon et al. 2017]` (the face detector was trained using the same procedure than for hands); and the old (deprecated) body-only model uses `[Cao et al. 2017]`.
+Please cite these papers in your publications if it helps your research. Most of OpenPose is based on `[8765346]`. In addition, the hand and face keypoint detectors are a combination of `[8765346]` and `[Simon et al. 2017]` (the face detector was trained using the same procedure than the hand detector).
 
-    @inproceedings{cao2018openpose,
-      author = {Zhe Cao and Gines Hidalgo and Tomas Simon and Shih-En Wei and Yaser Sheikh},
-      booktitle = {arXiv preprint arXiv:1812.08008},
-      title = {Open{P}ose: realtime multi-person 2{D} pose estimation using {P}art {A}ffinity {F}ields},
-      year = {2018}
+    @article{8765346,
+      author = {Z. {Cao} and G. {Hidalgo Martinez} and T. {Simon} and S. {Wei} and Y. A. {Sheikh}},
+      journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+      title = {OpenPose: Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields},
+      year = {2019}
     }
 
     @inproceedings{simon2017hand,
@@ -216,7 +216,9 @@ Please cite these papers in your publications if it helps your research. The bod
 
 Links to the papers:
 
-- [OpenPose: Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields](https://arxiv.org/abs/1812.08008)
+- OpenPose: Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields:
+    - [IEEE TPAMI](https://ieeexplore.ieee.org/document/8765346)
+    - [ArXiv](https://arxiv.org/abs/1812.08008)
 - [Hand Keypoint Detection in Single Images using Multiview Bootstrapping](https://arxiv.org/abs/1704.07809)
 - [Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields](https://arxiv.org/abs/1611.08050)
 - [Convolutional Pose Machines](https://arxiv.org/abs/1602.00134)
@@ -224,4 +226,4 @@ Links to the papers:
 
 
 ## License
-OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. Interested in a commercial license? Check this [FlintBox link](https://flintbox.com/public/project/47343/). For commercial queries, use the `Directly Contact Organization` section from the [FlintBox link](https://flintbox.com/public/project/47343/) and also send a copy of that message to [Yaser Sheikh](mailto:yaser@cs.cmu.edu).
+OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. Interested in a commercial license? Check this [FlintBox link](https://cmu.flintbox.com/#technologies/b820c21d-8443-4aa2-a49f-8919d93a8740). For commercial queries, use the `Contact` section from the [FlintBox link](https://cmu.flintbox.com/#technologies/b820c21d-8443-4aa2-a49f-8919d93a8740) and also send a copy of that message to [Yaser Sheikh](mailto:yaser@cs.cmu.edu).

@@ -46,7 +46,7 @@ namespace op
     }
 
     void renderHandKeypointsGpu(
-        float* framePtr, float* maxPtr, float* minPtr, float* scalePtr, const Point<int>& frameSize,
+        float* framePtr, float* maxPtr, float* minPtr, float* scalePtr, const Point<unsigned int>& frameSize,
         const float* const handsPtr, const int numberHands, const float renderThreshold, const float alphaColorToAdd)
     {
         try
