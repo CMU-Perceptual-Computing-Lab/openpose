@@ -700,11 +700,11 @@ endif (WIN32)
 if (UNIX OR APPLE)
   if (${DL_FRAMEWORK} MATCHES "CAFFE" OR ${DL_FRAMEWORK} MATCHES "NV_CAFFE")
     # Check if the user specified caffe paths
-    if (Caffe_INCLUDE_DIRS AND Caffe_LIBS_RELEASE AND NOT BUILD_CAFFE)
+    if (Caffe_INCLUDE_DIRS AND Caffe_LIBS AND NOT BUILD_CAFFE)
       message(STATUS "\${Caffe_INCLUDE_DIRS} set by the user to " ${Caffe_INCLUDE_DIRS})
-      message(STATUS "\${Caffe_LIBS_RELEASE} set by the user to " ${Caffe_LIBS_RELEASE})
+      message(STATUS "\${Caffe_LIBS} set by the user to " ${Caffe_LIBS})
       set(Caffe_FOUND 1)
-    endif (Caffe_INCLUDE_DIRS AND Caffe_LIBS_RELEASE AND NOT BUILD_CAFFE)
+    endif (Caffe_INCLUDE_DIRS AND Caffe_LIBS AND NOT BUILD_CAFFE)
 
     # Else build from scratch
     if (BUILD_CAFFE)
