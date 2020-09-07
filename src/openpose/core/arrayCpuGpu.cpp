@@ -805,7 +805,7 @@ namespace op
         try
         {
             #ifdef USE_CAFFE
-                return spImpl->pCaffeBlobT->asum_data();
+                return spImpl->pCaffeBlobT->asum_diff();
             #else
                 return T{0};
             #endif
@@ -823,7 +823,7 @@ namespace op
         try
         {
             #ifdef USE_CAFFE
-                return spImpl->pCaffeBlobT->asum_data();
+                return spImpl->pCaffeBlobT->sumsq_data();
             #else
                 return T{0};
             #endif
@@ -841,7 +841,7 @@ namespace op
         try
         {
             #ifdef USE_CAFFE
-                return spImpl->pCaffeBlobT->asum_data();
+                return spImpl->pCaffeBlobT->sumsq_diff();
             #else
                 return T{0};
             #endif
