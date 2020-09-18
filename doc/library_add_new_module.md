@@ -1,7 +1,7 @@
 OpenPose Library - Steps to Add a New Module
 ====================================
 
-## Developping Steps
+## Developing Steps
 In order to add a new module, these are the recommended steps in order to develop it:
 
 1. Create a folder with its name in the `experimental/` module, e.g., `experimental/hair/`.
