@@ -13,7 +13,6 @@ This procedure details moving the Jetson file system to a larger drive, building
 
 ## Contents
 - [Prep the TX1](#prep-the-tx1)
-- [Move file system to SATA drive](#move-file-system-to-sata-drive)
 - [Build custom kernel](#build-custom-kernel)
 - [Build OpenCV from source](#build-opencv-from-source)
 - [Install Openpose](#install-openpose)
