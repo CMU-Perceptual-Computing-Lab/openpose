@@ -13,7 +13,7 @@ OpenPose - Installation
 9. [Alternative Windows Instructions](#alternative-windows-instructions)
 10. [Reinstallation](#reinstallation)
 11. [Uninstallation](#uninstallation)
-12. [Deploying OpenPose (Exporting OpenPose to Other Projects)](#desploying-openpose-exporting-openpose-to-other-projects)
+12. [Deploying OpenPose (Exporting OpenPose to Other Projects)](#deploying-openpose-exporting-openpose-to-other-projects)
 13. [Optional Settings](#optional-settings)
     1. [Maximum Speed](#maximum-speed)
     2. [COCO and MPI Models](#coco-and-mpi-models)
@@ -185,14 +185,14 @@ Note: If you prefer to use your own custom Caffe or OpenCV versions, see [Custom
 ### OpenPose Building
 #### Ubuntu
 Build the project by running the following commands.
-```
+```bash
 cd build/
 make -j`nproc`
 ```
 
 #### Mac
 Build the project by running the following commands (note that Mac provides both `logicalcpu` and `physicalcpu`, but we want the logical number for maximum speed).
-```
+```bash
 cd build/
 make -j`sysctl -n hw.logicalcpu`
 ```
@@ -204,7 +204,7 @@ In order to build the project, select and run only one of the 2 following altern
 
 2. Command-line build alternative (not recommended). NOTE: The command line alternative is not officially supported, but it was added in [GitHub issue #1198](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/1198). For any questions or bug report about this command-line version, comment in that GitHub issue.
     1. Run "MSVS 2017 Developer Command Console"
-    ```
+    ```batch
     openpose\mkdir  build
     cd build
     cmake .. -G "Visual Studio 15 2017 Win64" -T v140
@@ -212,7 +212,7 @@ In order to build the project, select and run only one of the 2 following altern
     copy x64\Release\*  bin\
     ```
     2. If you want to clean build
-    ```
+    ```batch
     cmake --clean-first .
     cmake --build . --config Release
     copy x64\Release\*  bin\
@@ -262,7 +262,7 @@ Check the OpenPose Benchmark as well as some hints to speed up and/or reduce the
 #### COCO and MPI Models
 By default, the body COCO and MPI models are not downloaded. You can download them by turning on the `DOWNLOAD_BODY_COCO_MODEL` or `DOWNLOAD_BODY_MPI_MODEL` flags. It's slightly faster but less accurate and has less keypoints than the COCO body model.
 
-Note: Check the differences between these models in [doc/faq.md#difference-between-body_25-vs.-coco-vs.-mpi](./faq.md#difference-between-body_25-vs.-coco-vs.-mpi).
+Note: Check the differences between these models in [doc/faq.md#difference-between-body_25-vs-coco-vs-mpi](./faq.md#difference-between-body_25-vs-coco-vs-mpi).
 
 
 
@@ -281,7 +281,7 @@ The default CPU version takes ~0.2 images per second on Ubuntu (~50x slower than
 
 The user can configure the environmental variables `MKL_NUM_THREADS` and `OMP_NUM_THREADS`. They are set at an optimum parameter level by default (i.e., to the number of threads of the machine). However, they can be tweak by running the following commands into the terminal window, right before running any OpenPose application. Eg:
 
-```
+```bash
 # Optimal number = Number of threads (used by default)
 export MKL_NUM_THREADS="8"
 export OMP_NUM_THREADS="8"
@@ -303,20 +303,20 @@ Lastly, OpenCL version does not support unfixed `--net_resolution`. So a folder 
 #### Mac OSX Version
 Mac OSX Version compiles similarly to the Ubuntu version. Take a look at the prerequisites section. For GPU acceleration, OpenPose may be built with OpenCL support (check [OpenCL Version](#opencl-version) or add in CMake`GPU_MODE=OPENCL`). If you have a Mac with an inbuilt AMD graphics card, you have to manually select your AMD GPU. To do that, first note which device your Graphics card is set under:
 
-```
+```bash
 clinfo
 ```
 
-Most likely, your AMD device will be under device 2. Then run openpose with the following options to use youe AMD card for acceleration.
+Most likely, your AMD device will be under device 2. Then run openpose with the following options to use your AMD card for acceleration.
 
-```
-build/examples/openpose/openpose.bin --num_gpu 1 --num_gpu_start 2
+```bash
+./build/examples/openpose/openpose.bin --num_gpu 1 --num_gpu_start 2
 ```
 
 If you only have an integrated Intel Graphics card, then it will most probably be the device 1:
 
-```
-build/examples/openpose/openpose.bin --num_gpu 1 --num_gpu_start 1
+```bash
+./build/examples/openpose/openpose.bin --num_gpu 1 --num_gpu_start 1
 ```
 
 Also as a side note, if the default installation fails (i.e., the one explained above), install Caffe separately and set `BUILD_CAFFE` to false in the CMake config. Steps:
@@ -330,7 +330,7 @@ Also as a side note, if the default installation fails (i.e., the one explained 
     4. Run `Configure` and `Generate` from CMake GUI.
 
 In addition, if you face an OpenCV error during compiling time similar to `fatal error: 'opencv2/highgui/highgui.hpp' file not found`, please apply the following patch (this error has been reported in the latest OSX 10.14):
-```
+```bash
 cd 3rdparty/caffe; git apply ../../scripts/osx/mac_opencl_patch.txt
 ```
 
