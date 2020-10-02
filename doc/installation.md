@@ -307,16 +307,16 @@ Mac OSX Version compiles similarly to the Ubuntu version. Take a look at the pre
 clinfo
 ```
 
-Most likely, your AMD device will be under device 2. Then run openpose with the following options to use youe AMD card for acceleration.
+Most likely, your AMD device will be under device 2. Then run openpose with the following options to use your AMD card for acceleration.
 
 ```bash
-build/examples/openpose/openpose.bin --num_gpu 1 --num_gpu_start 2
+./build/examples/openpose/openpose.bin --num_gpu 1 --num_gpu_start 2
 ```
 
 If you only have an integrated Intel Graphics card, then it will most probably be the device 1:
 
 ```bash
-build/examples/openpose/openpose.bin --num_gpu 1 --num_gpu_start 1
+./build/examples/openpose/openpose.bin --num_gpu 1 --num_gpu_start 1
 ```
 
 Also as a side note, if the default installation fails (i.e., the one explained above), install Caffe separately and set `BUILD_CAFFE` to false in the CMake config. Steps:
