@@ -262,7 +262,7 @@ Check the OpenPose Benchmark as well as some hints to speed up and/or reduce the
 #### COCO and MPI Models
 By default, the body COCO and MPI models are not downloaded. You can download them by turning on the `DOWNLOAD_BODY_COCO_MODEL` or `DOWNLOAD_BODY_MPI_MODEL` flags. It's slightly faster but less accurate and has less keypoints than the COCO body model.
 
-Note: Check the differences between these models in [doc/faq.md#difference-between-body_25-vs.-coco-vs.-mpi](./faq.md#difference-between-body_25-vs.-coco-vs.-mpi).
+Note: Check the differences between these models in [doc/faq.md#difference-between-body_25-vs-coco-vs-mpi](./faq.md#difference-between-body_25-vs-coco-vs-mpi).
 
 
 
