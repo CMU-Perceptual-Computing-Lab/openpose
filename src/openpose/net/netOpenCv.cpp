@@ -40,9 +40,12 @@ namespace op
                 mNet{cv::dnn::readNetFromCaffe(caffeProto, caffeTrainedModel)},
                 spOutputBlob{new caffe::Blob<float>(1,1,1,1)}
             {
-                const std::string message{".\nPossible causes:\n\t1. Not downloading the OpenPose trained models."
-                                          "\n\t2. Not running OpenPose from the same directory where the `model`"
-                                          " folder is located.\n\t3. Using paths with spaces."};
+                    const std::string message{".\nPossible causes:\n"
+                        "\t1. Not downloading the OpenPose trained models.\n"
+                        "\t2. Not running OpenPose from the root directory (i.e., where the `model` folder is located, but do not move the `model` folder!). E.g.,\n"
+                        "\t\tRight example for the Windows portable binary: `cd {OpenPose_root_path}; bin/openpose.exe`\n"
+                        "\t\tWrong example for the Windows portable binary: `cd {OpenPose_root_path}/bin; openpose.exe`\n"
+                        "\t3. Using paths with spaces."};
                 if (!existFile(mCaffeProto))
                     error("Prototxt file not found: " + mCaffeProto + message, __LINE__, __FUNCTION__, __FILE__);
                 if (!existFile(mCaffeTrainedModel))

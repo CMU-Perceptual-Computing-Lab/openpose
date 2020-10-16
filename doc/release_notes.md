@@ -416,11 +416,12 @@ OpenPose Library - Release Notes
 
 ## Current version - Future OpenPose 1.6.1
 1. Main improvements:
+    1. Some parts of the documentation have been explained better.
 2. Functions or parameters renamed:
 3. Main bugs fixed:
     1. 90 and 270-degree rotations working again.
     2. C++ tutorial API demos only try to cv::imshow the image if it is not empty (avoding the assert that it would trigger otherwise).
-4. Changes/additions that affect the compatibility with the OpenPose Unity Plugin:
+    3. Several typos fixed in the documentation.
 
 
 
