@@ -4,22 +4,23 @@ OpenPose - Frequently Asked Question (FAQ)
 ## Contents
 1. [FAQ](#faq)
     1. [Errors](#errors)
-        1. [Out of Memory Error](#out-of-memory-error)
-        2. [Video/Webcam Not Working](#videowebcam-not-working)
-        3. [Cannot Find OpenPose.dll Error](#cannot-find-openposedll-error-windows)
-        4. [Free Invalid Pointer Error](#free-invalid-pointer-error)
-        5. [Source Directory does not Contain CMakeLists.txt (Windows)](#source-directory-does-not-contain-cmakeliststxt-windows)
-        6. [Always Zero People Detected](#always-zero-people-detected)
-        7. [Very Few People Detected](#very-few-people-detected)
-        8. [Check Failed for ReadProtoFromBinaryFile (Failed to Parse NetParameter File)](#check-failed-for-readprotofrombinaryfile-failed-to-parse-netparameter-file)
-        9. [3D OpenPose Returning Wrong Results: 0, NaN, Infinity, etc.](#3d-openpose-returning-wrong-results-0-nan-infinity-etc)
-        10. [Protobuf Clip Param Caffe Error](#protobuf-clip-param-caffe-error)
-        11. [The Human Skeleton Looks like Dotted Lines Rather than Solid Lines](#the-human-skeleton-looks-like-dotted-lines-rather-than-solid-lines)
-        12. [CUDA_cublas_device_LIBRARY Not Found](#cuda_cublas_device_library-not-found)
-        13. [CMake-GUI Error While Getting Default Caffe](#cmake-gui-error-while-getting-default-caffe)
-        14. [Libgomp Out of Memory Error](#libgomp-out-of-memory-error)
-        15. [Runtime Error with Turing GPU (Tesla T4) or Volta GPU](#runtime-error-with-turing-gpu-teslat4-or-volta-gpu)
-        16. [Obscure CMake Error about Caffe or Pybind](#obscure-cmake-error-about-caffe-or-pybind).
+        1. [Download Server Down](#download-server-down)
+        2. [Out of Memory Error](#out-of-memory-error)
+        3. [Video/Webcam Not Working](#videowebcam-not-working)
+        4. [Cannot Find OpenPose.dll Error](#cannot-find-openposedll-error-windows)
+        5. [Free Invalid Pointer Error](#free-invalid-pointer-error)
+        6. [Source Directory does not Contain CMakeLists.txt (Windows)](#source-directory-does-not-contain-cmakeliststxt-windows)
+        7. [Always Zero People Detected](#always-zero-people-detected)
+        8. [Very Few People Detected](#very-few-people-detected)
+        9. [Check Failed for ReadProtoFromBinaryFile (Failed to Parse NetParameter File)](#check-failed-for-readprotofrombinaryfile-failed-to-parse-netparameter-file)
+        10. [3D OpenPose Returning Wrong Results: 0, NaN, Infinity, etc.](#3d-openpose-returning-wrong-results-0-nan-infinity-etc)
+        11. [Protobuf Clip Param Caffe Error](#protobuf-clip-param-caffe-error)
+        12. [The Human Skeleton Looks like Dotted Lines Rather than Solid Lines](#the-human-skeleton-looks-like-dotted-lines-rather-than-solid-lines)
+        13. [CUDA_cublas_device_LIBRARY Not Found](#cuda_cublas_device_library-not-found)
+        14. [CMake-GUI Error While Getting Default Caffe](#cmake-gui-error-while-getting-default-caffe)
+        15. [Libgomp Out of Memory Error](#libgomp-out-of-memory-error)
+        16. [Runtime Error with Turing GPU (Tesla T4) or Volta GPU](#runtime-error-with-turing-gpu-teslat4-or-volta-gpu)
+        17. [Obscure CMake Error about Caffe or Pybind](#obscure-cmake-error-about-caffe-or-pybind).
     2. [Speed Performance Issues](#speed-performance-issues)
         1. [Speed Up, Memory Reduction, and Benchmark](#speed-up-memory-reduction-and-benchmark)
         2. [How to Measure the Latency Time?](#how-to-measure-the-latency-time)
@@ -39,6 +40,12 @@ OpenPose - Frequently Asked Question (FAQ)
 
 ## FAQ
 ### Errors
+#### Download Server Down
+**Q: The download server is down, Download Hash missmatch, Error 502: Bad Gateway, etc. I.e., I cannot download the OpenPose models and/or 3rd party libraries.**
+**A**: The are 2 alternatives. Option 1 (recommended): Download the links from [1602#issuecomment-641653411](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/1602#issuecomment-641653411) and download them in the places indicated by [doc/prerequisites.md](./prerequisites.md). Option 2: If you downloaded the models and dependencies to some local server, you could set the advanced CMake property `DOWNLOAD_SERVER` to link OpenPose to your local mirror server instead.
+
+
+
 #### Out of Memory Error
 **Q: Out of memory error** - I get an error similar to: `Check failed: error == cudaSuccess (2 vs. 0)  out of memory`.
 

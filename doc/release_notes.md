@@ -417,6 +417,7 @@ OpenPose Library - Release Notes
 ## Current version - Future OpenPose 1.6.1
 1. Main improvements:
     1. Some parts of the documentation have been explained better.
+    2. Added `DOWNLOAD_SERVER` variable to CMake. It specifies the link where the models and 3rd party libraries will be downloaded from.
 2. Functions or parameters renamed:
 3. Main bugs fixed:
     1. 90 and 270-degree rotations working again.
