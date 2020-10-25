@@ -344,6 +344,9 @@ if (APPLE)
   endif ()
 endif (APPLE)
 
+set(DOWNLOAD_SERVER "http://posefs1.perception.cs.cmu.edu/OpenPose/" CACHE STRING "Server from which the models and 3rdparty libraries will be downloaded from.")
+mark_as_advanced(DOWNLOAD_SERVER)
+
 ### FIND REQUIRED PACKAGES
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
@@ -397,7 +400,7 @@ else (${WITH_EIGEN} MATCHES "NONE")
   # OpenPose download/builds Eigen
   if (${WITH_EIGEN} MATCHES "BUILD")
     # Download it
-    set(OP_URL "http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/")
+    set(OP_URL "${DOWNLOAD_SERVER}3rdparty/")
     set(FIND_LIB_PREFIX ${CMAKE_SOURCE_DIR}/3rdparty/)
     download_zip("eigen_2018_05_23.zip" ${OP_URL} ${FIND_LIB_PREFIX} 29B9B2FD4679D587BB67467F09EE8365)
     # Set path
@@ -547,7 +550,7 @@ if (WIN32)
 
   # Download Windows 3rd party
   message(STATUS "Downloading windows dependencies...")
-  set(OP_WIN_URL "http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows")
+  set(OP_WIN_URL "${DOWNLOAD_SERVER}3rdparty/windows")
   set(OP_WIN_DIR "${CMAKE_SOURCE_DIR}/3rdparty/windows")
 
   # Download required zip files
@@ -988,7 +991,7 @@ endif (Caffe_FOUND)
 message(STATUS "Download the models.")
 
 # URL to the models
-set(OPENPOSE_URL "http://posefs1.perception.cs.cmu.edu/OpenPose/models/")
+set(OPENPOSE_URL "${DOWNLOAD_SERVER}models/")
 
 download_model("BODY_25" ${DOWNLOAD_BODY_25_MODEL} pose/body_25/pose_iter_584000.caffemodel
   78287B57CF85FA89C03F1393D368E5B7) # Body (BODY_25)
