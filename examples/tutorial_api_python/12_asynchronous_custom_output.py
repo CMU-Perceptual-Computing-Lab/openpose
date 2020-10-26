@@ -68,7 +68,7 @@ try:
     # oppython = op.OpenposePython()
 
     # Starting OpenPose
-    opWrapper = op.WrapperPython()
+    opWrapper = op.WrapperPython(op.ThreadManagerMode.AsynchronousOut)
     opWrapper.configure(params)
     opWrapper.start()
 
