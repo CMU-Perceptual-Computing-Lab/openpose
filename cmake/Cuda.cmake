@@ -229,12 +229,16 @@ function(detect_cuDNN)
   find_library(CUDNN_LIBRARY NAMES ${CUDNN_LIB_NAME}
    PATHS ${CUDNN_ROOT} $ENV{CUDNN_ROOT} ${CUDNN_INCLUDE} ${__libpath_hist} ${__libpath_hist}/../lib
    DOC "Path to cuDNN library.")
-  
+
   if (CUDNN_INCLUDE AND CUDNN_LIBRARY)
     set(HAVE_CUDNN  TRUE PARENT_SCOPE)
     set(CUDNN_FOUND TRUE PARENT_SCOPE)
 
-    file(READ ${CUDNN_INCLUDE}/cudnn.h CUDNN_VERSION_FILE_CONTENTS)
+    if(EXISTS "${CUDNN_INCLUDE}/cudnn_version.h")
+        file(READ ${CUDNN_INCLUDE}/cudnn_version.h CUDNN_VERSION_FILE_CONTENTS)
+    else()
+        file(READ ${CUDNN_INCLUDE}/cudnn.h CUDNN_VERSION_FILE_CONTENTS)
+    endif()
 
     # cuDNN v3 and beyond
     string(REGEX MATCH "define CUDNN_MAJOR * +([0-9]+)"
