@@ -64,7 +64,7 @@ try:
     datum = op.Datum()
     imageToProcess = cv2.imread(args[0].image_path)
     datum.cvInputData = imageToProcess
-    opWrapper.emplaceAndPop([datum])
+    opWrapper.emplaceAndPop(op.VectorDatum([datum]))
 
     # Process outputs
     outputImageF = (datum.inputNetData[0].copy())[0,:,:,:] + 0.5

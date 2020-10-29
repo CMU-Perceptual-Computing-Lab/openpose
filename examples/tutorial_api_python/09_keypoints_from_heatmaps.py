@@ -77,7 +77,7 @@ try:
     datum = op.Datum()
     datum.cvInputData = imageToProcess
     datum.poseNetOutput = poseHeatMaps
-    opWrapper.emplaceAndPop([datum])
+    opWrapper.emplaceAndPop(op.VectorDatum([datum]))
 
     # Display Image
     print("Body keypoints: \n" + str(datum.poseKeypoints))

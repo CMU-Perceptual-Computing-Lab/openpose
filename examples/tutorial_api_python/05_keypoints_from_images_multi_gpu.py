@@ -71,7 +71,6 @@ try:
     for imageBaseId in range(0, len(imagePaths), numberGPUs):
 
         # Create datums
-        datums = []
         images = []
 
         # Read and push images into OpenPose wrapper
@@ -84,8 +83,7 @@ try:
                 datum = op.Datum()
                 images.append(cv2.imread(imagePath))
                 datum.cvInputData = images[-1]
-                datums.append(datum)
-                opWrapper.waitAndEmplace([datums[-1]])
+                opWrapper.waitAndEmplace(op.VectorDatum([datum]))
 
         # Retrieve processed results from OpenPose wrapper
         for gpuId in range(0, numberGPUs):
@@ -93,8 +91,9 @@ try:
             imageId = imageBaseId+gpuId
             if imageId < len(imagePaths):
 
-                datum = datums[gpuId]
-                opWrapper.waitAndPop([datum])
+                datums = op.VectorDatum()
+                opWrapper.waitAndPop(datums)
+                datum = datums[0]
 
                 print("Body keypoints: \n" + str(datum.poseKeypoints))
 

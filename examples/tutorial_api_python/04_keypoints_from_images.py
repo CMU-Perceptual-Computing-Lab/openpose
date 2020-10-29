@@ -67,7 +67,7 @@ try:
         datum = op.Datum()
         imageToProcess = cv2.imread(imagePath)
         datum.cvInputData = imageToProcess
-        opWrapper.emplaceAndPop([datum])
+        opWrapper.emplaceAndPop(op.VectorDatum([datum]))
 
         print("Body keypoints: \n" + str(datum.poseKeypoints))
 

@@ -7,9 +7,12 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/stl_bind.h>
 #include <pybind11/numpy.h>
 #include <opencv2/core/core.hpp>
 #include <stdexcept>
+
+PYBIND11_MAKE_OPAQUE(std::vector<std::shared_ptr<op::Datum>>);
 
 #ifdef _WIN32
     #define OP_EXPORT __declspec(dllexport)
@@ -78,13 +81,20 @@ namespace op
     class WrapperPython{
     public:
         std::unique_ptr<Wrapper> opWrapper;
+        bool synchronousIn;
 
-        WrapperPython(int mode = 0)
+        WrapperPython(ThreadManagerMode mode = ThreadManagerMode::Asynchronous)
         {
             opLog("Starting OpenPose Python Wrapper...", Priority::High);
 
             // Construct opWrapper
-            opWrapper = std::unique_ptr<Wrapper>(new Wrapper(static_cast<ThreadManagerMode>(mode)));
+            opWrapper = std::unique_ptr<Wrapper>(new Wrapper(mode));
+
+            // Synchronous in
+            synchronousIn = (
+                mode == ThreadManagerMode::AsynchronousOut ||
+                mode == ThreadManagerMode::Synchronous
+            );
         }
 
         void configure(py::dict params = py::dict())
@@ -168,6 +178,22 @@ namespace op
                     op::String(FLAGS_write_video_adam), op::String(FLAGS_write_bvh), op::String(FLAGS_udp_host),
                     op::String(FLAGS_udp_port)};
                 opWrapper->configure(wrapperStructOutput);
+                if (synchronousIn) {
+                    // SynchronousIn => We need a producer
+
+                    // Producer (use default to disable any input)
+                    const auto cameraSize = flagsToPoint(op::String(FLAGS_camera_resolution), "-1x-1");
+                    ProducerType producerType;
+                    op::String producerString;
+                    std::tie(producerType, producerString) = flagsToProducer(
+                        op::String(FLAGS_image_dir), op::String(FLAGS_video), op::String(FLAGS_ip_camera), FLAGS_camera,
+                        FLAGS_flir_camera, FLAGS_flir_camera_index);
+                    const WrapperStructInput wrapperStructInput{
+                        producerType, producerString, FLAGS_frame_first, FLAGS_frame_step, FLAGS_frame_last,
+                        FLAGS_process_real_time, FLAGS_frame_flip, FLAGS_frame_rotate, FLAGS_frames_repeat,
+                        cameraSize, op::String(FLAGS_camera_parameter_path), FLAGS_frame_undistort, FLAGS_3d_views};
+                    opWrapper->configure(wrapperStructInput);
+                }
                 // No GUI. Equivalent to: opWrapper.configure(WrapperStructGui{});
                 // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)
                 if (FLAGS_disable_multi_thread)
@@ -207,18 +233,6 @@ namespace op
         {
             try
             {
-                const auto cameraSize = flagsToPoint(op::String(FLAGS_camera_resolution), "-1x-1");
-                ProducerType producerType;
-                op::String producerString;
-                std::tie(producerType, producerString) = flagsToProducer(
-                    op::String(FLAGS_image_dir), op::String(FLAGS_video), op::String(FLAGS_ip_camera), FLAGS_camera,
-                    FLAGS_flir_camera, FLAGS_flir_camera_index);
-                // Producer (use default to disable any input)
-                const WrapperStructInput wrapperStructInput{
-                    producerType, producerString, FLAGS_frame_first, FLAGS_frame_step, FLAGS_frame_last,
-                    FLAGS_process_real_time, FLAGS_frame_flip, FLAGS_frame_rotate, FLAGS_frames_repeat,
-                    cameraSize, op::String(FLAGS_camera_parameter_path), FLAGS_frame_undistort, FLAGS_3d_views};
-                opWrapper->configure(wrapperStructInput);
                 // GUI (comment or use default argument to disable any visual output)
                 const WrapperStructGui wrapperStructGui{
                     flagsToDisplayMode(FLAGS_display, FLAGS_3d), !FLAGS_no_gui_verbose, FLAGS_fullscreen};
@@ -231,29 +245,38 @@ namespace op
             }
         }
 
-        void emplaceAndPop(std::vector<std::shared_ptr<Datum>>& l)
+        bool emplaceAndPop(std::vector<std::shared_ptr<Datum>>& l)
         {
             try
             {
-                auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<Datum>>>(l);
-                opWrapper->emplaceAndPop(datumsPtr);
+                std::shared_ptr<std::vector<std::shared_ptr<Datum>>> datumsPtr(
+                    &l,
+                    [](std::vector<std::shared_ptr<Datum>>*){}
+                );
+                auto got = opWrapper->emplaceAndPop(datumsPtr);
+                if (got && datumsPtr.get() != &l) {
+                    l.swap(*datumsPtr);
+                }
+                return got;
             }
             catch (const std::exception& e)
             {
                 error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                return false;
             }
         }
 
-        void waitAndEmplace(std::vector<std::shared_ptr<Datum>>& l)
+        bool waitAndEmplace(std::vector<std::shared_ptr<Datum>>& l)
         {
             try
             {
-                auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<Datum>>>(l);
-                opWrapper->waitAndEmplace(datumsPtr);
+                std::shared_ptr<std::vector<std::shared_ptr<Datum>>> datumsPtr(&l);
+                return opWrapper->waitAndEmplace(datumsPtr);
             }
             catch (const std::exception& e)
             {
                 error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+                return false;
             }
         }
 
@@ -261,8 +284,12 @@ namespace op
         {
             try
             {
-                auto datumsPtr = std::make_shared<std::vector<std::shared_ptr<Datum>>>(l);
-                return opWrapper->waitAndPop(datumsPtr);
+                std::shared_ptr<std::vector<std::shared_ptr<Datum>>> datumsPtr;
+                auto got = opWrapper->waitAndPop(datumsPtr);
+                if (got) {
+                    l.swap(*datumsPtr);
+                }
+                return got;
             }
             catch (const std::exception& e)
             {
@@ -311,7 +338,7 @@ namespace op
         // OpenposePython
         py::class_<WrapperPython>(m, "WrapperPython")
             .def(py::init<>())
-            .def(py::init<int>())
+            .def(py::init<ThreadManagerMode>())
             .def("configure", &WrapperPython::configure)
             .def("start", &WrapperPython::start)
             .def("stop", &WrapperPython::stop)
@@ -319,6 +346,14 @@ namespace op
             .def("emplaceAndPop", &WrapperPython::emplaceAndPop)
             .def("waitAndEmplace", &WrapperPython::waitAndEmplace)
             .def("waitAndPop", &WrapperPython::waitAndPop)
+            ;
+
+        // ThreadManagerMode
+        py::enum_<ThreadManagerMode>(m, "ThreadManagerMode")
+            .value("Asynchronous", ThreadManagerMode::Asynchronous)
+            .value("AsynchronousIn", ThreadManagerMode::AsynchronousIn)
+            .value("AsynchronousOut", ThreadManagerMode::AsynchronousOut)
+            .value("Synchronous", ThreadManagerMode::Synchronous)
             ;
 
         // Datum Object
@@ -359,6 +394,8 @@ namespace op
             .def_readwrite("scaleNetToOutput", &Datum::scaleNetToOutput)
             .def_readwrite("elementRendered", &Datum::elementRendered)
             ;
+
+        py::bind_vector<std::vector<std::shared_ptr<Datum>>>(m, "VectorDatum");
 
         // Rectangle
         py::class_<Rectangle<float>>(m, "Rectangle")
@@ -431,10 +468,49 @@ template <> struct type_caster<op::Array<float>> {
         static handle cast(const op::Array<float> &m, return_value_policy, handle defval)
         {
             UNUSED(defval);
+            if (m.getSize().size() == 0) {
+                return none();
+            }
             std::string format = format_descriptor<float>::format();
             return array(buffer_info(
                 m.getPseudoConstPtr(),/* Pointer to buffer */
                 sizeof(float),        /* Size of one scalar */
+                format,               /* Python struct-style format descriptor */
+                m.getSize().size(),   /* Number of dimensions */
+                m.getSize(),          /* Buffer dimensions */
+                m.getStride()         /* Strides (in bytes) for each index */
+                )).release();
+        }
+
+    };
+}} // namespace pybind11::detail
+
+// Numpy - op::Array<long long> interop
+namespace pybind11 { namespace detail {
+
+template <> struct type_caster<op::Array<long long>> {
+    public:
+
+        PYBIND11_TYPE_CASTER(op::Array<long long>, _("numpy.ndarray"));
+
+        // Cast numpy to op::Array<long long>
+        bool load(handle src, bool imp)
+        {
+            op::error("op::Array<long long> is read only now", __LINE__, __FUNCTION__, __FILE__);
+            return false;
+        }
+
+        // Cast op::Array<long long> to numpy
+        static handle cast(const op::Array<long long> &m, return_value_policy, handle defval)
+        {
+            UNUSED(defval);
+            if (m.getSize().size() == 0) {
+                return none();
+            }
+            std::string format = format_descriptor<long long>::format();
+            return array(buffer_info(
+                m.getPseudoConstPtr(),/* Pointer to buffer */
+                sizeof(long long),    /* Size of one scalar */
                 format,               /* Python struct-style format descriptor */
                 m.getSize().size(),   /* Number of dimensions */
                 m.getSize(),          /* Buffer dimensions */
