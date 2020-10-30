@@ -33,11 +33,11 @@ set(VOLTA "70") # set(VOLTA "70 71 72") # This crashes with CUDA 10
 # Turing (CUDA >= 10)
 set(TURING "75")
 if (UNIX AND NOT APPLE)
-  set(Caffe_known_gpu_archs "${KEPLER} ${MAXWELL} ${PASCAL} ${VOLTA} ${TURING}")
+  set(Caffe_known_gpu_archs "35 37 ${MAXWELL} ${PASCAL} ${VOLTA} ${TURING}")
   # set(Caffe_known_gpu_archs "${FERMI} ${KEPLER} ${MAXWELL} ${PASCAL} ${VOLTA} ${TURING}")
   # set(Caffe_known_gpu_archs "20 21(20) 30 35 50 52 60 61")
 elseif (WIN32)
-  set(Caffe_known_gpu_archs "${KEPLER} ${MAXWELL} ${PASCAL} ${VOLTA} ${TURING}")
+  set(Caffe_known_gpu_archs "35 37 ${MAXWELL} ${PASCAL} ${VOLTA} ${TURING}")
 endif ()
 
 
