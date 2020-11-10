@@ -111,7 +111,7 @@ namespace op
     {
         try
         {
-            return (const void* const)(&spImpl->mCvMat);
+            return (const void*)(&spImpl->mCvMat);
         }
         catch (const std::exception& e)
         {

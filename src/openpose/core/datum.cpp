@@ -361,7 +361,7 @@ namespace op
                 #endif
             #endif
             // Return
-            return std::move(datum);
+            return datum;
         }
         catch (const std::exception& e)
         {

@@ -48,7 +48,7 @@ namespace op
             if (aNumberAsString.size() != bNumberAsString.size())
                 return aNumberAsString.size() < bNumberAsString.size();
             // Both same length --> Compare them
-            for (auto i = 0 ; i < aNumberAsString.size() ; ++i)
+            for (auto i = 0u ; i < aNumberAsString.size() ; ++i)
                 if (aNumberAsString[i] != bNumberAsString[i])
                     return aNumberAsString[i] < bNumberAsString[i];
             // Both same number --> Remove and return compareNat after removing those characters

@@ -397,13 +397,13 @@ OpenPose Library - Release Notes
     7. String is used in `include/openpose/wrapper/` to avoid std::string to cause errors for using diferent std DLLs.
     8. Added `ScaleMode::ZeroToOneFixedAspect` and `ScaleMode::PlusMinusOneFixedAspect`. Compared to `ZeroToOne` and `PlusMinusOne`, the new ones also preserve the aspect ratio of each axis.
     9. Added more verbose to wrapper when it is been configured, showing the values of some of its parameters.
+    10. Removed many Visual Studio (Windows) warnings.
 2. Functions or parameters renamed:
     1. All headers moved into `openpose_private`, all 3rd-party library calls in headers, and std::string calls in `include/openpose/wrapper/`.
     2. Renamed `dLog()` as `opLogIfDebug()`, `log()` as `opLog()`, `check()` as `checkBool()`, and also renamed all the `checkX()` functions in `include/openpose/utilities/check.hpp`. This avoids compiling crashes when exporting OpenPose to other projects which contain other 3rd-party libraries that define functions with the same popular names with `#define`.
 3. Main bugs fixed:
     1. Debug version of OpenPose actually targets debug lib/DLL files of 3rd-party libraries.
     2. Debug version no longer prints on console a huge log message from Caffe with the network when starting OpenPose (fixed by using the right debug libraries).
-    3. Removed many Visual Studio (Windows) warnings.
     4. Natural sort now works properly with filenames containining numbers longer than the limit of an int.
     5. Optionally auto-generated bin folder only contains the required DLLs (depending on the CMake configuration), instead of all of them.
     6. When WrapperStructFace and WrapperStructHand are not called and configured for Wrapper, setting body to CPU rendering was not working.
@@ -421,6 +421,7 @@ OpenPose Library - Release Notes
     3. Added Asynchronous mode to Python API.
     4. Added compatibility with Ubuntu 20.04, CUDA 11.X, and cuDNN 8.0.X.
     5. Installation documentation highly simplified and improved.
+    6. Removed all compiler warnings for Ubuntu 20.04.
 2. Functions or parameters renamed:
 3. Main bugs fixed:
     1. 90 and 270-degree rotations working again.

@@ -270,7 +270,7 @@ namespace op
             // Equivalent: std::copy(spData.get(), spData.get() + mVolume, array.spData.get());
             std::copy(pData, pData + mVolume, array.pData);
             // Return
-            return std::move(array);
+            return array;
         }
         catch (const std::exception& e)
         {
