@@ -418,6 +418,9 @@ OpenPose Library - Release Notes
 1. Main improvements:
     1. Some parts of the documentation have been explained better.
     2. Added `DOWNLOAD_SERVER` variable to CMake. It specifies the link where the models and 3rd party libraries will be downloaded from.
+    3. Added Asynchronous mode to Python API.
+    4. Added compatibility with Ubuntu 20.04, CUDA 11.X, and cuDNN 8.0.X.
+    5. Installation documentation highly simplified and improved.
 2. Functions or parameters renamed:
 3. Main bugs fixed:
     1. 90 and 270-degree rotations working again.

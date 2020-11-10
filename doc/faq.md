@@ -194,7 +194,10 @@ git submodule update
 #### Obscure CMake Error about Caffe or Pybind
 **Q:** There appear some weird and obscure errors on CMake about Caffe and/or Pybind.
 
-**A**: Check [doc/prerequisites.md#general-tips](./prerequisites.md#general-tips) to run the `git submodule` command.
+**A**: Check [doc/installation.md](./installation.md) to run the `git submodule` command, i.e.,
+```
+git submodule update --init --recursive --remote
+```
 
 
 

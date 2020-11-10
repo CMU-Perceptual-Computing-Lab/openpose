@@ -174,11 +174,7 @@ If you updated some software that our library or 3rdparty use, or you simply wan
 
 
 ## Doxygen Documentation Autogeneration
-You can generate the documentation by running the following command. The documentation will be generated in `doc/doxygen/html/index.html`. You can simply open it with double-click (your default browser should automatically display it).
-```
-cd doc/
-doxygen doc_autogeneration.doxygen
-```
+See [doc/installation.md#doxygen-documentation-autogeneration-ubuntu-only](./installation.md#doxygen-documentation-autogeneration-ubuntu-only).
 
 
 
@@ -200,9 +196,4 @@ We only modified some Caffe compilation flags and minor details. You can use you
 
 
 ## Compiling without cuDNN
-The [cuDNN](https://developer.nvidia.com/cudnn) library is not mandatory, but required for full keypoint detection accuracy. In case your graphics card is not compatible with cuDNN, you can disable it by:
-
-- Ubuntu: Disable `USE_CUDNN` in the `Makefile.config` file in `3rdparty/caffe`, and recompiling Caffe.
-- Windows: Compiling Caffe by your own with without cuDNN support and replacing the [3rdparty/windows/caffe](../3rdparty/windows/caffe)) folder by your own implementation.
-
-Then, you would have to reduce the `--net_resolution` flag to fit the model into the GPU memory. You can try values like `640x320`, `320x240`, `320x160`, or `160x80` to see your GPU memory capabilities. After finding the maximum approximate resolution that your GPU can handle without throwing an out-of-memory error, adjust the `net_resolution` ratio to your image or video to be processed (see the `--net_resolution` explanation from [doc/demo_overview.md](./demo_overview.md)).
+See [doc/installation.md#compiling-without-cudnn](./installation.md#compiling-without-cudnn).
