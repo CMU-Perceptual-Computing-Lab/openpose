@@ -38,7 +38,7 @@ You might prefer to download them manually:
         - Assuming your CMake downloaded folder is in {CMAKE_FOLDER_PATH}, everytime these instructions mentions `cmake-gui`, you will have to replace that line by `{CMAKE_FOLDER_PATH}/bin/cmake-gui`.
     - Ubuntu 14 or 16: Run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [doc/installation.md#CMake Command Line Configuration (Ubuntu Only)](./installation.md#cmake-command-line-configuration-ubuntu-only).
 3. Nvidia GPU version prerequisites:
-    1. **Note: OpenPose has been tested extensively with CUDA 8.0 (cuDNN 5.1) for Ubuntu 14 and 16, CUDA 10.1 (cuDNN 7.5) for Ubuntu 18, and CUDA 11 for Ubuntu 20**. We highly recommend using those versions for those Operating Systems to minimize potential installation issues. Other versions should also work, but we do not provide support about any CUDA/cuDNN installation/compilation issue, as well as problems related to their integration into OpenPose.
+    1. **Note: OpenPose has been tested extensively with CUDA 8.0 (cuDNN 5.1) for Ubuntu 14 and 16, CUDA 10.1 (cuDNN 7.5.1) for Ubuntu 18, and CUDA 11 for Ubuntu 20**. We highly recommend using those versions for those Operating Systems to minimize potential installation issues. Other versions should also work, but we do not provide support about any CUDA/cuDNN installation/compilation issue, as well as problems related to their integration into OpenPose.
     2. **CUDA**:
         - Ubuntu 20 ([**CUDA 11.1**](https://developer.nvidia.com/cuda-downloads)): Download CUDA 11.1 from their [official website](https://developer.nvidia.com/cuda-downloads). Most Ubuntu computers use the `Architecture` named `x86_64`, and we personally recommend the `Installer Type` named `runfile (local)`. Then, follow the Nvidia website installation instructions. When installing, make sure to enable the symbolic link in `usr/local/cuda` to minimize potential future errors.
         - Ubuntu 18 ([**CUDA 10.1**](https://developer.nvidia.com/cuda-10.1-download-archive-base)): Analog to the instructions for Ubuntu 20, but using CUDA version 10.1.
@@ -46,7 +46,7 @@ You might prefer to download them manually:
     3. **cuDNN**:
         - Download it (usually called `cuDNN Library for Linux (x86_64)`):
             - Ubuntu 20: [**cuDNN 8.0.4**](https://developer.nvidia.com/cudnn).
-            - Ubuntu 18: [**cuDNN 7.5**](https://developer.nvidia.com/rdp/cudnn-archive).
+            - Ubuntu 18: [**cuDNN 7.5.1**](https://developer.nvidia.com/rdp/cudnn-archive).
             - Ubuntu 14 or 16 (**cuDNN 5.1 or 7.2**): Run `sudo ./scripts/ubuntu/install_cudnn.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX) or alternatively [download it from their website](https://developer.nvidia.com/rdp/cudnn-archive).
         - And install it:
             - In order to manually install it (any version), just unzip it and copy (merge) its contents on the CUDA folder, usually `/usr/local/cuda-{version}/` in Ubuntu and `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v{version}\` in Windows.
@@ -82,19 +82,17 @@ You might prefer to download them manually:
 NOTE: These instructions are only required when compiling OpenPose brom source. If you simply wanna use the OpenPose binaries for Windows, skip this step.
 
 1. Install **CMake GUI**: Download and install the `Latest Release` of CMake `Windows win64-x64 Installer` from the [CMake download website](https://cmake.org/download/), called `cmake-X.X.X-win64-x64.msi`.
-2. Install **Microsoft Visual Studio (VS) 2017 Enterprise** or **VS 2015 Enterprise Update 3**:
+2. Install **Microsoft Visual Studio (VS) 2019 Enterprise**, **Microsoft Visual Studio (VS) 2017 Enterprise** or **VS 2015 Enterprise Update 3**:
     - **IMPORTANT**: Enable all C++-related flags when selecting the components to install.
     - Different VS versions:
-        - If **Visual Studio 2017 Community** is desired, we do not officially support it, but it should run similarly to VS 2017 Enterprise.
-        - VS 2015 Community and Enterprise Update 1 might give some compiler errors. They have not been tested and they are totally not supported (use VS 2017 Community instead).
+        - If **Visual Studio 2019 Community** (or 2017) is desired, we do not officially support it, but it should run similarly to VS 2017/2019 Enterprise.
 3. Nvidia GPU version prerequisites:
-    1. **Note: OpenPose has been tested extensively with CUDA 10.0 / cuDNN 7.5 for VS2017 and CUDA 8.0 / cuDNN 5.1 for VS 2015**. We highly recommend using those versions to minimize potential installation issues. Other versions should also work, but we do not provide support about any CUDA/cuDNN installation/compilation issue, as well as problems related to their integration into OpenPose.
-    2. [**CUDA 10**](https://developer.nvidia.com/cuda-downloads) or [**CUDA 8**](https://developer.nvidia.com/cuda-80-ga2-download-archive):
-        - Install CUDA 8.0/10.0 after Visual Studio 2015/2017 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was already installed, re-install it.
+    1. **Note: OpenPose has been tested extensively with CUDA 11.1.1 / cuDNN 8.0.5 for VS2019, CUDA 10.1 / cuDNN 7.5.1 for VS2017, and CUDA 8.0 / cuDNN 5.1 for VS 2015**. We highly recommend using those versions to minimize potential installation issues. Other versions should also work, but we do not provide support about any CUDA/cuDNN installation/compilation issue, as well as problems related to their integration into OpenPose.
+    2. Install one out of [**CUDA 11.1**](https://developer.nvidia.com/cuda-downloads), [**CUDA 10.1**](https://developer.nvidia.com/cuda-10.1-download-archive-base), or [**CUDA 8**](https://developer.nvidia.com/cuda-80-ga2-download-archive):
+        - Install CUDA 11.1/10.0/8.0 after Visual Studio 2019/2017/2015 is installed to assure that the CUDA installation will generate all necessary files for VS. If CUDA was installed before installing VS, then re-install CUDA.
         - **Important installation tips**:
-            - (Windows issue, reported Sep 2018): If your computer hangs when installing CUDA drivers, try installing first the [Nvidia drivers](http://www.nvidia.com/Download/index.aspx), and then installing CUDA without the Graphics Driver flag.
             - If CMake returns and error message similar to `CUDA_TOOLKIT_ROOT_DIR not found or specified` or any other CUDA component missing, then: 1) Re-install Visual Studio 2015; 2) Reboot your PC; 3) Re-install CUDA (in this order!).
-    3. [**cuDNN 7.5**](https://developer.nvidia.com/cudnn) or [**cuDNN 5.1**](https://developer.nvidia.com/rdp/cudnn-archive):
+    3. [**cuDNN 8.0.5**](https://developer.nvidia.com/cudnn), [**cuDNN 7.5.1**](https://developer.nvidia.com/rdp/cudnn-archive), or [**cuDNN 5.1**](https://developer.nvidia.com/rdp/cudnn-archive):
         - In order to manually install it, just unzip it and copy (merge) the contents on the CUDA folder, usually `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0` in Windows and `/usr/local/cuda/` in Ubuntu.
 4. AMD GPU version prerequisites:
     1. Download official AMD drivers for Windows from [**AMD - Windows**](https://support.amd.com/en-us/download).
