@@ -93,19 +93,19 @@ NOTE: These instructions are only required when compiling OpenPose brom source. 
         - **Important installation tips**:
             - If CMake returns and error message similar to `CUDA_TOOLKIT_ROOT_DIR not found or specified` or any other CUDA component missing, then: 1) Re-install Visual Studio 2015; 2) Reboot your PC; 3) Re-install CUDA (in this order!).
     3. [**cuDNN 8.0.5**](https://developer.nvidia.com/cudnn), [**cuDNN 7.5.1**](https://developer.nvidia.com/rdp/cudnn-archive), or [**cuDNN 5.1**](https://developer.nvidia.com/rdp/cudnn-archive):
-        - In order to manually install it, just unzip it and copy (merge) the contents on the CUDA folder, usually `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0` in Windows and `/usr/local/cuda/` in Ubuntu.
-4. AMD GPU version prerequisites:
-    1. Download official AMD drivers for Windows from [**AMD - Windows**](https://support.amd.com/en-us/download).
+        - In order to manually install it, just unzip it and copy (merge) the contents on the CUDA folder, usually `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v{version}` in Windows and `/usr/local/cuda-{version}/` in Ubuntu.
+4. AMD GPU version prerequisites (only if you do not have an Nvidia GPU and want to run on AMD graphic cards):
+    1. Download the official AMD drivers for Windows from [**AMD - Windows**](https://support.amd.com/en-us/download).
     2. The libviennacl package comes packaged inside OpenPose for Windows (i.e., no further action required).
 5. **Caffe, OpenCV, and Caffe prerequisites**:
     - CMake automatically downloads all the Windows DLLs. Alternatively, you might prefer to download them manually:
         - Dependencies:
             - Note: Leave the zip files in `3rdparty/windows/` so that CMake does not try to download them again.
             - Caffe (if you are not sure which one you need, donwload the default one):
-                - [CUDA Caffe (Default)](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_15_2020_04_05.zip): Unzip as `3rdparty/windows/caffe/`.
+                - [CUDA Caffe (Default)](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_16_2020_11_14.zip): Unzip as `3rdparty/windows/caffe/`.
                 - [CPU Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_cpu_2018_05_27.zip): Unzip as `3rdparty/windows/caffe_cpu/`.
                 - [OpenCL Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_opencl_2018_02_13.zip): Unzip as `3rdparty/windows/caffe_opencl/`.
-            - [Caffe dependencies](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe3rdparty_15_2019_03_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
+            - [Caffe dependencies](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe3rdparty_16_2020_11_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
             - [OpenCV 4.2.0](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_420_v14_15_2020_04_04.zip): Unzip as `3rdparty/windows/opencv/`.
 6. **Eigen prerequisite** (optional, only required for some specific extra functionality, such as extrinsic camera calibration):
     - Enable the `WITH_EIGEN` flag when running CMake, and set it to `BUILD`.

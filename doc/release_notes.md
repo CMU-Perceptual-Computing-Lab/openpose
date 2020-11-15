@@ -414,14 +414,14 @@ OpenPose Library - Release Notes
 
 
 
-## Current version - Future OpenPose 1.6.1
+## Current version - Future OpenPose 1.7.0
 1. Main improvements:
-    1. Some parts of the documentation have been explained better.
-    2. Added `DOWNLOAD_SERVER` variable to CMake. It specifies the link where the models and 3rd party libraries will be downloaded from.
+    1. Added compatibility with CUDA 11.X and cuDNN 8.X.
+    2. Added compatibility with Ubuntu 20.04.
     3. Added Asynchronous mode to Python API.
-    4. Added compatibility with Ubuntu 20.04, CUDA 11.X, and cuDNN 8.0.X.
+    4. Added `DOWNLOAD_SERVER` variable to CMake. It specifies the link where the models and 3rd party libraries will be downloaded from.
     5. Installation documentation highly simplified and improved.
-    6. Removed all compiler warnings for Ubuntu 20.04.
+    6. Removed all compiler warnings for Ubuntu 20.04 and removed some for Windows 10.
 2. Functions or parameters renamed:
 3. Main bugs fixed:
     1. 90 and 270-degree rotations working again.

@@ -608,7 +608,7 @@ namespace op
                                     // // Single-thread option
                                     // readAndUndistortImage(i, imagePtrs.at(i), cameraIntrinsics.at(i), cameraDistorsions.at(i));
                                 }
-                                readAndUndistortImage(imagePtrs.size()-1, imagePtrs.back(), cameraIntrinsics.back(),
+                                readAndUndistortImage((int)imagePtrs.size()-1, imagePtrs.back(), cameraIntrinsics.back(),
                                                       cameraDistorsions.back());
                                 // Close threads
                                 for (auto& thread : threads)
@@ -714,7 +714,7 @@ namespace op
                 //
                 opLog("\n*** DEVICE INFORMATION ***\n", Priority::High);
 
-                for (auto i = 0u; i < upImpl->mCameraList.GetSize(); i++)
+                for (auto i = 0; i < upImpl->mCameraList.GetSize(); i++)
                 {
                     // Select camera
                     auto cameraPtr = upImpl->mCameraList.GetByIndex(i);
@@ -729,7 +729,7 @@ namespace op
                                   __LINE__, __FUNCTION__, __FILE__);
                 }
 
-                for (auto i = 0u; i < upImpl->mCameraList.GetSize(); i++)
+                for (auto i = 0; i < upImpl->mCameraList.GetSize(); i++)
                 {
                     // Select camera
                     auto cameraPtr = upImpl->mCameraList.GetByIndex(i);
@@ -787,7 +787,7 @@ namespace op
                 //
                 // Serial numbers are the only persistent objects we gather in this
                 // example, which is why a std::vector is created.
-                for (auto i = 0u; i < upImpl->mCameraList.GetSize(); i++)
+                for (auto i = 0; i < upImpl->mCameraList.GetSize(); i++)
                 {
                     // Select camera
                     auto cameraPtr = upImpl->mCameraList.GetByIndex(i);
@@ -1072,7 +1072,7 @@ namespace op
                     // GetByIndex(); this is an alternative to retrieving cameras as
                     // Spinnaker::CameraPtr objects that can be quick and easy for small tasks.
                     //
-                    for (auto i = 0u; i < upImpl->mCameraList.GetSize(); i++)
+                    for (auto i = 0; i < upImpl->mCameraList.GetSize(); i++)
                     {
                         // Select camera
                         auto cameraPtr = upImpl->mCameraList.GetByIndex(i);
@@ -1119,7 +1119,7 @@ namespace op
                     if (cameraList.GetSize() > 0)
                     {
 
-                        for (auto i = 0u; i < cameraList.GetSize(); i++)
+                        for (auto i = 0; i < cameraList.GetSize(); i++)
                         {
                             // Select camera
                             auto cameraPtr = cameraList.GetByIndex(i);

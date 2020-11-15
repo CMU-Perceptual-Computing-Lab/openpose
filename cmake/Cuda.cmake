@@ -21,23 +21,25 @@ endmacro()
 
 # This list will be used for CUDA_ARCH = All option
 # Fermi (3.2 <= CUDA <= 8)
-set(FERMI "20 21(20)")
+# set(FERMI "20 21(20)")
 # Kepler (CUDA >= 5)
-set(KEPLER "30 35 37")
+set(KEPLER "35 37") # set(KEPLER "30 35 37") # This crashes with CUDA 10
 # Maxwell (CUDA >= 6)
 set(MAXWELL "50 52 53")
 # Pascal (CUDA >= 8)
 set(PASCAL "60 61 62")
 # Volta (CUDA >= 9)
-set(VOLTA "70") # set(VOLTA "70 71 72") # This crashes with CUDA 10
+set(VOLTA "70 72") # set(VOLTA "70 71 72") # This crashes with CUDA 10
 # Turing (CUDA >= 10)
 set(TURING "75")
+# Ampere (CUDA >= 11)
+set(AMPERE "80 86")
 if (UNIX AND NOT APPLE)
-  set(Caffe_known_gpu_archs "${KEPLER} ${MAXWELL} ${PASCAL} ${VOLTA} ${TURING}")
+  set(Caffe_known_gpu_archs "${KEPLER} ${MAXWELL} ${PASCAL} ${VOLTA} ${TURING} ${AMPERE}")
   # set(Caffe_known_gpu_archs "${FERMI} ${KEPLER} ${MAXWELL} ${PASCAL} ${VOLTA} ${TURING}")
   # set(Caffe_known_gpu_archs "20 21(20) 30 35 50 52 60 61")
 elseif (WIN32)
-  set(Caffe_known_gpu_archs "${KEPLER} ${MAXWELL} ${PASCAL} ${VOLTA} ${TURING}")
+  set(Caffe_known_gpu_archs "${KEPLER} ${MAXWELL} ${PASCAL} ${VOLTA} ${TURING} ${AMPERE}")
 endif ()
 
 

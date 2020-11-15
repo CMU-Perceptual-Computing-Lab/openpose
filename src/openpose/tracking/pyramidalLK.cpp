@@ -413,7 +413,7 @@ namespace op
                 // Check distance
                 for (size_t i=0; i<status.size(); i++)
                 {
-                    const float distance = std::sqrt(
+                    const double distance = std::sqrt(
                         std::pow(coordI[i].x-coordJ[i].x,2) + std::pow(coordI[i].y-coordJ[i].y,2));
 
                     // Check if lk loss track, if distance is close keep it

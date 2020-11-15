@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "NOTE: This script assumes Ubuntu 18 (Nvidia Graphics card >= 10XX), 16 (card up to 10XX), or 14 (card up to 10XX)."
+echo "NOTE: This script assumes Ubuntu 20 or 18 (Nvidia Graphics card >= 10XX), as well as 16 or 14 (card up to 10XX)."
 echo "Otherwise, install it by yourself or it might fail."
 
 # Install CUDA 8.0
