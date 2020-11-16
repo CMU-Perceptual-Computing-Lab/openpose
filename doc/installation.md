@@ -251,12 +251,13 @@ To install the Python API, ensure that the `BUILD_PYTHON` flag is turned on whil
 ### CPU Version
 To manually select the CPU Version, open CMake GUI mentioned above, and set the `GPU_MODE` flag to `CPU_ONLY`. **NOTE: Accuracy of the CPU version is ~1% higher than CUDA version, so the results will vary.**
 
-- On Ubuntu, OpenPose will link against the Intel MKL version (Math Kernel Library) of Caffe. Alternatively, the user can choose his own Caffe version, by unselecting `USE_MKL` and selecting his own Caffe path.
-- On Windows, it will use the default version of Caffe or one provided by the user on the CPU.
+- Windows, Ubuntu 20, and non-Intel CPUs: No special configuration required other than clicking `CPU_ONLY`.
+- Intel CPUs on Ubuntu versions older than 20 (14, 16, 18): After clicking `CPU_ONLY`, click on `Configured`, then search for `USE_MKL` and set it to true. This way, OpenPose will link against the Intel MKL version (Math Kernel Library) of Caffe. This speeds up CPU version on Ubuntu roughly about 2-3x.
+- Alternatively, the user can choose his own Caffe version, by selecting his own Caffe path (on both Windows and Ubuntu).
 
 The default CPU version takes ~0.2 images per second on Ubuntu (~50x slower than GPU) while the MKL version provides a roughly 2x speedup at ~0.4 images per second. As of now OpenPose does not support MKL on Windows but will at a later date. Also, MKL version does not support unfixed resolution. So a folder of images of different resolutions requires a fixed net resolution (e.g., `--net_resolution 656x368`).
 
-The user can configure the environmental variables `MKL_NUM_THREADS` and `OMP_NUM_THREADS`. They are set at an optimum parameter level by default (i.e., to the number of threads of the machine). However, they can be tweak by running the following commands into the terminal window, right before running any OpenPose application. Eg:
+For MKL, the user can configure the environmental variables `MKL_NUM_THREADS` and `OMP_NUM_THREADS`. They are set at an optimum parameter level by default (i.e., to the number of threads of the machine). However, they can be tweak by running the following commands into the terminal window, right before running any OpenPose application. Eg:
 
 ```bash
 # Optimal number = Number of threads (used by default)

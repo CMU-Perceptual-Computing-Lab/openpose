@@ -248,7 +248,7 @@ endif (${GPU_MODE} MATCHES "CUDA")
 # Intel branch with MKL Support
 if (${GPU_MODE} MATCHES "CPU_ONLY")
   if (UNIX AND NOT APPLE)
-    OPTION(USE_MKL "Use MKL Intel Branch." ON)
+    OPTION(USE_MKL "Use MKL Intel Branch." OFF)
   endif (UNIX AND NOT APPLE)
 endif (${GPU_MODE} MATCHES "CPU_ONLY")
 
