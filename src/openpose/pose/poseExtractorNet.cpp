@@ -344,7 +344,7 @@ namespace op
             opLog("Property " + std::to_string((int)property)
                 + " set from " + std::to_string(propertyElement)
                 + " to " + std::to_string(value), Priority::High);
-            propertyElement = {value};
+            propertyElement = value;
         }
         catch (const std::exception& e)
         {

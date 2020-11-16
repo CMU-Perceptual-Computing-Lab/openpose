@@ -120,7 +120,7 @@ namespace op
         {
             stopAndJoin();
             spIsRunning = isRunningSharedPtr;
-            *spIsRunning = {true};
+            *spIsRunning = true;
             threadFunction();
         }
         catch (const std::exception& e)
@@ -136,7 +136,7 @@ namespace op
         {
             opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             stopAndJoin();
-            *spIsRunning = {true};
+            *spIsRunning = true;
             mThread = {std::thread{&Thread::threadFunction, this}};
         }
         catch (const std::exception& e)
@@ -209,7 +209,7 @@ namespace op
     {
         try
         {
-            *spIsRunning = {false};
+            *spIsRunning = false;
         }
         catch (const std::exception& e)
         {

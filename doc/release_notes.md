@@ -421,8 +421,9 @@ OpenPose Library - Release Notes
     3. Added Asynchronous mode to Python API.
     4. Added `DOWNLOAD_SERVER` variable to CMake. It specifies the link where the models and 3rd party libraries will be downloaded from.
     5. Installation documentation highly simplified and improved.
-    6. Removed all compiler warnings for Ubuntu 20.04 and removed some for Windows 10.
+    6. Removed all compiler warnings for Ubuntu 20.04 (GCC and Clang) as well as some for Windows 10.
 2. Functions or parameters renamed:
+    1. `USE_MKL` disabled by default in Ubuntu. Reason: Not compatible with non-intel CPUs and Ubuntu 20.
 3. Main bugs fixed:
     1. 90 and 270-degree rotations working again.
     2. C++ tutorial API demos only try to cv::imshow the image if it is not empty (avoding the assert that it would trigger otherwise).
