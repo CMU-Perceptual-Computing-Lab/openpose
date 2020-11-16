@@ -9,7 +9,7 @@ import argparse
 
 def display(datums):
     datum = datums[0]
-    cv2.imshow("OpenPose 1.6.0 - Tutorial Python API", datum.cvOutputData)
+    cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", datum.cvOutputData)
     key = cv2.waitKey(1)
     return (key == 27)
 
