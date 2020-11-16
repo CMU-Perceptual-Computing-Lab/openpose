@@ -572,11 +572,9 @@ if (WIN32)
   endif (WITH_3D_RENDERER)
   message(STATUS "Windows dependencies downloaded.")
 
-  # set(VS_VERSION "14")
-  # set(VS_VERSION "15") # Note: VS2017 code seems to simply works in VS2015
-  set(VS_VERSION "16")
-  find_library(OpenCV_LIBS_RELEASE opencv_world420 HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc${VS_VERSION}/lib)
-  find_library(OpenCV_LIBS_DEBUG opencv_world420d HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc${VS_VERSION}/lib)
+  set(OPENCV_VS_VERSION "15")
+  find_library(OpenCV_LIBS_RELEASE opencv_world420 HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc${OPENCV_VS_VERSION}/lib)
+  find_library(OpenCV_LIBS_DEBUG opencv_world420d HINTS ${FIND_LIB_PREFIX}/opencv/x64/vc${OPENCV_VS_VERSION}/lib)
   find_library(GFLAGS_LIBRARY_RELEASE gflags HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
   find_library(GFLAGS_LIBRARY_DEBUG gflagsd HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
   find_library(GLOG_LIBRARY_RELEASE glog HINTS ${FIND_LIB_PREFIX}/caffe3rdparty/lib)
@@ -682,7 +680,7 @@ if (WIN32)
     file(GLOB CAFFE_3RD_PARTY_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/caffe3rdparty/lib/*.dll")
     file(COPY ${CAFFE_3RD_PARTY_DLL} DESTINATION ${BIN_FOLDER})
     # OpenCV DLLs
-    file(GLOB OPENCV_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv/x64/vc${VS_VERSION}/bin/*.dll")
+    file(GLOB OPENCV_DLL "${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv/x64/vc${OPENCV_VS_VERSION}/bin/*.dll")
     file(COPY ${OPENCV_DLL} DESTINATION ${BIN_FOLDER})
     # GLUT DLLs
     if (WITH_3D_RENDERER OR WITH_3D_ADAM_MODEL)
