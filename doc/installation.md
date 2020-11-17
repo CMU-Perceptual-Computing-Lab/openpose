@@ -85,8 +85,8 @@ Any problem installing OpenPose while following this guidelines? Check [doc/faq.
 ### Clone OpenPose
 The first step is to clone the OpenPose repository.
 
-1. Windows: You might use [GitHub Desktop](https://desktop.github.com/).
-2. Ubuntu/Mac:
+1. Windows: You might use [GitHub Desktop](https://desktop.github.com/) or clone it from Powershell.
+2. Ubuntu, Mac, or Windows Powershell:
 ```bash
 git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose
 cd openpose/
