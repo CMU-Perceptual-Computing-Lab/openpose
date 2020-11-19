@@ -41,8 +41,8 @@ OpenPose - Installation
     - **Ubuntu 20**.
     - **Mac OSX** Mavericks and above.
     - **Ubuntu 14, 16 and 18** as well as **Windows 7 and 8** are no longer officially maintained. However, they should still work (but might require minor changes).
-    - **Nvidia Jetson TX1** (for JetPack 3.1), installation instructions in [doc/installation_jetson_tx1.md](./installation_jetson_tx1.md).
-    - **Nvidia Jetson TX2** (for JetPack 3.1 or 3.3), installation instructions in [doc/installation_jetson_tx2_jetpack3.1.md](./installation_jetson_tx2_jetpack3.1.md) and [doc/installation_jetson_tx2_jetpack3.3.md](./installation_jetson_tx2_jetpack3.3.md) respectively.
+    - **Nvidia Jetson TX1** (for JetPack 3.1), installation instructions in [doc/jetson_tx/installation_jetson_tx1.md](./jetson_tx/installation_jetson_tx1.md).
+    - **Nvidia Jetson TX2** (for JetPack 3.1 or 3.3), installation instructions in [doc/jetson_tx/installation_jetson_tx2_jetpack3.1.md](./jetson_tx/installation_jetson_tx2_jetpack3.1.md) and [doc/jetson_tx/installation_jetson_tx2_jetpack3.3.md](./jetson_tx/installation_jetson_tx2_jetpack3.3.md) respectively.
     - OpenPose has also been used on **CentOS** and other **Nvidia Jetson (TK1)** embedded systems. However, we do not officially support them at the moment.
 - **Requirements** for the default configuration
     - CUDA (Nvidia GPU) version:
@@ -244,7 +244,7 @@ Note: Check the differences between these models in [doc/faq.md#difference-betwe
 
 
 ### Python API
-To install the Python API, ensure that the `BUILD_PYTHON` flag is turned on while running CMake GUI and follow the standard installation steps. After the installation, check [doc/modules/python_module.md](./modules/python_module.md) for further details.
+To install the Python API, ensure that the `BUILD_PYTHON` flag is turned on while running CMake GUI and follow the standard installation steps. After the installation, check [doc/python_module.md](./python_module.md) for further details.
 
 
 
@@ -337,14 +337,14 @@ You can include the 3D reconstruction module by:
 3. Follow the CMake installation steps. In addition, set the `WITH_FLIR_CAMERA` (only if Spinnaker was installed) and `WITH_3D_RENDERER` options.
 4. Increased accuracy with Ceres solver (Ubuntu only): For extra 3-D reconstruction accuracy, run `sudo apt-get install libeigen3-dev`, install [Ceres solver](http://ceres-solver.org/installation.html), and enable `WITH_CERES` in CMake when installing OpenPose. Ceres is harder to install in Windows, so we have not tested it so far in there. Feel free to make a pull request if you do.
 
-After installation, check the [doc/modules/3d_reconstruction_module.md](./modules/3d_reconstruction_module.md) instructions.
+After installation, check the [doc/3d_reconstruction_module.md](./3d_reconstruction_module.md) instructions.
 
 
 
 ### Calibration Module
 The calibration module is included by default, but you must also enable `WITH_EIGEN` if you intend to use the extrinsic camera parameter estimation tool. You can set that flag to 2 different values: `BUILD` or `FIND`, check [Requirements and Dependencies](#requirements-and-dependencies) for more information.
 
-After installation, check the [doc/modules/calibration_module.md](./modules/calibration_module.md) instructions.
+After installation, check the [doc/calibration/README.md](./calibration/README.md) instructions.
 
 
 

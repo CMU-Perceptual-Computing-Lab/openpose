@@ -273,4 +273,4 @@ There are 3 different keypoint `Array<float>` elements in the `Datum` class:
 ```
 
 ## Camera Matrix Output Format
-Check [doc/modules/calibration_module.md#camera-matrix-output-format](./modules/calibration_module.md#camera-matrix-output-format).
+Check [doc/calibration/README.md#camera-matrix-output-format](./calibration/README.md#camera-matrix-output-format).

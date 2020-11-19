@@ -48,19 +48,18 @@ It is **authored by [Gines Hidalgo](https://www.gineshidalgo.com), [Zhe Cao](htt
     - [**Foot dataset website**](https://cmu-perceptual-computing-lab.github.io/foot_keypoint_dataset/).
 - **Others**:
     - Available: command-line demo, C++ wrapper, and C++ API.
-    - [**Python API**](doc/modules/python_module.md).
+    - [**Python API**](doc/python_module.md).
     - [**Unity Plugin**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin).
     - CUDA (Nvidia GPU), OpenCL (AMD GPU), and CPU-only (no GPU) versions.
 
-
-
-## Latest Features
-- Sep 2019: [**Training code released**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_train)!
-- Jan 2019: [**Unity plugin released**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin)!
-- Jan 2019: [**Improved Python API**](doc/modules/python_module.md) released! Including body, face, hands, and all the functionality of the C++ API!
-- Dec 2018: [**Foot dataset released**](https://cmu-perceptual-computing-lab.github.io/foot_keypoint_dataset) and [**new paper released**](https://arxiv.org/abs/1812.08008)!
-
 For further details, check [all released features](doc/released_features.md) and [release notes](doc/release_notes.md).
+
+
+
+## Related Work
+- Since Sep 2019: [**Training code**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_train)!
+- Since Jan 2019: [**Unity plugin**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin)!
+- Since Dec 2018: [**Foot dataset**](https://cmu-perceptual-computing-lab.github.io/foot_keypoint_dataset) and [**new paper released**](https://arxiv.org/abs/1812.08008)!
 
 
 
@@ -107,7 +106,7 @@ This analysis was performed using the same images for each algorithm and a batch
 
 ## Contents
 1. [Features](#features)
-2. [Latest Features](#latest-features)
+2. [Related Work](#related-work)
 3. [Results](#results)
 4. [Installation, Reinstallation and Uninstallation](#installation-reinstallation-and-uninstallation)
 5. [Quick Start](#quick-start)
@@ -138,13 +137,11 @@ Most users do not need the OpenPose C++/Python API, but can simply use the OpenP
 bin\OpenPoseDemo.exe --video examples\media\video.avi
 ```
 
-- **Calibration toolbox**: To easily calibrate your cameras for 3-D OpenPose or any other stereo vision task. See [doc/modules/calibration_module.md](doc/modules/calibration_module.md).
-
-- **OpenPose C++ API**: If you want to read a specific input, and/or add your custom post-processing function, and/or implement your own display/saving, check the C++ API tutorial on [examples/tutorial_api_cpp/](examples/tutorial_api_cpp/) and [doc/library_introduction.md](doc/library_introduction.md). You can create your custom code on [examples/user_code/](examples/user_code/) and quickly compile it with CMake when compiling the whole OpenPose project. Quickly **add your custom code**: See [examples/user_code/README.md](examples/user_code/README.md) for further details.
+- **OpenPose C++ API**: If you want to read a specific input, and/or add your custom post-processing function, and/or implement your own display/saving, check the C++ API tutorial on [examples/tutorial_api_cpp/](examples/tutorial_api_cpp/). You can easily **create your custom code** on [examples/user_code/](examples/user_code/) and CMake will automatically compile it together with the whole OpenPose project. See [examples/user_code/README.md](examples/user_code/README.md) for more details.
 
 - **OpenPose Python API**: Analogously to the C++ API, find the tutorial for the Python API on [examples/tutorial_api_python/](examples/tutorial_api_python/).
 
-- **Adding an extra module**: Check [doc/library_add_new_module.md](./doc/library_add_new_module.md).
+- **Calibration toolbox**: To easily calibrate your cameras for 3-D OpenPose or any other stereo vision task. See [doc/calibration/README.md](doc/calibration/README.md).
 
 - **Standalone face or hand detector**:
     - **Face** keypoint detection **without body** keypoint detection: If you want to speed it up (but also reduce amount of detected faces), check the OpenCV-face-detector approach in [doc/standalone_face_or_hand_keypoint_detector.md](doc/standalone_face_or_hand_keypoint_detector.md).

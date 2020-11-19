@@ -3,19 +3,19 @@ OpenPose C++ API - Basic Overview
 
 
 
-Note: Read [doc/library_introduction.md](./library_introduction.md) before this page.
+Note: Read [doc/advanced/library_introduction.md](./library_introduction.md) before this page.
 
 
 
 ## Modules Diagram
 <p align="center">
-    <img src="../doc/UML/1_0_0rc3/UML.png", width="720">
+    <img src="./UML/1_0_0rc3/UML.png", width="720">
 </p>
 
 
 
 ## Main Modules
-In order to use and/or slightly extend the OpenPose library, we try to explain the 2 main components on this section. [doc/UML/](../doc/UML/) contains the class diagram of all these modules.
+In order to use and/or slightly extend the OpenPose library, we try to explain the 2 main components on this section. [doc/advanced/UML](./UML/) contains the class diagram of all these modules.
 
 1. The basic module: `core`.
 
@@ -120,7 +120,7 @@ There are 3 basic configuration modes: single-threading, multi-threading and sma
     threadManager.add(threadId++, wPose, queueIn++, queueOut++);                                // Thread 2, queues 3 -> 3
     ```
 
-3. Smart multi-threading: Some classes are much more faster than others (e.g., pose estimation takes ~100 ms while extracting frames from a video only ~10 ms). In addition, any machine has a limited number of threads. Therefore, the library allows the user to merge the faster threads in order to potentially speed up the code. Check the [real-time pose demo](../examples/openpose/openpose.cpp) too see a more complete example.
+3. Smart multi-threading: Some classes are much more faster than others (e.g., pose estimation takes ~100 ms while extracting frames from a video only ~10 ms). In addition, any machine has a limited number of threads. Therefore, the library allows the user to merge the faster threads in order to potentially speed up the code. Check the [real-time pose demo](../../examples/openpose/openpose.cpp) too see a more complete example.
     ```
     auto threadId = 0;
     auto queueIn = 0;
@@ -192,7 +192,7 @@ In order to be initialized, `PoseExtractorCaffe` has the following constructor a
 
 3. `outputSize` is the final desired resolution to be used. The human pose keypoint locations will be scaled to this output size. However, the heat-maps will have the `netOutputSize` size due to performance.
 
-4. `scaleNumber` and `scaleGap` specify the multi-scale parameters. Explained in the [README.md](../README.md), in the demo section.
+4. `scaleNumber` and `scaleGap` specify the multi-scale parameters. Explained in the [README.md](../../README.md), in the demo section.
 
 5. `poseModel` specifies the model to load (e.g., COCO or MPI).
 

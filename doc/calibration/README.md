@@ -174,7 +174,7 @@ This is a 3x4 matrix, which represents rotation (R as a 3x3 matrix) and translat
 ## Using a Different Camera Brand
 If you plan to use the calibration tool without using OpenPose, you can manually save a video sequence of your desired camera into each of the camera image folders (i.e., in the above example, the `~/Desktop/intrinsics_0`, `~/Desktop/intrinsics_1`, etc. folders).
 
-If you wanna eventually run that camera with OpenPose, check [doc/modules/3d_reconstruction_module.md#using-a-different-camera-brand](./3d_reconstruction_module.md#using-a-different-camera-brand).
+If you wanna eventually run that camera with OpenPose, check [doc/3d_reconstruction_module.md#using-a-different-camera-brand](../3d_reconstruction_module.md#using-a-different-camera-brand).
 
 
 

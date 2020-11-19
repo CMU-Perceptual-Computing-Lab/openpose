@@ -25,10 +25,10 @@ after_build:
     - ps: Get-ChildItem -Path 3rdparty/*.lib -Recurse -File | Copy-Item -Destination artifacts/lib
     - ps: Copy-Item models -Recurse -Destination artifacts/
     - ps: cd artifacts
-    - ps: 7z a ..\openpose.zip .
+    # - ps: 7z a ..\openpose.zip . # `artifacts` disabled
     - ps: cd ..
     # Test
-    - ps: .\artifacts\bin\openpose.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
+    - ps: .\artifacts\bin\OpenPoseDemo.exe --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
 
 # `artifacts` disabled because of the AppVeyor crash: "Maximum allowed artifact storage size of 50000 Mb will be exceeded."
 # artifacts:
