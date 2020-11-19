@@ -106,7 +106,7 @@ NOTE: These instructions are only required when compiling OpenPose brom source. 
                 - [CPU Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_cpu_2018_05_27.zip): Unzip as `3rdparty/windows/caffe_cpu/`.
                 - [OpenCL Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_opencl_2018_02_13.zip): Unzip as `3rdparty/windows/caffe_opencl/`.
             - [Caffe dependencies](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe3rdparty_16_2020_11_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
-            - [OpenCV 4.2.0](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_420_v14_15_2020_04_04.zip): Unzip as `3rdparty/windows/opencv/`.
+            - [OpenCV 4.2.0](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_450_v15_2020_11_18.zip): Unzip as `3rdparty/windows/opencv/`.
 6. **Eigen prerequisite** (optional, only required for some specific extra functionality, such as extrinsic camera calibration):
     - Enable the `WITH_EIGEN` flag when running CMake, and set it to `BUILD`.
     - CMake will automatically download Eigen.

@@ -7,7 +7,7 @@ SET WGET_EXE=wget\wget.exe
 :: Download temporary zip
 echo ----- Downloading OpenCV -----
 SET OPENCV_FOLDER=opencv\
-SET ZIP_NAME=opencv_420_v14_15_2020_04_04.zip
+SET ZIP_NAME=opencv_450_v15_2020_11_18.zip
 SET ZIP_FULL_PATH=%OPENCV_FOLDER%%ZIP_NAME%
 %WGET_EXE% -c http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/%ZIP_NAME% -P %OPENCV_FOLDER%
 echo:

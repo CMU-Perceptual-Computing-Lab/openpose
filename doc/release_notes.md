@@ -433,8 +433,13 @@ OpenPose Library - Release Notes
 
 ## Current version - Future OpenPose 1.7.1
 1. Main improvements:
+    1. Webcam speed boosted on Windows (by updating OpenCV).
+    2. Third party versions updated:
+        1. OpenCV: from 4.2 to 4.5.
+        2. `wget`: from 1.19.1 to 1.20.3.
 2. Functions or parameters renamed:
 3. Main bugs fixed:
+    1. Windows links to the right OpenCV DLL Files (v15, while it was linking to v14).
 
 
 

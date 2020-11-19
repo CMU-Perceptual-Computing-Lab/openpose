@@ -141,7 +141,7 @@ Note: This installer will not incorporate any new features, we recommend to use 
     - Dependencies:
         - [Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_16_2020_11_14.zip): Unzip as `3rdparty/windows/caffe/`.
         - [Caffe dependencies](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe3rdparty_16_2020_11_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
-        - [OpenCV 4.2.0](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_420_v14_15_2020_04_04.zip): Unzip as `3rdparty/windows/opencv/`.
+        - [OpenCV 4.2.0](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_450_v15_2020_11_18.zip): Unzip as `3rdparty/windows/opencv/`.
 2. Open the Visual Studio project sln file by double-cliking on `{openpose_path}\windows\OpenPose.sln`.
 3. In order to verify OpenPose is working, try compiling and executing the demo:
     1. Right click on `OpenPoseDemo` --> `Set as StartUp Project`.
@@ -150,7 +150,7 @@ Note: This installer will not incorporate any new features, we recommend to use 
 4. If you have a webcam connected, OpenPose will automatically start after being compiled.
 5. In order to use the created exe file from the command line (i.e., outside Visual Studio), you have to:
     1. Copy all the DLLs located on `{openpose_folder}\3rdparty\windows\caffe\bin\` on the exe folder: `{openpose_folder}\windows\x64\Release`.
-    2. Copy all the DLLs located on `{openpose_folder}\3rdparty\windows\opencv\x64\vc14\bin\` on the exe folder: `{openpose_folder}\windows\x64\Release`.
+    2. Copy all the DLLs located on `{openpose_folder}\3rdparty\windows\opencv\x64\vc15\bin\` on the exe folder: `{openpose_folder}\windows\x64\Release`.
     3. Open the Windows cmd (Windows button + <kbd>X</kbd>, then <kbd>A</kbd>).
     4. Go to the OpenPose directory, assuming OpenPose has been downloaded on `C:\openpose`: `cd C:\openpose\`.
     5. Run the tutorial commands.

@@ -3,22 +3,22 @@ Asio:
     - Link: https://think-async.com/Asio/Download
 
 Eigen:
-    - Version 3.3.4 (15.06.2017)
+    - Version 3.3.4
     - Link: http://eigen.tuxfamily.org/index.php?title=Main_Page
 
 Unix:
     - Caffe:
-        - Version 1.0.0, extracted from GitHub on 04/26/2018 from the current master branch.
+        - Version 1.0.0, extracted from GitHub from its master branch.
         - Link: https://github.com/BVLC/caffe
         - GitHub SHA: 864520713a4c5ffae7382ced5d34e4cadc608473
 
     - Spinnaker:
-        - Tested on Spinnaker 1.13.0.31 SDK - Linux Ubuntu 16.04 (64-bit) — 05/25/2018 - 41.580MB.
+        - Tested on Spinnaker 1.13.0.31 SDK - Linux Ubuntu 16.04 (64-bit) - 05/25/2018 - 41.580MB.
         - Prerequisites: https://www.ptgrey.com/tan/10685
 
 Windows:
     - Caffe & Caffe dependencies (caffe3rdparty):
-        - Version 1.0.0, extracted from GitHub on 07/11/2017 from the current master branch.
+        - Version 1.0.0, extracted from GitHub from its master branch.
         - Link: https://github.com/BVLC/caffe/tree/windows
 
     - FreeGLUT (only for the 3-D reconstruction demo):
@@ -26,7 +26,7 @@ Windows:
         - Link: https://www.transmissionzero.co.uk/software/freeglut-devel/
 
     - OpenCV:
-        - Version 4.2.0, extracted from their oficial website: section `Releases`, subsection `OpenCV – 4.2.0`, `Windows` version.
+        - Version 4.5.0, extracted from their oficial website: section `Releases`, subsection `OpenCV - 4.5.0`, `Windows` version.
         - Link: https://opencv.org/releases/
 
     - Unzip:
@@ -34,5 +34,5 @@ Windows:
         - Link: http://stahlworks.com/dev/?tool=zipunzip
 
     - Wget:
-        - Version wget-1.19.1-win64.
+        - Version wget-1.20.3-win64.
         - Link: https://eternallybored.org/misc/wget/
