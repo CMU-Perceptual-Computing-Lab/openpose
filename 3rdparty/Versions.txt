@@ -3,8 +3,8 @@ Asio:
     - Link: https://think-async.com/Asio/Download
 
 Eigen:
-    - Version 3.3.4
-    - Link: http://eigen.tuxfamily.org/index.php?title=Main_Page
+    - Version 3.3.8
+    - Link: http://eigen.tuxfamily.org/index.php
 
 Unix:
     - Caffe:

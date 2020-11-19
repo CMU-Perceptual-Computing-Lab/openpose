@@ -290,11 +290,10 @@ option(WITH_OPENCV_WITH_OPENGL "Much faster GUI display, but you must also enabl
 # Set the acceleration library
 if (WIN32 OR APPLE)
   set(WITH_EIGEN NONE CACHE STRING "Select the Eigen mode: NONE if not required, BUILD to let OpenPose download it, or FIND to let CMake find it (e.g., if you installed it manually).")
-  set_property(CACHE WITH_EIGEN PROPERTY STRINGS NONE BUILD FIND)
 elseif (UNIX AND NOT APPLE)
   set(WITH_EIGEN NONE CACHE STRING "Select the Eigen mode: NONE if not required, BUILD to let OpenPose download it, or FIND to let CMake find it (e.g., if you installed it manually or used `sudo apt-get install libeigen3-dev`).")
-  set_property(CACHE WITH_EIGEN PROPERTY STRINGS NONE BUILD FIND)
 endif (WIN32 OR APPLE)
+set_property(CACHE WITH_EIGEN PROPERTY STRINGS NONE BUILD FIND)
 
 # # Suboptions for OpenPose tracking
 # if (UNIX AND NOT APPLE)
@@ -402,7 +401,7 @@ else (${WITH_EIGEN} MATCHES "NONE")
     # Download it
     set(OP_URL "${DOWNLOAD_SERVER}3rdparty/")
     set(FIND_LIB_PREFIX ${CMAKE_SOURCE_DIR}/3rdparty/)
-    download_zip("eigen_2018_05_23.zip" ${OP_URL} ${FIND_LIB_PREFIX} 29B9B2FD4679D587BB67467F09EE8365)
+    download_zip("eigen_2020_11_18.zip" ${OP_URL} ${FIND_LIB_PREFIX} 57672715C62C1A795300FE1AE4D2687E)
     # Set path
     set(EIGEN3_INCLUDE_DIRS "3rdparty/eigen/include/")
   # Leave to CMake to find it
@@ -860,32 +859,28 @@ endif (USE_ASIO)
 
 # Calibration
 if (NOT ${WITH_EIGEN} MATCHES "NONE")
-  include_directories(
-      ${EIGEN3_INCLUDE_DIRS})
-  set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} Eigen3::Eigen)
+  include_directories(${EIGEN3_INCLUDE_DIRS})
+  if (${WITH_EIGEN} MATCHES "FIND")
+    set(OpenPose_3rdparty_libraries ${OpenPose_3rdparty_libraries} Eigen3::Eigen)
+  endif (${WITH_EIGEN} MATCHES "FIND")
 endif (NOT ${WITH_EIGEN} MATCHES "NONE")
 
 if (APPLE)
-  include_directories(
-      "/usr/local/opt/openblas/include")
+  include_directories("/usr/local/opt/openblas/include")
 endif (APPLE)
 
 if (USE_MKL)
- include_directories(
-     "${MKL_PATH}/include/")
+ include_directories("${MKL_PATH}/include/")
 endif (USE_MKL)
 
 if (Caffe_FOUND)
-  include_directories(
-      ${Caffe_INCLUDE_DIRS})
+  include_directories(${Caffe_INCLUDE_DIRS})
 endif (Caffe_FOUND)
 
 if (${GPU_MODE} MATCHES "CUDA")
-  include_directories(
-      ${CUDA_INCLUDE_DIRS})
+  include_directories(${CUDA_INCLUDE_DIRS})
 elseif (${GPU_MODE} MATCHES "OPENCL")
-  include_directories(
-    ${OpenCL_INCLUDE_DIRS})
+  include_directories(${OpenCL_INCLUDE_DIRS})
 endif (${GPU_MODE} MATCHES "CUDA")
 # 3D
 if (WITH_3D_RENDERER)
@@ -908,9 +903,7 @@ if (WITH_3D_ADAM_MODEL)
 endif (WITH_3D_ADAM_MODEL)
 # Windows includes
 if (WIN32)
-  include_directories(
-    # ${Boost_INCLUDE_DIRS}
-    ${WINDOWS_INCLUDE_DIRS})
+  include_directories(${WINDOWS_INCLUDE_DIRS})
 endif (WIN32)
 
 
