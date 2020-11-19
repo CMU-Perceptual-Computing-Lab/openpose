@@ -435,13 +435,15 @@ OpenPose Library - Release Notes
 1. Main improvements:
     1. Webcam speed boosted on Windows (by updating OpenCV).
     2. Third party versions updated:
-        1. OpenCV: From 4.2 to 4.5.
+        1. OpenCV (Windows): From 4.2 to 4.5.
         2. Eigen: From 3.3.4 to 3.3.8.
-        3. `wget`: From 1.19.1 to 1.20.3.
+        3. `wget` (Windows): From 1.19.1 to 1.20.3.
+    3. AppVeyor now tests the actual OpenPoseDemo.exe example (Windows).
 2. Functions or parameters renamed:
 3. Main bugs fixed:
     1. Eigen working again on Windows.
     2. OpenPose links to the right OpenCV DLL Files on Windows (it was wrongly linking to v14 rather than v15).
+    3. AppVeyor auto-testing working again by disabling artifacts (Windows).
 
 
 

@@ -1,10 +1,10 @@
-image: Visual Studio 2017
+image: Visual Studio 2019
 clone_folder: c:\openpose
 
 build_script:
     - mkdir build
     - cd build
-    - cmake -DGPU_MODE=CPU_ONLY -G "Visual Studio 15 2017 Win64" ..
+    - cmake -DGPU_MODE=CPU_ONLY -G "Visual Studio 16 2019" -A x64 ..
     - cmake --build . --config "Release"
 
 after_build:
@@ -27,7 +27,10 @@ after_build:
     - ps: cd artifacts
     - ps: 7z a ..\openpose.zip .
     - ps: cd ..
+    # Test
+    - ps: .\artifacts\bin\openpose.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
 
-artifacts:
-    - path: openpose.zip
-      name: OpenPose
+# `artifacts` disabled because of the AppVeyor crash: "Maximum allowed artifact storage size of 50000 Mb will be exceeded."
+# artifacts:
+#     - path: openpose.zip
+#       name: OpenPose
