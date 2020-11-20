@@ -84,7 +84,7 @@ Go to the 3rd party folder and clone the caffe repo:
 ```
 cd 3rdparty
 rm -rf caffe
-git clone https://github.com/BVLC/caffe.git
+git clone https://github.com/CMU-Perceptual-Computing-Lab/caffe.git
 ```
 
 Now, we have to make a change to the Caffe cmake configurations:
