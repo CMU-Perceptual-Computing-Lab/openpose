@@ -301,7 +301,7 @@ Also as a side note, if the default installation (i.e., the one explained above)
 or if you get a `Attempt to free invalid Pointer` runtime error, configure caffe manually to not include the `leveldb` dependency. Steps:
 - Re-create the build folder: `rm -rf build; mkdir build; cd build`.
 - `brew uninstall caffe` to remove the version of Caffe previously installed via cmake.
-- Follow the **Problem with installing Caffe from homebrew** in the [prerequisite.md](prerequisite.md#75) file, under Mac OS Prerequisites.
+- Follow the **Problem with installing Caffe from homebrew** in the [prerequisite.md](prerequisites.md#problem-with-installing-caffe-from-homebrew) file, under Mac OS Prerequisites.
 - Run `cmake-gui` and click `Configure` and `Generate`.
 
 In addition, if you face an OpenCV error during compiling time similar to `fatal error: 'opencv2/highgui/highgui.hpp' file not found`, please apply the following patch (this error has been reported in the latest OSX 10.14):
