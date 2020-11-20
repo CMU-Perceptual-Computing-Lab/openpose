@@ -15,28 +15,28 @@ OpenPose - Installation (deprecated)
 
 
 ## Operating Systems
-See [doc/installation.md#operating-systems](./installation.md#operating-systems).
+See [doc/installation/installation.md#operating-systems](../installation.md#operating-systems).
 
 
 
 ## Requirements
-See [doc/installation.md#requirements](./installation.md#requirements).
+See [doc/installation/installation.md#requirements](../installation.md#requirements).
 
 
 
 ## Clone OpenPose
-See [doc/installation.md#clone-openpose](./installation.md#clone-openpose).
+See [doc/installation/installation.md#clone-openpose](../installation.md#clone-openpose).
 
 
 
 ## Update OpenPose
-See [doc/installation.md#update-openpose](./installation.md#update-openpose).
+See [doc/installation/installation.md#update-openpose](../installation.md#update-openpose).
 
 
 
 ## Ubuntu
 ### Installation - CMake
-Recommended installation method, it is simpler and offers more customization settings. See [doc/installation.md](installation.md).
+Recommended installation method, it is simpler and offers more customization settings. See [doc/installation/installation.md](../installation.md).
 
 
 
@@ -56,7 +56,7 @@ Build Caffe & the OpenPose library + download the required Caffe models for Ubun
 ```bash
 bash scripts/ubuntu_deprecated/install_caffe_and_openpose_if_cuda8.sh
 ```
-**Highly important**: This script only works with CUDA 8 and Ubuntu 14 or 16. Otherwise, see [doc/installation.md](installation.md) or [Installation - Manual Compilation](#installation---manual-compilation).
+**Highly important**: This script only works with CUDA 8 and Ubuntu 14 or 16. Otherwise, see [doc/installation/installation.md](../installation.md) or [Installation - Manual Compilation](#installation---manual-compilation).
 
 
 
@@ -97,7 +97,7 @@ Alternatively to the script installation, if you want to use CUDA 7, avoid using
     make clean
     make all -j`nproc`
     ```
-**Highly important**: There are 2 `Makefile.config.Ubuntu##.example` analogous files, one in the main folder and one in [3rdparty/caffe/](../3rdparty/caffe/), corresponding to OpenPose and Caffe configuration files respectively. Any change must be done to both files (e.g., OpenCV 3 flag, Atlab/OpenBLAS/MKL flag, etc.). E.g., for CUDA 8 and Ubuntu16: [3rdparty/caffe/Makefile.config.Ubuntu16_cuda8.example](../3rdparty/caffe/Makefile.config.Ubuntu16.example) and [scripts/ubuntu_deprecated/Makefile.config.Ubuntu16_cuda8.example](../scripts/ubuntu_deprecated/Makefile.config.Ubuntu16_cuda8.example).
+**Highly important**: There are 2 `Makefile.config.Ubuntu##.example` analogous files, one in the main folder and one in [3rdparty/caffe/](../../../3rdparty/caffe/), corresponding to OpenPose and Caffe configuration files respectively. Any change must be done to both files (e.g., OpenCV 3 flag, Atlab/OpenBLAS/MKL flag, etc.). E.g., for CUDA 8 and Ubuntu16: [3rdparty/caffe/Makefile.config.Ubuntu16_cuda8.example](../../../3rdparty/caffe/Makefile.config.Ubuntu16.example) and [scripts/ubuntu_deprecated/Makefile.config.Ubuntu16_cuda8.example](../../../scripts/ubuntu_deprecated/Makefile.config.Ubuntu16_cuda8.example).
 
 
 
@@ -126,7 +126,7 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
     3. [**cuDNN 5.1**](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0`.
 
 #### CMake Installer
-Recommended installation method, it is simpler and offers more customization settings. See [doc/installation.md](installation.md). Note that it is a beta version, post in GitHub any issue you find.
+Recommended installation method, it is simpler and offers more customization settings. See [doc/installation/installation.md](../installation.md). Note that it is a beta version, post in GitHub any issue you find.
 
 
 #### Deprecated Windows Installer
@@ -154,7 +154,7 @@ Note: This installer will not incorporate any new features, we recommend to use 
     3. Open the Windows cmd (Windows button + <kbd>X</kbd>, then <kbd>A</kbd>).
     4. Go to the OpenPose directory, assuming OpenPose has been downloaded on `C:\openpose`: `cd C:\openpose\`.
     5. Run the tutorial commands.
-6. Check OpenPose was properly installed by running it on the default images, video or webcam: [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
+6. Check OpenPose was properly installed by running it on the default images, video or webcam: [doc/quick_start.md#quick-start](../../quick_start.md#quick-start).
 
 
 
@@ -174,7 +174,7 @@ If you updated some software that our library or 3rdparty use, or you simply wan
 
 
 ## Doxygen Documentation Autogeneration
-See [doc/installation.md#doxygen-documentation-autogeneration-ubuntu-only](./installation.md#doxygen-documentation-autogeneration-ubuntu-only).
+See [doc/installation/installation.md#doxygen-documentation-autogeneration-ubuntu-only](../installation.md#doxygen-documentation-autogeneration-ubuntu-only).
 
 
 
@@ -196,4 +196,4 @@ We only modified some Caffe compilation flags and minor details. You can use you
 
 
 ## Compiling without cuDNN
-See [doc/installation.md#compiling-without-cudnn](./installation.md#compiling-without-cudnn).
+See [doc/installation/installation.md#compiling-without-cudnn](../installation.md#compiling-without-cudnn).

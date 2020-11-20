@@ -21,7 +21,7 @@ It is **authored by [Gines Hidalgo](https://www.gineshidalgo.com), [Zhe Cao](htt
 
 
 <p align="center">
-    <img src="doc/media/pose_face_hands.gif", width="480">
+    <img src=".github/media/pose_face_hands.gif", width="480">
     <br>
     <sup>Authors <a href="https://www.gineshidalgo.com" target="_blank">Gines Hidalgo</a> (left) and <a href="https://jhugestar.github.io" target="_blank">Hanbyul Joo</a> (right) in front of the <a href="http://domedb.perception.cs.cmu.edu" target="_blank">CMU Panoptic Studio</a></sup>
 </p>
@@ -29,7 +29,7 @@ It is **authored by [Gines Hidalgo](https://www.gineshidalgo.com), [Zhe Cao](htt
 ## Features
 - **Functionality**:
     - **2D real-time multi-person keypoint detection**:
-        - 15 or 18 or **25-keypoint body/foot keypoint estimation**. **Running time invariant to number of detected people**.
+        - 15, 18 or **25-keypoint body/foot keypoint estimation**. **Running time invariant to number of detected people**.
         - **6-keypoint foot keypoint estimation**. Integrated together with the 25-keypoint body/foot keypoint detector.
         - **2x21-keypoint hand keypoint estimation**. Currently, **running time depends** on **number of detected people**.
         - **70-keypoint face keypoint estimation**. Currently, **running time depends** on **number of detected people**.
@@ -66,39 +66,39 @@ For further details, check [all released features](doc/released_features.md) and
 ## Results
 ### Body and Foot Estimation
 <p align="center">
-    <img src="doc/media/dance_foot.gif", width="360">
+    <img src=".github/media/dance_foot.gif", width="360">
     <br>
     <sup>Testing the <a href="https://www.youtube.com/watch?v=2DiQUX11YaY" target="_blank"><i>Crazy Uptown Funk flashmob in Sydney</i></a> video sequence with OpenPose</sup>
 </p>
 
 ### 3-D Reconstruction Module (Body, Foot, Face, and Hands)
 <p align="center">
-    <img src="doc/media/openpose3d.gif", width="360">
+    <img src=".github/media/openpose3d.gif", width="360">
     <br>
     <sup>Testing the 3D Reconstruction Module of OpenPose</sup>
 </p>
 
 ### Body, Foot, Face, and Hands Estimation
 <p align="center">
-    <img src="doc/media/pose_face.gif", width="360">
-    <img src="doc/media/pose_hands.gif", width="360">
+    <img src=".github/media/pose_face.gif", width="360">
+    <img src=".github/media/pose_hands.gif", width="360">
     <br>
     <sup>Authors <a href="https://www.gineshidalgo.com" target="_blank">Gines Hidalgo</a> (left image) and <a href="http://www.cs.cmu.edu/~tsimon" target="_blank">Tomas Simon</a> (right image) testing OpenPose</sup>
 </p>
 
 ### Unity Plugin
 <p align="center">
-    <img src="doc/media/unity_main.png", width="240">
-    <img src="doc/media/unity_body_foot.png", width="240">
-    <img src="doc/media/unity_hand_face.png", width="240">
+    <img src=".github/media/unity_main.png", width="240">
+    <img src=".github/media/unity_body_foot.png", width="240">
+    <img src=".github/media/unity_hand_face.png", width="240">
     <br>
-    <sup><a href="http://tianyizhao.com" target="_blank">Tianyi Zhao</a> and <a href="https://www.gineshidalgo.com" target="_blank">Gines Hidalgo</a> testing their <a href="https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin" target="_blank">OpenPose Unity Plugin</a></sup>
+    <sup><a href="http://tianyizhao.com" target="_blank">Tianyi Zhao</a> and <a href="https://www.gineshidalgo.com" target="_blank">Gines Hidalgo</a> testing the <a href="https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin" target="_blank">OpenPose Unity Plugin</a></sup>
 </p>
 
 ### Runtime Analysis
 Inference time comparison between the 3 available pose estimation libraries: OpenPose, Alpha-Pose (fast Pytorch version), and Mask R-CNN:
 <p align="center">
-    <img src="doc/media/openpose_vs_competition.png", width="360">
+    <img src=".github/media/openpose_vs_competition.png", width="360">
 </p>
 This analysis was performed using the same images for each algorithm and a batch size of 1. Each analysis was repeated 1000 times and then averaged. This was all performed on a system with a Nvidia 1080 Ti and CUDA 8. Megvii (Face++) and MSRA GitHub repositories were excluded because they only provide pose estimation results given a cropped person. However, they suffer the same problem than Alpha-Pose and Mask R-CNN, their runtimes grow linearly with the number of people.
 
@@ -122,14 +122,14 @@ This analysis was performed using the same images for each algorithm and a batch
 ## Installation, Reinstallation and Uninstallation
 **Windows portable version**: Simply download and use the latest version from the [Releases](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases) section.
 
-Otherwise, check [doc/installation.md](doc/installation.md) for instructions on how to build OpenPose from source.
+Otherwise, check [doc/installation/installation.md](doc/installation/installation.md) for instructions on how to build OpenPose from source.
 
 
 
 ## Quick Start
 Most users do not need the OpenPose C++/Python API, but can simply use the OpenPose Demo:
 
-- **OpenPose Demo**: To easily process images/video/webcam and display/save the results. See [doc/demo_overview.md](doc/demo_overview.md). E.g., run OpenPose in a video with:
+- **OpenPose Demo**: To easily process images/video/webcam and display/save the results. See [doc/quick_start.md](./doc/quick_start.md) and [doc/demo_overview.md](./doc/demo_overview.md). E.g., run OpenPose in a video with:
 ```
 # Ubuntu
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi
@@ -137,15 +137,17 @@ Most users do not need the OpenPose C++/Python API, but can simply use the OpenP
 bin\OpenPoseDemo.exe --video examples\media\video.avi
 ```
 
-- **OpenPose C++ API**: If you want to read a specific input, and/or add your custom post-processing function, and/or implement your own display/saving, check the C++ API tutorial on [examples/tutorial_api_cpp/](examples/tutorial_api_cpp/). You can easily **create your custom code** on [examples/user_code/](examples/user_code/) and CMake will automatically compile it together with the whole OpenPose project. See [examples/user_code/README.md](examples/user_code/README.md) for more details.
+- **OpenPose C++ API**: If you want to read a specific input, and/or add your custom post-processing function, and/or implement your own display/saving, check the C++ API tutorial on [examples/tutorial_api_cpp/](examples/tutorial_api_cpp/).
+    - For quick prototyping: You can easily **create your custom code** on [examples/user_code/](examples/user_code/) and CMake will automatically compile it together with the whole OpenPose project. See [examples/user_code/README.md](examples/user_code/README.md) for more details.
 
 - **OpenPose Python API**: Analogously to the C++ API, find the tutorial for the Python API on [examples/tutorial_api_python/](examples/tutorial_api_python/).
+    - For quick prototyping: You can simply duplicate any of the [examples/tutorial_api_python/](examples/tutorial_api_python/) files and rename it within the same folder.
 
-- **Calibration toolbox**: To easily calibrate your cameras for 3-D OpenPose or any other stereo vision task. See [doc/calibration/README.md](doc/calibration/README.md).
+- **Calibration toolbox**: To easily calibrate your cameras for 3-D OpenPose or any other stereo vision task. See [doc/advanced/calibration_module.md](doc/advanced/calibration_module.md).
 
-- **Standalone face or hand detector**:
-    - **Face** keypoint detection **without body** keypoint detection: If you want to speed it up (but also reduce amount of detected faces), check the OpenCV-face-detector approach in [doc/standalone_face_or_hand_keypoint_detector.md](doc/standalone_face_or_hand_keypoint_detector.md).
-    - **Use your own face/hand detector**: You can use the hand and/or face keypoint detectors with your own face or hand detectors, rather than using the body detector. E.g., useful for camera views at which the hands are visible but not the body (OpenPose detector would fail). See [doc/standalone_face_or_hand_keypoint_detector.md](doc/standalone_face_or_hand_keypoint_detector.md).
+- **Standalone face or hand detector**. See [doc/advanced/standalone_face_or_hand_keypoint_detector.md](doc/advanced/standalone_face_or_hand_keypoint_detector.md) if you want to do any of the following:
+    - **Face** keypoint detection **without body** keypoint detection: Pros: Speedup and RAM/GPU memory reduction. Cons: Worse accuracy and less detected number of faces).
+    - **Use your own face/hand detector**: You can use the hand and/or face keypoint detectors with your own face or hand detectors, rather than using the body detector. E.g., useful for camera views at which the hands are visible but not the body (OpenPose detector would fail).
 
 
 

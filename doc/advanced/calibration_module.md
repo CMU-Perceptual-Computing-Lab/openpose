@@ -3,14 +3,15 @@ OpenPose Calibration Module and Demo
 
 ## Contents
 1. [Introduction](#introduction)
-2. [Installing the Calibration Module](#installing-the-calibration-module)
-3. [Running Calibration](#running-calibration)
+2. [Example Chessboard](#example-chessboard)
+3. [Installing the Calibration Module](#installing-the-calibration-module)
+4. [Running Calibration](#running-calibration)
     1. [General Quality Tips](#general-quality-tips)
     2. [Step 1 - Distortion and Intrinsic Parameter Calibration](#step-1---distortion-and-intrinsic-parameter-calibration)
     3. [Step 2 - Extrinsic Parameter Calibration](#step-2---extrinsic-parameter-calibration)
-4. [Camera Matrix Output Format](#camera-matrix-output-format)
-5. [Using a Different Camera Brand](#using-a-different-camera-brand)
-6. [Naming Convention for the Output Images](#naming-convention-for-the-output-images)
+5. [Camera Matrix Output Format](#camera-matrix-output-format)
+6. [Using a Different Camera Brand](#using-a-different-camera-brand)
+7. [Naming Convention for the Output Images](#naming-convention-for-the-output-images)
 
 
 
@@ -23,9 +24,14 @@ Note: We are not aiming to have the best calibration toolbox, but the simplest o
 
 
 
+## Example Chessboard
+[doc/Chessboard_in_PDF/](./Chessboard_in_PDF/) contains a chessboard example that you can use to follow this documentation. You can simply print the PDF version ([doc/Chessboard_in_PDF/pattern.pdf](./Chessboard_in_PDF/pattern.pdf)), making your your printer maintains the aspect ratio and, if possible, does not zoom in/out the image. Simply replace the "127" used below by the size of each square on your printed chessboard.
+
+
+
 
 ## Installing the Calibration Module
-Check [doc/installation.md#calibration-module](../installation.md#calibration-module) for installation steps.
+Check [doc/installation/installation.md#calibration-module](../installation/installation.md#calibration-module) for installation steps.
 
 
 
@@ -174,7 +180,7 @@ This is a 3x4 matrix, which represents rotation (R as a 3x3 matrix) and translat
 ## Using a Different Camera Brand
 If you plan to use the calibration tool without using OpenPose, you can manually save a video sequence of your desired camera into each of the camera image folders (i.e., in the above example, the `~/Desktop/intrinsics_0`, `~/Desktop/intrinsics_1`, etc. folders).
 
-If you wanna eventually run that camera with OpenPose, check [doc/3d_reconstruction_module.md#using-a-different-camera-brand](../3d_reconstruction_module.md#using-a-different-camera-brand).
+If you wanna eventually run that camera with OpenPose, check [doc/advanced/3d_reconstruction_module.md#using-a-different-camera-brand](../advanced/3d_reconstruction_module.md#using-a-different-camera-brand).
 
 
 

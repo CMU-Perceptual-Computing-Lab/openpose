@@ -23,13 +23,13 @@ This module performs 3-D keypoint (body, face, and hand) reconstruction and rend
 
 
 ## Installation
-Check [doc/installation.md#3d-reconstruction-module](./installation.md#3d-reconstruction-module) for installation steps.
+Check [doc/installation/installation.md#3d-reconstruction-module](../installation/installation.md#3d-reconstruction-module) for installation steps.
 
 
 
 
 ## Non Linear Optimization
-In order to increase the 3-D reconstruction accuracy, OpenPose optionally performs non-linear optimization if Ceres solver support is enabled (only available in Ubuntu for now). To enable it, check [doc/installation.md#3d-reconstruction-module](./installation.md#3d-reconstruction-module) for more details.
+In order to increase the 3-D reconstruction accuracy, OpenPose optionally performs non-linear optimization if Ceres solver support is enabled (only available in Ubuntu for now). To enable it, check [doc/installation/installation.md#3d-reconstruction-module](../installation/installation.md#3d-reconstruction-module) for more details.
 
 
 
@@ -69,7 +69,7 @@ This demo assumes n arbitrary stereo cameras from the FLIR company (formerly Poi
 The user must manually get the intrinsic and extrinsic parameters of the stereo-cameras. Note, we will assume `Flir` cameras, which is specified by default with the flag `--camera_parameter_path "models/cameraParameters/flir/"`. Otherwise, change the path to your camera name accordingly.
 
 There are 2 alternatives to calibrate the cameras:
-1. Using the OpenPose calibration toolbox, [doc/calibration/README.md](./calibration/README.md).
+1. Using the OpenPose calibration toolbox, [doc/advanced/calibration_module.md](./calibration_module.md).
 2. Using your own calibration toolbox (or if you already know the camera parameters of your cameras):
     1. Create a xml file for each camera named as `models/cameraParameters/flir/{camera_serial_number}.xml`.
     2. The elements inside each xml file are the extrinsic parameters of the camera (`CameraMatrix`), the intrinsic parameters (`Intrinsics`), and the distortion coefficients (`Distortion`). Copy the format from `models/cameraParameters/flir/17012332.xml.example`. For the extrinsic parameters of the camera, it allows you to set the coordinate origin (so that 3-d keypoints are distances with respect to that origin).
@@ -86,7 +86,7 @@ OpenPose will display the cameras sorted by serial number, starting in the left 
 
 
 ## Quick Start
-Check the [doc/quick_start.md#3-d-reconstruction](./quick_start.md#3-d-reconstruction) for basic examples.
+Check the [doc/quick_start.md#3-d-reconstruction](../quick_start.md#3-d-reconstruction) for basic examples.
 
 
 
@@ -100,7 +100,7 @@ The visual GUI should show 3 screens.
 It should be similar to the following image.
 
 <p align="center">
-    <img src="../media/openpose3d.gif">
+    <img src="../../.github/media/openpose3d.gif">
 </p>
 
 

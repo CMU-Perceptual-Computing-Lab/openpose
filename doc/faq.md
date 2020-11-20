@@ -67,7 +67,7 @@ Also, hands and face increases the GPU memory requeriments, and 4 GB GPUs might 
 #### Cannot Find OpenPose.dll Error (Windows)
 **Q: System cannot find the file specified (Openpose.dll) error when trying to release** - Using a folder with images does work, but the video and/or the webcam do not. Note: often on Windows.
 
-**A**: Visual Studio (VS) and the [doc/installation.md](./installation.md) section is only intended if you plan to modify the OpenPose code or integrate it with another library or project. If you just want to use the OpenPose demo, simply follow [doc/installation.md#windows-portable-demo](./installation.md#windows-portable-demo) and download the OpenPose binaries in the [Releases](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases) section.
+**A**: Visual Studio (VS) and the [doc/installation/installation.md](./installation/installation.md) section is only intended if you plan to modify the OpenPose code or integrate it with another library or project. If you just want to use the OpenPose demo, simply follow [doc/installation/installation.md#windows-portable-demo](./installation/installation.md#windows-portable-demo) and download the OpenPose binaries in the [Releases](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases) section.
 
 If you need to compile it with Visual Studio (VS), then keep reading. In this error, VS is simply saying that there were errors while compiling the OpenPose library. Try compiling only the OpenPose library (not the demo), by right clicking on it, then `Set as StartUp Project`, and finally right click + `Build`. Then, at the bottom left part of VS, press `Error list` and then you should see which errors VS encountered while compiling. In that way, VS gives you the exact error so you can know it and share the exact issue.
 
@@ -96,12 +96,12 @@ Note: OpenPose library is not an executable, but a library. So instead clicking 
 
 **A**: This answer assumes that never a single person is detected. If in your case it works sometimes, then check [Always Zero People Detected](#always-zero-people-detected). This always-0-people problem usually occurs in 2 situations: 1) When you selection `--num_gpu 0`, and 2) when the caffemodel has not been properly downloaded. E.g., if the connection drops when downloading the models.
 
-For problem 1, setting `--num_gpu 0` means that no processing is done, so you can use this setting e.g., to record webcam. This functionality is kept for back-compatibility. You are most probably trying to run on CPU-only mode, for that, install OpenPose in CPU-only mode following [doc/installation.md](./installation.md).
+For problem 1, setting `--num_gpu 0` means that no processing is done, so you can use this setting e.g., to record webcam. This functionality is kept for back-compatibility. You are most probably trying to run on CPU-only mode, for that, install OpenPose in CPU-only mode following [doc/installation/installation.md](./installation/installation.md).
 
 For problem 2, try the following solutions (in this order):
 
 1. Assuming that default OpenPose (i.e., BODY_25 model) failed, try with `--model_pose COCO` and `--model_pose MPII` models. If any of them work, the `caffemodel` files of the other models were corrupted while being downloaded. Otherwise, it will most probably be a Caffe/protobuf issue.
-2. Assuming that the model is corrupted, remove the current models in the model folder, and download them manually from the links in [doc/installation.md](./installation.md). Alternatively, remove them and re-run Cmake again. If this does not work, try downloading the COCO_25 model from the browser following the download link on this [Dropbox link](https://www.dropbox.com/s/03r8pa8sikrqv62/pose_iter_584000.caffemodel).
+2. Assuming that the model is corrupted, remove the current models in the model folder, and download them manually from the links in [doc/installation/installation.md](./installation/installation.md). Alternatively, remove them and re-run Cmake again. If this does not work, try downloading the COCO_25 model from the browser following the download link on this [Dropbox link](https://www.dropbox.com/s/03r8pa8sikrqv62/pose_iter_584000.caffemodel).
 3. If none of the OpenPose models are working, make sure Caffe is working properly and that you can run the Caffe examples with other caffemodel / prototxt files.
 
 
@@ -136,7 +136,7 @@ F0821 14:26:29.665053 22812 upgrade_proto.cpp:97] Check failed: ReadProtoFromBin
 
 **A**: This error has been solved in the latest OpenPose versions. Completely remove OpenPose and re-download the latest version (just cleaning the compilation or removing the `build/` folder will not work).
 
-If you wanna use your custom Caffe and it has this error: This error only happens in some Ubuntu machines. Following #787, compile your own Caffe with an older version of it. The hacky (quick but not recommended way) is to follow [#787#issuecomment-415476837](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/787#issuecomment-415476837), the elegant way (compatible with future OpenPose versions) is to build your own Caffe independently, following [doc/installation.md#custom-caffe-ubuntu-only](./installation.md#custom-caffe-ubuntu-only).
+If you wanna use your custom Caffe and it has this error: This error only happens in some Ubuntu machines. Following #787, compile your own Caffe with an older version of it. The hacky (quick but not recommended way) is to follow [#787#issuecomment-415476837](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/787#issuecomment-415476837), the elegant way (compatible with future OpenPose versions) is to build your own Caffe independently, following [doc/installation/installation.md#custom-caffe-ubuntu-only](./installation/installation.md#custom-caffe-ubuntu-only).
 
 
 
@@ -194,7 +194,7 @@ git submodule update
 #### Obscure CMake Error about Caffe or Pybind
 **Q:** There appear some weird and obscure errors on CMake about Caffe and/or Pybind.
 
-**A**: Check [doc/installation.md](./installation.md) to run the `git submodule` command, i.e.,
+**A**: Check [doc/installation/installation.md](./installation/installation.md) to run the `git submodule` command, i.e.,
 ```
 git submodule update --init --recursive --remote
 ```
@@ -233,7 +233,7 @@ Check the [doc/speed_up_openpose.md#profiling-speed](./speed_up_openpose.md#prof
 #### Webcam Slower than Images
 **Q: Webcam is slow** - Using a folder with images matches the speed FPS benchmarks, but the webcam has lower FPS. Note: often on Windows.
 
-**A**: OpenCV has some issues with some camera drivers (specially on Windows). The first step should be to compile OpenCV by your own and re-compile OpenPose after that (following the [doc/installation.md#reinstallation](./installation.md#reinstallation) section). If the speed is still slower, you can better debug it by running a webcam OpenCV example (e.g. [this C++ example](http://answers.opencv.org/question/1/how-can-i-get-frames-from-my-webcam/)). If you are able to get the proper FPS with the OpenCV demo but OpenPose is still low, then let us know!
+**A**: OpenCV has some issues with some camera drivers (specially on Windows). The first step should be to compile OpenCV by your own and re-compile OpenPose after that (following the [doc/installation/installation.md#reinstallation](./installation/installation.md#reinstallation) section). If the speed is still slower, you can better debug it by running a webcam OpenCV example (e.g. [this C++ example](http://answers.opencv.org/question/1/how-can-i-get-frames-from-my-webcam/)). If you are able to get the proper FPS with the OpenCV demo but OpenPose is still low, then let us know!
 
 
 

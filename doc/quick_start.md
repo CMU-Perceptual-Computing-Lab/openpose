@@ -40,7 +40,7 @@ bin\OpenPoseDemo.exe --video examples\media\video.avi
 bin\OpenPoseDemo.exe --video examples\media\video.avi --face --hand
 ```
 ```
-:: Windows - Library - Assuming you copied the DLLs following doc/installation.md#windows
+:: Windows - Library - Assuming you copied the DLLs following doc/installation/installation.md#windows
 build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi
 :: With face and hands
 build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --face --hand
@@ -62,7 +62,7 @@ bin\OpenPoseDemo.exe
 bin\OpenPoseDemo.exe --face --hand
 ```
 ```
-:: Windows - Library - Assuming you copied the DLLs following doc/installation.md#windows
+:: Windows - Library - Assuming you copied the DLLs following doc/installation/installation.md#windows
 build\x64\Release\OpenPoseDemo.exe
 :: With face and hands
 build\x64\Release\OpenPoseDemo.exe --face --hand
@@ -84,7 +84,7 @@ bin\OpenPoseDemo.exe --image_dir examples\media\
 bin\OpenPoseDemo.exe --image_dir examples\media\ --face --hand
 ```
 ```
-:: Windows - Library - Assuming you copied the DLLs following doc/installation.md#windows
+:: Windows - Library - Assuming you copied the DLLs following doc/installation/installation.md#windows
 build\x64\Release\OpenPoseDemo.exe --image_dir examples\media\
 :: With face and hands
 build\x64\Release\OpenPoseDemo.exe --image_dir examples\media\ --face --hand
@@ -118,9 +118,9 @@ bin\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 --scale_gap 0.
 bin\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25 --hand --hand_scale_number 6 --hand_scale_range 0.4 --face
 ```
 ```
-:: Windows - Library - Assuming you copied the DLLs following doc/installation.md#windows: Body
+:: Windows - Library - Assuming you copied the DLLs following doc/installation/installation.md#windows: Body
 build\x64\Release\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25
-:: Windows - Library - Assuming you copied the DLLs following doc/installation.md#windows: Body + Hand + Face
+:: Windows - Library - Assuming you copied the DLLs following doc/installation/installation.md#windows: Body + Hand + Face
 build\x64\Release\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25 --hand --hand_scale_number 6 --hand_scale_range 0.4 --face
 ```
 
@@ -147,7 +147,7 @@ bin\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1
 bin\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --face --hand
 ```
 ```
-:: Windows - Library - Assuming you copied the DLLs following doc/installation.md#windows
+:: Windows - Library - Assuming you copied the DLLs following doc/installation/installation.md#windows
 build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1
 :: With face and hands
 build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --face --hand

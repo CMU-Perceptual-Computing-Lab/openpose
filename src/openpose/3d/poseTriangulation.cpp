@@ -147,8 +147,8 @@ namespace op
                             " detection from 4 cameras is about 2-3 pixels. It might be simply a wrong OpenPose"
                             " detection. However, if this message appears very frequently, your calibration parameters"
                             " might be wrong. Note: If you have introduced your own camera intrinsics, are they an"
-                            " upper triangular matrix (as specified in the OpenPose doc/calibration/README.md"
-                            " and doc/3d_reconstruction_module.md)?", Priority::High);
+                            " upper triangular matrix (as specified in the OpenPose doc/advanced/calibration_module.md"
+                            " and doc/advanced/3d_reconstruction_module.md)?", Priority::High);
                     // opLog("Reprojection error: " + std::to_string(reprojectionErrorTotal)); // To debug reprojection error
                     return atLeastOnePointProjected;
                 }

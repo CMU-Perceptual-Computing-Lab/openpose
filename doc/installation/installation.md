@@ -41,8 +41,8 @@ OpenPose - Installation
     - **Ubuntu 20**.
     - **Mac OSX** Mavericks and above.
     - **Ubuntu 14, 16 and 18** as well as **Windows 7 and 8** are no longer officially maintained. However, they should still work (but might require minor changes).
-    - **Nvidia Jetson TX1** (for JetPack 3.1), installation instructions in [doc/jetson_tx/installation_jetson_tx1.md](./jetson_tx/installation_jetson_tx1.md).
-    - **Nvidia Jetson TX2** (for JetPack 3.1 or 3.3), installation instructions in [doc/jetson_tx/installation_jetson_tx2_jetpack3.1.md](./jetson_tx/installation_jetson_tx2_jetpack3.1.md) and [doc/jetson_tx/installation_jetson_tx2_jetpack3.3.md](./jetson_tx/installation_jetson_tx2_jetpack3.3.md) respectively.
+    - **Nvidia Jetson TX1** (for JetPack 3.1), installation instructions in [doc/installation/jetson_tx/installation_jetson_tx1.md](./jetson_tx/installation_jetson_tx1.md).
+    - **Nvidia Jetson TX2** (for JetPack 3.1 or 3.3), installation instructions in [doc/installation/jetson_tx/installation_jetson_tx2_jetpack3.1.md](./jetson_tx/installation_jetson_tx2_jetpack3.1.md) and [doc/installation/jetson_tx/installation_jetson_tx2_jetpack3.3.md](./jetson_tx/installation_jetson_tx2_jetpack3.3.md) respectively.
     - OpenPose has also been used on **CentOS** and other **Nvidia Jetson (TK1)** embedded systems. However, we do not officially support them at the moment.
 - **Requirements** for the default configuration
     - CUDA (Nvidia GPU) version:
@@ -110,21 +110,21 @@ cmake-gui ..
 ```
 2. Select the OpenPose directory as project source directory, and a non-existing or empty sub-directory (e.g., `build`) where the Makefile files (Ubuntu) or Visual Studio solution (Windows) will be generated. If `build` does not exist, it will ask you whether to create it. Press `Yes`.
 <p align="center">
-    <img src="media/cmake_installation/im_1.png", width="480">
-    <img src="media/cmake_installation/im_1_windows.png", width="480">
+    <img src="media/cmake_installation_im_1.png", width="480">
+    <img src="media/cmake_installation_im_1_windows.png", width="480">
 </p>
 
 3. Press the `Configure` button, keep the generator in `Unix Makefiles` (Ubuntu) or set it to your 64-bit Visual Studio version (Windows), and press `Finish`. Note for Windows users: CMake-GUI has changed their design after version 14. For versions older than 14, you usually select `Visual Studio XX 20XX Win64` as the generator (`X` depends on your VS version), while the `Optional toolset to use` must be empty. However, new CMake versions require you to select only the VS version as the generator, e.g., `Visual Studio 15 2017`, and then you must manually choose `x64` for the `Optional platform for generator`. See the following images as example.
 <p align="center">
-    <img src="media/cmake_installation/im_2.png", width="240">
-    <img src="media/cmake_installation/im_2_windows.png", width="240">
-    <img src="media/cmake_installation/im_2_windows_new.png", width="240">
+    <img src="media/cmake_installation_im_2.png", width="240">
+    <img src="media/cmake_installation_im_2_windows.png", width="240">
+    <img src="media/cmake_installation_im_2_windows_new.png", width="240">
 </p>
 
 4. If this step is successful, the `Configuring done` text will appear in the bottom box in the last line. Otherwise, some red text will appear in that same bottom box.
 <p align="center">
-    <img src="media/cmake_installation/im_3.png", width="480">
-    <img src="media/cmake_installation/im_3_windows.png", width="480">
+    <img src="media/cmake_installation_im_3.png", width="480">
+    <img src="media/cmake_installation_im_3_windows.png", width="480">
 </p>
 
 5. Press the `Generate` button and proceed to [Compilation](#compilation). You can now close CMake.
@@ -226,7 +226,7 @@ In order to update it or reinstall it:
 
 
 ## Deploying or Exporting OpenPose to Other Projects
-See [doc/deployment.md](./deployment.md).
+See [doc/advanced/deployment.md](./advanced/deployment.md).
 
 
 
@@ -337,14 +337,14 @@ You can include the 3D reconstruction module by:
 3. Follow the CMake installation steps. In addition, set the `WITH_FLIR_CAMERA` (only if Spinnaker was installed) and `WITH_3D_RENDERER` options.
 4. Increased accuracy with Ceres solver (Ubuntu only): For extra 3-D reconstruction accuracy, run `sudo apt-get install libeigen3-dev`, install [Ceres solver](http://ceres-solver.org/installation.html), and enable `WITH_CERES` in CMake when installing OpenPose. Ceres is harder to install in Windows, so we have not tested it so far in there. Feel free to make a pull request if you do.
 
-After installation, check the [doc/3d_reconstruction_module.md](./3d_reconstruction_module.md) instructions.
+After installation, check the [doc/advanced/3d_reconstruction_module.md](./advanced/3d_reconstruction_module.md) instructions.
 
 
 
 ### Calibration Module
-The calibration module is included by default, but you must also enable `WITH_EIGEN` if you intend to use the extrinsic camera parameter estimation tool. You can set that flag to 2 different values: `BUILD` or `FIND`, check [Requirements and Dependencies](#requirements-and-dependencies) for more information.
+The calibration module is included by default, but you must also enable `WITH_EIGEN` if you intend to use the extrinsic camera parameter estimation tool. You can set that flag to 2 different values: `AUTOBUILD` (recommended) or `FIND` (check [Requirements and Dependencies](#requirements-and-dependencies) for more information).
 
-After installation, check the [doc/calibration/README.md](./calibration/README.md) instructions.
+After installation, check the [doc/advanced/calibration_module.md](./advanced/calibration_module.md) instructions.
 
 
 
@@ -367,7 +367,7 @@ OpenPose uses a [custom fork of Caffe](https://github.com/CMU-Perceptual-Computi
 
 Alternatively, you can use your own Caffe distribution on Ubuntu/Mac by 1) disabling `BUILD_CAFFE`, 2) setting `Caffe_INCLUDE_DIRS` to `{CAFFE_PATH}/include/caffe`, and 3) setting `Caffe_LIBS` to `{CAFFE_PATH}/build/lib/libcaffe.so`, as shown in the image below. Note that cuDNN-compatible Caffe version is required in order to get the maximum possible accuracy in OpenPose.
 <p align="center">
-    <img src="media/cmake_installation/im_5.png", width="480">
+    <img src="media/cmake_installation_im_5.png", width="480">
 </p>
 
 For Windows, simply replace the OpenCV DLLs and include folder for your custom one.

@@ -36,7 +36,7 @@ You might prefer to download them manually:
         - Run `./configure --qt-gui`. Make sure no error occurred.
         - Run ``./bootstrap && make -j`nproc` && sudo make install -j`nproc` ``. Make sure no error occurred.
         - Assuming your CMake downloaded folder is in {CMAKE_FOLDER_PATH}, everytime these instructions mentions `cmake-gui`, you will have to replace that line by `{CMAKE_FOLDER_PATH}/bin/cmake-gui`.
-    - Ubuntu 14 or 16: Run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [doc/installation.md#CMake Command Line Configuration (Ubuntu Only)](./installation.md#cmake-command-line-configuration-ubuntu-only).
+    - Ubuntu 14 or 16: Run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [doc/installation/installation.md#CMake-Command-Line-Configuration-(Ubuntu-Only)](./installation/installation.md#cmake-command-line-configuration-ubuntu-only).
 3. Nvidia GPU version prerequisites:
     1. **Note: OpenPose has been tested extensively with CUDA 8.0 (cuDNN 5.1) for Ubuntu 14 and 16, CUDA 10.1 (cuDNN 7.5.1) for Ubuntu 18, and CUDA 11 for Ubuntu 20**. We highly recommend using those versions for those Operating Systems to minimize potential installation issues. Other versions should also work, but we do not provide support about any CUDA/cuDNN installation/compilation issue, as well as problems related to their integration into OpenPose.
     2. **CUDA**:
@@ -58,12 +58,12 @@ You might prefer to download them manually:
 6. Install **Caffe, OpenCV, and Caffe prerequisites**:
     - OpenCV must be already installed on your machine. It can be installed with `sudo apt-get install libopencv-dev`. You could also use your own compiled OpenCV version.
     - Caffe prerequisites: By default, OpenPose uses Caffe under the hood. If you have not used Caffe previously, install its dependencies by running `sudo bash ./scripts/ubuntu/install_deps.sh` after installing your desired CUDA and cuDNN versions. If you are using Ubuntu 14 or 16, you can simply run `sudo bash ./scripts/ubuntu/install_deps_and_cuda.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX).
-7. **Eigen prerequisite** (optional, only required for some specific extra functionality, such as extrinsic camera calibration):
-    - If you enable the `WITH_EIGEN` flag when running CMake, you must have Eigen already installed in your system. Note that [Eigen <= 3.3.6 is not supported by CUDA >=9.1](https://bitbucket.org/eigen/eigen/commits/034b6c3e101792a3cc3ccabd9bfaddcabe85bb58?at=default). In order to install it, you can perform any of the 3 following options (but only 1 of them!), while making sure that Eigen version is compatible with CUDA:
-        1. Do not do anything if you set the `WITH_EIGEN` flag to `BUILD`, CMake will automatically download Eigen. Alternatively, you might prefer to download it manually:
-            - [Eigen3](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/eigen_2020_11_18.zip): Unzip as `3rdparty/eigen/`.
-        2. Run `sudo apt-get install libeigen3-dev` if you prefer to set `WITH_EIGEN` to `FIND`.
-        3. Use your own version of Eigen by setting `WITH_EIGEN` to `BUILD`, run CMake so that OpenPose downloads the zip file, and then replace the contents of `3rdparty/eigen/` by your own version.
+7. **Eigen prerequisite** (optional, only required for some specific extra functionality, such as extrinsic camera calibration). You can perform any of the 2 following options (but only 1 of them!)
+    - Recommended: Simply set the `WITH_EIGEN` flag to `AUTOBUILD`. CMake will automatically download it and configure OpenPose to use it. If you prefer to download it manually (or if your firewall blocks CMake from downloading it):
+        - [Eigen 3.3.8](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/eigen_2020_11_18.zip): Unzip as `3rdparty/eigen/`.
+    - Advanced (not recommended): If you set `WITH_EIGEN` to `FIND`, you must have Eigen already installed in your system. Note that [Eigen <= 3.3.6 is not supported by CUDA >=9.1](https://bitbucket.org/eigen/eigen/commits/034b6c3e101792a3cc3ccabd9bfaddcabe85bb58?at=default). In order to install it (make sure that Eigen version is compatible with CUDA!):
+        - Run `sudo apt-get install libeigen3-dev` and link CMake to the right CMake.
+    - Advanced (not recommended): Or you could also use your own version of Eigen by setting `WITH_EIGEN` to `AUTOBUILD`, click `Configure` to let CMake download the zip file, and replace `3rdparty/eigen/` by your own version.
 
 
 
@@ -72,7 +72,7 @@ You might prefer to download them manually:
 2. Install **CMake GUI**: Run the command `brew cask install cmake`.
 3. Install **Caffe, OpenCV, and Caffe prerequisites**: Run `bash scripts/osx/install_deps.sh`.
 4. **Eigen prerequisite** (optional, only required for some specific extra functionality, such as extrinsic camera calibration):
-    - Enable the `WITH_EIGEN` flag when running CMake, and set it to `BUILD`.
+    - Enable the `WITH_EIGEN` flag when running CMake, and set it to `AUTOBUILD`.
     - CMake will automatically download Eigen.
     - Alternatively, you can manually download it from the [Eigen3 website](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/eigen_2020_11_18.zip), and unzip as `3rdparty/eigen/`.
 
@@ -108,6 +108,6 @@ NOTE: These instructions are only required when compiling OpenPose brom source. 
             - [Caffe dependencies](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe3rdparty_16_2020_11_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
             - [OpenCV 4.2.0](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_450_v15_2020_11_18.zip): Unzip as `3rdparty/windows/opencv/`.
 6. **Eigen prerequisite** (optional, only required for some specific extra functionality, such as extrinsic camera calibration):
-    - Enable the `WITH_EIGEN` flag when running CMake, and set it to `BUILD`.
+    - Set the `WITH_EIGEN` flag in CMake to `AUTOBUILD`.
     - CMake will automatically download Eigen.
     - Alternatively, you can manually download it from the [Eigen3 website](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/eigen_2020_11_18.zip), run CMake so that OpenPose downloads the zip file, and then replace the contents of `3rdparty/eigen/` by your own version.

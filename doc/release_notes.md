@@ -405,7 +405,7 @@ OpenPose Library - Release Notes
     1. The debug version of OpenPose actually targets debug lib/DLL files of 3rd-party libraries.
     2. The debug version no longer prints on console a huge log message from Caffe with the network when starting OpenPose (fixed by using the right debug libraries).
     4. Natural sort now works properly with filenames containing numbers longer than the limit of an int.
-    5. The optionally auto-generated bin folder only contains the required DLLs (depending on the CMake configuration), instead of all of them.
+    5. The optionally auto-generated bin directory only contains the required DLLs (depending on the CMake configuration), instead of all of them.
     6. When WrapperStructFace and WrapperStructHand are not called and configured for Wrapper, setting the body to CPU rendering was not working.
     7. Skeleton rendering bugs:
         1. All or some skeletons were not properly displayed or completely missing on images with many people (e.g., videos with about 32 people).
@@ -439,7 +439,8 @@ OpenPose Library - Release Notes
         2. Eigen: From 3.3.4 to 3.3.8.
         3. `wget` (Windows): From 1.19.1 to 1.20.3.
     3. AppVeyor now tests the actual OpenPoseDemo.exe example (Windows).
-    4. Doc restructured and divided into subfolders to help users (`advanced`, `calibration`, `deprecated`, etc).
+    4. Doc restructured to improve simplicity. It is now divided into subdirectories (`advanced`, `deprecated`, `installation`, etc).
+    5. Calibration doc links to included chessboard pdf.
 2. Functions or parameters renamed:
 3. Main bugs fixed:
     1. Eigen working again on Windows.

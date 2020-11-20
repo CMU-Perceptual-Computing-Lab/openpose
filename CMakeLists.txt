@@ -289,11 +289,11 @@ option(WITH_OPENCV_WITH_OPENGL "Much faster GUI display, but you must also enabl
 
 # Set the acceleration library
 if (WIN32 OR APPLE)
-  set(WITH_EIGEN NONE CACHE STRING "Select the Eigen mode: NONE if not required, BUILD to let OpenPose download it, or FIND to let CMake find it (e.g., if you installed it manually).")
+  set(WITH_EIGEN NONE CACHE STRING "Select the Eigen mode: NONE if not required, AUTOBUILD to let OpenPose download it, or FIND to let CMake find it (e.g., if you installed it manually).")
 elseif (UNIX AND NOT APPLE)
-  set(WITH_EIGEN NONE CACHE STRING "Select the Eigen mode: NONE if not required, BUILD to let OpenPose download it, or FIND to let CMake find it (e.g., if you installed it manually or used `sudo apt-get install libeigen3-dev`).")
+  set(WITH_EIGEN NONE CACHE STRING "Select the Eigen mode: NONE if not required, AUTOBUILD to let OpenPose download it, or FIND to let CMake find it (e.g., if you installed it manually or used `sudo apt-get install libeigen3-dev`).")
 endif (WIN32 OR APPLE)
-set_property(CACHE WITH_EIGEN PROPERTY STRINGS NONE BUILD FIND)
+set_property(CACHE WITH_EIGEN PROPERTY STRINGS NONE AUTOBUILD FIND)
 
 # # Suboptions for OpenPose tracking
 # if (UNIX AND NOT APPLE)
@@ -397,7 +397,7 @@ else (${WITH_EIGEN} MATCHES "NONE")
   # OpenPose flags
   add_definitions(-DUSE_EIGEN)
   # OpenPose download/builds Eigen
-  if (${WITH_EIGEN} MATCHES "BUILD")
+  if (${WITH_EIGEN} MATCHES "AUTOBUILD")
     # Download it
     set(OP_URL "${DOWNLOAD_SERVER}3rdparty/")
     set(FIND_LIB_PREFIX ${CMAKE_SOURCE_DIR}/3rdparty/)
@@ -416,7 +416,7 @@ else (${WITH_EIGEN} MATCHES "NONE")
     else (CUDA_VERSION_STRING STRGREATER "9.0")
       find_package(Eigen3 3 REQUIRED NO_MODULE)
     endif (CUDA_VERSION_STRING STRGREATER "9.0")
-  endif (${WITH_EIGEN} MATCHES "BUILD")
+  endif (${WITH_EIGEN} MATCHES "AUTOBUILD")
 endif (${WITH_EIGEN} MATCHES "NONE")
 
 if (UNIX OR APPLE)
@@ -483,7 +483,7 @@ if (UNIX OR APPLE)
     # find_package(GLUT REQUIRED) # TODO: Duplicated of WITH_3D_RENDERER, clean somehow (like Eigen)
     # git clone --recursive https://github.com/libigl/libigl.git
     # No installation, it's header only
-    # TODO: It's header only (as Eigen), do BUILD option too to download it
+    # TODO: It's header only (as Eigen), do AUTOBUILD option too to download it
     find_package(LIBIGL REQUIRED)
     find_package(OpenMP REQUIRED)
     # Only adam/renderer::Renderer::IdleSaveImage() uses it. Make dependency optional in hand_model
@@ -1022,7 +1022,7 @@ if (UNIX OR APPLE)
     find_package(Doxygen)
     if (DOXYGEN_FOUND)
       # Set input and output files
-      set(DOXYGEN_FILE ${CMAKE_SOURCE_DIR}/doc/doc_autogeneration.doxygen)
+      set(DOXYGEN_FILE ${CMAKE_SOURCE_DIR}/scripts/doc_autogeneration.doxygen)
 
       # Custom target to build the documentation
       add_custom_target(doc_doxygen ALL
