@@ -12,7 +12,7 @@ OpenPose - Prerequisites
 ### General Tips
 **Very important**: New Nvidia model GPUs (e.g., Nvidia V, GTX 2080, v100, any Nvidia with Volta or Turing architecture, etc.) require (at least) CUDA 10. CUDA 8 would fail!
 
-In addition, CMake automatically downloads all the OpenPose models. However, **some firewall or company networks block these downloads**. 
+In addition, CMake automatically downloads all the OpenPose models. However, **some firewall or company networks block these downloads**.
 
 You might prefer to download them manually:
 - [BODY_25 model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/body_25/pose_iter_584000.caffemodel): download in `models/pose/body_25/`.
@@ -71,6 +71,58 @@ You might prefer to download them manually:
 1. If you don't have `brew`, install it by running `bash scripts/osx/install_brew.sh` on your terminal.
 2. Install **CMake GUI**: Run the command `brew cask install cmake`.
 3. Install **Caffe, OpenCV, and Caffe prerequisites**: Run `bash scripts/osx/install_deps.sh`.
+
+#### [Problem with installing Caffe from homebrew]:
+If you have installed Caffe from homebrew, you might run into an `invalid pointer error`. In such a case, the leveldb dependency of Caffe is causing an issue. There is a very simple fix.
+
+Note: If you have not, uninstall the current Caffe bottle:
+`brew uninstall caffe`
+
+Go to the 3rd party folder and clone the caffe repo:
+```
+cd 3rdparty
+rm -rf caffe
+git clone https://github.com/BVLC/caffe.git
+```
+
+Now, we have to make a change to the Caffe cmake configurations:
+
+```
+vi caffe/cmake/Modules/FindvecLib.cmake
+```
+
+Out here, look for the following line:
+`find_path(vecLib_INCLUDE_DIR vecLib.h`
+
+and under that there should be a `PATH` variable.
+
+Set the path Variable to `/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/Headers/` or where ever else you have your vecLib headers. This is cruicial.
+
+Ensure that you have `NO_DEFAULT_PATH` set.
+
+The file should now contain this:
+
+```
+find_path(vecLib_INCLUDE_DIR vecLib.h
+          DOC "vecLib include directory"
+          PATHS /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/Headers/
+          NO_DEFAULT_PATH)
+```
+
+Now we have to remove the `leveldb` dependency, and build without it. The `leveldb` dependency is the library that is causing the issue of `Attempt to Free Invalid Pointer`, not the `tcmalloc`. This is a documented issue on their [github repo](https://github.com/google/leveldb/issues/634).
+
+To do this we need to edit the `CMakeLists.txt` file for caffe.
+
+Run `vi caffe/CMakeLists.txt`.
+
+Look for the following line: `caffe_option(USE_LEVELDB "Build with levelDB" ON)`.
+We need to set this to off:
+
+`caffe_option(USE_LEVELDB "Build with levelDB" OFF)`
+
+Once you are done with this, you may continue the build process as usual.
+Make sure that `BUILD_CAFFE` is set to ON.
+
 4. **Eigen prerequisite** (optional, only required for some specific extra functionality, such as extrinsic camera calibration):
     - Enable the `WITH_EIGEN` flag when running CMake, and set it to `AUTOBUILD`.
     - CMake will automatically download Eigen.

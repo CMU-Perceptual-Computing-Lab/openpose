@@ -197,7 +197,7 @@ We add links to some community-based work based on OpenPose. Note: We do not sup
         - Option 1:
             - 1. (if necessary) Install the latest version of docker (There are extra steps, but if you're on Ubuntu, the main one is `sudo apt-get install docker-ce`.  Other steps can be found [here](https://phoenixnap.com/kb/how-to-install-docker-on-ubuntu-18-04) )
             - 2. `docker pull exsidius/openpose` - [Guide](https://github.com/gormonn/openpose-docker/blob/master/README.md)
-            - 3. [more details](https://cloud.docker.com/repository/docker/exsidius/openpose/general) 
+            - 3. [more details](https://cloud.docker.com/repository/docker/exsidius/openpose/general)
         - [Link 2](https://github.com/esemeniuc/openpose-docker), it claims to also include Python support. Read and post ONLY on [issue thread #1102](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/1102).
         - [Link 3](https://github.com/ExSidius/openpose-docker/blob/master/Dockerfile).
         - [Link 4](https://cloud.docker.com/repository/docker/exsidius/openpose/general).
@@ -297,15 +297,11 @@ If you only have an integrated Intel Graphics card, then it will most probably b
 ./build/examples/openpose/openpose.bin --num_gpu 1 --num_gpu_start 1
 ```
 
-Also as a side note, if the default installation fails (i.e., the one explained above), install Caffe separately and set `BUILD_CAFFE` to false in the CMake config. Steps:
+Also as a side note, if the default installation fails (i.e., the one explained above), configure caffe manually to not include the `leveldb` dependency. Steps:
 - Re-create the build folder: `rm -rf build; mkdir build; cd build`.
 - `brew uninstall caffe` to remove the version of Caffe previously installed via cmake.
-- `brew install caffe` to install Caffe separately.
-- Run `cmake-gui` and make the following adjustments to the cmake config:
-    1. `BUILD_CAFFE` set to false.
-    2. `Caffe_INCLUDE_DIRS` set to `/usr/local/include/caffe`.
-    3. `Caffe_LIBS` set to `/usr/local/lib/libcaffe.dylib`.
-    4. Run `Configure` and `Generate` from CMake GUI.
+- Follow the ####Problem with installing Caffe from homebrew#### in the [prerequisite.md](prerequisite.md#75) file, under Mac OS Prerequisites.
+- Run `cmake-gui` and click `Configure` and `Generate`.
 
 In addition, if you face an OpenCV error during compiling time similar to `fatal error: 'opencv2/highgui/highgui.hpp' file not found`, please apply the following patch (this error has been reported in the latest OSX 10.14):
 ```bash
