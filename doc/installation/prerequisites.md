@@ -72,8 +72,10 @@ You might prefer to download them manually:
 2. Install **CMake GUI**: Run the command `brew cask install cmake`.
 3. Install **Caffe, OpenCV, and Caffe prerequisites**: Run `bash scripts/osx/install_deps.sh`.
 
+<a name="problem-with-installing-caffe-from-homebrew"></a>
 #### [Problem with installing Caffe from homebrew]:
-If you have installed Caffe from homebrew, you might run into an `invalid pointer error`. In such a case, the leveldb dependency of Caffe is causing an issue. There is a very simple fix.
+
+If you have installed Caffe from homebrew, you might run into an `Attempt to free invalid pointer`. In such a case, the **leveldb** dependency of Caffe is causing an issue. There is a very simple fix.
 
 Note: If you have not, uninstall the current Caffe bottle:
 `brew uninstall caffe`
@@ -108,7 +110,7 @@ find_path(vecLib_INCLUDE_DIR vecLib.h
           PATHS /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/Headers/
           NO_DEFAULT_PATH)
 ```
-
+This will fix the `vecLib` not found issues when `BUILD_CAFFE` is run.
 Now we have to remove the `leveldb` dependency, and build without it. The `leveldb` dependency is the library that is causing the issue of `Attempt to Free Invalid Pointer`, not the `tcmalloc`. This is a documented issue on their [github repo](https://github.com/google/leveldb/issues/634).
 
 To do this we need to edit the `CMakeLists.txt` file for caffe.
