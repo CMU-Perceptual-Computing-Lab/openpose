@@ -112,7 +112,7 @@ namespace op
          * Order heatmaps: body parts + background (as appears in POSE_BODY_PART_MAPPING) + (x,y) channel of each PAF
          * (sorted as appears in POSE_BODY_PART_PAIRS). See `pose/poseParameters.hpp`.
          * The user can choose the heatmaps normalization: ranges [0, 1], [-1, 1] or [0, 255]. Check the
-         * `heatmaps_scale` flag in {OpenPose_path}doc/demo_overview.md for more details.
+         * `heatmaps_scale` flag in {OpenPose_path}doc/demo_not_quick_start.md for more details.
          * Size: #heatmaps x output_net_height x output_net_width
          */
         Array<float> poseHeatMaps;

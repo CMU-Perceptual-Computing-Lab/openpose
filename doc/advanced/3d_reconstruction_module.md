@@ -86,7 +86,7 @@ OpenPose will display the cameras sorted by serial number, starting in the left 
 
 
 ## Quick Start
-Check the [doc/quick_start.md#3-d-reconstruction](../quick_start.md#3-d-reconstruction) for basic examples.
+Check the [doc/demo_quick_start.md#3-d-reconstruction](../demo_quick_start.md#3-d-reconstruction) for basic examples.
 
 
 

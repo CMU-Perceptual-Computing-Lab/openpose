@@ -1,49 +1,89 @@
-OpenPose - Quick Start
+OpenPose Demo - Quick Start
 ====================================
 
+Forget about the OpenPose code, just download the portable Windows binaries (or compile the code from source) and use the demo by following this tutorial!
+
 ## Contents
-1. [Quick Start](#quick-start)
-    1. [BODY_25 vs. COCO vs. MPI Models](#body-25-vs-coco-vs-mpi-models)
-    2. [Mac OSX Version Additional Steps](#mac-osx-version-additional-steps)
-    3. [Running on Video](#running-on-video)
-    4. [Running on Webcam](#running-on-webcam)
-    5. [Running on Images](#running-on-images)
+1. [Mac OSX Additional Step](#mac-osx-additional-step)
+2. [Quick Start](#quick-start)
+    1. [Improving Memory and Speed but Decreasing Accuracy](#improving-memory-and-speed-but-decreasing-accuracy)
+    2. [Running on Video](#running-on-video)
+    3. [Running on Webcam](#running-on-webcam)
+    4. [Running on Images](#running-on-images)
+    5. [Face and Hands](#face-and-hands)
     6. [Maximum Accuracy Configuration](#maximum-accuracy-configuration)
     7. [3-D Reconstruction](#3-d-reconstruction)
-    8. [Tracking](#tracking)
-2. [Expected Visual Results](#expected-visual-results)
+    8. [JSON Output](json-output)
+    9. [JSON Output with No Visualization](json-output-with-no-visualization)
+    10. [Not Running All GPUs](#not-running-all-gpus)
+    11. [Kinect 2.0 as Webcam on Windows 10](#kinect-20-as-webcam-on-windows-10)
+    12. [Tracking](#tracking)
+3. [Advanced Quick Start](#advanced-quick-start)
 
 
 
-## Quick Start
-Check OpenPose was properly installed by running it on the default images, video, or webcam.
-
-Check that the library is working properly by running any of the following commands on any command-line interface program. In Ubuntu, Mac, and other Unix systems, use any command-line interface, such as `Terminal` or `Terminator`. In Windows, open the `PowerShell` (recommended) or Windows Command Prompt (CMD). They can be open by pressing the Windows button + X, and then A. Feel free to watch any Youtube video tutorial if you are not familiar with these non-GUI tools. Make sure that you are in the **root directory of the project** (i.e., in the OpenPose folder, not inside `build/` nor `windows/` nor `bin/`). In addition, `examples/media/video.avi` and `examples/media` do exist, no need to change the paths.
 
 
+## Mac OSX Version Additional Step
+If you are using a Mac and selected `CPU_ONLY`, you can skip this section.
 
-### BODY_25 vs. COCO vs. MPI Models
-The BODY_25 model (`--model_pose BODY_25`) includes both body and foot keypoints and it is based in [OpenPose: Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields](https://arxiv.org/abs/1812.08008). COCO and MPI models are slower, less accurate, and do not contain foot keypoints. They are based in our older paper [Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields](https://arxiv.org/abs/1611.08050). We highly recommend only using the BODY_25 model.
-
-There is an exception, for CPU version, the COCO and MPI models seems to be faster. Accuracy is still better for the BODY_25 model.
-
-
-
-### Mac OSX Version Additional Steps
-
-If you compiled Mac with `OPENCL` support, and have inbuilt AMD graphics card, you have to manually select your AMD GPU. To do that, first note which device your Graphics card is set under. Most likely, your AMD device will be device 2.
+If you are using a Mac and selected `OPENCL` support, and it has an inbuilt AMD graphics card, you have to manually select your AMD GPU. To do that, first note which device your Graphics card is set under. Most likely, your AMD device will be device 2.
 ```bash
 clinfo
 ```
 
-For any OpenPose command you run, add the following 2 flags to use your AMD card for acceleration.
+For any OpenPose command you run, add the following 2 flags to use your AMD card for acceleration (there `num_gpu_start` should be the number given above).
 ```bash
 ./build/examples/openpose/openpose.bin --num_gpu 1 --num_gpu_start 2
 ```
 
-If you only have an integrated Intel Graphics card, then it will most probably be the device 1:
+If you only have an integrated Intel Graphics card, then it will most probably be the device 1. Then, always add the following 2 flags to use your AMD card for acceleration.
 ```bash
 ./build/examples/openpose/openpose.bin --num_gpu 1 --num_gpu_start 1
+```
+
+
+
+## Quick Start
+Check that OpenPose was properly installed by running any of the following 3 examples (image folder, video, or webcam). The expected visual result should look like [doc/output.md#expected-visual-results](output.md#expected-visual-results).
+
+In Ubuntu, Mac, and other Unix systems, use any command-line interface, such as `Terminal` or `Terminator`. In Windows, open the `PowerShell`. You can do so with right-click on the Windows button, and `Windows PowerShell` (or pressing the Windows button + X, and then A). Feel free to watch any Youtube video tutorial if you are not familiar with these non-GUI tools.
+
+Make sure that you are in the **root directory of the project** when running any command (i.e., in the OpenPose folder, not inside `build/` nor `windows/` nor `bin/`). In addition, `examples/media/video.avi` and `examples/media` already exist, so there is no need to change any lines of code on this tutorial. You can test OpenPose by running:
+```
+# Ubuntu and Mac
+./build/examples/openpose/openpose.bin --video examples/media/video.avi
+```
+```
+:: Windows - Portable Demo
+bin\OpenPoseDemo.exe --video examples\media\video.avi
+```
+
+If these fail with an out of memory error, do not worry, the next example will fix this issue.
+
+
+
+### Improving Memory and Speed but Decreasing Accuracy
+If you have a Nvidia GPU that does not goes out of memory when running, **you should skip this step!**
+
+**Use at your own risk**: If your GPU runs out of memory or you do not have a Nvidia GPU, you can reduce `--net_resolution` to improve the speed and reduce the memory requirements, but it will also highly reduce accuracy! The lower the resolution, the lower accuracy, but also improved speed and memory:
+```
+# Ubuntu and Mac
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --net_resolution -1x256
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --net_resolution -1x196
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --net_resolution -1x128
+```
+```
+:: Windows - Portable Demo
+bin\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x256
+bin\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x196
+bin\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x128
+```
+```
+:: Windows - Library - Assuming you copied the DLLs following doc/installation/README.md#windows
+build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x256
+build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x196
+build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x128
 ```
 
 
@@ -111,6 +151,11 @@ build\x64\Release\OpenPoseDemo.exe --image_dir examples\media\
 :: With face and hands
 build\x64\Release\OpenPoseDemo.exe --image_dir examples\media\ --face --hand
 ```
+
+
+
+### Face and Hands
+Simply add `--face` and/or `--hand` to any command, as seeing in the exmaples above for video, webcam, and images.
 
 
 
@@ -215,38 +260,66 @@ build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --fa
 
 
 
+## JSON Output
+The following example runs the demo video `video.avi`, renders image frames on `output/result.avi`, and outputs JSON files in `output/`. Note: see [doc/output.md](output.md) to understand the format of the JSON files.
+```
+# Ubuntu and Mac (same flags for Windows version)
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_video output/result.avi --write_json output/
+```
+
+
+
+## JSON Output with No Visualization
+The following example runs the demo video `video.avi` and outputs JSON files in `output/`. Note: see [doc/output.md](output.md) to understand the format of the JSON files.
+```
+# Ubuntu and Mac (same flags for Windows version)
+# Only body
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_json output/ --display 0 --render_pose 0
+# Body + face + hands
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_json output/ --display 0 --render_pose 0 --face --hand
+```
+
+
+
+## Not Running All GPUs
+By default, OpenPose will use all the GPUs available in your machine. The following example runs the demo video `video.avi`, parallelizes it over 2 GPUs, GPUs 1 and 2 (note that it will skip GPU 0):
+```
+# Ubuntu and Mac (same flags for Windows version)
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --num_gpu 2 --num_gpu_start 1
+```
+
+
+
+## Kinect 2.0 as Webcam on Windows 10
+Since the Windows 10 Anniversary, Kinect 2.0 can be read as a normal webcam. All you need to do is go to `device manager`, expand the `kinect sensor devices` tab, right click and update driver of `WDF kinectSensor Interface`. If you already have another webcam, disconnect it or use `--camera 2`.
+
+
+
 ### Tracking
 1. Runtime huge speed up by reducing the accuracy:
 ```
+# Ubuntu and Mac (same flags for Windows version)
 # Using OpenPose 1 frame, tracking the following e.g., 5 frames
 ./build/examples/openpose/openpose.bin --tracking 5 --number_people_max 1
 ```
 
 2. Runtime speed up while keeping most of the accuracy:
 ```
-:: Using OpenPose 1 frame and tracking another frame
+# Ubuntu and Mac (same flags for Windows version)
+# Using OpenPose 1 frame and tracking another frame
 ./build/examples/openpose/openpose.bin --tracking 1 --number_people_max 1
 ```
 
 3. Visual smoothness:
 ```
+# Ubuntu and Mac (same flags for Windows version)
 # Running both OpenPose and tracking on each frame. Note: There is no speed up/slow down
 ./build/examples/openpose/openpose.bin --tracking 0 --number_people_max 1
 ```
 
 
 
-## Expected Visual Results
-The visual GUI should show the original image with the poses blended on it, similarly to the pose of this gif:
-<p align="center">
-    <img src="media/shake.gif", width="720">
-</p>
 
-If you choose to visualize a body part or a PAF (Part Affinity Field) heat map with the command option `--part_to_show`, the result should be similar to one of the following images:
-<p align="center">
-    <img src="media/body_heat_maps.png", width="720">
-</p>
 
-<p align="center">
-    <img src="media/paf_heat_maps.png", width="720">
-</p>
+## Advanced Quick Start
+In order to learn about many more flags, check [doc/demo_not_quick_start.md](demo_not_quick_start.md).

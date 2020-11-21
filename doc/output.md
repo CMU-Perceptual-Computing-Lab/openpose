@@ -4,7 +4,8 @@ OpenPose Demo - Output
 
 
 ## Contents
-1. [Output Format](#output-format)
+1. [Expected Visual Results](#expected-visual-results)
+2. [Output Format](#output-format)
     1. [Keypoint Ordering in C++/Python](#keypoint-ordering-in-c-python)
     2. [Heatmap Ordering](#heatmap-ordering)
     3. [Heatmap Saving in Float Format](#heatmap-saving-in-float-format)
@@ -13,9 +14,26 @@ OpenPose Demo - Output
     6. [Pose Output Format](#pose-output-format)
     7. [Face Output Format](#face-output-format)
     8. [Hand Output Format](#hand-output-format)
-2. [Reading Saved Results](#reading-saved-results)
-3. [Keypoint Format in the C++ API](#keypoint-format-in-the-c-api)
-4. [Camera Matrix Output Format](#camera-matrix-output-format)
+3. [Reading Saved Results](#reading-saved-results)
+4. [Keypoint Format in the C++ API](#keypoint-format-in-the-c-api)
+5. [Camera Matrix Output Format](#camera-matrix-output-format)
+
+
+
+## Expected Visual Results
+The visual GUI should show the original image with the poses blended on it, similarly to the pose of this gif:
+<p align="center">
+    <img src="../.github/media/shake.gif", width="720">
+</p>
+
+If you choose to visualize a body part or a PAF (Part Affinity Field) heat map with the command option `--part_to_show`, the result should be similar to one of the following images:
+<p align="center">
+    <img src="../.github/media/body_heat_maps.png", width="720">
+</p>
+
+<p align="center">
+    <img src="../.github/media/paf_heat_maps.png", width="720">
+</p>
 
 
 
@@ -178,28 +196,28 @@ The output format is analogous for hand (`hand_left_keypoints`, `hand_right_keyp
 
 ### Pose Output Format (BODY_25)
 <p align="center">
-    <img src="media/keypoints_pose_25.png", width="480">
+    <img src="../.github/media/keypoints_pose_25.png", width="480">
 </p>
 
 
 
 ### Pose Output Format (COCO)
 <p align="center">
-    <img src="media/keypoints_pose_18.png", width="480">
+    <img src="../.github/media/keypoints_pose_18.png", width="480">
 </p>
 
 
 
 ### Face Output Format
 <p align="center">
-    <img src="media/keypoints_face.png", width="480">
+    <img src="../.github/media/keypoints_face.png", width="480">
 </p>
 
 
 
 ### Hand Output Format
 <p align="center">
-    <img src="media/keypoints_hand.png", width="480">
+    <img src="../.github/media/keypoints_hand.png", width="480">
 </p>
 
 

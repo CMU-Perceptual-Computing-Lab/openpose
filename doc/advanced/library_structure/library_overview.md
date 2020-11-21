@@ -192,7 +192,7 @@ In order to be initialized, `PoseExtractorCaffe` has the following constructor a
 
 3. `outputSize` is the final desired resolution to be used. The human pose keypoint locations will be scaled to this output size. However, the heat-maps will have the `netOutputSize` size due to performance.
 
-4. `scaleNumber` and `scaleGap` specify the multi-scale parameters. Explained in [doc/demo_overview.md](../../demo_overview.md).
+4. `scaleNumber` and `scaleGap` specify the multi-scale parameters. Explained in [doc/demo_not_quick_start.md](../../demo_not_quick_start.md).
 
 5. `poseModel` specifies the model to load (e.g., COCO or MPI).
 

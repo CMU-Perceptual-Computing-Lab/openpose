@@ -109,7 +109,7 @@ For problem 2, try the following solutions (in this order):
 #### Very Few People Detected
 **Q: Low detection rate. It can detect the person on some images (usually higher contrast, with bigger people), but it will fail for most of images with low resolution or small people.**
 
-**A**: Images with low resolution, or with people too tiny will simply not work too well. However, it can be highly improved by using the maximum accuracy configuration detailed in [doc/quick_start.md#maximum-accuracy-configuration](quick_start.md#maximum-accuracy-configuration).
+**A**: Images with low resolution, or with people too tiny will simply not work too well. However, it can be highly improved by using the maximum accuracy configuration detailed in [doc/demo_quick_start.md#maximum-accuracy-configuration](demo_quick_start.md#maximum-accuracy-configuration).
 
 
 
@@ -241,7 +241,7 @@ Check the [doc/speed_up_openpose.md#profiling-speed](speed_up_openpose.md#profil
 
 ### Accuracy Issues
 #### Is Maximum Accuracy Configuration Possible on Lower End GPUs?
-**Q**: I've read that this command provides the most accurate results possible on Openpose so far: https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/quick_start.md#maximum-accuracy-configuration. However, a 8GB GPU (e.g., 1080 or 2080) will run out of memory, is there any method to achieve the same accuracy on GPU using less memory even if it meant sacrificing speed?
+**Q**: I've read that this command provides the most accurate results possible on Openpose so far: https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/demo_quick_start.md#maximum-accuracy-configuration. However, a 8GB GPU (e.g., 1080 or 2080) will run out of memory, is there any method to achieve the same accuracy on GPU using less memory even if it meant sacrificing speed?
 
 **A**: Unfortunately no, there is no way at the moment. Caffe just takes so much memory doing that. You can try with `--scale_number 3` instead of 4, reducing a bit the `net_resolution` (e.g. `720` vs. `736`) and starting the computer without GUI (which also takes about 1GB of memory just to keep the computer GUI running).
 

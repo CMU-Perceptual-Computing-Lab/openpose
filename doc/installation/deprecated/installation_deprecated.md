@@ -154,7 +154,7 @@ Note: This installer will not incorporate any new features, we recommend to use 
     3. Open the Windows cmd (Windows button + <kbd>X</kbd>, then <kbd>A</kbd>).
     4. Go to the OpenPose directory, assuming OpenPose has been downloaded on `C:\openpose`: `cd C:\openpose\`.
     5. Run the tutorial commands.
-6. Check OpenPose was properly installed by running it on the default images, video or webcam: [doc/quick_start.md#quick-start](../../quick_start.md#quick-start).
+6. Check OpenPose was properly installed by running it on the default images, video or webcam: [doc/demo_quick_start.md](../../demo_quick_start.md).
 
 
 

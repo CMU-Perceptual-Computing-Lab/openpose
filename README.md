@@ -13,7 +13,7 @@
 Note: Currently using [travis-matrix-badges](https://github.com/bjfish/travis-matrix-badges) vs. traditional [![Build Status](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose.svg?branch=master)](https://travis-ci.org/CMU-Perceptual-Computing-Lab/openpose)
 -->
 
-[**OpenPose**](https://github.com/CMU-Perceptual-Computing-Lab/openpose) has represented the **first real-time multi-person system to jointly detect human body, hand, facial, and foot keypoints (in total 135 keypoints) on single images**, and it is currently being actively used in many projects and research areas!
+[**OpenPose**](https://github.com/CMU-Perceptual-Computing-Lab/openpose) has represented the **first real-time multi-person system to jointly detect human body, hand, facial, and foot keypoints (in total 135 keypoints) on single images**.
 
 It is **authored by [Gines Hidalgo](https://www.gineshidalgo.com), [Zhe Cao](https://people.eecs.berkeley.edu/~zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Hanbyul Joo](https://jhugestar.github.io), and [Yaser Sheikh](http://www.cs.cmu.edu/~yaser)**, and **maintained by [Gines Hidalgo](https://www.gineshidalgo.com) and [Yaadhav Raaj](https://www.raaj.tech)**. OpenPose would not be possible without the [**CMU Panoptic Studio dataset**](http://domedb.perception.cs.cmu.edu). We would also like to thank all the people who helped OpenPose in any way ([doc/contributors.md](doc/contributors.md)).
 
@@ -74,7 +74,7 @@ It is **authored by [Gines Hidalgo](https://www.gineshidalgo.com), [Zhe Cao](htt
 </p>
 
 ### Runtime Analysis
-In the following image, we show an inference time comparison between the 3 available pose estimation libraries: OpenPose, Alpha-Pose (fast Pytorch version), and Mask R-CNN. The OpenPose runtime is constant, while the runtime of Alpha-Pose and Mask R-CNN grow linearly with the number of people. The analysis was performed using the same hardware (Nvidia 1080 Ti) and number of images per algorithm. More details [**here**](https://arxiv.org/abs/1812.08008).
+We show an inference time comparison between the 3 available pose estimation libraries (same hardware and conditions): OpenPose, Alpha-Pose (fast Pytorch version), and Mask R-CNN. The OpenPose runtime is constant, while the runtime of Alpha-Pose and Mask R-CNN grow linearly with the number of people. More details [**here**](https://arxiv.org/abs/1812.08008).
 <p align="center">
     <img src=".github/media/openpose_vs_competition.png", width="360">
 </p>
@@ -93,24 +93,23 @@ In the following image, we show an inference time comparison between the 3 avail
         - Compatible with Flir/Point Grey cameras.
     - [**Calibration toolbox**](doc/advanced/calibration_module.md): Estimation of distortion, intrinsic, and extrinsic camera parameters.
     - **Single-person tracking** for further speedup or visual smoothing.
-- **Input**: Image, video, webcam, Flir/Point Grey and IP camera.
-- **Output**: Basic image + keypoint display/saving (PNG, JPG, AVI, ...), keypoint saving (JSON, XML, YML, ...), and/or keypoints as array class.
-- Included [C++](examples/tutorial_api_cpp/)/[python](examples/tutorial_api_python/) examples to add your custom input and/or output, as well as pre or post-processing steps.
+- **Input**: Image, video, webcam, Flir/Point Grey, IP camera, and support to add your own custom input source (e.g., depth camera).
+- **Output**: Basic image + keypoint display/saving (PNG, JPG, AVI, ...), keypoint saving (JSON, XML, YML, ...), keypoints as array class, and support to add your own custom output code (e.g., some fancy UI).
 - **OS**: Ubuntu (20, 18, 16, 14), Windows (10, 8), Mac OSX, Nvidia TX2.
 - **Hardware compatibility**: CUDA (Nvidia GPU), OpenCL (AMD GPU), and non-GPU (CPU-only) versions.
-- **Others**:
-    - Available: command-line demo, C++ wrapper, and C++ API.
-    - [**Python API**](doc/python_module.md).
+- **Usage Alternatives**:
+    - [**Command-line demo**](doc/demo_quick_start.md) for built-in functionality.
+    - [**C++ API**](examples/tutorial_api_cpp/) and [**Python API**](doc/python_module.md) for custom functionality. E.g., adding your custom inputs, pre-processing, post-posprocessing, and output steps.
 
 For further details, check [all released features](doc/released_features.md) and [release notes](doc/release_notes.md).
 
 
 
 ## Related Work
-- [**OpenPose training code**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_train).
-- [**OpenPose foot dataset**](https://cmu-perceptual-computing-lab.github.io/foot_keypoint_dataset/).
-- [**Unity Plugin**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin).
-- OpenPose papers published in [**IEEE TPAMI** and **CVPR**](#citation). [Cite them](#citation) in your publications if OpenPose helps your research!
+- [**OpenPose training code**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_train)
+- [**OpenPose foot dataset**](https://cmu-perceptual-computing-lab.github.io/foot_keypoint_dataset/)
+- [**OpenPose Unity Plugin**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin)
+- OpenPose papers published in [**IEEE TPAMI** and **CVPR**](#citation). [Cite them](#citation) in your publications if it helps your research!
 
 
 
@@ -122,12 +121,16 @@ See [doc/installation/README.md](doc/installation/README.md) for more details.
 
 
 ## Quick Start
-Most users do not need the OpenPose C++/Python API, but can simply use the OpenPose Demo:
+Most users do not need to know C++ or Python, they can simply use the OpenPose Demo in their command-line tool (e.g., PowerShell/Terminal). E.g., this would run OpenPose on the webcam and display the body keypoints:
+```
+# Ubuntu
+./build/examples/openpose/openpose.bin
 
-- [**Output information**](doc/output.md): Learn about the output format, keypoint index ordering, etc.
+:: Windows - Portable Demo
+bin\OpenPoseDemo.exe --video examples\media\video.avi
+```
 
-- **OpenPose Demo**: Choose your input (e.g., images, video, webcam), set of algorithms (body, hand, face), and output (e.g., display, JSON keypoint saving, image+keypoints). See [doc/quick_start.md](doc/quick_start.md) and [doc/demo_overview.md](doc/demo_overview.md).
-    - E.g., in your terminal or PowerShell: Given an input video (`--video`), extract body (by default), face (`--face`) and hand (`--hand`) keypoints, save the keypoints in a JSON file (`--write_json`), and display (by default) the results in the screen. Remove any of the flags to remove that particular functionality.
+You can also add any of the available flags in any order. Do you also want to add face and/or hands? Add the `--face` and/or `--hand` flags. Do you also want to save the output keypoints on JSON files on disk? Add the `--write_json` flag, etc.
 ```
 # Ubuntu
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi --face --hand --write_json output_json_folder/
@@ -136,29 +139,16 @@ Most users do not need the OpenPose C++/Python API, but can simply use the OpenP
 bin\OpenPoseDemo.exe --video examples\media\video.avi --face --hand --write_json output_json_folder/
 ```
 
-- [**OpenPose C++ API**](examples/tutorial_api_cpp/): If you want to read a specific input, and/or add your custom post-processing function, and/or implement your own display/saving.
-    - For quick prototyping: You can easily **create your custom code** on [examples/user_code/](examples/user_code/) and CMake will automatically compile it together with the whole OpenPose project. See [examples/user_code/README.md](examples/user_code/README.md) for more details.
-
-- [**OpenPose Python API**](examples/tutorial_api_python/): Almost the exact same functionality than the C++ API, but in Python!
-    - For quick prototyping: You can simply duplicate and rename any of the [existing example files](examples/tutorial_api_python/) within that same folder.
-
-- [**Speeding up OpenPose and benchmark**](doc/speed_up_openpose.md): Check the OpenPose Benchmark as well as some hints to speed up and/or reduce the memory requirements for OpenPose.
-
-- [**Calibration toolbox**](doc/advanced/calibration_module.md) and [**3D OpenPose**](doc/advanced/3d_reconstruction_module.md): Calibrate your cameras for 3D OpenPose (or any other stereo vision tasks) and start obtaining 3D keypoints!
-
-- [**Standalone face or hand detector**doc/advanced/standalone_face_or_hand_keypoint_detector.md](doc/advanced/standalone_face_or_hand_keypoint_detector.md) is useful if you want to do any of the following:
-    - **Face** keypoint detection **without body** keypoint detection: Pros: Speedup and RAM/GPU memory reduction. Cons: Worse accuracy and less detected number of faces).
-    - **Use your own face/hand detector**: You can use the hand and/or face keypoint detectors with your own face or hand detectors, rather than using the body detector. E.g., useful for camera views at which the hands are visible but not the body (OpenPose detector would fail).
+After [installing](#installation) OpenPose, check [doc/README.md](doc/README.md) for a quick overview of all the alternatives and tutorials.
 
 
 
 ## Send Us Feedback!
-Our library is open source for research purposes, and we want to continuously improve it! So please, let us know if...
-1. ... you find any bug (in functionality or speed).
-2. ... you added some functionality on top of OpenPose which we might want to add.
-3. ... you know how to speed up or improve any part of OpenPose.
-4. ... you want to share your cool demo or project made on top of OpenPose (you can email it to us too!).
-5. ... etc.
+Our library is open source for research purposes, and we want to continuously improve it! So let us know if you...
+1. Find any bug (in functionality or speed).
+2. Add some functionality on top of OpenPose which we might want to add.
+3. Know how to speed up or improve any part of OpenPose.
+4. Want to share your cool demo or project made on top of OpenPose (you can email it to us too!).
 
 Just create a new GitHub issue or a pull request and we will answer as soon as possible!
 

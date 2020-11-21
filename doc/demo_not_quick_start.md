@@ -1,64 +1,37 @@
-OpenPose Demo - Overview
+OpenPose Demo - Not Quick Start
 ====================================
 
-Forget about the OpenPose library code, just compile the library and use the demo `./build/examples/openpose/openpose.bin`.
-
-In order to learn how to use it, run `./build/examples/openpose/openpose.bin --help` in your favorite command-line interface tool and read all the available flags (check only the flags for `examples/openpose/openpose.cpp` itself, i.e., the section `Flags from examples/openpose/openpose.cpp:`). We detail some of them in the following sections.
-
-In Ubuntu, Mac, and other Unix systems, use any command-line interface, such as `Terminal` or `Terminator`. In Windows, open the `PowerShell` (recommended) or Windows Command Prompt (CMD). They can be open by pressing the Windows button + X, and then A. Feel free to watch any Youtube video tutorial if you are not familiar with these non-GUI tools. Make sure that you are in the **root directory of the project** (i.e., in the OpenPose folder, not inside `build/` nor `windows/` nor `bin/`).
+This document is a more detailed continuation of [doc/demo_quick_start.md](demo_quick_start.md), and it assumes the user is quite familiar with the OpenPose demo and the contents of [doc/demo_quick_start.md](demo_quick_start.md).
 
 
 
-
-## Running on Images, Video or Webcam
-See [doc/quick_start.md#quick-start](quick_start.md#quick-start).
-
-
-
-## Pose + Face + Hands
-See [doc/quick_start.md#quick-start](quick_start.md#quick-start).
-
-
-
-## Maximum Accuracy Configuration
-See [doc/quick_start.md#maximum-accuracy-configuration](quick_start.md#maximum-accuracy-configuration).
+## Contents
+1. [More Advanced Common Settings](#more-advanced-common-settings)
+	1. [Reducing Latency/Lag](#reducing-latencylag)
+	2. [Advanced Hands](#advanced-hands)
+	3. [Rendering Face and Hands without Pose](#rendering-face-and-hands-without-pose)
+	4. [Debugging Information](#debugging-information)
+	5. [Heat Maps Storing](#heat-maps-storing)
+	6. [BODY_25 vs. COCO vs. MPI Models](#body-25-vs-coco-vs-mpi-models)
+2. [Main Flags](#main-flags)
+3. [Help Flag](#help-flag)
+4. [All Flags](#all-flags)
 
 
 
-## Reducing Latency/Lag
+
+
+## More Advanced Common Settings
+### Reducing Latency/Lag
 In general, there are 3 ways to reduce the latency (with some drawbacks each one):
 
 - Reducing `--output_resolution`: It will slightly reduce the latency and increase the FPS. But the quality of the displayed image will deteriorate.
-- Reducing `--net_resolution` and/or `--face_net_resolution` and/or `--hand_net_resolution`: It will increase the FPS and reduce the latency. But the accuracy will drop, specially for small people in the image. Note: For maximum accuracy, follow [doc/quick_start.md#maximum-accuracy-configuration](quick_start.md#maximum-accuracy-configuration).
+- Reducing `--net_resolution` and/or `--face_net_resolution` and/or `--hand_net_resolution`: It will increase the FPS and reduce the latency. But the accuracy will drop, specially for small people in the image. Note: For maximum accuracy, follow [doc/demo_quick_start.md#maximum-accuracy-configuration](demo_quick_start.md#maximum-accuracy-configuration).
 - Enabling `--disable_multi_thread`: The latency should be reduced. But the speed will drop to 1-GPU speed (as it will only use 1 GPU). Note that it's practical only for body, if hands and face are also extracted, it's usually not worth it.
 
 
 
-## Kinect 2.0 as Webcam on Windows 10
-Since the Windows 10 Anniversary, Kinect 2.0 can be read as a normal webcam. All you need to do is go to `device manager`, expand the `kinect sensor devices` tab, right click and update driver of `WDF kinectSensor Interface`. If you already have another webcam, disconnect it or use `--camera 2`.
-
-
-
-## JSON Output with No Visualization
-The following example runs the demo video `video.avi` and outputs JSON files in `output/`. Note: see [doc/output.md](output.md) to understand the format of the JSON files.
-```
-# Only body
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_json output/ --display 0 --render_pose 0
-# Body + face + hands
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_json output/ --display 0 --render_pose 0 --face --hand
-```
-
-
-
-## JSON Output + Rendered Images Saving
-The following example runs the demo video `video.avi`, renders image frames on `output/result.avi`, and outputs JSON files in `output/`. Note: see [doc/output.md](output.md) to understand the format of the JSON files.
-```
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_video output/result.avi --write_json output/
-```
-
-
-
-## Hands
+### Advanced Hands
 ```
 # Fast method for speed
 ./build/examples/openpose/openpose.bin --hand
@@ -72,7 +45,7 @@ The following example runs the demo video `video.avi`, renders image frames on `
 
 
 
-## Rendering Face and Hands without Pose
+### Rendering Face and Hands without Pose
 ```
 # CPU rendering (faster)
 ./build/examples/openpose/openpose.bin --render_pose 0 --face --face_render 1 --hand --hand_render 1
@@ -82,7 +55,7 @@ The following example runs the demo video `video.avi`, renders image frames on `
 
 
 
-## Debugging Information
+### Debugging Information
 ```
 # Basic information
 ./build/examples/openpose/openpose.bin --logging_level 3
@@ -92,19 +65,20 @@ The following example runs the demo video `video.avi`, renders image frames on `
 
 
 
-## Selecting Some GPUs
-The following example runs the demo video `video.avi`, parallelizes it over 2 GPUs, GPUs 1 and 2 (note that it will skip GPU 0):
-```
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --num_gpu 2 --num_gpu_start 1
-```
-
-
-
-## Heat Maps Storing
+### Heat Maps Storing
 The following command will save all the body part heat maps, background heat map and Part Affinity Fields (PAFs) in the folder `output_heatmaps_folder`. It will save them on PNG format. Instead of individually saving each of the 67 heatmaps (18 body parts + background + 2 x 19 PAFs) individually, the library concatenate them vertically into a huge (width x #heatmaps) x (height) matrix. The PAFs channels are multiplied by 2 because there is one heatmpa for the x-coordinates and one for the y-coordinates. The order is body parts + bkg + PAFs. It will follow the sequence on POSE_BODY_PART_MAPPING in [include/openpose/pose/poseParameters.hpp](../include/openpose/pose/poseParameters.hpp).
 ```
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi --heatmaps_add_parts --heatmaps_add_bkg --heatmaps_add_PAFs --write_heatmaps output_heatmaps_folder/
 ```
+
+
+
+### BODY_25 vs. COCO vs. MPI Models
+The `BODY_25` model (`--model_pose BODY_25`) includes both body and foot keypoints and it is based in [OpenPose: Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields](https://arxiv.org/abs/1812.08008). COCO and MPI models are slower, less accurate, and do not contain foot keypoints. They are based in our older paper [Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields](https://arxiv.org/abs/1611.08050). We highly recommend only using the `BODY_25` model.
+
+There is an exception, for CPU version, the COCO and MPI models seems to be faster. Accuracy is still better for the `BODY_25` model.
+
+
 
 
 
@@ -130,7 +104,24 @@ We enumerate some of the most important flags, check the `Flags Detailed Descrip
 
 
 
-## Flag Description
+
+
+## Help Flag
+Now that you are more familiar with OpenPose, you can add the flag `--help` to see all the available OpenPose flags. Check only the flags for `examples/openpose/openpose.cpp` itself (i.e., the ones in the section `Flags from examples/openpose/openpose.cpp:`). [All Flags](#all-flags) shows them all in this document.
+```
+# Ubuntu and Mac
+./build/examples/openpose/openpose.bin --help
+```
+```
+:: Windows - Portable Demo
+bin\OpenPoseDemo.exe --help
+```
+
+
+
+
+
+## All Flags
 Each flag is divided into flag name, default value, and description.
 
 1. Debugging/Other
