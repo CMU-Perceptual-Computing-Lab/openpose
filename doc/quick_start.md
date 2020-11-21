@@ -4,17 +4,20 @@ OpenPose - Quick Start
 ## Contents
 1. [Quick Start](#quick-start)
     1. [BODY_25 vs. COCO vs. MPI Models](#body-25-vs-coco-vs-mpi-models)
-    2. [Running on Video](#running-on-video)
-    3. [Running on Webcam](#running-on-webcam)
-    4. [Running on Images](#running-on-images)
-    5. [Maximum Accuracy Configuration](#maximum-accuracy-configuration)
-    6. [3-D Reconstruction](#3-d-reconstruction)
-    7. [Tracking](#tracking)
+    2. [Mac OSX Version Additional Steps](#mac-osx-version-additional-steps)
+    3. [Running on Video](#running-on-video)
+    4. [Running on Webcam](#running-on-webcam)
+    5. [Running on Images](#running-on-images)
+    6. [Maximum Accuracy Configuration](#maximum-accuracy-configuration)
+    7. [3-D Reconstruction](#3-d-reconstruction)
+    8. [Tracking](#tracking)
 2. [Expected Visual Results](#expected-visual-results)
 
 
 
 ## Quick Start
+Check OpenPose was properly installed by running it on the default images, video, or webcam.
+
 Check that the library is working properly by running any of the following commands on any command-line interface program. In Ubuntu, Mac, and other Unix systems, use any command-line interface, such as `Terminal` or `Terminator`. In Windows, open the `PowerShell` (recommended) or Windows Command Prompt (CMD). They can be open by pressing the Windows button + X, and then A. Feel free to watch any Youtube video tutorial if you are not familiar with these non-GUI tools. Make sure that you are in the **root directory of the project** (i.e., in the OpenPose folder, not inside `build/` nor `windows/` nor `bin/`). In addition, `examples/media/video.avi` and `examples/media` do exist, no need to change the paths.
 
 
@@ -23,6 +26,25 @@ Check that the library is working properly by running any of the following comma
 The BODY_25 model (`--model_pose BODY_25`) includes both body and foot keypoints and it is based in [OpenPose: Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields](https://arxiv.org/abs/1812.08008). COCO and MPI models are slower, less accurate, and do not contain foot keypoints. They are based in our older paper [Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields](https://arxiv.org/abs/1611.08050). We highly recommend only using the BODY_25 model.
 
 There is an exception, for CPU version, the COCO and MPI models seems to be faster. Accuracy is still better for the BODY_25 model.
+
+
+
+### Mac OSX Version Additional Steps
+
+If you compiled Mac with `OPENCL` support, and have inbuilt AMD graphics card, you have to manually select your AMD GPU. To do that, first note which device your Graphics card is set under. Most likely, your AMD device will be device 2.
+```bash
+clinfo
+```
+
+For any OpenPose command you run, add the following 2 flags to use your AMD card for acceleration.
+```bash
+./build/examples/openpose/openpose.bin --num_gpu 1 --num_gpu_start 2
+```
+
+If you only have an integrated Intel Graphics card, then it will most probably be the device 1:
+```bash
+./build/examples/openpose/openpose.bin --num_gpu 1 --num_gpu_start 1
+```
 
 
 
@@ -40,7 +62,7 @@ bin\OpenPoseDemo.exe --video examples\media\video.avi
 bin\OpenPoseDemo.exe --video examples\media\video.avi --face --hand
 ```
 ```
-:: Windows - Library - Assuming you copied the DLLs following doc/installation/installation.md#windows
+:: Windows - Library - Assuming you copied the DLLs following doc/installation/README.md#windows
 build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi
 :: With face and hands
 build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --face --hand
@@ -62,7 +84,7 @@ bin\OpenPoseDemo.exe
 bin\OpenPoseDemo.exe --face --hand
 ```
 ```
-:: Windows - Library - Assuming you copied the DLLs following doc/installation/installation.md#windows
+:: Windows - Library - Assuming you copied the DLLs following doc/installation/README.md#windows
 build\x64\Release\OpenPoseDemo.exe
 :: With face and hands
 build\x64\Release\OpenPoseDemo.exe --face --hand
@@ -84,7 +106,7 @@ bin\OpenPoseDemo.exe --image_dir examples\media\
 bin\OpenPoseDemo.exe --image_dir examples\media\ --face --hand
 ```
 ```
-:: Windows - Library - Assuming you copied the DLLs following doc/installation/installation.md#windows
+:: Windows - Library - Assuming you copied the DLLs following doc/installation/README.md#windows
 build\x64\Release\OpenPoseDemo.exe --image_dir examples\media\
 :: With face and hands
 build\x64\Release\OpenPoseDemo.exe --image_dir examples\media\ --face --hand
@@ -118,9 +140,9 @@ bin\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 --scale_gap 0.
 bin\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25 --hand --hand_scale_number 6 --hand_scale_range 0.4 --face
 ```
 ```
-:: Windows - Library - Assuming you copied the DLLs following doc/installation/installation.md#windows: Body
+:: Windows - Library - Assuming you copied the DLLs following doc/installation/README.md#windows: Body
 build\x64\Release\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25
-:: Windows - Library - Assuming you copied the DLLs following doc/installation/installation.md#windows: Body + Hand + Face
+:: Windows - Library - Assuming you copied the DLLs following doc/installation/README.md#windows: Body + Hand + Face
 build\x64\Release\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25 --hand --hand_scale_number 6 --hand_scale_range 0.4 --face
 ```
 
@@ -147,7 +169,7 @@ bin\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1
 bin\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --face --hand
 ```
 ```
-:: Windows - Library - Assuming you copied the DLLs following doc/installation/installation.md#windows
+:: Windows - Library - Assuming you copied the DLLs following doc/installation/README.md#windows
 build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1
 :: With face and hands
 build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --face --hand

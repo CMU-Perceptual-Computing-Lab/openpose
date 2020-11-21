@@ -10,16 +10,14 @@ OpenPose - Prerequisites
 
 
 ### General Tips
-**Very important**: New Nvidia model GPUs (e.g., Nvidia V, GTX 2080, v100, any Nvidia with Volta or Turing architecture, etc.) require (at least) CUDA 10. CUDA 8 would fail!
-
-In addition, CMake automatically downloads all the OpenPose models. However, **some firewall or company networks block these downloads**. 
-
-You might prefer to download them manually:
-- [BODY_25 model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/body_25/pose_iter_584000.caffemodel): download in `models/pose/body_25/`.
-- [COCO model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/coco/pose_iter_440000.caffemodel): download in `models/pose/coco/`.
-- [MPI model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/mpi/pose_iter_160000.caffemodel): download in `models/pose/mpi/`.
-- [Face model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/face/pose_iter_116000.caffemodel): download in `models/face/`.
-- [Hands model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/hand/pose_iter_102000.caffemodel): download in `models/hand/`.
+These tips are **very important** and avoid many bugs:
+- Install the latest CUDA version or make sure your GPU is compatible with the CUDA version you have in your system. E.g., Nvidia 30XX GPUs require at least CUDA 11, others (GTX 20XX, V100, Volta or Turing GPUs) require at least CUDA 10.
+- CMake automatically downloads all the OpenPose models. However, **some firewall or company networks block these downloads**. If so, you might need to download them manually:
+    - [BODY_25 model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/body_25/pose_iter_584000.caffemodel): download in `models/pose/body_25/`.
+    - [COCO model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/coco/pose_iter_440000.caffemodel): download in `models/pose/coco/`.
+    - [MPI model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/mpi/pose_iter_160000.caffemodel): download in `models/pose/mpi/`.
+    - [Face model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/face/pose_iter_116000.caffemodel): download in `models/face/`.
+    - [Hands model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/hand/pose_iter_102000.caffemodel): download in `models/hand/`.
 
 
 
@@ -36,7 +34,7 @@ You might prefer to download them manually:
         - Run `./configure --qt-gui`. Make sure no error occurred.
         - Run ``./bootstrap && make -j`nproc` && sudo make install -j`nproc` ``. Make sure no error occurred.
         - Assuming your CMake downloaded folder is in {CMAKE_FOLDER_PATH}, everytime these instructions mentions `cmake-gui`, you will have to replace that line by `{CMAKE_FOLDER_PATH}/bin/cmake-gui`.
-    - Ubuntu 14 or 16: Run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [doc/installation/installation.md#CMake-Command-Line-Configuration-(Ubuntu-Only)](./installation/installation.md#cmake-command-line-configuration-ubuntu-only).
+    - Ubuntu 14 or 16: Run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [doc/installation/README.md#CMake-Command-Line-Configuration-(Ubuntu-Only)](installation/README.md#cmake-command-line-configuration-ubuntu-only).
 3. Nvidia GPU version prerequisites:
     1. **Note: OpenPose has been tested extensively with CUDA 8.0 (cuDNN 5.1) for Ubuntu 14 and 16, CUDA 10.1 (cuDNN 7.5.1) for Ubuntu 18, and CUDA 11 for Ubuntu 20**. We highly recommend using those versions for those Operating Systems to minimize potential installation issues. Other versions should also work, but we do not provide support about any CUDA/cuDNN installation/compilation issue, as well as problems related to their integration into OpenPose.
     2. **CUDA**:
@@ -50,7 +48,7 @@ You might prefer to download them manually:
             - Ubuntu 14 or 16 (**cuDNN 5.1 or 7.2**): Run `sudo ./scripts/ubuntu/install_cudnn.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX) or alternatively [download it from their website](https://developer.nvidia.com/rdp/cudnn-archive).
         - And install it:
             - In order to manually install it (any version), just unzip it and copy (merge) its contents on the CUDA folder, usually `/usr/local/cuda-{version}/` in Ubuntu and `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v{version}\` in Windows.
-5. AMD GPU version prerequisites (only if you do not have an Nvidia GPU and want to run on AMD graphic cards):
+5. OpenCL / AMD GPU version prerequisites (only if you do not have an Nvidia GPU and want to run on AMD graphic cards):
     - Ubuntu 20 or 18: Not tested and not officially supported. Try at your own risk. You might want to use the CPU version if no Nvidia GPU is available.
     - Ubuntu 14 or 16:
         1. Download 3rd party ROCM driver for Ubuntu from [**AMD - OpenCL**](https://rocm.github.io/ROCmInstall.html).
@@ -58,12 +56,16 @@ You might prefer to download them manually:
 6. Install **Caffe, OpenCV, and Caffe prerequisites**:
     - OpenCV must be already installed on your machine. It can be installed with `sudo apt-get install libopencv-dev`. You could also use your own compiled OpenCV version.
     - Caffe prerequisites: By default, OpenPose uses Caffe under the hood. If you have not used Caffe previously, install its dependencies by running `sudo bash ./scripts/ubuntu/install_deps.sh` after installing your desired CUDA and cuDNN versions. If you are using Ubuntu 14 or 16, you can simply run `sudo bash ./scripts/ubuntu/install_deps_and_cuda.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX).
-7. **Eigen prerequisite** (optional, only required for some specific extra functionality, such as extrinsic camera calibration). You can perform any of the 2 following options (but only 1 of them!)
-    - Recommended: Simply set the `WITH_EIGEN` flag to `AUTOBUILD`. CMake will automatically download it and configure OpenPose to use it. If you prefer to download it manually (or if your firewall blocks CMake from downloading it):
-        - [Eigen 3.3.8](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/eigen_2020_11_18.zip): Unzip as `3rdparty/eigen/`.
-    - Advanced (not recommended): If you set `WITH_EIGEN` to `FIND`, you must have Eigen already installed in your system. Note that [Eigen <= 3.3.6 is not supported by CUDA >=9.1](https://bitbucket.org/eigen/eigen/commits/034b6c3e101792a3cc3ccabd9bfaddcabe85bb58?at=default). In order to install it (make sure that Eigen version is compatible with CUDA!):
-        - Run `sudo apt-get install libeigen3-dev` and link CMake to the right CMake.
-    - Advanced (not recommended): Or you could also use your own version of Eigen by setting `WITH_EIGEN` to `AUTOBUILD`, click `Configure` to let CMake download the zip file, and replace `3rdparty/eigen/` by your own version.
+7. Python prerequisites (optional, only if you plan to use the Python API): python-dev, Numpy (for array management), and OpenCV (for image loading).
+```
+# Python 3 (default and recommended)
+sudo apt-get install python3-dev
+sudo pip3 install numpy opencv-python
+
+# Python 2
+sudo apt-get install python-dev
+sudo pip install numpy opencv-python
+```
 
 
 
@@ -71,10 +73,6 @@ You might prefer to download them manually:
 1. If you don't have `brew`, install it by running `bash scripts/osx/install_brew.sh` on your terminal.
 2. Install **CMake GUI**: Run the command `brew cask install cmake`.
 3. Install **Caffe, OpenCV, and Caffe prerequisites**: Run `bash scripts/osx/install_deps.sh`.
-4. **Eigen prerequisite** (optional, only required for some specific extra functionality, such as extrinsic camera calibration):
-    - Enable the `WITH_EIGEN` flag when running CMake, and set it to `AUTOBUILD`.
-    - CMake will automatically download Eigen.
-    - Alternatively, you can manually download it from the [Eigen3 website](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/eigen_2020_11_18.zip), and unzip as `3rdparty/eigen/`.
 
 
 
@@ -107,7 +105,7 @@ NOTE: These instructions are only required when compiling OpenPose brom source. 
                 - [OpenCL Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_opencl_2018_02_13.zip): Unzip as `3rdparty/windows/caffe_opencl/`.
             - [Caffe dependencies](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe3rdparty_16_2020_11_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
             - [OpenCV 4.2.0](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_450_v15_2020_11_18.zip): Unzip as `3rdparty/windows/opencv/`.
-6. **Eigen prerequisite** (optional, only required for some specific extra functionality, such as extrinsic camera calibration):
-    - Set the `WITH_EIGEN` flag in CMake to `AUTOBUILD`.
-    - CMake will automatically download Eigen.
-    - Alternatively, you can manually download it from the [Eigen3 website](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/eigen_2020_11_18.zip), run CMake so that OpenPose downloads the zip file, and then replace the contents of `3rdparty/eigen/` by your own version.
+7. Python prerequisites (optional, only if you plan to use the Python API): Install any [Python 3.X](https://www.python.org/downloads/windows/) version for Windows, and then:
+```
+sudo pip install numpy opencv-python
+```

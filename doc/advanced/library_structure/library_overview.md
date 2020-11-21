@@ -3,7 +3,7 @@ OpenPose C++ API - Basic Overview
 
 
 
-Note: Read [doc/advanced/library_structure/README.md](./README.md) before this page.
+Note: Read [doc/advanced/library_structure/README.md](README.md) before this page.
 
 
 
@@ -15,7 +15,7 @@ Note: Read [doc/advanced/library_structure/README.md](./README.md) before this p
 
 
 ## Main Modules
-In order to use and/or slightly extend the OpenPose library, we try to explain the 2 main components on this section. [doc/advanced/library_structure/UML](./UML/) contains the class diagram of all these modules.
+In order to use and/or slightly extend the OpenPose library, we try to explain the 2 main components on this section. [doc/advanced/library_structure/UML](UML/) contains the class diagram of all these modules.
 
 1. The basic module: `core`.
 

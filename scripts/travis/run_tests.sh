@@ -14,8 +14,8 @@ if [[ $RUN_EXAMPLES == true ]] ; then
   ./build/examples/openpose/openpose.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
   echo " "
 
-  echo "Tutorial Add Module: Example 1..."
-  ./build/examples/tutorial_add_module/1_custom_post_processing.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
+  echo "(Deprecated) Tutorial Add Module: Example 1..."
+  ./build/examples/deprecated/tutorial_add_module_custom_post_processing.bin --image_dir examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
   echo " "
 
   # # Note: Examples 1-2 require the whole OpenPose resolution (too much RAM memory) and the GUI

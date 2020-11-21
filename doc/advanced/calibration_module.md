@@ -25,13 +25,13 @@ Note: We are not aiming to have the best calibration toolbox, but the simplest o
 
 
 ## Example Chessboard
-[doc/Chessboard_in_PDF/](./Chessboard_in_PDF/) contains a chessboard example that you can use to follow this documentation. You can simply print the PDF version ([doc/Chessboard_in_PDF/pattern.pdf](./Chessboard_in_PDF/pattern.pdf)), making your your printer maintains the aspect ratio and, if possible, does not zoom in/out the image. Simply replace the "127" used below by the size of each square on your printed chessboard.
+[doc/Chessboard_in_PDF/](Chessboard_in_PDF/) contains a chessboard example that you can use to follow this documentation. You can simply print the PDF version ([doc/Chessboard_in_PDF/pattern.pdf](Chessboard_in_PDF/pattern.pdf)), making your your printer maintains the aspect ratio and, if possible, does not zoom in/out the image. Simply replace the "127" used below by the size of each square on your printed chessboard.
 
 
 
 
 ## Installing the Calibration Module
-Check [doc/installation/installation.md#calibration-module](../installation/installation.md#calibration-module) for installation steps.
+Check [doc/installation/README.md#calibration-module](../installation/README.md#calibration-module) for installation steps.
 
 
 

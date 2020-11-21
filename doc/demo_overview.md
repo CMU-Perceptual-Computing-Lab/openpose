@@ -11,17 +11,17 @@ In Ubuntu, Mac, and other Unix systems, use any command-line interface, such as 
 
 
 ## Running on Images, Video or Webcam
-See [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
+See [doc/quick_start.md#quick-start](quick_start.md#quick-start).
 
 
 
 ## Pose + Face + Hands
-See [doc/quick_start.md#quick-start](./quick_start.md#quick-start).
+See [doc/quick_start.md#quick-start](quick_start.md#quick-start).
 
 
 
 ## Maximum Accuracy Configuration
-See [doc/quick_start.md#maximum-accuracy-configuration](./quick_start.md#maximum-accuracy-configuration).
+See [doc/quick_start.md#maximum-accuracy-configuration](quick_start.md#maximum-accuracy-configuration).
 
 
 
@@ -29,7 +29,7 @@ See [doc/quick_start.md#maximum-accuracy-configuration](./quick_start.md#maximum
 In general, there are 3 ways to reduce the latency (with some drawbacks each one):
 
 - Reducing `--output_resolution`: It will slightly reduce the latency and increase the FPS. But the quality of the displayed image will deteriorate.
-- Reducing `--net_resolution` and/or `--face_net_resolution` and/or `--hand_net_resolution`: It will increase the FPS and reduce the latency. But the accuracy will drop, specially for small people in the image. Note: For maximum accuracy, follow [doc/quick_start.md#maximum-accuracy-configuration](./quick_start.md#maximum-accuracy-configuration).
+- Reducing `--net_resolution` and/or `--face_net_resolution` and/or `--hand_net_resolution`: It will increase the FPS and reduce the latency. But the accuracy will drop, specially for small people in the image. Note: For maximum accuracy, follow [doc/quick_start.md#maximum-accuracy-configuration](quick_start.md#maximum-accuracy-configuration).
 - Enabling `--disable_multi_thread`: The latency should be reduced. But the speed will drop to 1-GPU speed (as it will only use 1 GPU). Note that it's practical only for body, if hands and face are also extracted, it's usually not worth it.
 
 
@@ -40,7 +40,7 @@ Since the Windows 10 Anniversary, Kinect 2.0 can be read as a normal webcam. All
 
 
 ## JSON Output with No Visualization
-The following example runs the demo video `video.avi` and outputs JSON files in `output/`. Note: see [doc/output.md](./output.md) to understand the format of the JSON files.
+The following example runs the demo video `video.avi` and outputs JSON files in `output/`. Note: see [doc/output.md](output.md) to understand the format of the JSON files.
 ```
 # Only body
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_json output/ --display 0 --render_pose 0
@@ -51,7 +51,7 @@ The following example runs the demo video `video.avi` and outputs JSON files in 
 
 
 ## JSON Output + Rendered Images Saving
-The following example runs the demo video `video.avi`, renders image frames on `output/result.avi`, and outputs JSON files in `output/`. Note: see [doc/output.md](./output.md) to understand the format of the JSON files.
+The following example runs the demo video `video.avi`, renders image frames on `output/result.avi`, and outputs JSON files in `output/`. Note: see [doc/output.md](output.md) to understand the format of the JSON files.
 ```
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_video output/result.avi --write_json output/
 ```

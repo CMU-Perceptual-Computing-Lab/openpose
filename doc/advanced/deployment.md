@@ -18,7 +18,7 @@ Starting in OpenPose 1.6.0 (GitHub code in or after October 2019), OpenPose has 
 
 
 ### Third-Party Libraries
-While compiling OpenPose from source, the static library files (`*.a` for Ubuntu, `*.lib` for Windows, etc.) and `include/` directories of all the third-party libraries detailed in [doc/installation/installation.md](../installation/installation.md) are required (GFlags, Glog, OpenCV, Caffe, etc.). However, when deploying OpenPose, fewer dependencies are required:
+While compiling OpenPose from source, the static library files (`*.a` for Ubuntu, `*.lib` for Windows, etc.) and `include/` directories of all the third-party libraries detailed in [doc/installation/README.md](../installation/README.md) are required (GFlags, Glog, OpenCV, Caffe, etc.). However, when deploying OpenPose, fewer dependencies are required:
 - GFLags and Glog are required only if the `include/openpose/flags.hpp` file is going to be used (e.g., when intenting to use the command-line interface).
 - OpenCV can be optionally included if your project already uses it (but make sure to use the same binaries and include directory of OpenCV for both OpenPose and your project or weird runtime crashes will occur!). Including OpenCV does not increase the functionality of OpenPose, but it makes it easier to use by adding some functions that directly take cv::Mat matrices as input (rather than raw pointers). However, it is optional starting in OpenPose 1.6.0.
 - Caffe or any other 3rd-party libraries are not required.

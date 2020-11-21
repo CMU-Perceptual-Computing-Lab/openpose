@@ -11,7 +11,7 @@ If you intend to extend the functionality of our library:
 
 4. Read, understand and play with the other tutorials in [examples/](../../../examples/). It includes more specific examples.
 
-5. Check the basic UML diagram on the [doc/advanced/library_structure/UML](./UML/) to get an idea of each module relations.
+5. Check the basic UML diagram on the [doc/advanced/library_structure/UML](UML/) to get an idea of each module relations.
 
 6. Take a look to the stucuture of the already existing modules.
 

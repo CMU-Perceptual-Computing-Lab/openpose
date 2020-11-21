@@ -50,19 +50,7 @@ If run via the command line, you may need to run cmake twice in order for this c
 
 
 ## Installation
-Check [doc/installation/installation.md#python-api](./installation/installation.md#python-api) for installation steps.
-
-The Python API requires python-dev, Numpy (for array management), and OpenCV (for image loading). They can be installed via:
-
-```
-# Python 3 (default and recommended)
-sudo apt-get install python3-dev
-sudo pip3 install numpy opencv-python
-
-# Python 2
-sudo apt-get install python-dev
-sudo pip install numpy opencv-python
-```
+Make sure you followed the Python steps in [doc/installation/README.md#cmake-configuration](installation/README.md#cmake-configuration).
 
 
 

@@ -7,9 +7,9 @@
 // 2. `wUserPostProcessing.hpp`: Change 1 line in `work(TDatums& tDatums)` to use your custom function from
 // `userPostProcessing.hpp`.
 // 3. `userDatum.hpp`: Add any required output of your post-processing class there.
-// 4. `1_custom_post_processing.cpp`: Change 1 line, when creating the `UserPostProcessing` class, add any specific
+// 4. `tutorial_add_module_custom_post_processing.cpp`: Change 1 line, when creating the `UserPostProcessing` class, add any specific
 // arguments/parameters than your class need.
-// 5. `1_custom_post_processing.bin`: Compile and run this file (as you usually run the OpenPose demo) in order to
+// 5. `tutorial_add_module_custom_post_processing.bin`: Compile and run this file (as you usually run the OpenPose demo) in order to
 // test your custom functionality.
 
 // Syntax rules
@@ -27,8 +27,8 @@
 #include <openpose/flags.hpp>
 // OpenPose dependencies
 #include <openpose/headers.hpp>
-#include "userDatum.hpp"
-#include "wUserPostProcessing.hpp"
+#include "tutorial_add_module/userDatum.hpp"
+#include "tutorial_add_module/wUserPostProcessing.hpp"
 
 void configureWrapper(op::WrapperT<op::UserDatum>& opWrapperT)
 {

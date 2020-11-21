@@ -15,28 +15,28 @@ OpenPose - Installation (deprecated)
 
 
 ## Operating Systems
-See [doc/installation/installation.md#operating-systems](../installation.md#operating-systems).
+See [doc/installation/README.md#operating-systems](../README.md#operating-systems).
 
 
 
 ## Requirements
-See [doc/installation/installation.md#requirements](../installation.md#requirements).
+See [doc/installation/README.md#requirements](../README.md#requirements).
 
 
 
 ## Clone OpenPose
-See [doc/installation/installation.md#clone-openpose](../installation.md#clone-openpose).
+See [doc/installation/README.md#clone-openpose](../README.md#clone-openpose).
 
 
 
 ## Update OpenPose
-See [doc/installation/installation.md#update-openpose](../installation.md#update-openpose).
+See [doc/installation/README.md#update-openpose](../README.md#update-openpose).
 
 
 
 ## Ubuntu
 ### Installation - CMake
-Recommended installation method, it is simpler and offers more customization settings. See [doc/installation/installation.md](../installation.md).
+Recommended installation method, it is simpler and offers more customization settings. See [doc/installation/README.md](../README.md).
 
 
 
@@ -56,7 +56,7 @@ Build Caffe & the OpenPose library + download the required Caffe models for Ubun
 ```bash
 bash scripts/ubuntu_deprecated/install_caffe_and_openpose_if_cuda8.sh
 ```
-**Highly important**: This script only works with CUDA 8 and Ubuntu 14 or 16. Otherwise, see [doc/installation/installation.md](../installation.md) or [Installation - Manual Compilation](#installation---manual-compilation).
+**Highly important**: This script only works with CUDA 8 and Ubuntu 14 or 16. Otherwise, see [doc/installation/README.md](../README.md) or [Installation - Manual Compilation](#installation---manual-compilation).
 
 
 
@@ -126,7 +126,7 @@ You just need to remove the OpenPose folder, by default called `openpose/`. E.g.
     3. [**cuDNN 5.1**](https://developer.nvidia.com/cudnn): Once you have downloaded it, just unzip it and copy (merge) the contents on the CUDA folder, `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0`.
 
 #### CMake Installer
-Recommended installation method, it is simpler and offers more customization settings. See [doc/installation/installation.md](../installation.md). Note that it is a beta version, post in GitHub any issue you find.
+Recommended installation method, it is simpler and offers more customization settings. See [doc/installation/README.md](../README.md). Note that it is a beta version, post in GitHub any issue you find.
 
 
 #### Deprecated Windows Installer
@@ -174,7 +174,7 @@ If you updated some software that our library or 3rdparty use, or you simply wan
 
 
 ## Doxygen Documentation Autogeneration
-See [doc/installation/installation.md#doxygen-documentation-autogeneration-ubuntu-only](../installation.md#doxygen-documentation-autogeneration-ubuntu-only).
+See [doc/installation/README.md#doxygen-documentation-autogeneration-ubuntu-only](../README.md#doxygen-documentation-autogeneration-ubuntu-only).
 
 
 
@@ -196,4 +196,4 @@ We only modified some Caffe compilation flags and minor details. You can use you
 
 
 ## Compiling without cuDNN
-See [doc/installation/installation.md#compiling-without-cudnn](../installation.md#compiling-without-cudnn).
+See [doc/installation/README.md#compiling-without-cudnn](../README.md#compiling-without-cudnn).

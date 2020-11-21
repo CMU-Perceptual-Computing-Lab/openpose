@@ -1,6 +1,9 @@
 set(EXAMPLE_FILES
-  1_thread_user_processing_function.cpp
-  2_thread_user_input_processing_output_and_datum.cpp)
+    tutorial_add_module_custom_post_processing.cpp
+    tutorial_api_thread_1_user_processing_function.cpp
+    tutorial_api_thread_2_user_input_processing_output_and_datum.cpp)
+
+include(${CMAKE_SOURCE_DIR}/cmake/Utils.cmake)
 
 foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
 
@@ -17,7 +20,7 @@ foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
   target_link_libraries(${EXE_NAME} openpose ${examples_3rdparty_libraries})
 
   if (WIN32)
-    set_property(TARGET ${EXE_NAME} PROPERTY FOLDER "Examples/Tutorial/Thread API")
+    set_property(TARGET ${EXE_NAME} PROPERTY FOLDER "Examples/Tutorial/Deprecated")
     configure_file(${CMAKE_SOURCE_DIR}/cmake/OpenPose${VCXPROJ_FILE_GPU_MODE}.vcxproj.user
         ${CMAKE_CURRENT_BINARY_DIR}/${EXE_NAME}.vcxproj.user @ONLY)
     # Properties->General->Output Directory
