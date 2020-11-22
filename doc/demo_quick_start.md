@@ -7,17 +7,16 @@ Forget about the OpenPose code, just download the portable Windows binaries (or 
 1. [Mac OSX Additional Step](#mac-osx-additional-step)
 2. [Quick Start](#quick-start)
     1. [Improving Memory and Speed but Decreasing Accuracy](#improving-memory-and-speed-but-decreasing-accuracy)
-    2. [Running on Video](#running-on-video)
-    3. [Running on Webcam](#running-on-webcam)
-    4. [Running on Images](#running-on-images)
-    5. [Face and Hands](#face-and-hands)
-    6. [Maximum Accuracy Configuration](#maximum-accuracy-configuration)
-    7. [3-D Reconstruction](#3-d-reconstruction)
-    8. [JSON Output](json-output)
-    9. [JSON Output with No Visualization](json-output-with-no-visualization)
-    10. [Not Running All GPUs](#not-running-all-gpus)
-    11. [Kinect 2.0 as Webcam on Windows 10](#kinect-20-as-webcam-on-windows-10)
-    12. [Tracking](#tracking)
+    2. [Running on Images, Video, or Webcam](#running-on-images-video-or-webcam)
+    3. [Face and Hands](#face-and-hands)
+    4. [Different Outputs (JSON, Images, Video, UI)](#different-outputs-json-images-video-ui)
+    5. [Only Skeleton without Background Image](#only-skeleton-without-background-image)
+    6. [Not Running All GPUs](#not-running-all-gpus)
+    7. [Maximum Accuracy Configuration](#maximum-accuracy-configuration)
+    8. [3-D Reconstruction](#3-d-reconstruction)
+    9. [Tracking](#tracking)
+    10. [Kinect 2.0 as Webcam on Windows 10](#kinect-20-as-webcam-on-windows-10)
+    11. [Main Flags](#main-flags)
 3. [Advanced Quick Start](#advanced-quick-start)
 
 
@@ -64,75 +63,40 @@ If these fail with an out of memory error, do not worry, the next example will f
 
 
 ### Improving Memory and Speed but Decreasing Accuracy
-If you have a Nvidia GPU that does not goes out of memory when running, **you should skip this step!**
+**If you have a Nvidia GPU that does not goes out of memory when running, you should skip this step!**
 
-**Use at your own risk**: If your GPU runs out of memory or you do not have a Nvidia GPU, you can reduce `--net_resolution` to improve the speed and reduce the memory requirements, but it will also highly reduce accuracy! The lower the resolution, the lower accuracy, but also improved speed and memory:
+**Use `net_resolution` at your own risk**: If your GPU runs out of memory or you do not have a Nvidia GPU, you can reduce `--net_resolution` to improve the speed and reduce the memory requirements, but it will also highly reduce accuracy! The lower the resolution, the lower accuracy but better speed/memory.
 ```
 # Ubuntu and Mac
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --net_resolution -1x320
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi --net_resolution -1x256
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi --net_resolution -1x196
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi --net_resolution -1x128
 ```
 ```
 :: Windows - Portable Demo
+bin\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x320
 bin\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x256
 bin\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x196
 bin\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x128
 ```
 ```
 :: Windows - Library - Assuming you copied the DLLs following doc/installation/README.md#windows
+build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x320
 build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x256
 build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x196
 build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x128
 ```
 
-
-
-### Running on Video
-```
-# Ubuntu and Mac
-./build/examples/openpose/openpose.bin --video examples/media/video.avi
-# With face and hands
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --face --hand
-```
-```
-:: Windows - Portable Demo
-bin\OpenPoseDemo.exe --video examples\media\video.avi
-:: With face and hands
-bin\OpenPoseDemo.exe --video examples\media\video.avi --face --hand
-```
-```
-:: Windows - Library - Assuming you copied the DLLs following doc/installation/README.md#windows
-build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi
-:: With face and hands
-build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --face --hand
-```
+Additional notes:
+- The default resolution is `-1x368`, any resolution smaller will improve speed.
+- The `-1` means that that the resolution will be adapted to maintain the aspect ratio of the input source. E.g., `-1x368`, `656x-1`, and `656x368` will result in the same exact resolution for 720p and 1080p input images.
+- For videos, using `-1` is recommended to let OpenPose find the ideal resolution. For a folder of images of different sizes, not adding `-1` and using images with completely different aspect ratios might result in out of memory issues. E.g., if a folder contains 2 images of resolution `100x11040` and `10000x368`. Then, using the default `-1x368` will result in the network output resolutions of `3x368` and `10000x368`, resulting in an obvious out of memory for the `10000x368` image.
 
 
 
-### Running on Webcam
-```
-# Ubuntu and Mac
-./build/examples/openpose/openpose.bin
-# With face and hands
-./build/examples/openpose/openpose.bin --face --hand
-```
-```
-:: Windows - Portable Demo
-bin\OpenPoseDemo.exe
-:: With face and hands
-bin\OpenPoseDemo.exe --face --hand
-```
-```
-:: Windows - Library - Assuming you copied the DLLs following doc/installation/README.md#windows
-build\x64\Release\OpenPoseDemo.exe
-:: With face and hands
-build\x64\Release\OpenPoseDemo.exe --face --hand
-```
-
-
-
-### Running on Images
+### Running on Images, Video, or Webcam
+- Directory with images (`--image_dir {DIRECTORY_PATH}`):
 ```
 # Ubuntu and Mac
 ./build/examples/openpose/openpose.bin --image_dir examples/media/
@@ -151,11 +115,125 @@ build\x64\Release\OpenPoseDemo.exe --image_dir examples\media\
 :: With face and hands
 build\x64\Release\OpenPoseDemo.exe --image_dir examples\media\ --face --hand
 ```
+- Video (`--video {VIDEO_PATH}`):
+```
+# Ubuntu and Mac
+./build/examples/openpose/openpose.bin --video examples/media/video.avi
+# With face and hands
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --face --hand
+```
+```
+:: Windows - Portable Demo
+bin\OpenPoseDemo.exe --video examples\media\video.avi
+:: With face and hands
+bin\OpenPoseDemo.exe --video examples\media\video.avi --face --hand
+```
+```
+:: Windows - Library - Assuming you copied the DLLs following doc/installation/README.md#windows
+build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi
+:: With face and hands
+build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --face --hand
+```
+- Webcam is applied by default (i.e., if no `--image_dir` or `--video` flags used). Optionally, if you have more than 1 camera, you could use `--camera {CAMERA_NUMBER}` to select the right one:
+```
+# Ubuntu and Mac
+./build/examples/openpose/openpose.bin
+./build/examples/openpose/openpose.bin --camera 0
+./build/examples/openpose/openpose.bin --camera 1
+# With face and hands
+./build/examples/openpose/openpose.bin --face --hand
+```
+```
+:: Windows - Portable Demo
+bin\OpenPoseDemo.exe
+bin\OpenPoseDemo.exe --camera 0
+bin\OpenPoseDemo.exe --camera 1
+:: With face and hands
+bin\OpenPoseDemo.exe --face --hand
+```
+```
+:: Windows - Library - Assuming you copied the DLLs following doc/installation/README.md#windows
+build\x64\Release\OpenPoseDemo.exe
+build\x64\Release\OpenPoseDemo.exe --camera 0
+build\x64\Release\OpenPoseDemo.exe --camera 1
+:: With face and hands
+build\x64\Release\OpenPoseDemo.exe --face --hand
+```
 
 
 
 ### Face and Hands
-Simply add `--face` and/or `--hand` to any command, as seeing in the exmaples above for video, webcam, and images.
+Simply add `--face` and/or `--hand` to any command:
+```
+# Ubuntu and Mac
+./build/examples/openpose/openpose.bin --image_dir examples\media\
+./build/examples/openpose/openpose.bin --video examples\media\video.avi
+./build/examples/openpose/openpose.bin
+# With face and hands
+./build/examples/openpose/openpose.bin --image_dir examples\media\ --face --hand
+./build/examples/openpose/openpose.bin --video examples\media\video.avi --face --hand
+./build/examples/openpose/openpose.bin --face --hand
+```
+```
+:: Windows - Portable Demo
+bin\OpenPoseDemo.exe --image_dir examples\media\
+bin\OpenPoseDemo.exe --video examples\media\video.avi
+bin\OpenPoseDemo.exe
+:: With face and hands
+bin\OpenPoseDemo.exe --image_dir examples\media\ --face --hand
+bin\OpenPoseDemo.exe --video examples\media\video.avi --face --hand
+bin\OpenPoseDemo.exe --face --hand
+```
+
+
+
+## Different Outputs (JSON, Images, Video, UI)
+All the output options are complementary to each other. E.g., whether you display the images with the skeletons on the UI (or not) is independent on whether you save them on disk (or not).
+
+- Save the skeletons in a set of JSON files with `--write_json {OUTPUT_VIDEO_PATH}`. Omitting the flag (default) means no JSON saving. See [doc/output.md](output.md) to understand the output format of the JSON files.
+```
+# Ubuntu and Mac (same flags for Windows)
+./build/examples/openpose/openpose.bin --image_dir examples\media\ --write_json output_jsons/
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_json output_jsons/
+./build/examples/openpose/openpose.bin --write_json output_jsons/
+```
+- Save on disk the visual output of OpenPose (the images with the skeletons overlaid) as an output video (`--write_video {OUTPUT_VIDEO_PATH}`) or a set of images (`--write_images {OUTPUT_IMAGE_DIRECTORY_PATH}`, where `--write_images_format {FORMAT}` could also come handy):
+```
+# Ubuntu and Mac (same flags for Windows)
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_video output/result.avi
+./build/examples/openpose/openpose.bin --image_dir examples\media\ --write_video output/result.avi
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_images output_images/ --write_images_format png
+./build/examples/openpose/openpose.bin --image_dir examples\media\ --write_images output_images/ --write_images_format jpg
+```
+- You can also disable the UI visualization with `--display 0`. However, OpenPose will check and make sure your application is generating some kind of output. I.e., one out of `--write_json`, `--write_video`, or `--write_images` must be set if `--display 0`).
+```
+# Ubuntu and Mac (same flags for Windows)
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_images output_images/ --display 0
+```
+- To speed up OpenPose even further when using `--display 0`, also add `--render_pose 0` if you are not using `--write_video` or `--write_images`. This way, OpenPose will not waste time overlaying skeletons with the input images.
+```
+# Ubuntu and Mac (same flags for Windows)
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_json output_jsons/ --display 0 --render_pose 0
+```
+
+
+
+## Only Skeleton without Background Image
+You can also visualize/save the skeleton without the original image overlaid or blended by adding `--disable_blending`:
+```
+# Ubuntu and Mac (same flags for Windows)
+# Only body
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --disable_blending
+```
+
+
+
+## Not Running All GPUs
+By default, OpenPose will use all the GPUs available in your machine. The following example runs the demo video `video.avi`, parallelizes it over 2 GPUs, GPUs 1 and 2 (note that it will skip GPU 0):
+```
+:: Windows - Portable Demo (same flags for Ubuntu and Mac)
+bin\OpenPoseDemo.exe --video examples/media/video.avi --num_gpu 2 --num_gpu_start 1
+```
 
 
 
@@ -163,8 +241,8 @@ Simply add `--face` and/or `--hand` to any command, as seeing in the exmaples ab
 This command provides the most accurate results we have been able to achieve for body, hand and face keypoint detection.
 
 However:
-- This will not work on CPU given the huge ammount of memory required. Your only option with CPU-only versions is to manually crop the people to fit the whole area of the image that is fed into OpenPose.
-- It will also need ~10.5 GB of GPU memory for body-foot (BODY_25) model (~6.7 GB for COCO model).
+- This will only work on Nvidia GPUs with at least 8 GB of memory. It won't work on CPU or OpenCL settings. Your only option to maximize accuracy with those is to manually crop the people to fit the whole area of the image that is fed into OpenPose.
+- It will need ~10.5 GB of GPU memory for the body-foot model (`BODY_25`) or ~6.7 GB for the `COCO` model.
 - This requires GPUs like Titan X, Titan XP, some Quadro models, P100, V100, etc.
 - Including hands and face will require >= 16GB GPUs (so the 12 GB GPUs like Titan X and XPs will no longer work).
 - This command runs at ~2 FPS on a Titan X for the body-foot model (~1 FPS for COCO).
@@ -222,13 +300,13 @@ build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --fa
 
 2. Saving 3-D keypoints and video
 ```
-# Ubuntu and Mac (same flags for Windows version)
+# Ubuntu and Mac (same flags for Windows)
 ./build/examples/openpose/openpose.bin --flir_camera --3d --number_people_max 1 --write_json output_folder_path/ --write_video_3d output_folder_path/video_3d.avi
 ```
 
 3. Fast stereo camera image saving (without keypoint detection) for later post-processing
 ```
-# Ubuntu and Mac (same flags for Windows version)
+# Ubuntu and Mac (same flags for Windows)
 # Saving video
 # Note: saving in PNG rather than JPG will improve image quality, but slow down FPS (depending on hard disk writing speed and camera number)
 ./build/examples/openpose/openpose.bin --flir_camera --num_gpu 0 --write_video output_folder_path/video.avi --write_video_fps 5
@@ -239,7 +317,7 @@ build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --fa
 
 4. Reading and processing previouly saved stereo camera images
 ```
-# Ubuntu and Mac (same flags for Windows version)
+# Ubuntu and Mac (same flags for Windows)
 # Optionally add `--face` and/or `--hand` to include face and/or hands
 # Assuming 3 cameras
 # Note: We highly recommend to reduce `--output_resolution`. E.g., for 3 cameras recording at 1920x1080, the resulting image is (3x1920)x1080, so we recommend e.g. 640x360 (x3 reduction).
@@ -251,7 +329,7 @@ build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --fa
 
 5. Reconstruction when the keypoint is visible in at least `x` camera views out of the total `n` cameras
 ```
-# Ubuntu and Mac (same flags for Windows version)
+# Ubuntu and Mac (same flags for Windows)
 # Reconstruction when a keypoint is visible in at least 2 camera views (assuming `n` >= 2)
 ./build/examples/openpose/openpose.bin --flir_camera --3d --number_people_max 1 --3d_min_views 2 --output_resolution {desired_output_resolution}
 # Reconstruction when a keypoint is visible in at least max(2, min(4, n-1)) camera views
@@ -260,32 +338,26 @@ build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --fa
 
 
 
-## JSON Output
-The following example runs the demo video `video.avi`, renders image frames on `output/result.avi`, and outputs JSON files in `output/`. Note: see [doc/output.md](output.md) to understand the format of the JSON files.
+### Tracking
+1. Runtime huge speed up by reducing the accuracy:
 ```
-# Ubuntu and Mac (same flags for Windows version)
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_video output/result.avi --write_json output/
-```
-
-
-
-## JSON Output with No Visualization
-The following example runs the demo video `video.avi` and outputs JSON files in `output/`. Note: see [doc/output.md](output.md) to understand the format of the JSON files.
-```
-# Ubuntu and Mac (same flags for Windows version)
-# Only body
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_json output/ --display 0 --render_pose 0
-# Body + face + hands
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_json output/ --display 0 --render_pose 0 --face --hand
+:: Windows - Portable Demo (same flags for Ubuntu and Mac)
+# Using OpenPose 1 frame, tracking the following e.g., 5 frames
+bin\OpenPoseDemo.exe --tracking 5 --number_people_max 1
 ```
 
-
-
-## Not Running All GPUs
-By default, OpenPose will use all the GPUs available in your machine. The following example runs the demo video `video.avi`, parallelizes it over 2 GPUs, GPUs 1 and 2 (note that it will skip GPU 0):
+2. Runtime speed up while keeping most of the accuracy:
 ```
-# Ubuntu and Mac (same flags for Windows version)
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --num_gpu 2 --num_gpu_start 1
+:: Windows - Portable Demo (same flags for Ubuntu and Mac)
+# Using OpenPose 1 frame and tracking another frame
+bin\OpenPoseDemo.exe --tracking 1 --number_people_max 1
+```
+
+3. Visual smoothness:
+```
+:: Windows - Portable Demo (same flags for Ubuntu and Mac)
+# Running both OpenPose and tracking on each frame. Note: There is no speed up/slow down
+bin\OpenPoseDemo.exe --tracking 0 --number_people_max 1
 ```
 
 
@@ -295,27 +367,27 @@ Since the Windows 10 Anniversary, Kinect 2.0 can be read as a normal webcam. All
 
 
 
-### Tracking
-1. Runtime huge speed up by reducing the accuracy:
-```
-# Ubuntu and Mac (same flags for Windows version)
-# Using OpenPose 1 frame, tracking the following e.g., 5 frames
-./build/examples/openpose/openpose.bin --tracking 5 --number_people_max 1
-```
 
-2. Runtime speed up while keeping most of the accuracy:
-```
-# Ubuntu and Mac (same flags for Windows version)
-# Using OpenPose 1 frame and tracking another frame
-./build/examples/openpose/openpose.bin --tracking 1 --number_people_max 1
-```
 
-3. Visual smoothness:
-```
-# Ubuntu and Mac (same flags for Windows version)
-# Running both OpenPose and tracking on each frame. Note: There is no speed up/slow down
-./build/examples/openpose/openpose.bin --tracking 0 --number_people_max 1
-```
+### Main Flags
+These are the most common flags, but check [doc/demo_not_quick_start.md](demo_not_quick_start.md) for a full list and description of all of them.
+
+- `--face`: Enables face keypoint detection.
+- `--hand`: Enables hand keypoint detection.
+- `--video input.mp4`: Read video `input.mp4`.
+- `--camera 3`: Read webcam number 3.
+- `--image_dir path_with_images/`: Run on the directory `path_with_images/` with images.
+- `--ip_camera http://iris.not.iac.es/axis-cgi/mjpg/video.cgi?resolution=320x240?x.mjpeg`: Run on a streamed IP camera. See examples public IP cameras [here](http://www.webcamxp.com/publicipcams.aspx).
+- `--write_video path.avi`: Save processed images as video.
+- `--write_images folder_path`: Save processed images on a folder.
+- `--write_keypoint path/`: Output JSON, XML or YML files with the people pose data on a folder.
+- `--process_real_time`: For video, it might skip frames to display at real time.
+- `--disable_blending`: If enabled, it will render the results (keypoint skeletons or heatmaps) on a black background, not showing the original image. Related: `part_to_show`, `alpha_pose`, and `alpha_pose`.
+- `--part_to_show`: Prediction channel to visualize.
+- `--display 0`: Display window not opened. Useful for servers and/or to slightly speed up OpenPose.
+- `--num_gpu 2 --num_gpu_start 1`: Parallelize over this number of GPUs starting by the desired device id. By default it uses all the available GPUs.
+- `--model_pose MPI`: Model to use, affects number keypoints, speed and accuracy.
+- `--logging_level 3`: Logging messages threshold, range [0,255]: 0 will output any message & 255 will output none. Current messages in the range [1-4], 1 for low priority messages and 4 for important ones.
 
 
 

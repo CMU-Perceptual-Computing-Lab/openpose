@@ -1,4 +1,4 @@
-OpenPose Library - Release Notes
+OpenPose - Release Notes
 ====================================
 
 

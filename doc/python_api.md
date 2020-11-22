@@ -1,4 +1,5 @@
-# OpenPose Python Module and Demo
+OpenPose - Python API
+====================================
 
 ## Contents
 1. [Introduction](#introduction)

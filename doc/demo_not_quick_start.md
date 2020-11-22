@@ -13,9 +13,8 @@ This document is a more detailed continuation of [doc/demo_quick_start.md](demo_
 	4. [Debugging Information](#debugging-information)
 	5. [Heat Maps Storing](#heat-maps-storing)
 	6. [BODY_25 vs. COCO vs. MPI Models](#body-25-vs-coco-vs-mpi-models)
-2. [Main Flags](#main-flags)
-3. [Help Flag](#help-flag)
-4. [All Flags](#all-flags)
+2. [Help Flag](#help-flag)
+3. [All Flags](#all-flags)
 
 
 
@@ -82,32 +81,10 @@ There is an exception, for CPU version, the COCO and MPI models seems to be fast
 
 
 
-## Main Flags
-We enumerate some of the most important flags, check the `Flags Detailed Description` section or run `./build/examples/openpose/openpose.bin --help` for a full description of all of them.
-
-- `--face`: Enables face keypoint detection.
-- `--hand`: Enables hand keypoint detection.
-- `--video input.mp4`: Read video.
-- `--camera 3`: Read webcam number 3.
-- `--image_dir path_to_images/`: Run on a folder with images.
-- `--ip_camera http://iris.not.iac.es/axis-cgi/mjpg/video.cgi?resolution=320x240?x.mjpeg`: Run on a streamed IP camera. See examples public IP cameras [here](http://www.webcamxp.com/publicipcams.aspx).
-- `--write_video path.avi`: Save processed images as video.
-- `--write_images folder_path`: Save processed images on a folder.
-- `--write_keypoint path/`: Output JSON, XML or YML files with the people pose data on a folder.
-- `--process_real_time`: For video, it might skip frames to display at real time.
-- `--disable_blending`: If enabled, it will render the results (keypoint skeletons or heatmaps) on a black background, not showing the original image. Related: `part_to_show`, `alpha_pose`, and `alpha_pose`.
-- `--part_to_show`: Prediction channel to visualize.
-- `--display 0`: Display window not opened. Useful for servers and/or to slightly speed up OpenPose.
-- `--num_gpu 2 --num_gpu_start 1`: Parallelize over this number of GPUs starting by the desired device id. By default it uses all the available GPUs.
-- `--model_pose MPI`: Model to use, affects number keypoints, speed and accuracy.
-- `--logging_level 3`: Logging messages threshold, range [0,255]: 0 will output any message & 255 will output none. Current messages in the range [1-4], 1 for low priority messages and 4 for important ones.
-
-
-
-
-
 ## Help Flag
-Now that you are more familiar with OpenPose, you can add the flag `--help` to see all the available OpenPose flags. Check only the flags for `examples/openpose/openpose.cpp` itself (i.e., the ones in the section `Flags from examples/openpose/openpose.cpp:`). [All Flags](#all-flags) shows them all in this document.
+We recommend [All Flags](#all-flags) shows them all in this document, which sorts all the flags by category.
+
+However, you could add the flag `--help` at any point to see all the available OpenPose flags. Check only the flags for `examples/openpose/openpose.cpp` itself (i.e., the ones in the section `Flags from examples/openpose/openpose.cpp:`).
 ```
 # Ubuntu and Mac
 ./build/examples/openpose/openpose.bin --help
@@ -122,7 +99,7 @@ bin\OpenPoseDemo.exe --help
 
 
 ## All Flags
-Each flag is divided into flag name, default value, and description.
+Now that you are more familiar with OpenPose, this is a list with all the available flags. Each one is divided into flag name, default value, and description.
 
 1. Debugging/Other
 - DEFINE_int32(logging_level,             3,              "The logging level. Integer in the range [0, 255]. 0 will output any opLog() message, while 255 will not output any. Current OpenPose library messages are in the range 0-4: 1 for low priority messages and 4 for important ones.");

@@ -99,7 +99,7 @@ We show an inference time comparison between the 3 available pose estimation lib
 - **Hardware compatibility**: CUDA (Nvidia GPU), OpenCL (AMD GPU), and non-GPU (CPU-only) versions.
 - **Usage Alternatives**:
     - [**Command-line demo**](doc/demo_quick_start.md) for built-in functionality.
-    - [**C++ API**](examples/tutorial_api_cpp/) and [**Python API**](doc/python_module.md) for custom functionality. E.g., adding your custom inputs, pre-processing, post-posprocessing, and output steps.
+    - [**C++ API**](examples/tutorial_api_cpp/) and [**Python API**](doc/python_api.md) for custom functionality. E.g., adding your custom inputs, pre-processing, post-posprocessing, and output steps.
 
 For further details, check [all released features](doc/released_features.md) and [release notes](doc/release_notes.md).
 
@@ -125,7 +125,8 @@ Most users do not need to know C++ or Python, they can simply use the OpenPose D
 ```
 # Ubuntu
 ./build/examples/openpose/openpose.bin
-
+```
+```
 :: Windows - Portable Demo
 bin\OpenPoseDemo.exe --video examples\media\video.avi
 ```
@@ -134,7 +135,8 @@ You can also add any of the available flags in any order. Do you also want to ad
 ```
 # Ubuntu
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi --face --hand --write_json output_json_folder/
-
+```
+```
 :: Windows - Portable Demo
 bin\OpenPoseDemo.exe --video examples\media\video.avi --face --hand --write_json output_json_folder/
 ```

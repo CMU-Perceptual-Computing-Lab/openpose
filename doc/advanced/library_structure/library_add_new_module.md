@@ -1,4 +1,4 @@
-OpenPose Library - Steps to Add a New Module
+OpenPose - Steps to Add a New Module
 ====================================
 
 ## Developing Steps
