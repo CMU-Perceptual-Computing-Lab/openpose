@@ -4,51 +4,33 @@ OpenPose Demo - Quick Start
 Forget about the OpenPose code, just download the portable Windows binaries (or compile the code from source) and use the demo by following this tutorial!
 
 ## Contents
-1. [Mac OSX Additional Step](#mac-osx-additional-step)
-2. [Quick Start](#quick-start)
-    1. [Improving Memory and Speed but Decreasing Accuracy](#improving-memory-and-speed-but-decreasing-accuracy)
+1. [Quick Start](#quick-start)
     2. [Running on Images, Video, or Webcam](#running-on-images-video-or-webcam)
     3. [Face and Hands](#face-and-hands)
     4. [Different Outputs (JSON, Images, Video, UI)](#different-outputs-json-images-video-ui)
     5. [Only Skeleton without Background Image](#only-skeleton-without-background-image)
     6. [Not Running All GPUs](#not-running-all-gpus)
     7. [Maximum Accuracy Configuration](#maximum-accuracy-configuration)
+        1. [Additional Model with Maximum Accuracy](#additional-model-with-maximum-accuracy)
+        2. [Additional Model with Lower False Positives](#additional-model-with-lower-false-positives)
     8. [3-D Reconstruction](#3-d-reconstruction)
     9. [Tracking](#tracking)
     10. [Kinect 2.0 as Webcam on Windows 10](#kinect-20-as-webcam-on-windows-10)
     11. [Main Flags](#main-flags)
-3. [Advanced Quick Start](#advanced-quick-start)
+2. [Advanced Quick Start](#advanced-quick-start)
+3. [Bug Solving](#bug-solving)
+    1. [Improving Memory and Speed but Decreasing Accuracy](#improving-memory-and-speed-but-decreasing-accuracy)
+    2. [Mac OSX Additional Step](#mac-osx-additional-step)
+    3. [FAQ](#faq)
 
 
-
-
-
-## Mac OSX Version Additional Step
-If you are using a Mac and selected `CPU_ONLY`, you can skip this section.
-
-If you are using a Mac and selected `OPENCL` support, and it has an inbuilt AMD graphics card, you have to manually select your AMD GPU. To do that, first note which device your Graphics card is set under. Most likely, your AMD device will be device 2.
-```bash
-clinfo
-```
-
-For any OpenPose command you run, add the following 2 flags to use your AMD card for acceleration (there `num_gpu_start` should be the number given above).
-```bash
-./build/examples/openpose/openpose.bin --num_gpu 1 --num_gpu_start 2
-```
-
-If you only have an integrated Intel Graphics card, then it will most probably be the device 1. Then, always add the following 2 flags to use your AMD card for acceleration.
-```bash
-./build/examples/openpose/openpose.bin --num_gpu 1 --num_gpu_start 1
-```
 
 
 
 ## Quick Start
-Check that OpenPose was properly installed by running any of the following 3 examples (image folder, video, or webcam). The expected visual result should look like [doc/output.md#expected-visual-results](output.md#expected-visual-results).
+In Ubuntu, Mac, and other Unix systems, use `Terminal` or `Terminator`. In Windows, the `Windows PowerShell`. Watch any Youtube video tutorial if you are not familiar with these tools. Make sure that you are in the **root directory of the project** when running any command (i.e., in the OpenPose folder, not inside `build/` nor `windows/` nor `bin/`). In addition, `examples/media/video.avi` and `examples/media` exist, so there is no need to change any lines of code.
 
-In Ubuntu, Mac, and other Unix systems, use any command-line interface, such as `Terminal` or `Terminator`. In Windows, open the `PowerShell`. You can do so with right-click on the Windows button, and `Windows PowerShell` (or pressing the Windows button + X, and then A). Feel free to watch any Youtube video tutorial if you are not familiar with these non-GUI tools.
-
-Make sure that you are in the **root directory of the project** when running any command (i.e., in the OpenPose folder, not inside `build/` nor `windows/` nor `bin/`). In addition, `examples/media/video.avi` and `examples/media` already exist, so there is no need to change any lines of code on this tutorial. You can test OpenPose by running:
+Test OpenPose by running the following. The expected visual result should look like [doc/output.md#ui-and-visual-output](output.md#ui-and-visual-output).
 ```
 # Ubuntu and Mac
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi
@@ -58,40 +40,16 @@ Make sure that you are in the **root directory of the project** when running any
 bin\OpenPoseDemo.exe --video examples\media\video.avi
 ```
 
-If these fail with an out of memory error, do not worry, the next example will fix this issue.
-
-
-
-### Improving Memory and Speed but Decreasing Accuracy
-**If you have a Nvidia GPU that does not goes out of memory when running, you should skip this step!**
-
-**Use `net_resolution` at your own risk**: If your GPU runs out of memory or you do not have a Nvidia GPU, you can reduce `--net_resolution` to improve the speed and reduce the memory requirements, but it will also highly reduce accuracy! The lower the resolution, the lower accuracy but better speed/memory.
+If you are only using the OpenPose demo, we highly recommend using [the latest Windows portable version of OpenPose](doc/installation/README.md#windows-portable-demo). If you still want to use the demo with Visual Studio, you can copy the `bin/*.dll` files into the final DLL bin location following [doc/installation/README.md#windows](installation/README.md#windows), or you could also simply modify the default flag values from [include/flags.hpp](../include/flags.hpp). If you have copied the DLLs, you can execute this:
 ```
-# Ubuntu and Mac
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --net_resolution -1x320
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --net_resolution -1x256
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --net_resolution -1x196
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --net_resolution -1x128
-```
-```
-:: Windows - Portable Demo
-bin\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x320
-bin\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x256
-bin\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x196
-bin\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x128
-```
-```
-:: Windows - Library - Assuming you copied the DLLs following doc/installation/README.md#windows
-build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x320
-build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x256
-build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x196
-build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x128
+:: Windows - Library - Assuming you have copied the DLLs following doc/installation/README.md#windows
+build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi
 ```
 
-Additional notes:
-- The default resolution is `-1x368`, any resolution smaller will improve speed.
-- The `-1` means that that the resolution will be adapted to maintain the aspect ratio of the input source. E.g., `-1x368`, `656x-1`, and `656x368` will result in the same exact resolution for 720p and 1080p input images.
-- For videos, using `-1` is recommended to let OpenPose find the ideal resolution. For a folder of images of different sizes, not adding `-1` and using images with completely different aspect ratios might result in out of memory issues. E.g., if a folder contains 2 images of resolution `100x11040` and `10000x368`. Then, using the default `-1x368` will result in the network output resolutions of `3x368` and `10000x368`, resulting in an obvious out of memory for the `10000x368` image.
+If it worked, continue with the next section. Otherwise:
+- If these failed with an out of memory error, check and follow [Improving Memory and Speed but Decreasing Accuracy](#improving-memory-and-speed-but-decreasing-accuracy).
+- If you are using Mac, make sure to check and follow [Mac OSX Additional Step](#mac-osx-additional-step).
+- Otherwise, check [FAQ](#faq).
 
 
 
@@ -100,39 +58,19 @@ Additional notes:
 ```
 # Ubuntu and Mac
 ./build/examples/openpose/openpose.bin --image_dir examples/media/
-# With face and hands
-./build/examples/openpose/openpose.bin --image_dir examples/media/ --face --hand
 ```
 ```
 :: Windows - Portable Demo
 bin\OpenPoseDemo.exe --image_dir examples\media\
-:: With face and hands
-bin\OpenPoseDemo.exe --image_dir examples\media\ --face --hand
-```
-```
-:: Windows - Library - Assuming you copied the DLLs following doc/installation/README.md#windows
-build\x64\Release\OpenPoseDemo.exe --image_dir examples\media\
-:: With face and hands
-build\x64\Release\OpenPoseDemo.exe --image_dir examples\media\ --face --hand
 ```
 - Video (`--video {VIDEO_PATH}`):
 ```
 # Ubuntu and Mac
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi
-# With face and hands
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --face --hand
 ```
 ```
 :: Windows - Portable Demo
 bin\OpenPoseDemo.exe --video examples\media\video.avi
-:: With face and hands
-bin\OpenPoseDemo.exe --video examples\media\video.avi --face --hand
-```
-```
-:: Windows - Library - Assuming you copied the DLLs following doc/installation/README.md#windows
-build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi
-:: With face and hands
-build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --face --hand
 ```
 - Webcam is applied by default (i.e., if no `--image_dir` or `--video` flags used). Optionally, if you have more than 1 camera, you could use `--camera {CAMERA_NUMBER}` to select the right one:
 ```
@@ -140,24 +78,12 @@ build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi --face --han
 ./build/examples/openpose/openpose.bin
 ./build/examples/openpose/openpose.bin --camera 0
 ./build/examples/openpose/openpose.bin --camera 1
-# With face and hands
-./build/examples/openpose/openpose.bin --face --hand
 ```
 ```
 :: Windows - Portable Demo
 bin\OpenPoseDemo.exe
 bin\OpenPoseDemo.exe --camera 0
 bin\OpenPoseDemo.exe --camera 1
-:: With face and hands
-bin\OpenPoseDemo.exe --face --hand
-```
-```
-:: Windows - Library - Assuming you copied the DLLs following doc/installation/README.md#windows
-build\x64\Release\OpenPoseDemo.exe
-build\x64\Release\OpenPoseDemo.exe --camera 0
-build\x64\Release\OpenPoseDemo.exe --camera 1
-:: With face and hands
-build\x64\Release\OpenPoseDemo.exe --face --hand
 ```
 
 
@@ -166,20 +92,12 @@ build\x64\Release\OpenPoseDemo.exe --face --hand
 Simply add `--face` and/or `--hand` to any command:
 ```
 # Ubuntu and Mac
-./build/examples/openpose/openpose.bin --image_dir examples\media\
-./build/examples/openpose/openpose.bin --video examples\media\video.avi
-./build/examples/openpose/openpose.bin
-# With face and hands
 ./build/examples/openpose/openpose.bin --image_dir examples\media\ --face --hand
 ./build/examples/openpose/openpose.bin --video examples\media\video.avi --face --hand
 ./build/examples/openpose/openpose.bin --face --hand
 ```
 ```
 :: Windows - Portable Demo
-bin\OpenPoseDemo.exe --image_dir examples\media\
-bin\OpenPoseDemo.exe --video examples\media\video.avi
-bin\OpenPoseDemo.exe
-:: With face and hands
 bin\OpenPoseDemo.exe --image_dir examples\media\ --face --hand
 bin\OpenPoseDemo.exe --video examples\media\video.avi --face --hand
 bin\OpenPoseDemo.exe --face --hand
@@ -190,27 +108,29 @@ bin\OpenPoseDemo.exe --face --hand
 ## Different Outputs (JSON, Images, Video, UI)
 All the output options are complementary to each other. E.g., whether you display the images with the skeletons on the UI (or not) is independent on whether you save them on disk (or not).
 
-- Save the skeletons in a set of JSON files with `--write_json {OUTPUT_VIDEO_PATH}`. Omitting the flag (default) means no JSON saving. See [doc/output.md](output.md) to understand the output format of the JSON files.
+- Save the skeletons in a set of JSON files with `--write_json {OUTPUT_JSON_PATH}`, see [doc/output.md](output.md) to understand its format.
 ```
 # Ubuntu and Mac (same flags for Windows)
-./build/examples/openpose/openpose.bin --image_dir examples\media\ --write_json output_jsons/
+./build/examples/openpose/openpose.bin --image_dir examples/media/ --write_json output_jsons/
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_json output_jsons/
 ./build/examples/openpose/openpose.bin --write_json output_jsons/
 ```
-- Save on disk the visual output of OpenPose (the images with the skeletons overlaid) as an output video (`--write_video {OUTPUT_VIDEO_PATH}`) or a set of images (`--write_images {OUTPUT_IMAGE_DIRECTORY_PATH}`, where `--write_images_format {FORMAT}` could also come handy):
+- Save on disk the visual output of OpenPose (the images with the skeletons overlaid) as an output video (`--write_video {OUTPUT_VIDEO_PATH}`) or set of images (`--write_images {OUTPUT_IMAGE_DIRECTORY_PATH}`.:
 ```
 # Ubuntu and Mac (same flags for Windows)
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_video output/result.avi
-./build/examples/openpose/openpose.bin --image_dir examples\media\ --write_video output/result.avi
-./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_images output_images/ --write_images_format png
-./build/examples/openpose/openpose.bin --image_dir examples\media\ --write_images output_images/ --write_images_format jpg
+./build/examples/openpose/openpose.bin --image_dir examples/media/ --write_video output/result.avi
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_images output_images/
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_images output_images/ --write_images_format jpg
+./build/examples/openpose/openpose.bin --image_dir examples/media/ --write_images output_images/
+./build/examples/openpose/openpose.bin --image_dir examples/media/ --write_images output_images/ --write_images_format jpg
 ```
-- You can also disable the UI visualization with `--display 0`. However, OpenPose will check and make sure your application is generating some kind of output. I.e., one out of `--write_json`, `--write_video`, or `--write_images` must be set if `--display 0`).
+- You can also disable the UI visualization with `--display 0`. However, some kind of output must be generated. I.e., set one out of `--write_json`, `--write_video`, or `--write_images` if `--display 0`.
 ```
 # Ubuntu and Mac (same flags for Windows)
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_images output_images/ --display 0
 ```
-- To speed up OpenPose even further when using `--display 0`, also add `--render_pose 0` if you are not using `--write_video` or `--write_images`. This way, OpenPose will not waste time overlaying skeletons with the input images.
+- To speed up OpenPose even further when using `--display 0`, also add `--render_pose 0` if you are not using `--write_video` or `--write_images` (so OpenPose will not overlay skeletons with the input images).
 ```
 # Ubuntu and Mac (same flags for Windows)
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi --write_json output_jsons/ --display 0 --render_pose 0
@@ -229,7 +149,7 @@ You can also visualize/save the skeleton without the original image overlaid or 
 
 
 ## Not Running All GPUs
-By default, OpenPose will use all the GPUs available in your machine. The following example runs the demo video `video.avi`, parallelizes it over 2 GPUs, GPUs 1 and 2 (note that it will skip GPU 0):
+By default, OpenPose will use all the GPUs available in your machine. Otherwise, `--num_gpu` sets the number of total GPUs and `--num_gpu_start` the first GPU to use. E.g., `--num_gpu 2 --num_gpu_start 1` will use GPUs ID 1 and 2 while ignore GPU ID 0 (assuming there are at least 3 GPUs):
 ```
 :: Windows - Portable Demo (same flags for Ubuntu and Mac)
 bin\OpenPoseDemo.exe --video examples/media/video.avi --num_gpu 2 --num_gpu_start 1
@@ -239,17 +159,6 @@ bin\OpenPoseDemo.exe --video examples/media/video.avi --num_gpu 2 --num_gpu_star
 
 ### Maximum Accuracy Configuration
 This command provides the most accurate results we have been able to achieve for body, hand and face keypoint detection.
-
-However:
-- This will only work on Nvidia GPUs with at least 8 GB of memory. It won't work on CPU or OpenCL settings. Your only option to maximize accuracy with those is to manually crop the people to fit the whole area of the image that is fed into OpenPose.
-- It will need ~10.5 GB of GPU memory for the body-foot model (`BODY_25`) or ~6.7 GB for the `COCO` model.
-- This requires GPUs like Titan X, Titan XP, some Quadro models, P100, V100, etc.
-- Including hands and face will require >= 16GB GPUs (so the 12 GB GPUs like Titan X and XPs will no longer work).
-- This command runs at ~2 FPS on a Titan X for the body-foot model (~1 FPS for COCO).
-- Increasing `--net_resolution` will highly reduce the frame rate and increase latency, while it might increase the accuracy. However, this accuracy increase is not guaranteed in all scenarios, required a more detailed analysis for each particular scenario. E.g., it will work better for images with very small people, but usually worse for people taking a big ratio of the image. Thus, we recommend to follow the commands below for maximum accuracy in most cases for both big and small-size people.
-- **Do not use this configuration for MPII model**, its accuracy might be harmed by this multi-scale setting. This configuration is optimal only for COCO and COCO-extended (e.g., the default BODY_25) models.
-
-**Method overview:**
 ```
 # Ubuntu and Mac: Body
 ./build/examples/openpose/openpose.bin --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25
@@ -262,18 +171,31 @@ bin\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 --scale_gap 0.
 :: Windows - Portable Demo: Body + Hand + Face
 bin\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25 --hand --hand_scale_number 6 --hand_scale_range 0.4 --face
 ```
-```
-:: Windows - Library - Assuming you copied the DLLs following doc/installation/README.md#windows: Body
-build\x64\Release\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25
-:: Windows - Library - Assuming you copied the DLLs following doc/installation/README.md#windows: Body + Hand + Face
-build\x64\Release\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 --scale_gap 0.25 --hand --hand_scale_number 6 --hand_scale_range 0.4 --face
-```
 
-If you want to increase the accuracy value metric on COCO, while harming the qualitative accuracy, add the flag `--maximize_positives`. It reduces the thresholds to accept a person candidate. It highly increases both false and true positives. I.e., it maximizes average recall but could harm average precision. Our experience is that it looks much worse visually, but it improves the COCO accuracy numbers, so use it at your own risk.
+- Required:
+    - `BODY_25` (default model). `COCO` is less accurate (but still usable), while `MPI` is not supported (i.e., `MPI` accuracy and speed will drop by using these settings).
+    - Nvidia GPU with at least 16 GB of memory. 8 or 12 GB could work in some subcases detailed here.
+        - `BODY_25` (body + foot, default model): Nvidia GPU with at least about 10.5 GB of memory. E.g., Titan X(P), some Quadro models, P100, V100.
+        - `BODY_25` + face + hands: Nvidia GPU with at least about 16 GB of memory. E.g., V100.
+        - `COCO` Body + face + hands: Nvidia GPU with at least about 6.7 GB of memory. E.g., 2070, 2080.
+    - It won't work on CPU/OpenCL modes, your only option there is to manually crop each person, rescale it, and fed it into the default OpenPose
+- Additional information:
+    - It runs at about 2 FPS on a Titan X for `BODY_25` (1 FPS for COCO).
+    - Increasing `--net_resolution` will highly reduce speed, while it does not guarantee the accuracy to increase. Thus, we recommend only using the exact flags and values detailed here (or alternatively ask the user to make their own accuracy analysis if using other values).
+    - (Not recommended, use at your own risk) You can add `--maximize_positives` to harm the visual/qualitative accuracy, but it increases the accuracy value metric on COCO challenge. It reduces the thresholds to accept a person candidate (i.e., more false and true positives), which maximizes average recall but could harm average precision. Our experience: it looks much worse visually, but improves the challenge accuracy numbers.
+    - If you are operating on Ubuntu, you can check the experimental scripts that we use to test our accuracy (we do not officially support it, i.e., we will not answer questions about it, as well as it might change it continuously), they are placed in `openpose/scripts/tests/`, called `pose_accuracy_coco_test_dev.sh` and `pose_accuracy_coco_val.sh`.
 
-In addition, our paper numbers are not based on the current models that have been released. We released our best model at the time but later found a better one. But given that the accuracy difference is less than 2%, we did not want to release yet another model to avoid confusion for the users (otherwise there would be more than 10 models released at this point). We will release a new one every time a major improvement is achieved.
 
-If you are operating on Ubuntu, you can check the experimental scripts that we use to test our accuracy (we do not officially support it, i.e., we will not answer questions about it, as well as it might change it continuously), they are placed in `openpose/scripts/tests/`, called `pose_accuracy_coco_test_dev.sh` and `pose_accuracy_coco_val.sh`.
+#### Additional Model with Maximum Accuracy
+Disclaimer: It is more accurate but also slower and requires more GPU memory.
+
+Our paper accuracy numbers do not match the default model numbers. We released our best model at the time but found better ones later.
+
+For our best model, you can download the `BODY_25B` pre-trained model from the OpenPose training repository: [BODY_25B Model - Option 1 (Maximum Accuracy, Less Speed)](https://github.com/CMU-Perceptual-Computing-Lab/openpose_train/tree/master/experimental_models#body_25b-model---option-1-maximum-accuracy-less-speed).
+
+
+#### Additional Model with Lower False Positives
+Do you need a model with less false positives but the same runtime performance and GPU requirements? You can download the `BODY_25B` pre-trained model from the OpenPose training repository: [BODY_25B Model - Option 2 (Recommended)](https://github.com/CMU-Perceptual-Computing-Lab/openpose_train/tree/master/experimental_models#body_25b-model---option-2-recommended).
 
 
 
@@ -290,12 +212,6 @@ If you are operating on Ubuntu, you can check the experimental scripts that we u
 bin\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1
 :: With face and hands
 bin\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --face --hand
-```
-```
-:: Windows - Library - Assuming you copied the DLLs following doc/installation/README.md#windows
-build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1
-:: With face and hands
-build\x64\Release\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --face --hand
 ```
 
 2. Saving 3-D keypoints and video
@@ -395,3 +311,56 @@ These are the most common flags, but check [doc/demo_not_quick_start.md](demo_no
 
 ## Advanced Quick Start
 In order to learn about many more flags, check [doc/demo_not_quick_start.md](demo_not_quick_start.md).
+
+
+
+
+
+## Bug Solving
+### Improving Memory and Speed but Decreasing Accuracy
+**If you have a Nvidia GPU that does not goes out of memory when running, you should skip this step!**
+
+**Use `net_resolution` at your own risk**: If your GPU runs out of memory or you do not have a Nvidia GPU, you can reduce `--net_resolution` to improve the speed and reduce the memory requirements, but it will also highly reduce accuracy! The lower the resolution, the lower accuracy but better speed/memory.
+```
+# Ubuntu and Mac
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --net_resolution -1x320
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --net_resolution -1x256
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --net_resolution -1x196
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --net_resolution -1x128
+```
+```
+:: Windows - Portable Demo
+bin\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x320
+bin\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x256
+bin\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x196
+bin\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x128
+```
+
+Additional notes:
+- The default resolution is `-1x368`, any resolution smaller will improve speed.
+- The `-1` means that that the resolution will be adapted to maintain the aspect ratio of the input source. E.g., `-1x368`, `656x-1`, and `656x368` will result in the same exact resolution for 720p and 1080p input images.
+- For videos, using `-1` is recommended to let OpenPose find the ideal resolution. For a folder of images of different sizes, not adding `-1` and using images with completely different aspect ratios might result in out of memory issues. E.g., if a folder contains 2 images of resolution `100x11040` and `10000x368`. Then, using the default `-1x368` will result in the network output resolutions of `3x368` and `10000x368`, resulting in an obvious out of memory for the `10000x368` image.
+
+
+
+### Mac OSX Additional Step
+**If you are not using Mac, or you are using Mac with `CPU_only`, you can skip this section.**
+
+If you are using a Mac and selected `OPENCL` support, and it has an AMD graphics card, that means that the machine has 2 GPUs that are not compatible with each other (AMD and Intel). Then, you will have to manually select one of them (the AMD one should be more poweful). To do that, first check which device your Graphics card is set under. Most likely, your AMD device will be device 2.
+```bash
+clinfo
+```
+
+For any OpenPose command you run, add the following 2 flags to use your AMD card for acceleration (where `num_gpu_start` should be the ID number given above).
+```bash
+./build/examples/openpose/openpose.bin --num_gpu 1 --num_gpu_start 2
+```
+
+If you only have an integrated Intel Graphics card, then it will most probably be the device 1. Then, always add the following 2 flags to use your AMD card for acceleration.
+```bash
+./build/examples/openpose/openpose.bin --num_gpu 1 --num_gpu_start 1
+```
+
+
+### FAQ
+Check [doc/faq.md](faq.md) to see if you can find your error, issue, or concern.
