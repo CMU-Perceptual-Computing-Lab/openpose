@@ -114,7 +114,7 @@ For further details, check [all released features](doc/released_features.md) and
 
 
 ## Installation
-If you want to use OpenPose without compiling or writing any code, simply [download and use the latest Windows portable version of OpenPose](doc/installation/README.md#windows-portable-demo)! Otherwise, you can also [build OpenPose from source](doc/installation/README.md#compiling-and-running-openpose-from-source-on-windows-ubuntu-and-mac).
+If you want to use OpenPose without compiling or writing any code, simply [download and use the latest Windows portable version of OpenPose](doc/installation/README.md#windows-portable-demo)! Otherwise, you can also [build OpenPose from source](doc/installation/README.md#compiling-and-running-openpose-from-source).
 
 See [doc/installation/README.md](doc/installation/README.md) for more details.
 

@@ -4,7 +4,7 @@ OpenPose - Installation
 ## Contents
 1. [Operating Systems, Requirements, and Dependencies](#operating-systems-requirements-and-dependencies)
 2. [Windows Portable Demo](#windows-portable-demo)
-3. [Compiling and Running OpenPose from Source on Windows, Ubuntu, and Mac](#compiling-and-running-openpose-from-source-on-windows-ubuntu-and-mac)
+3. [Compiling and Running OpenPose from Source](#compiling-and-running-openpose-from-source)
     1. [Problems and Errors Installing OpenPose](#problems-and-errors-installing-openpose)
     2. [Prerequisites](#prerequisites)
     3. [Clone OpenPose](#clone-openpose)
@@ -65,15 +65,20 @@ OpenPose - Installation
 
 ## Windows Portable Demo
 **If you just want to use OpenPose** without compiling or writing any code, simply use the latest portable version of OpenPose for Windows.
-1. Download it from the [Releases](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases) section.
-2. Follow the `Instructions.txt` file inside the downloaded zip file to download the models required by OpenPose (about 500 Mb).
-3. Then, you can run OpenPose from the PowerShell command-line by following [doc/demo_quick_start.md](demo_quick_start.md).
+1. For maximum speed, you should use OpenPose in a machine with a Nvidia GPU version. If so, you must upgrade your Nvidia drivers to the latest version (in the Nvidia "GeForce Experience" software or its [website](https://www.nvidia.com/Download/index.aspx)).
+2. Download the latest OpenPose version from the [Releases](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases) section.
+3. Follow the `Instructions.txt` file inside the downloaded zip file to download the models required by OpenPose (about 500 Mb).
+4. Then, you can run OpenPose from the PowerShell command-line by following [doc/demo_quick_start.md](demo_quick_start.md).
+
+Note: If you are using the GPU-accelerated version and are seeing `Cuda check failed (3 vs. 0): initialization error` when running OpenPose, you can fix it by doing one of these:
+- Upgrade your Nvidia drivers. If the error persists, make sure your machine does not contain any CUDA version (or if so, that it's the same than the OpenPose portable demo files). Otherwise, uninstall that CUDA version. If you need to keep that CUDA version installed, [compile OpenPose from Source](#compiling-and-running-openpose-from-source) for that CUDA version instead.
+- Download an older OpenPose version (v1.6.0 does not show this error).
 
 
 
 
 
-## Compiling and Running OpenPose from Source on Windows, Ubuntu, and Mac
+## Compiling and Running OpenPose from Source
 The instructions in the following subsections describe the steps to build OpenPose using CMake-GUI. These instructions are only recommended if you plan to modify the OpenPose code or integrate it with another library or project. You can stop reading this document if you just wanted to run OpenPose on Windows without compiling or modifying any code.
 
 
@@ -244,7 +249,7 @@ OpenPose can be easily uninstalled:
 
 In order to update it or reinstall it:
 1. Follow the above steps to uninstall it.
-2. Follow the [Compiling and Running OpenPose from Source on Windows, Ubuntu, and Mac](#compiling-and-running-openpose-from-source-on-windows-ubuntu-and-mac) steps again.
+2. Follow the [Compiling and Running OpenPose from Source](#compiling-and-running-openpose-from-source) steps again.
 
 
 
