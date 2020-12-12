@@ -55,7 +55,7 @@ try:
         datum = op.Datum()
         imageToProcess = cv2.imread(args[0].image_path)
         datum.cvInputData = imageToProcess
-        opWrapper.emplaceAndPop([datum])
+        opWrapper.emplaceAndPop(op.VectorDatum([datum]))
         poseHeatMaps = datum.poseHeatMaps.copy()
         opWrapper.stop()
 
