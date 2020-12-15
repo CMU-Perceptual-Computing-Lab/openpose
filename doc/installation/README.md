@@ -68,7 +68,7 @@ OpenPose - Installation
 1. For maximum speed, you should use OpenPose in a machine with a Nvidia GPU version. If so, you must upgrade your Nvidia drivers to the latest version (in the Nvidia "GeForce Experience" software or its [website](https://www.nvidia.com/Download/index.aspx)).
 2. Download the latest OpenPose version from the [Releases](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases) section.
 3. Follow the `Instructions.txt` file inside the downloaded zip file to download the models required by OpenPose (about 500 Mb).
-4. Then, you can run OpenPose from the PowerShell command-line by following [doc/demo_quick_start.md](demo_quick_start.md).
+4. Then, you can run OpenPose from the PowerShell command-line by following [doc/demo_quick_start.md](../demo_quick_start.md).
 
 Note: If you are using the GPU-accelerated version and are seeing `Cuda check failed (3 vs. 0): initialization error` when running OpenPose, you can fix it by doing one of these:
 - Upgrade your Nvidia drivers. If the error persists, make sure your machine does not contain any CUDA version (or if so, that it's the same than the OpenPose portable demo files). Otherwise, uninstall that CUDA version. If you need to keep that CUDA version installed, [compile OpenPose from Source](#compiling-and-running-openpose-from-source) for that CUDA version instead.
@@ -84,7 +84,7 @@ The instructions in the following subsections describe the steps to build OpenPo
 
 
 ### Problems and Errors Installing OpenPose
-Any problem installing OpenPose while following this guidelines? Check [doc/faq.md](faq.md) and/or check existing GitHub issues. If you do you find your issue, post a new one. We will not respond to duplicated issues, as well as GitHub issues about Caffe, OpenCV or CUDA installation errors, as well as issues that do not fill all the information that the GitHub template asks for.
+Any problem installing OpenPose while following this guidelines? Check [doc/faq.md](../faq.md) and/or check existing GitHub issues. If you do you find your issue, post a new one. We will not respond to duplicated issues, as well as GitHub issues about Caffe, OpenCV or CUDA installation errors, as well as issues that do not fill all the information that the GitHub template asks for.
 
 
 
@@ -131,7 +131,7 @@ cmake-gui ..
 
 5. Set the `GPU_MODE` flag to the proper value and click `Configure` again:
     1. If your machine has an Nvidia GPU, you should most probably not modify this flag and skip this step. Cases in which you might have to change it:
-        - If you have a Nvidia GPU with 2GB of memory or less: Then you will have to follow some of the tricks in [doc/speed_up_openpose.md](speed_up_openpose.md) or change `GPU_MODE` back to `CPU_ONLY`.
+        - If you have a Nvidia GPU with 2GB of memory or less: Then you will have to follow some of the tricks in [doc/speed_up_openpose.md](../speed_up_openpose.md) or change `GPU_MODE` back to `CPU_ONLY`.
         - If you cannot install CUDA, then you can also set `GPU_MODE` to `CPU_ONLY`.
     2. Mac OSX and machines without a non-Nvidia GPU (Intel or AMD GPUs): Set the `GPU_MODE` flag to `CPU_ONLY` (easier to install but slower runtime) or `OPENCL` (GPU-accelerated, it is harder to install but provides a faster runtime speed). For more details on OpenCV support, see [doc/prerequisites.md](prerequisites.md) and [OpenCL Version](#opencl-version).
     3. If your machine does not have any GPU, set the `GPU_MODE` flag to `CPU_ONLY`.
@@ -211,7 +211,7 @@ We welcome users to send us their installation videos (e.g., sharing them as Git
 
 
 ### Running OpenPose
-Check OpenPose was properly installed by running any demo example: [doc/demo_quick_start.md](demo_quick_start.md).
+Check OpenPose was properly installed by running any demo example: [doc/demo_quick_start.md](../demo_quick_start.md).
 
 
 
@@ -257,14 +257,14 @@ In order to update it or reinstall it:
 
 ## Advanced Additional Settings (Optional)
 ### Deploying or Exporting OpenPose to Other Projects
-See [doc/advanced/deployment.md](advanced/deployment.md).
+See [doc/advanced/deployment.md](../advanced/deployment.md).
 
 
 
 
 
 ### Maximum Speed
-Check the OpenPose Benchmark as well as some hints to speed up and/or reduce the memory requirements to run OpenPose on [doc/speed_up_openpose.md](speed_up_openpose.md).
+Check the OpenPose Benchmark as well as some hints to speed up and/or reduce the memory requirements to run OpenPose on [doc/speed_up_openpose.md](../speed_up_openpose.md).
 
 
 
@@ -285,7 +285,7 @@ export MKL_NUM_THREADS="8"
 export OMP_NUM_THREADS="8"
 ```
 
-Increasing the number of threads results in a higher RAM memory usage. You can check the [doc/speed_up_openpose.md](speed_up_openpose.md) for more information about speed and memory requirements in several CPUs and GPUs.
+Increasing the number of threads results in a higher RAM memory usage. You can check the [doc/speed_up_openpose.md](../speed_up_openpose.md) for more information about speed and memory requirements in several CPUs and GPUs.
 
 
 
@@ -301,7 +301,7 @@ Lastly, OpenCL version does not support unfixed `--net_resolution`. So a folder 
 
 
 ### COCO and MPI Models
-By default, the body `COCO` and `MPI` models are not downloaded (they are slower and less accurate than `BODY_25`, so not useful in most cases!). But you can download them by turning on the `DOWNLOAD_BODY_COCO_MODEL` or `DOWNLOAD_BODY_MPI_MODEL` flags. Check the differences between these models in [doc/faq.md#difference-between-body_25-vs-coco-vs-mpi](faq.md#difference-between-body_25-vs-coco-vs-mpi).
+By default, the body `COCO` and `MPI` models are not downloaded (they are slower and less accurate than `BODY_25`, so not useful in most cases!). But you can download them by turning on the `DOWNLOAD_BODY_COCO_MODEL` or `DOWNLOAD_BODY_MPI_MODEL` flags. Check the differences between these models in [doc/faq.md#difference-between-body_25-vs-coco-vs-mpi](../faq.md#difference-between-body_25-vs-coco-vs-mpi).
 
 
 
@@ -329,7 +329,7 @@ You can include the 3D reconstruction module by:
 3. Follow the CMake installation steps. In addition, set the `WITH_FLIR_CAMERA` (only if Spinnaker was installed) and `WITH_3D_RENDERER` options.
 4. Increased accuracy with Ceres solver (Ubuntu only): For extra 3-D reconstruction accuracy, run `sudo apt-get install libeigen3-dev`, install [Ceres solver](http://ceres-solver.org/installation.html), and enable `WITH_CERES` in CMake when installing OpenPose. Ceres is harder to install in Windows, so we have not tested it so far in there. Feel free to make a pull request if you do.
 
-After installation, check the [doc/advanced/3d_reconstruction_module.md](advanced/3d_reconstruction_module.md) instructions.
+After installation, check the [doc/advanced/3d_reconstruction_module.md](../advanced/3d_reconstruction_module.md) instructions.
 
 
 
@@ -343,7 +343,7 @@ To enable the extrinsic camera parameter estimation toolbox, you must also enabl
     - Run `sudo apt-get install libeigen3-dev` and link CMake to the right CMake.
 - Advanced (not recommended): Or you could also use your own version of Eigen by setting `WITH_EIGEN` to `AUTOBUILD`, click `Configure` to let CMake download the zip file, and replace `3rdparty/eigen/` by your own version.
 
-After installation, check the [doc/advanced/calibration_module.md](advanced/calibration_module.md) instructions.
+After installation, check the [doc/advanced/calibration_module.md](../advanced/calibration_module.md) instructions.
 
 
 
@@ -357,7 +357,7 @@ However, the OpenPose Unity version will crash if if faces an error while it is 
 ### Compiling without cuDNN
 The [cuDNN](https://developer.nvidia.com/cudnn) library is not mandatory, but required for full keypoint detection accuracy. In case your graphics card is not compatible with cuDNN, you can disable it by unchecking `USE_CUDNN` in CMake.
 
-Then, you would have to reduce the `--net_resolution` flag to fit the model into the GPU memory. You can try values like `640x320`, `320x240`, `320x160`, or `160x80` to see your GPU memory capabilities. After finding the maximum approximate resolution that your GPU can handle without throwing an out-of-memory error, adjust the `net_resolution` ratio to your image or video to be processed (see the `--net_resolution` explanation from [doc/demo_not_quick_start.md](demo_not_quick_start.md)), or use `-1` (e.g., `--net_resolution -1x320`).
+Then, you would have to reduce the `--net_resolution` flag to fit the model into the GPU memory. You can try values like `640x320`, `320x240`, `320x160`, or `160x80` to see your GPU memory capabilities. After finding the maximum approximate resolution that your GPU can handle without throwing an out-of-memory error, adjust the `net_resolution` ratio to your image or video to be processed (see the `--net_resolution` explanation from [doc/demo_not_quick_start.md](../demo_not_quick_start.md)), or use `-1` (e.g., `--net_resolution -1x320`).
 
 
 
