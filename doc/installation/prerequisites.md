@@ -34,7 +34,7 @@ These tips are **very important** and avoid many bugs:
         - Run `./configure --qt-gui`. Make sure no error occurred.
         - Run ``./bootstrap && make -j`nproc` && sudo make install -j`nproc` ``. Make sure no error occurred.
         - Assuming your CMake downloaded folder is in {CMAKE_FOLDER_PATH}, everytime these instructions mentions `cmake-gui`, you will have to replace that line by `{CMAKE_FOLDER_PATH}/bin/cmake-gui`.
-    - Ubuntu 14 or 16: Run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [doc/installation/README.md#CMake-Command-Line-Configuration-(Ubuntu-Only)](installation/README.md#cmake-command-line-configuration-ubuntu-only).
+    - Ubuntu 14 or 16: Run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [doc/installation/README.md#CMake-Command-Line-Configuration-(Ubuntu-Only)](README.md#cmake-command-line-configuration-ubuntu-only).
 3. Nvidia GPU version prerequisites:
     1. **Note: OpenPose has been tested extensively with CUDA 11 for Ubuntu 20, CUDA 10.1 (cuDNN 7.5.1) for Ubuntu 18, and CUDA 8.0 (cuDNN 5.1) for Ubuntu 14 and 16.**. We highly recommend using those versions for those Operating Systems to minimize potential installation issues. Other versions should also work, but we do not provide support about any CUDA/cuDNN installation/compilation issue, as well as problems related to their integration into OpenPose.
     2. Upgrade your Nvidia drivers to the latest version.
