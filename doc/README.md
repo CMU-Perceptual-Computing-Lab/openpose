@@ -17,18 +17,18 @@ Most users can simply use the OpenPose Demo without reading any C++/Python code.
 bin\OpenPoseDemo.exe --video examples\media\video.avi --face --hand --write_json output_json_folder/
 ```
 
-- [**OpenPose C++ API**](examples/tutorial_api_cpp/): If you want to read a specific input, and/or add your custom post-processing function, and/or implement your own display/saving.
+- [**OpenPose C++ API**](../examples/tutorial_api_cpp/): If you want to read a specific input, and/or add your custom post-processing function, and/or implement your own display/saving.
 	- You should be familiar with the [**OpenPose Demo**](demo_quick_start.md) and the main OpenPose flags before trying to read the C++ or Python API examples. Otherwise, it will be way harder to follow.
     - For quick prototyping: You can easily **create your custom code** on [examples/user_code/](examples/user_code/) and CMake will automatically compile it together with the whole OpenPose project. See [examples/user_code/README.md](examples/user_code/README.md) for more details.
 
-- [**OpenPose Python API**](examples/tutorial_api_python/): Almost the exact same functionality than the C++ API, but in Python!
+- [**OpenPose Python API**](../examples/tutorial_api_python/): Almost the exact same functionality than the C++ API, but in Python!
 	- You should be familiar with the [**OpenPose Demo**](demo_quick_start.md) and the main OpenPose flags before trying to read the C++ or Python API examples. Otherwise, it will be way harder to follow.
     - For quick prototyping: You can simply duplicate and rename any of the [existing example files](examples/tutorial_api_python/) within that same folder.
 
-- [**Speeding up OpenPose and benchmark**](doc/speed_up_openpose.md): Check the OpenPose Benchmark as well as some hints to speed up and/or reduce the memory requirements for OpenPose.
+- [**Speeding up OpenPose and benchmark**](speed_up_openpose.md): Check the OpenPose Benchmark as well as some hints to speed up and/or reduce the memory requirements for OpenPose.
 
-- [**Calibration toolbox**](doc/advanced/calibration_module.md) and [**3D OpenPose**](doc/advanced/3d_reconstruction_module.md): Calibrate your cameras for 3D OpenPose (or any other stereo vision tasks) and start obtaining 3D keypoints!
+- [**Calibration toolbox**](advanced/calibration_module.md) and [**3D OpenPose**](advanced/3d_reconstruction_module.md): Calibrate your cameras for 3D OpenPose (or any other stereo vision tasks) and start obtaining 3D keypoints!
 
-- [**Standalone face or hand detector**doc/advanced/standalone_face_or_hand_keypoint_detector.md](doc/advanced/standalone_face_or_hand_keypoint_detector.md) is useful if you want to do any of the following:
+- [**Standalone face or hand detector**](advanced/standalone_face_or_hand_keypoint_detector.md) is useful if you want to do any of the following:
     - **Face** keypoint detection **without body** keypoint detection: Pros: Speedup and RAM/GPU memory reduction. Cons: Worse accuracy and less detected number of faces).
     - **Use your own face/hand detector**: You can use the hand and/or face keypoint detectors with your own face or hand detectors, rather than using the body detector. E.g., useful for camera views at which the hands are visible but not the body (OpenPose detector would fail).
