@@ -27,7 +27,7 @@ bin\OpenPoseDemo.exe --video examples\media\video.avi --face --hand --write_json
 
 - [**Speeding up OpenPose and benchmark**](speed_up_openpose.md): Check the OpenPose Benchmark as well as some hints to speed up and/or reduce the memory requirements for OpenPose.
 
-- [**Calibration toolbox**](advanced/calibration_module.md) and [**3D OpenPose**](doc/advanced/3d_reconstruction_module.md): Calibrate your cameras for 3D OpenPose (or any other stereo vision tasks) and start obtaining 3D keypoints!
+- [**Calibration toolbox**](advanced/calibration_module.md) and [**3D OpenPose**](advanced/3d_reconstruction_module.md): Calibrate your cameras for 3D OpenPose (or any other stereo vision tasks) and start obtaining 3D keypoints!
 
 - [**Standalone face or hand detector**](advanced/standalone_face_or_hand_keypoint_detector.md) is useful if you want to do any of the following:
     - **Face** keypoint detection **without body** keypoint detection: Pros: Speedup and RAM/GPU memory reduction. Cons: Worse accuracy and less detected number of faces).
