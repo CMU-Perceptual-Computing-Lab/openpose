@@ -32,3 +32,5 @@ bin\OpenPoseDemo.exe --video examples\media\video.avi --face --hand --write_json
 - [**Standalone face or hand detector**](advanced/standalone_face_or_hand_keypoint_detector.md) is useful if you want to do any of the following:
     - **Face** keypoint detection **without body** keypoint detection: Pros: Speedup and RAM/GPU memory reduction. Cons: Worse accuracy and less detected number of faces).
     - **Use your own face/hand detector**: You can use the hand and/or face keypoint detectors with your own face or hand detectors, rather than using the body detector. E.g., useful for camera views at which the hands are visible but not the body (OpenPose detector would fail).
+
+- [**Hand gesture classification application - OpenHand**](https://github.com/ArthurFDLR/OpenHand-App): Third-party application that eases hand keypoints datasets creation and real-time hand gesture classification. You can **deploy your own Neural Network classification model on top of OpenPose** and play with it in real-time through a GUI!
