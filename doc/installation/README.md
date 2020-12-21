@@ -133,7 +133,7 @@ cmake-gui ..
     1. If your machine has an Nvidia GPU, you should most probably not modify this flag and skip this step. Cases in which you might have to change it:
         - If you have a Nvidia GPU with 2GB of memory or less: Then you will have to follow some of the tricks in [doc/speed_up_openpose.md](../speed_up_openpose.md) or change `GPU_MODE` back to `CPU_ONLY`.
         - If you cannot install CUDA, then you can also set `GPU_MODE` to `CPU_ONLY`.
-    2. Mac OSX and machines without a non-Nvidia GPU (Intel or AMD GPUs): Set the `GPU_MODE` flag to `CPU_ONLY` (easier to install but slower runtime) or `OPENCL` (GPU-accelerated, it is harder to install but provides a faster runtime speed). For more details on OpenCV support, see [doc/prerequisites.md](prerequisites.md) and [OpenCL Version](#opencl-version).
+    2. Mac OSX and machines with a non-Nvidia GPU (Intel or AMD GPUs): Set the `GPU_MODE` flag to `CPU_ONLY` (easier to install but slower runtime) or `OPENCL` (GPU-accelerated, it is harder to install but provides a faster runtime speed). For more details on OpenCV support, see [doc/prerequisites.md](prerequisites.md) and [OpenCL Version](#opencl-version).
     3. If your machine does not have any GPU, set the `GPU_MODE` flag to `CPU_ONLY`.
 
 6. If this step is successful, the `Configuring done` text will appear in the bottom box in the last line. Otherwise, some red text will appear in that same bottom box.
