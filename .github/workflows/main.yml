@@ -188,6 +188,8 @@ jobs:
       with:
         submodules: recursive
     - uses: actions/setup-python@v2
+      with:
+        python-version: 2.x
       if: ${{ matrix.env.WITH_PYTHON }}
     - name: Docs APT packages
       run: sudo apt-get -yq install doxygen doxygen-doc doxygen-latex doxygen-gui graphviz
