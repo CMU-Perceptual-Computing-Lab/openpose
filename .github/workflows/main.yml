@@ -176,8 +176,6 @@ jobs:
         submodules: recursive
     - uses: actions/setup-python@v2
       if: ${{ matrix.env.WITH_PYTHON }}
-    - name: Export CI
-      run: export CI
     - name: Docs APT packages
       run: sudo apt-get -yq install doxygen doxygen-doc doxygen-latex doxygen-gui graphviz
       if: ${{ matrix.DOCS }}
