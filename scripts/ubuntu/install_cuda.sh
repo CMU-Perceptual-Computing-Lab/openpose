@@ -10,7 +10,7 @@ fi
 
 # Install CUDA 8.0
 UBUNTU_VERSION="$(lsb_release -r)"
-sudo apt-get update && sudo apt-get install wget -y --no-install-recommends
+sudo apt-get update && sudo apt-get -yq install wget --no-install-recommends
 if [[ $UBUNTU_VERSION == *"14."* ]]; then
   echo "wget -c \"https://developer.nvidia.com/compute/cuda/8.0/Prod2/local_installers/cuda-repo-ubuntu1404-8-0-local-ga2_8.0.61-1_amd64-deb\" ${WGET_VERBOSE}"
   wget -c "https://developer.nvidia.com/compute/cuda/8.0/Prod2/local_installers/cuda-repo-ubuntu1404-8-0-local-ga2_8.0.61-1_amd64-deb" ${WGET_VERBOSE}
