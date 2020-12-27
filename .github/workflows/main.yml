@@ -46,6 +46,7 @@ jobs:
               NAME: U16-python-cmake-cpu
               WITH_PYTHON: true
               WITH_CUDA: false
+              WITH_CUDNN: false
               TRAVIS_OS_NAME: linux
 
           # Ubuntu 16.04 - Python - CMake - OpenCL
@@ -55,6 +56,7 @@ jobs:
               NAME: U16-python-cmake-opencl
               WITH_PYTHON: true
               WITH_CUDA: false
+              WITH_CUDNN: false
               WITH_OPEN_CL: true
               TRAVIS_OS_NAME: linux
 
@@ -65,6 +67,7 @@ jobs:
               NAME: U16-python-cmake-cpu-debug
               WITH_PYTHON: true
               WITH_CUDA: false
+              WITH_CUDNN: false
               WITH_DEBUG: true
               TRAVIS_OS_NAME: linux
 
@@ -76,6 +79,7 @@ jobs:
               WITH_PYTHON: true
               WITH_UNITY: true
               WITH_CUDA: false
+              WITH_CUDNN: false
               TRAVIS_OS_NAME: linux
 
           # Mac OSX
@@ -85,6 +89,7 @@ jobs:
             env:
               NAME: OSX-python-cmake-cpu
               WITH_CUDA: false
+              WITH_CUDNN: false
               WITH_PYTHON: true
               TRAVIS_OS_NAME: osx
 
@@ -94,6 +99,7 @@ jobs:
             env:
               NAME: OSX-default-cmake-opencl
               WITH_CUDA: false
+              WITH_CUDNN: false
               WITH_OPEN_CL: true
               TRAVIS_OS_NAME: osx
 
@@ -103,6 +109,7 @@ jobs:
             env:
               NAME: OSX-python-cmake-cpu-debug
               WITH_CUDA: false
+              WITH_CUDNN: false
               WITH_PYTHON: true
               WITH_DEBUG: true
               TRAVIS_OS_NAME: osx
@@ -113,6 +120,7 @@ jobs:
             env:
               NAME: OSX-python-cmake-cpu-unity
               WITH_CUDA: false
+              WITH_CUDNN: false
               WITH_PYTHON: true
               WITH_UNITY: true
               TRAVIS_OS_NAME: osx
@@ -123,6 +131,7 @@ jobs:
             env:
               NAME: OSX-default-cmake-cpu
               WITH_CUDA: false
+              WITH_CUDNN: false
               TRAVIS_OS_NAME: osx
 
           # Ubuntu (others)
@@ -132,6 +141,7 @@ jobs:
             env:
               NAME: U16-default-cmake-cpu
               WITH_CUDA: false
+              WITH_CUDNN: false
               TRAVIS_OS_NAME: linux
 
           # Ubuntu 16.04 - Default - Make - CUDA
@@ -149,6 +159,7 @@ jobs:
           #   env:
           #     NAME: U16-default-cmake-cpu-mkl
           #     WITH_CUDA: false
+          #     WITH_CUDNN: false
           #     WITH_MKL: true
           #     TRAVIS_OS_NAME: linux
 
@@ -159,6 +170,7 @@ jobs:
           #     NAME: U16-python-cmake-opencl
           #     WITH_PYTHON: true
           #     WITH_CUDA: false
+          #     WITH_CUDNN: false
           #     WITH_OPEN_CL: true
           #     TRAVIS_OS_NAME: linux
 
