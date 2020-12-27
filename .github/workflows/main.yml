@@ -174,6 +174,8 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: recursive
+    - uses: actions/setup-python@v2
+      if: ${{ matrix.env.WITH_PYTHON }}
     - name: Docs APT packages
       run: |
         sudo apt-get install doxygen doxygen-doc doxygen-latex doxygen-gui graphviz
