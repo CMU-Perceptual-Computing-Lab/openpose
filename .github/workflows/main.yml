@@ -180,10 +180,10 @@ jobs:
       if: ${{ matrix.DOCS }}
     - name: Install (Linux)
       run: scripts/travis/install_deps_ubuntu.sh
-      if: ${{ matrix.os_name == "linux" }}
+      if: ${{ matrix.os_name == 'linux' }}
     - name: Install (Mac OS)
       run: scripts/travis/install_deps_osx.sh
-      if: ${{ matrix.os_name == "osx" }}
+      if: ${{ matrix.os_name == 'osx' }}
 
     - name: Configure
       run: scripts/travis/configure.sh
