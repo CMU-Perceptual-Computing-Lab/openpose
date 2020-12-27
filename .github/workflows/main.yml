@@ -10,7 +10,6 @@ env:
   GH_REPO_NAME: ${{ github.event.repository.name }}
   DOXYFILE: ${{ github.workspace }}/scripts/doc_autogeneration.doxygen
   GH_REPO_REF: ${{ github.repositoryUrl }}
-  TRAVIS_BUILD_DIR: ${{ github.workspace }}
 
 jobs:
   build:
@@ -191,8 +190,23 @@ jobs:
       run: scripts/travis/run_make.sh
     - name: Tests
       run: scripts/travis/run_tests.sh
-    - name: Docs
+    - name: Generate docs
       run: |
         cd ${{ github.workspace }}
-        ./scripts/generate_gh_pages.sh
+        echo 'Generating Doxygen code documentation...'
+        echo "INPUT                  = ${{ github.workspace }}/README.md ${{ github.workspace }}/include/openpose/" >> $DOXYFILE
+        echo "USE_MDFILE_AS_MAINPAGE = ${{ github.workspace }}/README.md" >> $DOXYFILE
+        echo "OUTPUT_DIRECTORY       = " >> $DOXYFILE
+        doxygen $DOXYFILE 2>&1 | tee doxygen.log
+        echo "" > html/.nojekyll
+        cp doxygen.log html/doxygen.log
+      if: ${{ matrix.DOCS }}
+    - name: Deploy Docs
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: html
+        destination_dir: .
+        enable_jekyll: false
+        force_orphan: true
       if: ${{ matrix.DOCS }}
