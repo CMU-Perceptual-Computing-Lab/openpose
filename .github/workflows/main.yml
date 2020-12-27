@@ -16,6 +16,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env: ${{ matrix.env }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           # Ubuntu 16.04
