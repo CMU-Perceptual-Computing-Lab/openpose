@@ -19,12 +19,13 @@ then
     hash pip2 2> /dev/null || sudo apt-get -yq install python-pip
     sudo -H pip2 install pip --upgrade
     sudo -H pip2 install --upgrade numpy protobuf "opencv-python<4.3"
-fi
+else
 # Python3 libs
-sudo apt-get -yq install python3-setuptools python3-dev build-essential
-hash pip3 2> /dev/null || sudo apt-get -yq install python3-pip
-sudo -H pip3 install pip --upgrade
-sudo -H pip3 install --upgrade numpy protobuf opencv-python
+    sudo apt-get -yq install python3-setuptools python3-dev build-essential
+    hash pip3 2> /dev/null || sudo apt-get -yq install python3-pip
+    sudo -H pip3 install pip --upgrade
+    sudo -H pip3 install --upgrade numpy protobuf opencv-python
+fi
 # OpenCL Generic (Official OpenPose support dropped after Ubuntu 20)
 if [[ $UBUNTU_VERSION == *"14."* ]] || [[ $UBUNTU_VERSION == *"15."* ]] || [[ $UBUNTU_VERSION == *"16."* ]] || [[ $UBUNTU_VERSION == *"17."* ]] || [[ $UBUNTU_VERSION == *"18."* ]]
 then
