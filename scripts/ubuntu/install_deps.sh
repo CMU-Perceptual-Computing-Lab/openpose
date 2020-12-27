@@ -16,12 +16,14 @@ sudo apt-get -yq install libgflags-dev libgoogle-glog-dev liblmdb-dev
 if [[ $UBUNTU_VERSION == *"14."* ]] || [[ $UBUNTU_VERSION == *"15."* ]] || [[ $UBUNTU_VERSION == *"16."* ]] || [[ $UBUNTU_VERSION == *"17."* ]] || [[ $UBUNTU_VERSION == *"18."* ]];
 then
     sudo apt-get -yq install python-setuptools python-dev build-essential
-    hash pip 2> /dev/null || sudo easy_install pip
-    sudo -H pip install --upgrade numpy protobuf opencv-python
+    hash pip2 2> /dev/null || sudo apt-get -yq install python-pip
+    sudo -H pip2 install pip --upgrade
+    sudo -H pip2 install --upgrade numpy protobuf opencv-python
 fi
 # Python3 libs
 sudo apt-get -yq install python3-setuptools python3-dev build-essential
-sudo apt-get -yq install python3-pip
+hash pip3 2> /dev/null || sudo apt-get -yq install python3-pip
+sudo -H pip3 install pip --upgrade
 sudo -H pip3 install --upgrade numpy protobuf opencv-python
 # OpenCL Generic (Official OpenPose support dropped after Ubuntu 20)
 if [[ $UBUNTU_VERSION == *"14."* ]] || [[ $UBUNTU_VERSION == *"15."* ]] || [[ $UBUNTU_VERSION == *"16."* ]] || [[ $UBUNTU_VERSION == *"17."* ]] || [[ $UBUNTU_VERSION == *"18."* ]]
