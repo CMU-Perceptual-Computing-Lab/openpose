@@ -95,7 +95,10 @@ if [[ $RUN_EXAMPLES == true ]] ; then
   if [[ $WITH_PYTHON == true ]] ; then
     echo "Tutorial API Python: OpenPose demo..."
     cd build/examples/tutorial_api_python
-    python openpose_python.py --image_dir ../../../examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
+    PYTHON_EXE=python2
+    [[ "${TRAVIS_OS_NAME}" == "linux" ]] && [[ "$(lsb_release -r)" == *"20."* ]] && PYTHON_EXE=python3
+    echo "Using python: ${PYTHON_EXE}"
+    ${PYTHON_EXE} openpose_python.py --image_dir ../../../examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
     echo " "
     # Note: All Python examples require GUI
   fi
