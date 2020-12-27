@@ -16,7 +16,7 @@ sudo apt-get -yq install libgflags-dev libgoogle-glog-dev liblmdb-dev
 if [[ $UBUNTU_VERSION == *"14."* ]] || [[ $UBUNTU_VERSION == *"15."* ]] || [[ $UBUNTU_VERSION == *"16."* ]] || [[ $UBUNTU_VERSION == *"17."* ]] || [[ $UBUNTU_VERSION == *"18."* ]];
 then
     sudo apt-get -yq install python-setuptools python-dev build-essential
-    sudo easy_install pip
+    hash pip 2> /dev/null || sudo easy_install pip
     sudo -H pip install --upgrade numpy protobuf opencv-python
 fi
 # Python3 libs
