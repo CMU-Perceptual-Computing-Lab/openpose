@@ -9,22 +9,22 @@ then
 fi
 
 # Install CUDA 8.0
-ubuntu_version="$(lsb_release -r)"
+UBUNTU_VERSION="$(lsb_release -r)"
 sudo apt-get update && sudo apt-get install wget -y --no-install-recommends
-if [[ $ubuntu_version == *"14."* ]]; then
+if [[ $UBUNTU_VERSION == *"14."* ]]; then
   echo "wget -c \"https://developer.nvidia.com/compute/cuda/8.0/Prod2/local_installers/cuda-repo-ubuntu1404-8-0-local-ga2_8.0.61-1_amd64-deb\" ${WGET_VERBOSE}"
   wget -c "https://developer.nvidia.com/compute/cuda/8.0/Prod2/local_installers/cuda-repo-ubuntu1404-8-0-local-ga2_8.0.61-1_amd64-deb" ${WGET_VERBOSE}
   sudo dpkg --install cuda-repo-ubuntu1404-8-0-local-ga2_8.0.61-1_amd64-deb
   sudo apt-get update
   sudo apt-get -yq install cuda-8-0
-elif [[ $ubuntu_version == *"16."* ]]; then
+elif [[ $UBUNTU_VERSION == *"16."* ]]; then
   echo "wget -c \"https://developer.nvidia.com/compute/cuda/8.0/Prod2/local_installers/cuda-repo-ubuntu1604-8-0-local-ga2_8.0.61-1_amd64-deb\" ${WGET_VERBOSE}"
   wget -c "https://developer.nvidia.com/compute/cuda/8.0/Prod2/local_installers/cuda-repo-ubuntu1604-8-0-local-ga2_8.0.61-1_amd64-deb" ${WGET_VERBOSE}
   sudo dpkg --install cuda-repo-ubuntu1604-8-0-local-ga2_8.0.61-1_amd64-deb
   sudo apt-get update
   sudo apt-get -yq install cuda-8-0
 # Install CUDA 10.0
-elif [[ $ubuntu_version == *"18."* ]]; then
+elif [[ $UBUNTU_VERSION == *"18."* ]]; then
   echo "wget -c \"https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin\" ${WGET_VERBOSE}"
   wget -c "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin" ${WGET_VERBOSE}
   sudo mv cuda-ubuntu1804.pin /etc/apt/preferences.d/cuda-repository-pin-600
@@ -35,7 +35,7 @@ elif [[ $ubuntu_version == *"18."* ]]; then
   sudo apt-get update
   sudo apt-get -yq install cuda
 # Install CUDA 11.0
-elif [[ $ubuntu_version == *"20."* ]]; then
+elif [[ $UBUNTU_VERSION == *"20."* ]]; then
   echo "wget -c \"https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin\" ${WGET_VERBOSE}"
   wget -c "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin" ${WGET_VERBOSE}
   sudo mv cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600
