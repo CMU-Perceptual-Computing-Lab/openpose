@@ -19,25 +19,25 @@ then
     then
         sudo apt-get -yq install python-setuptools python-dev build-essential
         hash pip2 2> /dev/null || sudo apt-get -yq install python-pip
-        sudo -H pip2 install pip --upgrade
+        sudo -H python2 -m pip install pip --upgrade
         if [[ "$CI" == "true" ]]
         then
-            sudo -H pip2 install --upgrade "numpy<1.17" protobuf
-            sudo -H pip2 install --user "opencv-python<4.3"
+            sudo -H python2 -m pip install --upgrade "numpy<1.17" protobuf
+            python2 -m pip install --user "opencv-python<4.3"
         else
-            sudo -H pip2 install --upgrade "numpy<1.17" protobuf "opencv-python<4.3"
+            sudo -H python2 -m pip install --upgrade "numpy<1.17" protobuf "opencv-python<4.3"
         fi
     else
     # Python3 libs
         sudo apt-get -yq install python3-setuptools python3-dev build-essential
         hash pip3 2> /dev/null || sudo apt-get -yq install python3-pip
-        sudo -H pip3 install pip --upgrade
+        sudo -H python3 -m pip install pip --upgrade
         if [[ "$CI" == "true" ]]
         then
-            sudo -H pip3 install --upgrade numpy protobuf
-            sudo -H pip3 install --user opencv-python
+            sudo -H python3 -m pip install --upgrade numpy protobuf
+            python3 -m pip install --user opencv-python
         else
-            sudo -H pip3 install --upgrade numpy protobuf opencv-python
+            sudo -H python3 -m pip install --upgrade numpy protobuf opencv-python
         fi
     fi
 fi
