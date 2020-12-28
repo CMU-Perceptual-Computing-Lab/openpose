@@ -18,7 +18,7 @@ then
     sudo apt-get -yq install python-setuptools python-dev build-essential
     hash pip2 2> /dev/null || sudo apt-get -yq install python-pip
     sudo -H pip2 install pip --upgrade
-    sudo -H pip2 install --upgrade numpy protobuf
+    sudo -H pip2 install --upgrade "numpy<1.17" protobuf
     pip2 install pip --upgrade --user
     pip2 install --upgrade --user "opencv-python<4.3"
 else
