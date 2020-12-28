@@ -17,5 +17,4 @@ fi
 
 source scripts/ubuntu/install_deps.sh
 
-sudo apt-get -yq  install libatlas-base-dev
 sudo apt-get -yq  install libopencv-dev
