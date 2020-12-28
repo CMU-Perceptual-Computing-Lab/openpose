@@ -19,6 +19,7 @@ then
     hash pip2 2> /dev/null || sudo apt-get -yq install python-pip
     sudo -H pip2 install pip --upgrade
     sudo -H pip2 install --upgrade numpy protobuf
+    pip2 install pip --upgrade --user
     pip2 install --upgrade --user "opencv-python<4.3"
 else
 # Python3 libs
@@ -26,6 +27,7 @@ else
     hash pip3 2> /dev/null || sudo apt-get -yq install python3-pip
     sudo -H pip3 install pip --upgrade
     sudo -H pip3 install --upgrade numpy protobuf
+    pip3 install pip --upgrade --user
     pip3 install --upgrade --user opencv-python
 fi
 # OpenCL Generic (Official OpenPose support dropped after Ubuntu 20)
