@@ -5,18 +5,18 @@ Forget about the OpenPose code, just download the portable Windows binaries (or 
 
 ## Contents
 1. [Quick Start](#quick-start)
-    2. [Running on Images, Video, or Webcam](#running-on-images-video-or-webcam)
-    3. [Face and Hands](#face-and-hands)
-    4. [Different Outputs (JSON, Images, Video, UI)](#different-outputs-json-images-video-ui)
-    5. [Only Skeleton without Background Image](#only-skeleton-without-background-image)
-    6. [Not Running All GPUs](#not-running-all-gpus)
-    7. [Maximum Accuracy Configuration](#maximum-accuracy-configuration)
+    1. [Running on Images, Video, or Webcam](#running-on-images-video-or-webcam)
+    2. [Face and Hands](#face-and-hands)
+    3. [Different Outputs (JSON, Images, Video, UI)](#different-outputs-json-images-video-ui)
+    4. [Only Skeleton without Background Image](#only-skeleton-without-background-image)
+    5. [Not Running All GPUs](#not-running-all-gpus)
+    6. [Maximum Accuracy Configuration](#maximum-accuracy-configuration)
         1. [Additional Model with Maximum Accuracy](#additional-model-with-maximum-accuracy)
         2. [Additional Model with Lower False Positives](#additional-model-with-lower-false-positives)
-    8. [3-D Reconstruction](#3-d-reconstruction)
-    9. [Tracking](#tracking)
-    10. [Kinect 2.0 as Webcam on Windows 10](#kinect-20-as-webcam-on-windows-10)
-    11. [Main Flags](#main-flags)
+    7. [3-D Reconstruction](#3-d-reconstruction)
+    8. [Tracking](#tracking)
+    9. [Kinect 2.0 as Webcam on Windows 10](#kinect-20-as-webcam-on-windows-10)
+    10. [Main Flags](#main-flags)
 2. [Advanced Quick Start](#advanced-quick-start)
 3. [Bug Solving](#bug-solving)
     1. [Improving Memory and Speed but Decreasing Accuracy](#improving-memory-and-speed-but-decreasing-accuracy)
@@ -37,13 +37,13 @@ Test OpenPose by running the following. The expected visual result should look l
 ```
 ```
 :: Windows - Portable Demo
-bin\OpenPoseDemo.exe --video examples\media\video.avi
+bin\OpenPoseDemo.exe --video examples/media/video.avi
 ```
 
 If you are only using the OpenPose demo, we highly recommend using [the latest Windows portable version of OpenPose](doc/installation/README.md#windows-portable-demo). If you still want to use the demo with Visual Studio, you can copy the `bin/*.dll` files into the final DLL bin location following [doc/installation/README.md#windows](installation/README.md#windows), or you could also simply modify the default flag values from [include/flags.hpp](../include/flags.hpp). If you have copied the DLLs, you can execute this:
 ```
 :: Windows - Library - Assuming you have copied the DLLs following doc/installation/README.md#windows
-build\x64\Release\OpenPoseDemo.exe --video examples\media\video.avi
+build\x64\Release\OpenPoseDemo.exe --video examples/media/video.avi
 ```
 
 If it worked, continue with the next section. Otherwise:
@@ -61,7 +61,7 @@ If it worked, continue with the next section. Otherwise:
 ```
 ```
 :: Windows - Portable Demo
-bin\OpenPoseDemo.exe --image_dir examples\media\
+bin\OpenPoseDemo.exe --image_dir examples/media/
 ```
 - Video (`--video {VIDEO_PATH}`):
 ```
@@ -70,7 +70,7 @@ bin\OpenPoseDemo.exe --image_dir examples\media\
 ```
 ```
 :: Windows - Portable Demo
-bin\OpenPoseDemo.exe --video examples\media\video.avi
+bin\OpenPoseDemo.exe --video examples/media/video.avi
 ```
 - Webcam is applied by default (i.e., if no `--image_dir` or `--video` flags used). Optionally, if you have more than 1 camera, you could use `--camera {CAMERA_NUMBER}` to select the right one:
 ```
@@ -92,14 +92,14 @@ bin\OpenPoseDemo.exe --camera 1
 Simply add `--face` and/or `--hand` to any command:
 ```
 # Ubuntu and Mac
-./build/examples/openpose/openpose.bin --image_dir examples\media\ --face --hand
-./build/examples/openpose/openpose.bin --video examples\media\video.avi --face --hand
+./build/examples/openpose/openpose.bin --image_dir examples/media/ --face --hand
+./build/examples/openpose/openpose.bin --video examples/media/video.avi --face --hand
 ./build/examples/openpose/openpose.bin --face --hand
 ```
 ```
 :: Windows - Portable Demo
-bin\OpenPoseDemo.exe --image_dir examples\media\ --face --hand
-bin\OpenPoseDemo.exe --video examples\media\video.avi --face --hand
+bin\OpenPoseDemo.exe --image_dir examples/media/ --face --hand
+bin\OpenPoseDemo.exe --video examples/media/video.avi --face --hand
 bin\OpenPoseDemo.exe --face --hand
 ```
 
@@ -187,7 +187,7 @@ bin\OpenPoseDemo.exe --net_resolution "1312x736" --scale_number 4 --scale_gap 0.
 
 
 #### Additional Model with Maximum Accuracy
-Disclaimer: It is more accurate but also slower and requires more GPU memory.
+Disclaimer: It is more accurate but also slower, requires more GPU memory, and must use the Nvidia GPU version.
 
 Our paper accuracy numbers do not match the default model numbers. We released our best model at the time but found better ones later.
 
@@ -195,6 +195,8 @@ For our best model, you can download the `BODY_25B` pre-trained model from the O
 
 
 #### Additional Model with Lower False Positives
+Disclaimer: It must use the Nvidia GPU version.
+
 Do you need a model with less false positives but the same runtime performance and GPU requirements? You can download the `BODY_25B` pre-trained model from the OpenPose training repository: [BODY_25B Model - Option 2 (Recommended)](https://github.com/CMU-Perceptual-Computing-Lab/openpose_train/tree/master/experimental_models#body_25b-model---option-2-recommended).
 
 
@@ -330,10 +332,10 @@ In order to learn about many more flags, check [doc/demo_not_quick_start.md](dem
 ```
 ```
 :: Windows - Portable Demo
-bin\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x320
-bin\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x256
-bin\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x196
-bin\OpenPoseDemo.exe --video examples\media\video.avi --net_resolution -1x128
+bin\OpenPoseDemo.exe --video examples/media/video.avi --net_resolution -1x320
+bin\OpenPoseDemo.exe --video examples/media/video.avi --net_resolution -1x256
+bin\OpenPoseDemo.exe --video examples/media/video.avi --net_resolution -1x196
+bin\OpenPoseDemo.exe --video examples/media/video.avi --net_resolution -1x128
 ```
 
 Additional notes:

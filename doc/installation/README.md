@@ -116,15 +116,15 @@ cmake-gui ..
 ```
 2. Select the OpenPose directory as project source directory, and a non-existing or empty sub-directory (e.g., `build`) where the Makefile files (Ubuntu) or Visual Studio solution (Windows) will be generated. If `build` does not exist, it will ask you whether to create it. Press `Yes`.
 <p align="center">
-    <img src="../../.github/media/cmake_installation_im_1.png", width="480">
-    <img src="../../.github/media/cmake_installation_im_1_windows.png", width="480">
+    <img src="media/cmake_installation_im_1.png", width="480">
+    <img src="media/cmake_installation_im_1_windows.png", width="480">
 </p>
 
 3. Press the `Configure` button, keep the generator in `Unix Makefiles` (Ubuntu) or set it to your 64-bit Visual Studio version (Windows), and press `Finish`. Note for Windows users: CMake-GUI has changed their design after version 14. For versions older than 14, you usually select `Visual Studio XX 20XX Win64` as the generator (`X` depends on your VS version), while the `Optional toolset to use` must be empty. However, new CMake versions require you to select only the VS version as the generator, e.g., `Visual Studio 16 2019`, and then you must manually choose `x64` for the `Optional platform for generator`. See the following images as example.
 <p align="center">
-    <img src="../../.github/media/cmake_installation_im_2.png", width="240">
-    <img src="../../.github/media/cmake_installation_im_2_windows.png", width="240">
-    <img src="../../.github/media/cmake_installation_im_2_windows_new.png", width="240">
+    <img src="media/cmake_installation_im_2.png", width="240">
+    <img src="media/cmake_installation_im_2_windows.png", width="240">
+    <img src="media/cmake_installation_im_2_windows_new.png", width="240">
 </p>
 
 4. Enabling Python (optional step, only apply it if you plan to use the Python API): Enable the `BUILD_PYTHON` flag and click `Configure` again.
@@ -138,8 +138,8 @@ cmake-gui ..
 
 6. If this step is successful, the `Configuring done` text will appear in the bottom box in the last line. Otherwise, some red text will appear in that same bottom box.
 <p align="center">
-    <img src="../../.github/media/cmake_installation_im_3.png", width="480">
-    <img src="../../.github/media/cmake_installation_im_3_windows.png", width="480">
+    <img src="media/cmake_installation_im_3.png", width="480">
+    <img src="media/cmake_installation_im_3_windows.png", width="480">
 </p>
 
 7. Press the `Generate` button and proceed to [Compilation](#compilation). You can now close CMake.
@@ -366,7 +366,7 @@ OpenPose uses a [custom fork of Caffe](https://github.com/CMU-Perceptual-Computi
 
 Alternatively, you can use your own Caffe distribution on Ubuntu/Mac by 1) disabling `BUILD_CAFFE`, 2) setting `Caffe_INCLUDE_DIRS` to `{CAFFE_PATH}/include/caffe`, and 3) setting `Caffe_LIBS` to `{CAFFE_PATH}/build/lib/libcaffe.so`, as shown in the image below. Note that cuDNN-compatible Caffe version is required in order to get the maximum possible accuracy in OpenPose.
 <p align="center">
-    <img src="../../.github/media/cmake_installation_im_5.png", width="480">
+    <img src="media/cmake_installation_im_5.png", width="480">
 </p>
 
 For Windows, simply replace the OpenCV DLLs and include folder for your custom one.
