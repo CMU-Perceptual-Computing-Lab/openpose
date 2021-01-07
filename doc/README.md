@@ -5,7 +5,7 @@ Most users can simply use the OpenPose Demo without reading any C++/Python code.
 
 - The first step for any software, [installing](installation.md) it!
 
-- [**Output information**](doc/output.md): Learn about the output format, keypoint index ordering, etc.
+- [**Output information**](output.md): Learn about the output format, keypoint index ordering, etc.
 
 - [**OpenPose Demo**](demo_quick_start.md) for your terminal or PowerShell: Choose your input (e.g., images, video, webcam), set of algorithms (body, hand, face), and output (e.g., display, JSON keypoint saving, image+keypoints).
     - E.g.: Given an input video (`--video`), extract body (by default), face (`--face`) and hand (`--hand`) keypoints, save the keypoints in a JSON file (`--write_json`), and display (by default) the results in the screen. You can remove any of the flags to remove that particular functionality or add any other.
