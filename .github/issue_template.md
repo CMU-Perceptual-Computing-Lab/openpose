@@ -1,14 +1,18 @@
 ### Posting rules
-1. **Duplicated posts will not be answered**. Check the [FAQ](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/faq.md) section, other GitHub issues, and general documentation before posting. E.g., **low-speed, out-of-memory, output format, 0-people detected, installation issues, ...**).
-2. **Fill** the **Your System Configuration section (all of it or it will not be answered!)** if you are facing an error or unexpected behavior. Feature requests or some other type of posts might not require it.
+1. **No duplicated posts, only 1 new post opened a day, and up to 2 opened a week**. Otherwise, extrict user bans will occur.
+    - Check the [FAQ](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/faq.md) section, other GitHub issues, and general documentation before posting. E.g., **low-speed, out-of-memory, output format, 0-people detected, installation issues, ...**).
+    - Keep posting all your issues in the same post.
+    - No bans if you are unsure whether the post is duplicated!
+2. **Fill all** the **Your System Configuration section** if you are facing an error or unexpected behavior. Some posts (e.g., feature requests) might not require it.
 3. **No questions about training or 3rd party libraries**:
-    - OpenPose only implements testing.
-    - Caffe errors/issues, check [Caffe](http://caffe.berkeleyvision.org) documentation.
-    - CUDA check failed errors: They are usually fixed by re-installing CUDA, then re-installing the proper cuDNN version, and then re-compiling (or re-installing) OpenPose. Otherwise, check for help in CUDA forums.
-    - OpenCV errors: Install the default/pre-compiled OpenCV or check for online help.
-4. Set a **proper issue title**: add the Ubuntu/Windows keyword and be specific (e.g., do not call it: `Error`).
+    - OpenPose only implements testing. For training, check [OpenPose train](https://github.com/CMU-Perceptual-Computing-Lab/openpose_train).
+    - Caffe errors/issues: Check [Caffe](http://caffe.berkeleyvision.org) documentation.
+    - CUDA/cuDNN check failed errors: They are usually fixed by re-installing CUDA, then re-installing the proper cuDNN version, then rebooting, and then re-installing OpenPose. Otherwise, check Nvidia/CUDA/cuDNN forums.
+    - OpenCV errors: Install the default/pre-compiled OpenCV or check for OpenCV online help.
+4. Set a **proper issue title**: Add the OS (Ubuntu, Windows) and be specific (e.g., do not call it: `Error`).
 5. Only English comments.
-Posts which do not follow these rules will be **ignored, closed, or reported** with no further clarification.
+6. Remove these posting rules from your post but follow them!
+Posts which do not follow these rules will be **ignored/deleted** and those **users banned** with no further clarification.
 
 
 
@@ -30,7 +34,7 @@ Note: add `--logging_level 0 --disable_multi_thread` to get higher debug informa
 
 
 ### Type of Issue
-You might select multiple topics, delete the rest:
+Select the topic(s) on your post, delete the rest:
 - Compilation/installation error
 - Execution error
 - Help wanted

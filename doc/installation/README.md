@@ -182,9 +182,13 @@ cd 3rdparty/caffe; git apply ../../scripts/osx/mac_opencl_patch.txt
 #### Windows
 In order to build the project, select and run only one of the 2 following alternatives.
 
-1. **CMake-GUI alternative (recommended)**: Open the Visual Studio solution (Windows) by clicking in `Open Project` in CMake (or alternatively `build/OpenPose.sln`). Then, set the configuration from `Debug` to `Release` and press F7 (or `Build`, `Build Solution`). After it has compiled, and if you have a webcam, you can press the green triangle icon (alternatively <kbd>F5</kbd>) to run OpenPose with the default settings on the webcam.
+- **CMake-GUI alternative (recommended)**:
+    1. Open the Visual Studio solution (Windows) by clicking in `Open Project` in CMake (or alternatively `build/OpenPose.sln`). Then, set the configuration from `Debug` to `Release`.
+    2. Press <kbd>F7</kbd> (or `Build` menu and click on `Build Solution`).
+    3. **Important for Python version**: Make sure not to skip step 2, it is not enough to click on <kbd>F5</kbd> (Run), you must also `Build Solution` for the Python bindings to be generated.
+    4. After it has compiled, and if you have a webcam, you can press the green triangle icon (alternatively <kbd>F5</kbd>) to run the OpenPose demo with the default settings on the webcam.
 
-2. Command-line build alternative (not recommended). NOTE: The command line alternative is not officially supported, but it was added in [GitHub issue #1198](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/1198). For any questions or bug report about this command-line version, comment in that GitHub issue.
+- Command-line build alternative (not recommended). NOTE: The command line alternative is not officially supported, but it was added in [GitHub issue #1198](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/1198). For any questions or bug report about this command-line version, comment in that GitHub issue.
     1. Run "MSVS 2019 Developer Command Console"
     ```batch
     openpose\mkdir  build
@@ -236,7 +240,9 @@ If you do not want to use the Windows portable binaries nor compile it from sour
         - [Dockerfile - OpenPose v1.4.0, OpenCV, CUDA 8, CuDNN 6, Python2.7](https://gist.github.com/moiseevigor/11c02c694fc0c22fccd59521793aeaa6).
         - [Dockerfile - OpenPose v1.2.1](https://gist.github.com/sberryman/6770363f02336af82cb175a83b79de33).
 
-- [Google Colab helper script](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/949#issue-387855863): Script to install OpenPose on Google Colab. Really useful when access to a computer powerful enough to run OpenPose is not possible, so one possible way to use OpenPose is to build it on a GPU-enabled Colab runtime and then run the programs there. For questions and more details, read and post ONLY on [issue thread #949](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/949).
+- Google Colab helper scripts: Script to install OpenPose on Google Colab. Really useful when access to a computer powerful enough to run OpenPose is not possible, so one possible way to use OpenPose is to build it on a GPU-enabled Colab runtime and then run the programs there.
+    - [Google Colab 1/2](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/1736#issuecomment-736846794): For questions and more details, read and post ONLY on [issue thread #1736](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/1736).
+    - [Google Colab 2/2](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/949#issue-387855863): For questions and more details, read and post ONLY on [issue thread #949](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/949).
 
 
 
