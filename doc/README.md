@@ -3,7 +3,7 @@ OpenPose - Quick Start
 
 Most users can simply use the OpenPose Demo without reading any C++/Python code. Users that need to add additional functionality (new inputs, outputs, etc) should check the C++/Python APIs:
 
-- The first step for any software, [installing](installation.md) it!
+- The first step for any software, [installing](installation/README.md) it!
 
 - [**Output information**](output.md): Learn about the output format, keypoint index ordering, etc.
 
@@ -19,11 +19,11 @@ bin\OpenPoseDemo.exe --video examples\media\video.avi --face --hand --write_json
 
 - [**OpenPose C++ API**](../examples/tutorial_api_cpp/): If you want to read a specific input, and/or add your custom post-processing function, and/or implement your own display/saving.
 	- You should be familiar with the [**OpenPose Demo**](demo_quick_start.md) and the main OpenPose flags before trying to read the C++ or Python API examples. Otherwise, it will be way harder to follow.
-    - For quick prototyping: You can easily **create your custom code** on [examples/user_code/](examples/user_code/) and CMake will automatically compile it together with the whole OpenPose project. See [examples/user_code/README.md](examples/user_code/README.md) for more details.
+    - For quick prototyping: You can easily **create your custom code** on [examples/user_code/](../examples/user_code/) and CMake will automatically compile it together with the whole OpenPose project. See [examples/user_code/README.md](../examples/user_code/README.md) for more details.
 
 - [**OpenPose Python API**](../examples/tutorial_api_python/): Almost the exact same functionality than the C++ API, but in Python!
 	- You should be familiar with the [**OpenPose Demo**](demo_quick_start.md) and the main OpenPose flags before trying to read the C++ or Python API examples. Otherwise, it will be way harder to follow.
-    - For quick prototyping: You can simply duplicate and rename any of the [existing example files](examples/tutorial_api_python/) within that same folder.
+    - For quick prototyping: You can simply duplicate and rename any of the [existing example files](../examples/tutorial_api_python/) within that same folder.
 
 - [**Speeding up OpenPose and benchmark**](speed_up_openpose.md): Check the OpenPose Benchmark as well as some hints to speed up and/or reduce the memory requirements for OpenPose.
 
