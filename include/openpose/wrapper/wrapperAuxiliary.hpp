@@ -290,8 +290,8 @@ namespace op
             {
                 // Get input scales and sizes
                 const auto scaleAndSizeExtractor = std::make_shared<ScaleAndSizeExtractor>(
-                    wrapperStructPose.netInputSize, finalOutputSize, wrapperStructPose.scalesNumber,
-                    wrapperStructPose.scaleGap
+                    wrapperStructPose.netInputSize, (float)wrapperStructPose.netInputSizeDynamicBehavior, finalOutputSize,
+                    wrapperStructPose.scalesNumber, wrapperStructPose.scaleGap
                 );
                 scaleAndSizeExtractorW = std::make_shared<WScaleAndSizeExtractor<TDatumsSP>>(scaleAndSizeExtractor);
 

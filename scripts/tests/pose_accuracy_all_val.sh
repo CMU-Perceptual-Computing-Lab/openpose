@@ -20,7 +20,7 @@ temporaryJsonFile1=~/Desktop/OpenPose_1.json
 temporaryJsonFile4=~/Desktop/OpenPose_4.json
 OP_COMAND="./build/examples/openpose/openpose.bin --face --hand --render_pose 0 --display 0 --cli_verbose 0.2"
 OP_COMAND_1SCALE="${OP_COMAND} --write_coco_json ${temporaryJsonFile1} --num_gpu_start 1"
-OP_COMAND_4SCALES="${OP_COMAND} --maximize_positives --scale_number 4 --scale_gap 0.25 --write_coco_json ${temporaryJsonFile4} --num_gpu_start 1"
+OP_COMAND_4SCALES="${OP_COMAND} --maximize_positives --net_resolution_dynamic -1 --scale_number 4 --scale_gap 0.25 --write_coco_json ${temporaryJsonFile4} --num_gpu_start 1"
 
 # NOTE: Uncomment those tests you are interested into. By default, all disabled.
 

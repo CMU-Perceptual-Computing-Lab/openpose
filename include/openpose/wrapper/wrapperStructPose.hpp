@@ -32,6 +32,15 @@ namespace op
         Point<int> netInputSize;
 
         /**
+         * Zero or negative means that using `-1` in netInputSize will behave as explained in its flag description.
+         * Otherwise, and to avoid out of memory errors, the `-1` in netInputSize will clip to this value times the
+         * default 16/9 aspect ratio value (i.e., 656 width for a 368 height). E.g., netInputSizeDynamicBehavior = 10
+         * and netInputSize = {-1x368} will clip to 6560x368 (10 x 656). Recommended 1 for small GPUs (to avoid out of
+         * memory errors but maximize speed) and 0 for big GPUs (for maximum accuracy and speed).
+         */
+        double netInputSizeDynamicBehavior;
+
+        /**
          * Output size of the final rendered image.
          * It barely affects performance compared to netInputSize.
          * The final Datum.poseKeypoints can be scaled with respect to outputSize if `keypointScaleMode` is set to
@@ -211,6 +220,7 @@ namespace op
          */
         WrapperStructPose(
             const PoseMode poseMode = PoseMode::Enabled, const Point<int>& netInputSize = Point<int>{-1, 368},
+            const double netInputSizeDynamicBehavior = 1.,
             const Point<int>& outputSize = Point<int>{-1, -1},
             const ScaleMode keypointScaleMode = ScaleMode::InputResolution, const int gpuNumber = -1,
             const int gpuNumberStart = 0, const int scalesNumber = 1, const float scaleGap = 0.25f,

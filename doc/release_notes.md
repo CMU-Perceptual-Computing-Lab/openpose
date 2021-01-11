@@ -433,18 +433,19 @@ OpenPose - Release Notes
 
 ## Current version - Future OpenPose 1.7.1
 1. Main improvements:
-    1. Webcam speed boosted on Windows (by updating OpenCV).
-    2. Third party versions updated:
+    1. (For images and custom inputs only): Flag `--net_resolution_dynamic` added to avoid out of memory errors in low GPUs (set by default to 1). It also allows maintaining the maximum possible accuracy (for big GPUs), which was the previous default until OpenPose v1.7.0.
+    2. Webcam speed boosted on Windows (by updating OpenCV).
+    3. Third party versions updated:
         1. OpenCV (Windows): From 4.2 to 4.5.
         2. Eigen: From 3.3.4 to 3.3.8.
         3. `wget` (Windows): From 1.19.1 to 1.20.3.
-    3. AppVeyor now tests the actual OpenPoseDemo.exe example (Windows).
-    4. Documentation improvements:
+    4. AppVeyor now tests the actual OpenPoseDemo.exe example (Windows).
+    5. Documentation improvements:
         1. Highly simplified README.md.
         2. Highly simplified doc, restructured to improve simplicity and now divided into subdirectories (`advanced`, `deprecated`, `installation`, etc).
         3. More examples added to the demo quick start documentation.
-    5. Calibration doc links to included chessboard pdf.
-    6. Deprecated examples directories `tutorial_add_module` and `tutorial_api_thread` (and renamed as `deprecated`). They still compile, but we no longer support them.
+    6. Calibration doc links to included chessboard pdf.
+    7. Deprecated examples directories `tutorial_add_module` and `tutorial_api_thread` (and renamed as `deprecated`). They still compile, but we no longer support them.
 2. Functions or parameters renamed:
 3. Main bugs fixed:
     1. Eigen working again on Windows.

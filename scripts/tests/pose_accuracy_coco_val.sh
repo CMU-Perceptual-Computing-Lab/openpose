@@ -19,7 +19,7 @@ OP_BIN=./build/examples/openpose/openpose.bin
     # 1 scale (body)
 $OP_BIN --image_dir $IMAGE_FOLDER --display 0 --render_pose 0 --cli_verbose 0.2 --write_coco_json ${JSON_FOLDER}1.json --write_coco_json_variants 1
 # $OP_BIN --image_dir $IMAGE_FOLDER --display 0 --render_pose 0 --cli_verbose 0.2 --write_coco_json ${JSON_FOLDER}1_max.json --write_coco_json_variants 3 \
-#     --maximize_positives
+#     --maximize_positives --net_resolution_dynamic -1
 
     # 1 scale (foot)
 $OP_BIN --image_dir $IMAGE_FOOT_FOLDER --display 0 --render_pose 0 --cli_verbose 0.2 --write_coco_json ${JSON_FOLDER}1.json --write_coco_json_variants 2
@@ -32,6 +32,6 @@ $OP_BIN --image_dir $IMAGE_FOOT_FOLDER --display 0 --render_pose 0 --cli_verbose
 
 # Additional settings:
 # 1. For maximum accuracy:
-#     --write_coco_json ${JSON_FOLDER}1_4_max.json --maximize_positives
+#     --write_coco_json ${JSON_FOLDER}1_4_max.json --maximize_positives --net_resolution_dynamic -1
 # 2. For custom models:
 #     --model_pose BODY_25B/BODY_23 --model_folder ${JSON_FOLDER}

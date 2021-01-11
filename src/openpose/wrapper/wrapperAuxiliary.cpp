@@ -16,6 +16,14 @@ namespace op
         {
             opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
 
+            // Disable netInputSizeDynamicBehavior if not images and not custom input
+            // (i.e., fixed resolution stream like webcam or video)
+            if (wrapperStructInput.producerType != ProducerType::ImageDirectory
+                && wrapperStructInput.producerType != ProducerType::None)
+            {
+                wrapperStructPose.netInputSizeDynamicBehavior = -1.f;
+            }
+
             // Check no wrong/contradictory flags enabled
             if (wrapperStructPose.alphaKeypoint < 0. || wrapperStructPose.alphaKeypoint > 1.
                 || wrapperStructFace.alphaHeatMap < 0. || wrapperStructFace.alphaHeatMap > 1.

@@ -102,6 +102,13 @@ DEFINE_string(net_resolution,           "-1x368",       "Multiples of 16. If it 
                                                         " any of the dimensions, OP will choose the optimal aspect ratio depending on the user's"
                                                         " input value. E.g., the default `-1x368` is equivalent to `656x368` in 16:9 resolutions,"
                                                         " e.g., full HD (1980x1080) and HD (1280x720) resolutions.");
+DEFINE_double(net_resolution_dynamic,   1.,             "This flag only applies to images or custom inputs (not to video or webcam). If it is zero"
+                                                        " or a negative value, it means that using `-1` in `net_resolution` will behave as explained"
+                                                        " in its description. Otherwise, and to avoid out of memory errors, the `-1` in"
+                                                        " `net_resolution` will clip to this value times the default 16/9 aspect ratio value (which"
+                                                        " is 656 width for a 368 height). E.g., `net_resolution_dynamic 10 net_resolution -1x368`"
+                                                        " will clip to 6560x368 (10 x 656). Recommended 1 for small GPUs (to avoid out of memory"
+                                                        " errors but maximize speed) and 0 for big GPUs (for maximum accuracy and speed).");
 DEFINE_int32(scale_number,              1,              "Number of scales to average.");
 DEFINE_double(scale_gap,                0.25,           "Scale gap between scales. No effect unless scale_number > 1. Initial scale is always 1."
                                                         " If you want to change the initial scale, you actually want to multiply the"

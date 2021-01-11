@@ -9,8 +9,8 @@ namespace op
     class OP_API ScaleAndSizeExtractor
     {
     public:
-        ScaleAndSizeExtractor(const Point<int>& netInputResolution, const Point<int>& outputResolution,
-                              const int scaleNumber = 1, const double scaleGap = 0.25);
+        ScaleAndSizeExtractor(const Point<int>& netInputResolution, const float netInputResolutionDynamicBehavior,
+            const Point<int>& outputResolution, const int scaleNumber = 1, const double scaleGap = 0.25);
 
         virtual ~ScaleAndSizeExtractor();
 
@@ -19,6 +19,7 @@ namespace op
 
     private:
         const Point<int> mNetInputResolution;
+        const float mNetInputResolutionDynamicBehavior;
         const Point<int> mOutputSize;
         const int mScaleNumber;
         const double mScaleGap;

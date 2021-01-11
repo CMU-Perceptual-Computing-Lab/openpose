@@ -3,17 +3,18 @@
 namespace op
 {
     WrapperStructPose::WrapperStructPose(
-        const PoseMode poseMode_, const Point<int>& netInputSize_, const Point<int>& outputSize_,
-        const ScaleMode keypointScaleMode_, const int gpuNumber_, const int gpuNumberStart_, const int scalesNumber_,
-        const float scaleGap_, const RenderMode renderMode_, const PoseModel poseModel_,
-        const bool blendOriginalFrame_, const float alphaKeypoint_, const float alphaHeatMap_,
-        const int defaultPartToRender_, const String& modelFolder_, const std::vector<HeatMapType>& heatMapTypes_,
-        const ScaleMode heatMapScaleMode_, const bool addPartCandidates_, const float renderThreshold_,
-        const int numberPeopleMax_, const bool maximizePositives_, const double fpsMax_,
-        const String& protoTxtPath_, const String& caffeModelPath_, const float upsamplingRatio_,
-        const bool enableGoogleLogging_) :
+        const PoseMode poseMode_, const Point<int>& netInputSize_, const double netInputSizeDynamicBehavior_,
+        const Point<int>& outputSize_, const ScaleMode keypointScaleMode_, const int gpuNumber_,
+        const int gpuNumberStart_, const int scalesNumber_, const float scaleGap_, const RenderMode renderMode_,
+        const PoseModel poseModel_, const bool blendOriginalFrame_, const float alphaKeypoint_,
+        const float alphaHeatMap_, const int defaultPartToRender_, const String& modelFolder_,
+        const std::vector<HeatMapType>& heatMapTypes_, const ScaleMode heatMapScaleMode_,
+        const bool addPartCandidates_, const float renderThreshold_, const int numberPeopleMax_,
+        const bool maximizePositives_, const double fpsMax_, const String& protoTxtPath_,
+        const String& caffeModelPath_, const float upsamplingRatio_, const bool enableGoogleLogging_) :
         poseMode{poseMode_},
         netInputSize{netInputSize_},
+        netInputSizeDynamicBehavior{netInputSizeDynamicBehavior_},
         outputSize{outputSize_},
         keypointScaleMode{keypointScaleMode_},
         gpuNumber{gpuNumber_},

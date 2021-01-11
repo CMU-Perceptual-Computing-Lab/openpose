@@ -5,9 +5,10 @@
 namespace op
 {
     ScaleAndSizeExtractor::ScaleAndSizeExtractor(const Point<int>& netInputResolution,
-                                                 const Point<int>& outputResolution, const int scaleNumber,
-                                                 const double scaleGap) :
+        const float netInputResolutionDynamicBehavior, const Point<int>& outputResolution, const int scaleNumber,
+        const double scaleGap) :
         mNetInputResolution{netInputResolution},
+        mNetInputResolutionDynamicBehavior{netInputResolutionDynamicBehavior},
         mOutputSize{outputResolution},
         mScaleNumber{scaleNumber},
         mScaleGap{scaleGap}
@@ -49,14 +50,24 @@ namespace op
                 if (poseNetInputSize.x <= 0 && poseNetInputSize.y <= 0)
                     error("Only 1 of the dimensions of net input resolution can be <= 0.",
                           __LINE__, __FUNCTION__, __FILE__);
-                if (poseNetInputSize.x <= 0)
-                    poseNetInputSize.x = 16 * positiveIntRound(
-                        poseNetInputSize.y * inputResolution.x / (float) inputResolution.y / 16.f
-                    );
-                else // if (poseNetInputSize.y <= 0)
-                    poseNetInputSize.y = 16 * positiveIntRound(
-                        poseNetInputSize.x * inputResolution.y / (float) inputResolution.x / 16.f
-                    );
+                // mNetInputResolutionDynamicBehavior limiting maximum
+                if (mNetInputResolutionDynamicBehavior > 0)
+                {
+                    if (poseNetInputSize.x <= 0)
+                        poseNetInputSize.x = 16 * positiveIntRound(1 / 16.f *
+                            fastMin(poseNetInputSize.y * mNetInputResolutionDynamicBehavior * 16.f / 9.f, poseNetInputSize.y * inputResolution.x / (float)inputResolution.y));
+                    else // if (poseNetInputSize.y <= 0)
+                        poseNetInputSize.y = 16 * positiveIntRound(1 / 16.f *
+                            fastMin(poseNetInputSize.x * mNetInputResolutionDynamicBehavior * 9.f / 16.f, poseNetInputSize.x * inputResolution.y / (float)inputResolution.x));
+                        poseNetInputSize.y = 16 * positiveIntRound(1 / 16.f * poseNetInputSize.x * inputResolution.y / (float)inputResolution.x);
+                }
+                else // No mNetInputResolutionDynamicBehavior behavior
+                {
+                    if (poseNetInputSize.x <= 0)
+                        poseNetInputSize.x = 16 * positiveIntRound(1 / 16.f * poseNetInputSize.y * inputResolution.x / (float)inputResolution.y);
+                    else // if (poseNetInputSize.y <= 0)
+                        poseNetInputSize.y = 16 * positiveIntRound(1 / 16.f * poseNetInputSize.x * inputResolution.y / (float)inputResolution.x);
+                }
             }
             // scaleInputToNetInputs & netInputSizes - Reescale keeping aspect ratio
             std::vector<double> scaleInputToNetInputs(mScaleNumber, 1.f);
