@@ -141,7 +141,7 @@ namespace op
                         // Empirically tested - OpenCV is more efficient normalizing a whole matrix/image (it uses AVX and
                         // other optimized instruction sets).
                         // In addition, the following if statement does not copy the pointer to a cv::Mat, just wrapps it.
-                    cv::Mat floatPtrImageCvWrapper(height, width, CV_32FC3, floatPtrImage);
+                    cv::Mat floatPtrImageCvWrapper(height*width*3, 1, CV_32FC1, floatPtrImage); // CV_32FC3 warns about https://github.com/opencv/opencv/issues/16739
                     floatPtrImageCvWrapper = floatPtrImageCvWrapper*(1/256.f) - 0.5f;
                 #endif
             }
