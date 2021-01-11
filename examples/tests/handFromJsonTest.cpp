@@ -50,9 +50,10 @@ int handFromJsonTest()
         op::WrapperHandFromJsonTest<op::Datum> opWrapper;
         // Pose configuration (use WrapperStructPose{} for default and recommended configuration)
         op::WrapperStructPose wrapperStructPose{
-            op::PoseMode::Disabled, op::flagsToPoint("656x368"), op::flagsToPoint("1280x720"), op::ScaleMode::InputResolution,
-            FLAGS_num_gpu, FLAGS_num_gpu_start, 1, 0.15f, op::RenderMode::None, op::PoseModel::BODY_25, true, 0.f, 0.f,
-            0, "models/", {}, op::ScaleMode::ZeroToOneFixedAspect, false, 0.05f, -1, false};
+            op::PoseMode::Disabled, op::flagsToPoint("656x368", "?x?"), -1.0, op::flagsToPoint("1280x720", "?x?"),
+            op::ScaleMode::InputResolution, FLAGS_num_gpu, FLAGS_num_gpu_start, 1, 0.15f, op::RenderMode::None,
+            op::PoseModel::BODY_25, true, 0.f, 0.f, 0, "models/", {}, op::ScaleMode::ZeroToOneFixedAspect, false,
+            0.05f, -1, false};
         wrapperStructPose.modelFolder = op::String(FLAGS_model_folder);
         // Hand configuration (use op::WrapperStructHand{} to disable it)
         const op::WrapperStructHand wrapperStructHand{

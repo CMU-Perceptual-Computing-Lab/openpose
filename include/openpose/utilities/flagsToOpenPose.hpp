@@ -39,8 +39,8 @@ namespace op
     OP_API DisplayMode flagsToDisplayMode(const int display, const bool enabled3d);
 
     /**
-     * E.g., const auto netInputSize = flagsToPoint(op::String(FLAGS_net_resolution), "-1x368");
-     * E.g., const Point<int> resolution = flagsToPoint(resolutionString, "-1280x720");
+     * E.g., const Point<int> netInputSize = flagsToPoint(op::String(FLAGS_net_resolution), "-1x368");
+     * E.g., const Point<int> resolution = flagsToPoint(resolutionString, "1280x720");
      */
     OP_API Point<int> flagsToPoint(const String& pointString, const String& pointExample);
 }

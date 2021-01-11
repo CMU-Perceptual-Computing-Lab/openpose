@@ -59,7 +59,6 @@ namespace op
                     else // if (poseNetInputSize.y <= 0)
                         poseNetInputSize.y = 16 * positiveIntRound(1 / 16.f *
                             fastMin(poseNetInputSize.x * mNetInputResolutionDynamicBehavior * 9.f / 16.f, poseNetInputSize.x * inputResolution.y / (float)inputResolution.x));
-                        poseNetInputSize.y = 16 * positiveIntRound(1 / 16.f * poseNetInputSize.x * inputResolution.y / (float)inputResolution.x);
                 }
                 else // No mNetInputResolutionDynamicBehavior behavior
                 {
