@@ -1,0 +1,226 @@
+name: CI
+
+on: [push, pull_request]
+
+env:
+  GH_REPO_NAME: ${{ github.event.repository.name }}
+  DOXYFILE: ${{ github.workspace }}/scripts/doc_autogeneration.doxygen
+  GH_REPO_REF: ${{ github.repositoryUrl }}
+
+jobs:
+  build:
+    name: ${{ matrix.env.NAME }}
+    runs-on: ${{ matrix.os }}
+    env: ${{ matrix.env }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Ubuntu 16.04
+          # Ubuntu 16.04 - Default - CMake - CUDA
+          - os: ubuntu-16.04
+            os_name: linux
+            env:
+              NAME: U16-default-cmake-cuda8
+              TRAVIS_OS_NAME: linux
+
+          # Ubuntu 16.04 - Python - CMake - CUDA
+          - os: ubuntu-16.04
+            os_name: linux
+            env:
+              NAME: U16-python-cmake-cuda8
+              WITH_PYTHON: true
+              TRAVIS_OS_NAME: linux
+              TRAVIS_BUILD_NUMBER: ${{ github.run_number }}
+              TRAVIS_COMMIT: ${{ github.sha }}
+            DOCS: true
+
+          # Ubuntu 16.04 - Python - CMake - CPU
+          - os: ubuntu-16.04
+            os_name: linux
+            env:
+              NAME: U16-python-cmake-cpu
+              WITH_PYTHON: true
+              WITH_CUDA: false
+              WITH_CUDNN: false
+              TRAVIS_OS_NAME: linux
+
+          # Ubuntu 16.04 - Python - CMake - OpenCL
+          - os: ubuntu-16.04
+            os_name: linux
+            env:
+              NAME: U16-python-cmake-opencl
+              WITH_PYTHON: true
+              WITH_CUDA: false
+              WITH_CUDNN: false
+              WITH_OPEN_CL: true
+              TRAVIS_OS_NAME: linux
+
+          # Ubuntu 16.04 - Python - CMake - CPU - Debug
+          - os: ubuntu-16.04
+            os_name: linux
+            env:
+              NAME: U16-python-cmake-cpu-debug
+              WITH_PYTHON: true
+              WITH_CUDA: false
+              WITH_CUDNN: false
+              WITH_DEBUG: true
+              TRAVIS_OS_NAME: linux
+
+          # Ubuntu 16.04 - Python - CMake - CPU - Unity
+          - os: ubuntu-16.04
+            os_name: linux
+            env:
+              NAME: U16-python-cmake-cpu-unity
+              WITH_PYTHON: true
+              WITH_UNITY: true
+              WITH_CUDA: false
+              WITH_CUDNN: false
+              TRAVIS_OS_NAME: linux
+
+          # Mac OSX
+          # Mac OSX - Python - CMake - CPU
+          - os: macos-10.15
+            os_name: osx
+            env:
+              NAME: OSX-python-cmake-cpu
+              WITH_CUDA: false
+              WITH_CUDNN: false
+              WITH_PYTHON: true
+              TRAVIS_OS_NAME: osx
+
+          # Mac OSX - Python - CMake - OpenCL
+          - os: macos-10.15
+            os_name: osx
+            env:
+              NAME: OSX-default-cmake-opencl
+              WITH_CUDA: false
+              WITH_CUDNN: false
+              WITH_OPEN_CL: true
+              TRAVIS_OS_NAME: osx
+
+          # Mac OSX - Python - CMake - CPU - Debug
+          - os: macos-10.15
+            os_name: osx
+            env:
+              NAME: OSX-python-cmake-cpu-debug
+              WITH_CUDA: false
+              WITH_CUDNN: false
+              WITH_PYTHON: true
+              WITH_DEBUG: true
+              TRAVIS_OS_NAME: osx
+
+          # Mac OSX - Python - CMake - CPU - Unity
+          - os: macos-10.15
+            os_name: osx
+            env:
+              NAME: OSX-python-cmake-cpu-unity
+              WITH_CUDA: false
+              WITH_CUDNN: false
+              WITH_PYTHON: true
+              WITH_UNITY: true
+              TRAVIS_OS_NAME: osx
+
+          # Mac OSX - Default - CMake - CPU
+          - os: macos-10.15
+            os_name: osx
+            env:
+              NAME: OSX-default-cmake-cpu
+              WITH_CUDA: false
+              WITH_CUDNN: false
+              TRAVIS_OS_NAME: osx
+
+          # Ubuntu (others)
+          # Ubuntu 16.04 - Default - CMake - CPU
+          - os: ubuntu-16.04
+            os_name: linux
+            env:
+              NAME: U16-default-cmake-cpu
+              WITH_CUDA: false
+              WITH_CUDNN: false
+              TRAVIS_OS_NAME: linux
+
+          # Ubuntu 16.04 - Default - Make - CUDA
+          - os: ubuntu-16.04
+            os_name: linux
+            env:
+              NAME: U16-default-make-cuda8
+              WITH_CMAKE: false
+              TRAVIS_OS_NAME: linux
+
+          # # TO-DO: To be implemented
+          # # Ubuntu 16.04 - Default - CMake - CPU MKL
+          # - os: ubuntu-16.04
+          #   os_name: linux
+          #   env:
+          #     NAME: U16-default-cmake-cpu-mkl
+          #     WITH_CUDA: false
+          #     WITH_CUDNN: false
+          #     WITH_MKL: true
+          #     TRAVIS_OS_NAME: linux
+
+          # # Ubuntu 16.04 - Python - CMake - OpenCL
+          # - os: ubuntu-16.04
+          #   os_name: linux
+          #   env:
+          #     NAME: U16-python-cmake-opencl
+          #     WITH_PYTHON: true
+          #     WITH_CUDA: false
+          #     WITH_CUDNN: false
+          #     WITH_OPEN_CL: true
+          #     TRAVIS_OS_NAME: linux
+
+          # # Unnecessary/redundant ones
+          # # Ubuntu 16.04 - Default - CMake - CUDA - no cuDNN
+          # - os: ubuntu-16.04
+          #   os_name: linux
+          #   env:
+          #     NAME: U16-default-cmake-cuda8-nocudnn
+          #     WITH_CUDNN: false
+          #     TRAVIS_OS_NAME: linux
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        submodules: recursive
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 2.x
+      if: ${{ matrix.env.WITH_PYTHON }}
+    - name: Docs APT packages
+      run: sudo apt-get -yq install doxygen doxygen-doc doxygen-latex doxygen-gui graphviz
+      if: ${{ matrix.DOCS }}
+    - name: Install (Linux)
+      run: scripts/travis/install_deps_ubuntu.sh
+      if: ${{ matrix.os_name == 'linux' }}
+    - name: Install (Mac OS)
+      run: scripts/travis/install_deps_osx.sh
+      if: ${{ matrix.os_name == 'osx' }}
+
+    - name: Configure
+      run: scripts/travis/configure.sh
+    - name: Make
+      run: scripts/travis/run_make.sh
+    - name: Tests
+      run: scripts/travis/run_tests.sh
+    - name: Generate docs
+      run: |
+        cd ${{ github.workspace }}
+        echo 'Generating Doxygen code documentation...'
+        echo "INPUT                  = ${{ github.workspace }}/README.md ${{ github.workspace }}/include/openpose/" >> $DOXYFILE
+        echo "USE_MDFILE_AS_MAINPAGE = ${{ github.workspace }}/README.md" >> $DOXYFILE
+        echo "OUTPUT_DIRECTORY       = " >> $DOXYFILE
+        doxygen $DOXYFILE 2>&1 | tee doxygen.log
+        echo "" > html/.nojekyll
+        cp doxygen.log html/doxygen.log
+      if: ${{ matrix.DOCS }}
+    - name: Deploy Docs
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: html
+        destination_dir: .
+        enable_jekyll: false
+        force_orphan: true
+      if: ${{ matrix.DOCS && github.event_name == 'push' && github.ref == 'refs/heads/master' }}
