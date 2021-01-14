@@ -8,5 +8,5 @@ brew install hdf5 opencv
 brew install protobuf boost
 brew install cmake
 brew install viennacl
-sudo python2 -m pip install "numpy<1.17"
-sudo python2 -m pip install "opencv-python<4.3"
+sudo -H python2 -m pip install "numpy<1.17"
+sudo -H python2 -m pip install "opencv-python<4.3"
