@@ -532,6 +532,7 @@ namespace op
         OP_API void _OPConfigurePose(
             unsigned char poseMode,
             int netInputSizeX, int netInputSizeY, // Point
+            double netInputSizeDynamicBehavior,
             int outputSizeX, int outputSizeY, // Point
             unsigned char keypointScaleMode, // ScaleMode
             int gpuNumber, int gpuNumberStart, int scalesNumber, float scaleGap,
@@ -547,10 +548,10 @@ namespace op
             try
             {
                 spWrapperStructPose = std::make_shared<WrapperStructPose>(
-                    (PoseMode)poseMode, Point<int>{netInputSizeX, netInputSizeY}, Point<int>{outputSizeX, outputSizeY},
-                    (ScaleMode) keypointScaleMode, gpuNumber, gpuNumberStart, scalesNumber, scaleGap,
-                    (RenderMode) renderMode, (PoseModel) poseModel, blendOriginalFrame, alphaKeypoint, alphaHeatMap,
-                    defaultPartToRender, modelFolder,
+                    (PoseMode)poseMode, Point<int>{netInputSizeX, netInputSizeY}, netInputSizeDynamicBehavior,
+                    Point<int>{outputSizeX, outputSizeY}, (ScaleMode) keypointScaleMode, gpuNumber, gpuNumberStart,
+                    scalesNumber, scaleGap, (RenderMode) renderMode, (PoseModel) poseModel, blendOriginalFrame,
+                    alphaKeypoint, alphaHeatMap, defaultPartToRender, modelFolder,
                     // HeatMapType // (HeatMapType) heatmap_type,
                     flagsToHeatMaps(heatMapAddParts, heatMapAddBkg, heatMapAddPAFs),
                     (ScaleMode) heatMapScaleMode, addPartCandidates, renderThreshold, numberPeopleMax,
