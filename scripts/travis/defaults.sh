@@ -12,6 +12,12 @@ WITH_MKL=${WITH_MKL:-false}
 WITH_UNITY=${WITH_UNITY:-false}
 WITH_DEBUG=${WITH_DEBUG:-false}
 
+if [[ $WITH_CUDA == false ]] && [[ $WITH_CUDNN == true ]]
+then
+  echo "CUDNN only possible in combination with CUDA, setting WITH_CUDNN to false"
+  WITH_CUDNN=false
+fi
+
 # Examples should be run (Travis not compatible with GPU code)
 # if [[ $WITH_CMAKE == true ]] && [[ $WITH_PYTHON == true ]] && [[ $WITH_CUDA == false ]] && [[ $WITH_OPEN_CL == false ]] && [[ $WITH_MKL == false ]]; then
 if [[ $WITH_CUDA == false ]] && [[ $WITH_OPEN_CL == false ]] && [[ $WITH_UNITY == false ]]; then
