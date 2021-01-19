@@ -15,11 +15,11 @@ sudo apt-get --assume-yes install libgflags-dev libgoogle-glog-dev liblmdb-dev
 
 # Python2 libs (Official Ubuntu support dropped after Ubuntu 20)
 if [[ $UBUNTU_VERSION == *"14."* ]] || [[ $UBUNTU_VERSION == *"15."* ]] || [[ $UBUNTU_VERSION == *"16."* ]] || [[ $UBUNTU_VERSION == *"17."* ]] || [[ $UBUNTU_VERSION == *"18."* ]]; then
+    echo "Installing Python2 libs..."
     sudo apt-get --assume-yes install python-setuptools python-dev build-essential
     hash pip2 2> /dev/null || sudo apt-get --assume-yes install python-pip
     sudo -H python2 -m pip install pip --upgrade
-    if [[ $CI == true ]]
-    then
+    if [[ $CI == true ]]; then
         sudo -H python2 -m pip install --upgrade "numpy<1.17" protobuf
         python2 -m pip install --user "opencv-python<4.3"
     else
@@ -27,16 +27,16 @@ if [[ $UBUNTU_VERSION == *"14."* ]] || [[ $UBUNTU_VERSION == *"15."* ]] || [[ $U
     fi
 fi
 # Python3 libs
+echo "Installing Python3 libs..."
 sudo apt-get --assume-yes install python3-setuptools python3-dev build-essential
 hash pip3 2> /dev/null || sudo apt-get --assume-yes install python3-pip
 sudo -H python3 -m pip install pip --upgrade
-if [[ $CI == true ]]
-then
+if [[ $CI == true ]]; then
     sudo -H python3 -m pip install --upgrade numpy protobuf
     python3 -m pip install --user opencv-python
 else
     sudo -H python3 -m pip install --upgrade numpy protobuf opencv-python
-    fi
+fi
 
 # OpenCL Generic (Official OpenPose support dropped after Ubuntu 20)
 if [[ $UBUNTU_VERSION == *"14."* ]] || [[ $UBUNTU_VERSION == *"15."* ]] || [[ $UBUNTU_VERSION == *"16."* ]] || [[ $UBUNTU_VERSION == *"17."* ]] || [[ $UBUNTU_VERSION == *"18."* ]]; then

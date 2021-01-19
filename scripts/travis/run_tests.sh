@@ -93,9 +93,14 @@ if [[ $RUN_EXAMPLES == true ]] ; then
 
   # Python examples
   if [[ $WITH_PYTHON == true ]] ; then
+    if [[ $PYTHON3_VERSION ]] ; then
+      PYTHON_COMMAND=python3
+    else
+      PYTHON_COMMAND=python
+    fi
     echo "Tutorial API Python: OpenPose demo..."
     cd build/examples/tutorial_api_python
-    python openpose_python.py --image_dir ../../../examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
+    ${PYTHON_COMMAND} openpose_python.py --image_dir ../../../examples/media/ --net_resolution -1x32 --write_json output/ --write_images output/ --display 0
     echo " "
     # Note: All Python examples require GUI
   fi

@@ -11,6 +11,7 @@ OpenPose - Installation
     4. [CMake Configuration](#cmake-configuration)
     5. [Compilation](#compilation)
     6. [Running OpenPose](#running-openpose)
+    7. [Custom User Code](#custom-user-code)
 4. [Compiling and Running OpenPose from Source on ROS, Docker, and Google Colab - Community-Based Work](#compiling-and-running-openpose-from-source-on-ros-docker-and-google-colab-community-based-work)
 5. [Uninstalling, Reinstalling, or Updating OpenPose](#Uninstalling-reinstalling-or-updating-openpose)
 6. [Advanced Additional Settings (Optional)](#advanced-additional-settings-optional)
@@ -219,7 +220,12 @@ Check OpenPose was properly installed by running any demo example: [doc/demo_qui
 
 
 
-### Compiling and Running OpenPose from Source on ROS, Docker, and Google Colab - Community-Based Work
+### Custom User Code
+You can quickly add your custom code so that quick prototypes can be easily tested without having to create a whole new project just for it. See [examples/user_code/README.md](../../examples/user_code/README.md) for more details.
+
+
+
+## Compiling and Running OpenPose from Source on ROS, Docker, and Google Colab - Community-Based Work
 If you do not want to use the Windows portable binaries nor compile it from source code, we add links to some community-based work based on OpenPose. Note: We do not support them, and we will remove new GitHub issues opened asking about them as well as block those users from posting again. If you face any issue, comment only in the GitHub issues links especified below, or ask the owner of them.
 
 - ROS examples:

@@ -38,7 +38,7 @@ These tips are **very important** and avoid many bugs:
 3. Nvidia GPU version prerequisites:
     1. **Note: OpenPose has been tested extensively with CUDA 11.1.1 (cuDNN 8.0.5) for Ubuntu 20**. Older OpenPose versions (v1.6.X and v1.5.X) were tested with **CUDA 10.1 (cuDNN 7.5.1) for Ubuntu 18 and CUDA 8.0 (cuDNN 5.1) for Ubuntu 14 and 16**. We highly recommend using those combinations to minimize potential installation issues. Other combinations should also work, but we do not provide any support about installation/compilation issues related to CUDA/cuDNN or their integration with OpenPose.
     2. Upgrade your Nvidia drivers to the latest version.
-    3. **CUDA**:
+    3. **CUDA**: You can simply run `sudo bash ./scripts/ubuntu/install_cuda.sh` if you are not too familiar with CUDA. If you are, then you could also do one of the following instead:
         - Ubuntu 20 ([**CUDA 11.1**](https://developer.nvidia.com/cuda-downloads)): Download CUDA 11.1 from their [official website](https://developer.nvidia.com/cuda-downloads). Most Ubuntu computers use the `Architecture` named `x86_64`, and we personally recommend the `Installer Type` named `runfile (local)`. Then, follow the Nvidia website installation instructions. When installing, make sure to enable the symbolic link in `usr/local/cuda` to minimize potential future errors.
         - Ubuntu 18 ([**CUDA 10.1**](https://developer.nvidia.com/cuda-10.1-download-archive-base)): Analog to the instructions for Ubuntu 20, but using CUDA version 10.1.
         - Ubuntu 14 or 16 ([**CUDA 8**](https://developer.nvidia.com/cuda-80-ga2-download-archive) **or 10**): Run `sudo ./scripts/ubuntu/install_cuda.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX) or alternatively download and install it from their website.
@@ -46,7 +46,7 @@ These tips are **very important** and avoid many bugs:
         - Download it (usually called `cuDNN Library for Linux (x86_64)`):
             - Ubuntu 20: [**cuDNN 8.0.4**](https://developer.nvidia.com/cudnn).
             - Ubuntu 18: [**cuDNN 7.5.1**](https://developer.nvidia.com/rdp/cudnn-archive).
-            - Ubuntu 14 or 16 (**cuDNN 5.1 or 7.2**): Run `sudo ./scripts/ubuntu/install_cudnn.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX) or alternatively [download it from their website](https://developer.nvidia.com/rdp/cudnn-archive).
+            - Ubuntu 14 or 16 (**cuDNN 5.1 or 7.2**): Run `sudo ./scripts/ubuntu/install_cudnn_up_to_Ubuntu16.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX) or alternatively [download it from their website](https://developer.nvidia.com/rdp/cudnn-archive).
         - And install it:
             - In order to manually install it (any version), just unzip it and copy (merge) its contents on the CUDA folder, usually `/usr/local/cuda-{version}/` in Ubuntu and `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v{version}\` in Windows.
 5. OpenCL / AMD GPU version prerequisites (only if you do not have an Nvidia GPU and want to run on AMD graphic cards):
@@ -56,7 +56,7 @@ These tips are **very important** and avoid many bugs:
         2. Install `sudo apt-get install libviennacl-dev`.
 6. Install **Caffe, OpenCV, and Caffe prerequisites**:
     - OpenCV must be already installed on your machine. It can be installed with `sudo apt-get install libopencv-dev`. You could also use your own compiled OpenCV version.
-    - Caffe prerequisites: By default, OpenPose uses Caffe under the hood. If you have not used Caffe previously, install its dependencies by running `sudo bash ./scripts/ubuntu/install_deps.sh` after installing your desired CUDA and cuDNN versions. If you are using Ubuntu 14 or 16, you can simply run `sudo bash ./scripts/ubuntu/install_deps_and_cuda.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX).
+    - Caffe prerequisites: By default, OpenPose uses Caffe under the hood. If you have not used Caffe previously, install its dependencies by running `sudo bash ./scripts/ubuntu/install_deps.sh` after installing your desired CUDA and cuDNN versions.
 7. Python prerequisites (optional, only if you plan to use the Python API): python-dev, Numpy (for array management), and OpenCV (for image loading).
 ```
 # Python 3 (default and recommended)

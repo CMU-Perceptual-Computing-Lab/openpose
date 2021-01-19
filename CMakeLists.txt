@@ -516,7 +516,7 @@ if (UNIX OR APPLE)
 
     if (USE_CUDNN AND NOT CUDNN_FOUND)
       message(STATUS "cuDNN not found.")
-      execute_process(COMMAND cat install_cudnn.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/scripts/ubuntu)
+      execute_process(COMMAND cat install_cudnn_up_to_Ubuntu16.sh WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/scripts/ubuntu)
       message(FATAL_ERROR "Install cuDNN using the above commands. or turn off cuDNN by setting USE_CUDNN to OFF.")
     endif (USE_CUDNN AND NOT CUDNN_FOUND)
   endif (${GPU_MODE} MATCHES "CUDA")

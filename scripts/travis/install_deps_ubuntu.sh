@@ -10,7 +10,7 @@ if [[ $WITH_CUDA == true ]]; then
   bash $BASEDIR/../ubuntu/install_cuda.sh
 fi
 if [[ $WITH_CUDNN == true ]]; then
-  bash $BASEDIR/../ubuntu/install_cudnn.sh
+  bash $BASEDIR/../ubuntu/install_cudnn_up_to_Ubuntu16.sh
 fi
 
 bash $BASEDIR/../ubuntu/install_deps.sh
