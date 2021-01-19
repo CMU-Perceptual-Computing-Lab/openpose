@@ -13,7 +13,7 @@ fi
 
 echo "WITH_PYTHON = ${WITH_PYTHON}."
 if [[ $WITH_PYTHON == true ]] ; then
-  if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then
+  if [[ "$CI_OS_NAME" == "linux" ]] ; then
     ARGS="$ARGS -DBUILD_PYTHON=On"
     if [[ $PYTHON3_VERSION ]] ; then
       ARGS="$ARGS -DPYTHON_EXECUTABLE=/usr/bin/${PYTHON3_VERSION} -DPYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/lib${PYTHON3_VERSION}m.so"
@@ -22,7 +22,7 @@ if [[ $WITH_PYTHON == true ]] ; then
       ARGS="$ARGS -DPYTHON_EXECUTABLE=/usr/bin/python2.7 -DPYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython2.7m.so"
     fi
   fi
-  if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then
+  if [[ "$CI_OS_NAME" == "osx" ]] ; then
     ARGS="$ARGS -DBUILD_PYTHON=On -DPYTHON_EXECUTABLE=/usr/local/bin/python2.7 -DPYTHON_LIBRARY=/usr/local/opt/python/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7m.dylib"
   fi
   echo "Python arguments = $ARGS"
@@ -71,7 +71,7 @@ echo "ARGS = ${ARGS}."
 cmake .. $ARGS
 
 # Patch for OpenCL and OSX
-if [[ $WITH_OPEN_CL == true && $TRAVIS_OS_NAME == "osx" ]] ; then
+if [[ $WITH_OPEN_CL == true && $CI_OS_NAME == "osx" ]] ; then
   cd ../3rdparty/caffe; git apply ../../scripts/osx/mac_opencl_patch.txt;
   cd ../../build;
 fi

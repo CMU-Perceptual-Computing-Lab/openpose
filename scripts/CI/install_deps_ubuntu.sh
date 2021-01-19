@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Install dependencies for Ubuntu
-echo "Running on ${TRAVIS_OS_NAME} OS."
+echo "Running on ${CI_OS_NAME} OS."
 
 BASEDIR=$(dirname $0)
 source $BASEDIR/defaults.sh

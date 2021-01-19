@@ -2,7 +2,7 @@
 
 # Set default environment variables
 set -e
-TRAVIS_OS_NAME=${TRAVIS_OS_NAME}
+CI_OS_NAME=${CI_OS_NAME}
 WITH_CMAKE=${WITH_CMAKE:-true}
 WITH_PYTHON=${WITH_PYTHON:-false}
 WITH_CUDA=${WITH_CUDA:-true}
@@ -18,7 +18,7 @@ then
   WITH_CUDNN=false
 fi
 
-# Examples should be run (Travis not compatible with GPU code)
+# Examples should be run (CI environment not compatible with GPU code)
 # if [[ $WITH_CMAKE == true ]] && [[ $WITH_PYTHON == true ]] && [[ $WITH_CUDA == false ]] && [[ $WITH_OPEN_CL == false ]] && [[ $WITH_MKL == false ]]; then
 if [[ $WITH_CUDA == false ]] && [[ $WITH_OPEN_CL == false ]] && [[ $WITH_UNITY == false ]]; then
   RUN_EXAMPLES=true

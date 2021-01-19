@@ -107,7 +107,7 @@ if [[ $RUN_EXAMPLES == true ]] ; then
 
   echo "Demos and tutorials successfully finished!"
 
-# Disable examples for all other Travis Build configurations
+# Disable examples for all other CI Build configurations
 else
   echo "Skipping tests for non CPU-only versions."
   exit 0

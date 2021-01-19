@@ -8,13 +8,13 @@ __AUTHOR__="openpose"
 # - Packages doxygen doxygen-doc doxygen-latex doxygen-gui graphviz
 #   must be installed.
 # - Doxygen configuration file must have the destination directory empty and
-#   source code directory with a $(TRAVIS_BUILD_DIR) prefix.
+#   source code directory with a $(CI_BUILD_DIR) prefix.
 # - An gh-pages branch should already exist. See below for mor info on hoe to
 #   create a gh-pages branch.
 #
 # Required global variables:
-# - TRAVIS_BUILD_NUMBER : The number of the current build.
-# - TRAVIS_COMMIT       : The commit that the current build is testing.
+# - CI_BUILD_NUMBER : The number of the current build.
+# - CI_COMMIT       : The commit that the current build is testing.
 # - DOXYFILE            : The Doxygen configuration file.
 # - GH_REPO_NAME        : The name of the repository.
 # - GH_REPO_REF         : The GitHub reference to the repository.
@@ -71,8 +71,8 @@ echo "" > .nojekyll
 ##### Generate the Doxygen code documentation and log the output.          #####
 echo 'Generating Doxygen code documentation...'
 # Redirect both stderr and stdout to the log file AND the console.
-echo "INPUT                  = ${TRAVIS_BUILD_DIR}/README.md ${TRAVIS_BUILD_DIR}/include/openpose/" >> $DOXYFILE
-echo "USE_MDFILE_AS_MAINPAGE = ${TRAVIS_BUILD_DIR}/README.md" >> $DOXYFILE
+echo "INPUT                  = ${CI_BUILD_DIR}/README.md ${CI_BUILD_DIR}/include/openpose/" >> $DOXYFILE
+echo "USE_MDFILE_AS_MAINPAGE = ${CI_BUILD_DIR}/README.md" >> $DOXYFILE
 echo "OUTPUT_DIRECTORY       = " >> $DOXYFILE
 doxygen $DOXYFILE 2>&1 | tee doxygen.log
 
@@ -92,7 +92,7 @@ if [ -d "html" ] && [ -f "html/index.html" ]; then
 
     # Commit the added files with a title and description containing the Travis CI
     # build number and the GitHub commit reference that issued this build.
-    git commit -m "Deploy code docs to GitHub Pages Travis build: ${TRAVIS_BUILD_NUMBER}" -m "Commit: ${TRAVIS_COMMIT}"
+    git commit -m "Deploy code docs to GitHub Pages Travis build: ${CI_BUILD_NUMBER}" -m "Commit: ${CI_COMMIT}"
 
     # Force push to the remote gh-pages branch.
     # The ouput is redirected to /dev/null to hide any sensitive credential data

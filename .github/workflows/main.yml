@@ -23,14 +23,14 @@ jobs:
             env:
               NAME: U20-default-cmake-cuda
               WITH_CUDNN: false
-              TRAVIS_OS_NAME: linux
+              CI_OS_NAME: linux
           # Ubuntu 18.04 - Default - CMake - CUDA
           - os: ubuntu-18.04
             os_name: linux
             env:
               NAME: U18-default-cmake-cuda
               WITH_CUDNN: false
-              TRAVIS_OS_NAME: linux
+              CI_OS_NAME: linux
           # Ubuntu 20.04 - Python - CMake - CUDA
           - os: ubuntu-20.04
             os_name: linux
@@ -38,9 +38,9 @@ jobs:
               NAME: U20-python-cmake-cuda
               WITH_CUDNN: false
               WITH_PYTHON: true
-              TRAVIS_OS_NAME: linux
-              TRAVIS_BUILD_NUMBER: ${{ github.run_number }}
-              TRAVIS_COMMIT: ${{ github.sha }}
+              CI_OS_NAME: linux
+              CI_BUILD_NUMBER: ${{ github.run_number }}
+              CI_COMMIT: ${{ github.sha }}
               PYTHON3_VERSION: python3.8
             DOCS: true
           # Ubuntu 18.04 - Python - CMake - CUDA
@@ -50,9 +50,9 @@ jobs:
               NAME: U18-python-cmake-cuda
               WITH_CUDNN: false
               WITH_PYTHON: true
-              TRAVIS_OS_NAME: linux
-              TRAVIS_BUILD_NUMBER: ${{ github.run_number }}
-              TRAVIS_COMMIT: ${{ github.sha }}
+              CI_OS_NAME: linux
+              CI_BUILD_NUMBER: ${{ github.run_number }}
+              CI_COMMIT: ${{ github.sha }}
             DOCS: true
           # Ubuntu 20.04 - Python - CMake - CPU
           - os: ubuntu-20.04
@@ -62,7 +62,7 @@ jobs:
               WITH_PYTHON: true
               WITH_CUDA: false
               WITH_CUDNN: false
-              TRAVIS_OS_NAME: linux
+              CI_OS_NAME: linux
               PYTHON3_VERSION: python3.8
           # Ubuntu 18.04 - Python - CMake - CPU
           - os: ubuntu-18.04
@@ -72,7 +72,7 @@ jobs:
               WITH_PYTHON: true
               WITH_CUDA: false
               WITH_CUDNN: false
-              TRAVIS_OS_NAME: linux
+              CI_OS_NAME: linux
           # Ubuntu 16.04 - Python - CMake - CPU
           - os: ubuntu-16.04
             os_name: linux
@@ -81,7 +81,7 @@ jobs:
               WITH_PYTHON: true
               WITH_CUDA: false
               WITH_CUDNN: false
-              TRAVIS_OS_NAME: linux
+              CI_OS_NAME: linux
           # TO-DO (not passing)
           # # Ubuntu 20.04 - Python - CMake - OpenCL
           # - os: ubuntu-20.04
@@ -92,7 +92,7 @@ jobs:
           #     WITH_CUDA: false
           #     WITH_CUDNN: false
           #     WITH_OPEN_CL: true
-          #     TRAVIS_OS_NAME: linux
+          #     CI_OS_NAME: linux
           #     PYTHON3_VERSION: python3.8
           # Ubuntu 18.04 - Python - CMake - OpenCL
           - os: ubuntu-18.04
@@ -103,7 +103,7 @@ jobs:
               WITH_CUDA: false
               WITH_CUDNN: false
               WITH_OPEN_CL: true
-              TRAVIS_OS_NAME: linux
+              CI_OS_NAME: linux
           # Ubuntu 16.04 - Python - CMake - OpenCL
           - os: ubuntu-16.04
             os_name: linux
@@ -113,7 +113,7 @@ jobs:
               WITH_CUDA: false
               WITH_CUDNN: false
               WITH_OPEN_CL: true
-              TRAVIS_OS_NAME: linux
+              CI_OS_NAME: linux
           # Ubuntu 20.04 - Python - CMake - CPU - Debug
           - os: ubuntu-20.04
             os_name: linux
@@ -123,7 +123,7 @@ jobs:
               WITH_CUDA: false
               WITH_CUDNN: false
               WITH_DEBUG: true
-              TRAVIS_OS_NAME: linux
+              CI_OS_NAME: linux
               PYTHON3_VERSION: python3.8
           # Ubuntu 18.04 - Python - CMake - CPU - Debug
           - os: ubuntu-18.04
@@ -134,7 +134,7 @@ jobs:
               WITH_CUDA: false
               WITH_CUDNN: false
               WITH_DEBUG: true
-              TRAVIS_OS_NAME: linux
+              CI_OS_NAME: linux
           # Ubuntu 16.04 - Python - CMake - CPU - Debug
           - os: ubuntu-16.04
             os_name: linux
@@ -144,7 +144,7 @@ jobs:
               WITH_CUDA: false
               WITH_CUDNN: false
               WITH_DEBUG: true
-              TRAVIS_OS_NAME: linux
+              CI_OS_NAME: linux
           # Ubuntu 20.04 - Python - CMake - CPU - Unity
           - os: ubuntu-20.04
             os_name: linux
@@ -154,7 +154,7 @@ jobs:
               WITH_UNITY: true
               WITH_CUDA: false
               WITH_CUDNN: false
-              TRAVIS_OS_NAME: linux
+              CI_OS_NAME: linux
               PYTHON3_VERSION: python3.8
           # Ubuntu 20.04 - Default - CMake - CPU
           - os: ubuntu-20.04
@@ -163,7 +163,7 @@ jobs:
               NAME: U20-default-cmake-cpu
               WITH_CUDA: false
               WITH_CUDNN: false
-              TRAVIS_OS_NAME: linux
+              CI_OS_NAME: linux
 
           # Mac OSX
           # Mac OSX - Python - CMake - CPU
@@ -174,7 +174,7 @@ jobs:
               WITH_CUDA: false
               WITH_CUDNN: false
               WITH_PYTHON: true
-              TRAVIS_OS_NAME: osx
+              CI_OS_NAME: osx
           # Mac OSX - Python - CMake - OpenCL
           - os: macos-10.15
             os_name: osx
@@ -183,7 +183,7 @@ jobs:
               WITH_CUDA: false
               WITH_CUDNN: false
               WITH_OPEN_CL: true
-              TRAVIS_OS_NAME: osx
+              CI_OS_NAME: osx
           # Mac OSX - Python - CMake - CPU - Debug
           - os: macos-10.15
             os_name: osx
@@ -193,7 +193,7 @@ jobs:
               WITH_CUDNN: false
               WITH_PYTHON: true
               WITH_DEBUG: true
-              TRAVIS_OS_NAME: osx
+              CI_OS_NAME: osx
           # Mac OSX - Python - CMake - CPU - Unity
           - os: macos-10.15
             os_name: osx
@@ -203,7 +203,7 @@ jobs:
               WITH_CUDNN: false
               WITH_PYTHON: true
               WITH_UNITY: true
-              TRAVIS_OS_NAME: osx
+              CI_OS_NAME: osx
           # Mac OSX - Default - CMake - CPU
           - os: macos-10.15
             os_name: osx
@@ -211,7 +211,7 @@ jobs:
               NAME: OSX-default-cmake-cpu
               WITH_CUDA: false
               WITH_CUDNN: false
-              TRAVIS_OS_NAME: osx
+              CI_OS_NAME: osx
 
           # TO-DO (not passing)
           # Note: CUDA jobs fail in U16 because of an issue with GCC 5.5 (https://github.com/NVIDIA/apex/issues/529). GH Actions doesn't support
@@ -222,7 +222,7 @@ jobs:
           #   os_name: linux
           #   env:
           #     NAME: U16-default-cmake-cuda8
-          #     TRAVIS_OS_NAME: linux
+          #     CI_OS_NAME: linux
 
           # # Deprecated (not working for the above issue between CUDA and the Ubuntu16 from GitHub Actions) 
           # # Ubuntu 16.04 - Default - Make - CUDA
@@ -232,7 +232,7 @@ jobs:
           #     NAME: U16-default-make-cuda
           #     WITH_CUDNN: false
           #     WITH_CMAKE: false
-          #     TRAVIS_OS_NAME: linux
+          #     CI_OS_NAME: linux
 
     steps:
     - uses: actions/checkout@v2
