@@ -247,18 +247,18 @@ jobs:
       run: sudo apt-get -yq install doxygen doxygen-doc doxygen-latex doxygen-gui graphviz
       if: ${{ matrix.DOCS }}
     - name: Install (Linux)
-      run: scripts/travis/install_deps_ubuntu.sh
+      run: scripts/CI/install_deps_ubuntu.sh
       if: ${{ matrix.os_name == 'linux' }}
     - name: Install (Mac OS)
-      run: scripts/travis/install_deps_osx.sh
+      run: scripts/CI/install_deps_osx.sh
       if: ${{ matrix.os_name == 'osx' }}
 
     - name: Configure
-      run: scripts/travis/configure.sh
+      run: scripts/CI/configure.sh
     - name: Make
-      run: scripts/travis/run_make.sh
+      run: scripts/CI/run_make.sh
     - name: Tests
-      run: scripts/travis/run_tests.sh
+      run: scripts/CI/run_tests.sh
     - name: Generate docs
       run: |
         cd ${{ github.workspace }}

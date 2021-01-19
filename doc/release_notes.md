@@ -440,18 +440,19 @@ OpenPose - Release Notes
         2. Eigen: From 3.3.4 to 3.3.8.
         3. `wget` (Windows): From 1.19.1 to 1.20.3.
     4. AppVeyor now tests the actual OpenPoseDemo.exe example (Windows).
-    5. Added GitHub Actions (Workspaces) to test Ubuntu and Mac OSX versions (rather than the deprecated Travis).
-    6. Documentation improvements:
+    5. Documentation improvements:
         1. Highly simplified README.md.
         2. Highly simplified doc, restructured to improve simplicity and now divided into subdirectories (`advanced`, `deprecated`, `installation`, etc).
         3. More examples added to the demo quick start documentation.
-    7. Calibration doc links to included chessboard pdf.
-    8. Deprecated examples directories `tutorial_add_module` and `tutorial_api_thread` (and renamed as `deprecated`). They still compile, but we no longer support them.
+    6. Calibration doc links to included chessboard pdf.
+    7. Deprecated examples directories `tutorial_add_module` and `tutorial_api_thread` (and renamed as `deprecated`). They still compile, but we no longer support them.
 2. Functions or parameters renamed:
+    1. Added GitHub Actions (Workspaces) to test Ubuntu and Mac OSX versions (rather than the deprecated Travis). Travis was giving many issues, that were not OpenPose errors, making Travis not usable. Its code has been left for now (but commented out).
 3. Main bugs fixed:
     1. Eigen working again on Windows.
     2. OpenPose links to the right OpenCV DLL Files on Windows (it was wrongly linking to v14 rather than v15).
     3. AppVeyor auto-testing working again by disabling artifacts (Windows).
+    4. All CI tests pass (after switching to GitHub actions).
 
 
 
