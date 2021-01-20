@@ -1,4 +1,4 @@
-OpenPose - Installation on Nvidia Jetson TX2
+OpenPose Doc - Installation - Installation on Nvidia Jetson TX2 JetPack 3.3
 ====================================
 Note that OpenPose for Nvidia Jetson TX2 was developed and it is maintained by the community. The OpenPose authors will not be able to provide official support for it.
 

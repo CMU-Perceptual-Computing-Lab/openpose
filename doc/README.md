@@ -1,4 +1,4 @@
-OpenPose - Quick Start
+OpenPose Doc
 ==========================
 
 Most users can simply use the OpenPose Demo without reading any C++/Python code. Users that need to add additional functionality (new inputs, outputs, etc) should check the C++/Python APIs:
@@ -25,7 +25,7 @@ bin\OpenPoseDemo.exe --video examples\media\video.avi --face --hand --write_json
 	- You should be familiar with the [**OpenPose Demo**](demo_quick_start.md) and the main OpenPose flags before trying to read the C++ or Python API examples. Otherwise, it will be way harder to follow.
     - For quick prototyping: You can simply duplicate and rename any of the [existing example files](../examples/tutorial_api_python/) within that same folder.
 
-- [**Speeding up OpenPose and benchmark**](speed_up_openpose.md): Check the OpenPose Benchmark as well as some hints to speed up and/or reduce the memory requirements for OpenPose.
+- [**Speeding up OpenPose and benchmark**](maximizing_openpose_speed.md): Check the OpenPose Benchmark as well as some hints to speed up and/or reduce the memory requirements for OpenPose.
 
 - [**Calibration toolbox**](advanced/calibration_module.md) and [**3D OpenPose**](advanced/3d_reconstruction_module.md): Calibrate your cameras for 3D OpenPose (or any other stereo vision tasks) and start obtaining 3D keypoints!
 

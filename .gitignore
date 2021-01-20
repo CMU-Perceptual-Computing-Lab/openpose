@@ -32,7 +32,6 @@
 *.sst
 *.ldb
 LOCK
-LOG*
 CURRENT
 MANIFEST-*
 

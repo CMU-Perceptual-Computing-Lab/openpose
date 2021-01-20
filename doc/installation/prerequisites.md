@@ -1,4 +1,4 @@
-OpenPose - Prerequisites
+OpenPose Doc - Installation - Prerequisites
 ==========================
 
 ## Contents

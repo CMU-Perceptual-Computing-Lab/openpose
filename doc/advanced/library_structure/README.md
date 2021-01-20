@@ -1,4 +1,4 @@
-OpenPose C++ API - Introduction
+OpenPose Doc - Advanced Doc - Library Structure
 ====================================
 
 As a user, you do not need to know anything about this section! This section is intended for OpenPose internal developpers. It is exposed publicly, but you can skip this whole folder if you are just trying to use OpenPose or create new code/demos using OpenPose.

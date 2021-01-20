@@ -1,4 +1,4 @@
-OpenPose - Installation
+OpenPose Doc - Installation
 ==========================
 
 ## Contents
@@ -132,7 +132,7 @@ cmake-gui ..
 
 5. Set the `GPU_MODE` flag to the proper value and click `Configure` again:
     1. If your machine has an Nvidia GPU, you should most probably not modify this flag and skip this step. Cases in which you might have to change it:
-        - If you have a Nvidia GPU with 2GB of memory or less: Then you will have to follow some of the tricks in [doc/speed_up_openpose.md](../speed_up_openpose.md) or change `GPU_MODE` back to `CPU_ONLY`.
+        - If you have a Nvidia GPU with 2GB of memory or less: Then you will have to follow some of the tricks in [doc/maximizing_openpose_speed.md](../maximizing_openpose_speed.md) or change `GPU_MODE` back to `CPU_ONLY`.
         - If you cannot install CUDA, then you can also set `GPU_MODE` to `CPU_ONLY`.
     2. Mac OSX and machines with a non-Nvidia GPU (Intel or AMD GPUs): Set the `GPU_MODE` flag to `CPU_ONLY` (easier to install but slower runtime) or `OPENCL` (GPU-accelerated, it is harder to install but provides a faster runtime speed). For more details on OpenCV support, see [doc/prerequisites.md](prerequisites.md) and [OpenCL Version](#opencl-version).
     3. If your machine does not have any GPU, set the `GPU_MODE` flag to `CPU_ONLY`.
@@ -276,7 +276,7 @@ See [doc/advanced/deployment.md](../advanced/deployment.md).
 
 
 ### Maximum Speed
-Check the OpenPose Benchmark as well as some hints to speed up and/or reduce the memory requirements to run OpenPose on [doc/speed_up_openpose.md](../speed_up_openpose.md).
+Check the OpenPose Benchmark as well as some hints to speed up and/or reduce the memory requirements to run OpenPose on [doc/maximizing_openpose_speed.md](../maximizing_openpose_speed.md).
 
 
 
@@ -297,7 +297,7 @@ export MKL_NUM_THREADS="8"
 export OMP_NUM_THREADS="8"
 ```
 
-Increasing the number of threads results in a higher RAM memory usage. You can check the [doc/speed_up_openpose.md](../speed_up_openpose.md) for more information about speed and memory requirements in several CPUs and GPUs.
+Increasing the number of threads results in a higher RAM memory usage. You can check the [doc/maximizing_openpose_speed.md](../maximizing_openpose_speed.md) for more information about speed and memory requirements in several CPUs and GPUs.
 
 
 

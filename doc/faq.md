@@ -1,4 +1,4 @@
-OpenPose - Frequently Asked Question (FAQ)
+OpenPose Doc - Frequently Asked Question (FAQ)
 ============================================
 
 ## Contents
@@ -207,26 +207,26 @@ git submodule update --init --recursive --remote
 #### Speed Up, Memory Reduction, and Benchmark
 **Q: Low speed** - OpenPose is quite slow, is it normal? How can I speed it up?
 
-**A**: Check [doc/speed_up_openpose.md](speed_up_openpose.md) to discover the approximate speed of your graphics card and some speed tips.
+**A**: Check [doc/maximizing_openpose_speed.md](maximizing_openpose_speed.md) to discover the approximate speed of your graphics card and some speed tips.
 
 
 
 #### How to Measure the Latency Time?
 **Q: How to measure/calculate/estimate the latency/lag time?**
 
-**A**: [Profile](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/speed_up_openpose.md#profiling-speed) the OpenPose speed. For 1-GPU or CPU-only systems (use `--disable_multi_thread` for simplicity in multi-GPU systems for latency measurement), the latency will be roughly the sum of all the reported measurements.
+**A**: [Profile](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/maximizing_openpose_speed.md#profiling-speed) the OpenPose speed. For 1-GPU or CPU-only systems (use `--disable_multi_thread` for simplicity in multi-GPU systems for latency measurement), the latency will be roughly the sum of all the reported measurements.
 
 
 
 #### CPU Version Too Slow
 **Q: The CPU version is insanely slow compared to the GPU version.**
 
-**A**: Check [doc/speed_up_openpose.md#cpu-version](speed_up_openpose.md#cpu-version) to discover the approximate speed and some speed tips.
+**A**: Check [doc/maximizing_openpose_speed.md#cpu-version](maximizing_openpose_speed.md#cpu-version) to discover the approximate speed and some speed tips.
 
 
 
 #### Profiling Speed and Estimating FPS without Display
-Check the [doc/speed_up_openpose.md#profiling-speed](speed_up_openpose.md#profiling-speed) section.
+Check the [doc/maximizing_openpose_speed.md#profiling-speed](maximizing_openpose_speed.md#profiling-speed) section.
 
 
 

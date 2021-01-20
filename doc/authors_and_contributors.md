@@ -1,12 +1,10 @@
-OpenPose - Authors and Contributors
+OpenPose Doc - Authors and Contributors
 ====================================
 
 
 
 ### Authors
-OpenPose is authored by [Gines Hidalgo](https://www.gineshidalgo.com/), [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Hanbyul Joo](http://www.cs.cmu.edu/~hanbyulj/), and [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/).
-
-The body pose estimation work is based on the following and original 2 repositories: [CVPR 2017 repository](https://github.com/ZheC/Multi-Person-Pose-Estimation) and [ECCV 2016 repository](https://github.com/CMU-Perceptual-Computing-Lab/caffe_rtpose).
+OpenPose is authored by [Ginés Hidalgo](https://www.gineshidalgo.com/), [Zhe Cao](http://www.andrew.cmu.edu/user/zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon/), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Hanbyul Joo](http://www.cs.cmu.edu/~hanbyulj/), and [Yaser Sheikh](http://www.cs.cmu.edu/~yaser/). The body pose estimation work is based on the following and original 2 repositories: [CVPR 2017 repository](https://github.com/ZheC/Multi-Person-Pose-Estimation) and [ECCV 2016 repository](https://github.com/CMU-Perceptual-Computing-Lab/caffe_rtpose).
 
 
 

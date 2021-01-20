@@ -1,4 +1,4 @@
-OpenPose - Python API
+OpenPose Doc - Python API
 ====================================
 
 ## Contents

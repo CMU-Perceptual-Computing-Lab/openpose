@@ -1,4 +1,4 @@
-OpenPose C++ API - How to Develop OpenPose
+OpenPose Doc - Advanced Doc - Library Structure - How to Develop OpenPose
 ======================================================
 
 

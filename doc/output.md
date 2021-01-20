@@ -1,4 +1,4 @@
-OpenPose - Output
+OpenPose Doc - Output
 ====================================
 
 

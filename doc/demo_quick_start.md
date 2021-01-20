@@ -1,4 +1,4 @@
-OpenPose Demo - Quick Start
+OpenPose Doc - Demo - Quick Start
 ====================================
 
 Forget about the OpenPose code, just download the portable Windows binaries (or compile the code from source) and use the demo by following this tutorial!

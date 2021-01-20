@@ -1,4 +1,4 @@
-OpenPose - Installation on Nvidia Jetson TX1
+OpenPose Doc - Installation - Installation on Nvidia Jetson TX1
 ====================================
 ## Introduction
 We do not officially support TX1, but thanks to @dreinsdo, we have these instructions about how he made it work in his TX1. We would like to thank @dreinsdo, who added this documentation in [this GitHub issue post](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/1124#issuecomment-474090671). If you face any issue, feel free to post on that issue post.

@@ -1,4 +1,4 @@
-OpenPose C++ API - Basic Overview
+OpenPose Doc - Advanced Doc - Library Structure - Basic Overview
 ====================================
 
 

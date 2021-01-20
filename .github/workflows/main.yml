@@ -51,8 +51,6 @@ jobs:
               WITH_CUDNN: false
               WITH_PYTHON: true
               CI_OS_NAME: linux
-              CI_BUILD_NUMBER: ${{ github.run_number }}
-              CI_COMMIT: ${{ github.sha }}
             DOCS: true
           # Ubuntu 20.04 - Python - CMake - CPU
           - os: ubuntu-20.04

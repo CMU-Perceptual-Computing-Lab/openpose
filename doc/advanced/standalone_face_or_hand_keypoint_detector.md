@@ -1,4 +1,4 @@
-OpenPose - Standalone Face Or Hand Keypoint Detector
+OpenPose Doc - Advanced Doc - Standalone Face Or Hand Keypoint Detector
 ====================================
 
 In case of hand camera views at which the hands are visible but not the rest of the body, or if you do not need the body keypoint detector and want to speed up the process, you can use the OpenPose face or hand keypoint detectors with your own face or hand detectors, rather than using the body keypoint detector as initial detector for those.

@@ -1,4 +1,4 @@
-OpenPose Demo - Not Quick Start
+OpenPose Doc - Demo - Not Quick Start
 ====================================
 
 This document is a more detailed continuation of [doc/demo_quick_start.md](demo_quick_start.md), and it assumes the user is quite familiar with the OpenPose demo and the contents of [doc/demo_quick_start.md](demo_quick_start.md).

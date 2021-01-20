@@ -1,4 +1,4 @@
-OpenPose - Installation (deprecated)
+OpenPose Doc - Installation (deprecated)
 ======================================
 
 ## Contents

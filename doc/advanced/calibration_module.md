@@ -1,4 +1,4 @@
-OpenPose Calibration Module and Demo
+OpenPose Doc - Advanced Doc - OpenPose Calibration Module and Demo
 =============================================
 
 ## Contents

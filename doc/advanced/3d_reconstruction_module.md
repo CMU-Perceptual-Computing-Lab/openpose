@@ -1,4 +1,4 @@
-﻿OpenPose 3-D Reconstruction Module and Demo
+﻿OpenPose Doc - Advanced Doc - OpenPose 3-D Reconstruction Module and Demo
 =============================================
 
 ## Contents

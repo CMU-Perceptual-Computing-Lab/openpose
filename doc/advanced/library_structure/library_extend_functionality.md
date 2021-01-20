@@ -1,4 +1,4 @@
-OpenPose - How to Develop OpenPose
+OpenPose Doc - Advanced Doc - Library Structure - How to Extend Functionality
 ====================================
 
 If you intend to extend the functionality of our library:

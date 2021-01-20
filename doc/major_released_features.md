@@ -1,4 +1,4 @@
-OpenPose - All Major Released Features
+OpenPose Doc - Major Released Features
 ====================================
 
 - Nov 2020: [**Python API improved and included on Windows portable binaries**](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases)!

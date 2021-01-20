@@ -1,4 +1,4 @@
-Deploying OpenPose (Exporting OpenPose to Other Projects)
+OpenPose Doc - Advanced Doc - Deploying OpenPose (Exporting OpenPose to Other Projects)
 ==========================
 
 ## Contents

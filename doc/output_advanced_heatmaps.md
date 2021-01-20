@@ -1,4 +1,4 @@
-OpenPose - Heatmap Output (Advanced)
+OpenPose Doc - Output - Heatmaps (Advanced)
 ====================================
 
 
