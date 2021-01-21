@@ -1,4 +1,4 @@
-OpenPose Doc - Output - Heatmaps (Advanced)
+OpenPose Advanced Doc - Heatmap Output
 ====================================
 
 
@@ -15,7 +15,7 @@ OpenPose Doc - Output - Heatmaps (Advanced)
 
 
 ## Keypoints
-Check [doc/output_keypoints.md](output_keypoints.md) for the basic output information. This document is for users that want to use the heatmaps.
+Check [doc/output_keypoints.md](../2_output.md) for the basic output information. This document is for users that want to use the heatmaps.
 
 
 
@@ -24,11 +24,11 @@ Check [doc/output_keypoints.md](output_keypoints.md) for the basic output inform
 ## UI and Visual Heatmap Output
 If you choose to visualize a body part or a PAF (Part Affinity Field) heat map with the command option `--part_to_show`, the visual GUI should show something similar to one of the following images:
 <p align="center">
-    <img src="../.github/media/body_heat_maps.png", width="720">
+    <img src="../.github/media/body_heat_maps.png" width="720">
 </p>
 
 <p align="center">
-    <img src="../.github/media/paf_heat_maps.png", width="720">
+    <img src="../.github/media/paf_heat_maps.png" width="720">
 </p>
 
 

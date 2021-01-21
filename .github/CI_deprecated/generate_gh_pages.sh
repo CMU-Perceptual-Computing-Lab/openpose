@@ -71,8 +71,6 @@ echo "" > .nojekyll
 ##### Generate the Doxygen code documentation and log the output.          #####
 echo 'Generating Doxygen code documentation...'
 # Redirect both stderr and stdout to the log file AND the console.
-echo "INPUT                  = ${CI_BUILD_DIR}/README.md ${CI_BUILD_DIR}/include/openpose/" >> $DOXYFILE
-echo "USE_MDFILE_AS_MAINPAGE = ${CI_BUILD_DIR}/README.md" >> $DOXYFILE
 echo "OUTPUT_DIRECTORY       = " >> $DOXYFILE
 doxygen $DOXYFILE 2>&1 | tee doxygen.log
 

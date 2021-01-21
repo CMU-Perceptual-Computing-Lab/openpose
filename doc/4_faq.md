@@ -1,4 +1,4 @@
-OpenPose Doc - Frequently Asked Question (FAQ)
+OpenPose Doc - Frequently Asked Questions (FAQ)
 ============================================
 
 ## Contents
@@ -42,7 +42,7 @@ OpenPose Doc - Frequently Asked Question (FAQ)
 ### Errors
 #### Download Server Down
 **Q: The download server is down, Download Hash missmatch, Error 502: Bad Gateway, etc. I.e., I cannot download the OpenPose models and/or 3rd party libraries.**
-**A**: The are 2 alternatives. Option 1 (recommended): Download the links from [1602#issuecomment-641653411](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/1602#issuecomment-641653411) and download them in the places indicated by [doc/prerequisites.md](prerequisites.md). Option 2: If you downloaded the models and dependencies to some local server, you could set the advanced CMake property `DOWNLOAD_SERVER` to link OpenPose to your local mirror server instead.
+**A**: The are 2 alternatives. Option 1 (recommended): Download the links from [1602#issuecomment-641653411](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/1602#issuecomment-641653411) and download them in the places indicated by [doc/1_prerequisites.md](1_prerequisites.md). Option 2: If you downloaded the models and dependencies to some local server, you could set the advanced CMake property `DOWNLOAD_SERVER` to link OpenPose to your local mirror server instead.
 
 
 
@@ -67,7 +67,7 @@ Also, hands and face increases the GPU memory requeriments, and 4 GB GPUs might 
 #### Cannot Find OpenPose.dll Error (Windows)
 **Q: System cannot find the file specified (Openpose.dll) error when trying to release** - Using a folder with images does work, but the video and/or the webcam do not. Note: often on Windows.
 
-**A**: Visual Studio (VS) and the [doc/installation/README.md](installation/README.md) section is only intended if you plan to modify the OpenPose code or integrate it with another library or project. If you just want to use the OpenPose demo, simply follow [doc/installation/README.md#windows-portable-demo](installation/README.md#windows-portable-demo) and download the OpenPose binaries in the [Releases](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases) section.
+**A**: Visual Studio (VS) and the [doc/installation/0_index.md](installation/0_index.md) section is only intended if you plan to modify the OpenPose code or integrate it with another library or project. If you just want to use the OpenPose demo, simply follow [doc/installation/0_index.md#windows-portable-demo](installation/0_index.md#windows-portable-demo) and download the OpenPose binaries in the [Releases](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases) section.
 
 If you need to compile it with Visual Studio (VS), then keep reading. In this error, VS is simply saying that there were errors while compiling the OpenPose library. Try compiling only the OpenPose library (not the demo), by right clicking on it, then `Set as StartUp Project`, and finally right click + `Build`. Then, at the bottom left part of VS, press `Error list` and then you should see which errors VS encountered while compiling. In that way, VS gives you the exact error so you can know it and share the exact issue.
 
@@ -96,12 +96,12 @@ Note: OpenPose library is not an executable, but a library. So instead clicking 
 
 **A**: This answer assumes that never a single person is detected. If in your case it works sometimes, then check [Always Zero People Detected](#always-zero-people-detected). This always-0-people problem usually occurs in 2 situations: 1) When you selection `--num_gpu 0`, and 2) when the caffemodel has not been properly downloaded. E.g., if the connection drops when downloading the models.
 
-For problem 1, setting `--num_gpu 0` means that no processing is done, so you can use this setting e.g., to record webcam. This functionality is kept for back-compatibility. You are most probably trying to run on CPU-only mode, for that, install OpenPose in CPU-only mode following [doc/installation/README.md](installation/README.md).
+For problem 1, setting `--num_gpu 0` means that no processing is done, so you can use this setting e.g., to record webcam. This functionality is kept for back-compatibility. You are most probably trying to run on CPU-only mode, for that, install OpenPose in CPU-only mode following [doc/installation/0_index.md](installation/0_index.md).
 
 For problem 2, try the following solutions (in this order):
 
 1. Assuming that default OpenPose (i.e., BODY_25 model) failed, try with `--model_pose COCO` and `--model_pose MPII` models. If any of them work, the `caffemodel` files of the other models were corrupted while being downloaded. Otherwise, it will most probably be a Caffe/protobuf issue.
-2. Assuming that the model is corrupted, remove the current models in the model folder, and download them manually from the links in [doc/installation/README.md](installation/README.md). Alternatively, remove them and re-run Cmake again. If this does not work, try downloading the COCO_25 model from the browser following the download link on this [Dropbox link](https://www.dropbox.com/s/03r8pa8sikrqv62/pose_iter_584000.caffemodel).
+2. Assuming that the model is corrupted, remove the current models in the model folder, and download them manually from the links in [doc/installation/0_index.md](installation/0_index.md). Alternatively, remove them and re-run Cmake again. If this does not work, try downloading the COCO_25 model from the browser following the download link on this [Dropbox link](https://www.dropbox.com/s/03r8pa8sikrqv62/pose_iter_584000.caffemodel).
 3. If none of the OpenPose models are working, make sure Caffe is working properly and that you can run the Caffe examples with other caffemodel / prototxt files.
 
 
@@ -109,7 +109,7 @@ For problem 2, try the following solutions (in this order):
 #### Very Few People Detected
 **Q: Low detection rate. It can detect the person on some images (usually higher contrast, with bigger people), but it will fail for most of images with low resolution or small people.**
 
-**A**: Images with low resolution, or with people too tiny will simply not work too well. However, it can be highly improved by using the maximum accuracy configuration detailed in [doc/demo_quick_start.md#maximum-accuracy-configuration](demo_quick_start.md#maximum-accuracy-configuration).
+**A**: Images with low resolution, or with people too tiny will simply not work too well. However, it can be highly improved by using the maximum accuracy configuration detailed in [doc/1_demo.md#maximum-accuracy-configuration](1_demo.md#maximum-accuracy-configuration).
 
 
 
@@ -136,7 +136,7 @@ F0821 14:26:29.665053 22812 upgrade_proto.cpp:97] Check failed: ReadProtoFromBin
 
 **A**: This error has been solved in the latest OpenPose versions. Completely remove OpenPose and re-download the latest version (just cleaning the compilation or removing the `build/` folder will not work).
 
-If you wanna use your custom Caffe and it has this error: This error only happens in some Ubuntu machines. Following #787, compile your own Caffe with an older version of it. The hacky (quick but not recommended way) is to follow [#787#issuecomment-415476837](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/787#issuecomment-415476837), the elegant way (compatible with future OpenPose versions) is to build your own Caffe independently, following [doc/installation/README.md#custom-caffe-ubuntu-only](installation/README.md#custom-caffe-ubuntu-only).
+If you wanna use your custom Caffe and it has this error: This error only happens in some Ubuntu machines. Following #787, compile your own Caffe with an older version of it. The hacky (quick but not recommended way) is to follow [#787#issuecomment-415476837](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/787#issuecomment-415476837), the elegant way (compatible with future OpenPose versions) is to build your own Caffe independently, following [doc/installation/0_index.md#custom-caffe-ubuntu-only](installation/0_index.md#custom-caffe-ubuntu-only).
 
 
 
@@ -156,7 +156,7 @@ CUDA_cublas_device_LIBRARY (ADVANCED)
     linked by target "caffe" in directory /home/jakebmalis/Documents/openpose/3rdparty/caffe/src/caffe
 ```
 
-**A**: Make sure to download and install CMake-GUI following the [doc/prerequisites.md](prerequisites.md) section. This is a known problem with CMake-GUI versions from 3.8 to 3.11 (unfortunately, default Ubuntu 18 CMake-GUI uses 3.10). You will need a CMake version >= 3.12.
+**A**: Make sure to download and install CMake-GUI following the [doc/1_prerequisites.md](1_prerequisites.md) section. This is a known problem with CMake-GUI versions from 3.8 to 3.11 (unfortunately, default Ubuntu 18 CMake-GUI uses 3.10). You will need a CMake version >= 3.12.
 
 
 
@@ -194,7 +194,7 @@ git submodule update
 #### Obscure CMake Error about Caffe or Pybind
 **Q:** There appear some weird and obscure errors on CMake about Caffe and/or Pybind.
 
-**A**: Check [doc/installation/README.md](installation/README.md) to run the `git submodule` command, i.e.,
+**A**: Check [doc/installation/0_index.md](installation/0_index.md) to run the `git submodule` command, i.e.,
 ```
 git submodule update --init --recursive --remote
 ```
@@ -207,33 +207,33 @@ git submodule update --init --recursive --remote
 #### Speed Up, Memory Reduction, and Benchmark
 **Q: Low speed** - OpenPose is quite slow, is it normal? How can I speed it up?
 
-**A**: Check [doc/maximizing_openpose_speed.md](maximizing_openpose_speed.md) to discover the approximate speed of your graphics card and some speed tips.
+**A**: Check [doc/5_maximizing_openpose_speed.md](5_maximizing_openpose_speed.md) to discover the approximate speed of your graphics card and some speed tips.
 
 
 
 #### How to Measure the Latency Time?
 **Q: How to measure/calculate/estimate the latency/lag time?**
 
-**A**: [Profile](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/maximizing_openpose_speed.md#profiling-speed) the OpenPose speed. For 1-GPU or CPU-only systems (use `--disable_multi_thread` for simplicity in multi-GPU systems for latency measurement), the latency will be roughly the sum of all the reported measurements.
+**A**: [Profile](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/5_maximizing_openpose_speed.md#profiling-speed) the OpenPose speed. For 1-GPU or CPU-only systems (use `--disable_multi_thread` for simplicity in multi-GPU systems for latency measurement), the latency will be roughly the sum of all the reported measurements.
 
 
 
 #### CPU Version Too Slow
 **Q: The CPU version is insanely slow compared to the GPU version.**
 
-**A**: Check [doc/maximizing_openpose_speed.md#cpu-version](maximizing_openpose_speed.md#cpu-version) to discover the approximate speed and some speed tips.
+**A**: Check [doc/5_maximizing_openpose_speed.md#cpu-version](5_maximizing_openpose_speed.md#cpu-version) to discover the approximate speed and some speed tips.
 
 
 
 #### Profiling Speed and Estimating FPS without Display
-Check the [doc/maximizing_openpose_speed.md#profiling-speed](maximizing_openpose_speed.md#profiling-speed) section.
+Check the [doc/5_maximizing_openpose_speed.md#profiling-speed](5_maximizing_openpose_speed.md#profiling-speed) section.
 
 
 
 #### Webcam Slower than Images
 **Q: Webcam is slow** - Using a folder with images matches the speed FPS benchmarks, but the webcam has lower FPS. Note: often on Windows.
 
-**A**: OpenCV has some issues with some camera drivers (specially on Windows). The first step should be to compile OpenCV by your own and re-compile OpenPose after that (following the [doc/installation/README.md#reinstallation](installation/README.md#reinstallation) section). If the speed is still slower, you can better debug it by running a webcam OpenCV example (e.g. [this C++ example](http://answers.opencv.org/question/1/how-can-i-get-frames-from-my-webcam/)). If you are able to get the proper FPS with the OpenCV demo but OpenPose is still low, then let us know!
+**A**: OpenCV has some issues with some camera drivers (specially on Windows). The first step should be to compile OpenCV by your own and re-compile OpenPose after that (following the [doc/installation/0_index.md#reinstallation](installation/0_index.md#reinstallation) section). If the speed is still slower, you can better debug it by running a webcam OpenCV example (e.g. [this C++ example](http://answers.opencv.org/question/1/how-can-i-get-frames-from-my-webcam/)). If you are able to get the proper FPS with the OpenCV demo but OpenPose is still low, then let us know!
 
 
 
@@ -241,7 +241,7 @@ Check the [doc/maximizing_openpose_speed.md#profiling-speed](maximizing_openpose
 
 ### Accuracy Issues
 #### Is Maximum Accuracy Configuration Possible on Lower End GPUs?
-**Q**: I've read that this command provides the most accurate results possible on Openpose so far: https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/demo_quick_start.md#maximum-accuracy-configuration. However, a 8GB GPU (e.g., 1080 or 2080) will run out of memory, is there any method to achieve the same accuracy on GPU using less memory even if it meant sacrificing speed?
+**Q**: I've read that this command provides the most accurate results possible on Openpose so far: https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/1_demo.md#maximum-accuracy-configuration. However, a 8GB GPU (e.g., 1080 or 2080) will run out of memory, is there any method to achieve the same accuracy on GPU using less memory even if it meant sacrificing speed?
 
 **A**: Unfortunately no, there is no way at the moment. Caffe just takes so much memory doing that. You can try with `--scale_number 3` instead of 4, reducing a bit the `net_resolution` (e.g. `720` vs. `736`) and starting the computer without GUI (which also takes about 1GB of memory just to keep the computer GUI running).
 

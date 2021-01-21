@@ -9,7 +9,7 @@ OpenPose Doc - Installation - Prerequisites
 
 
 
-### General Tips
+## General Tips
 These tips are **very important** and avoid many bugs:
 - Install the latest CUDA version or make sure your GPU is compatible with the CUDA version you have in your system. E.g., Nvidia 30XX GPUs require at least CUDA 11, others (GTX 20XX, V100, Volta or Turing GPUs) require at least CUDA 10.
 - CMake automatically downloads all the OpenPose models. However, **some firewall or company networks block these downloads**. If so, you might need to download them manually:
@@ -21,7 +21,7 @@ These tips are **very important** and avoid many bugs:
 
 
 
-### Ubuntu Prerequisites
+## Ubuntu Prerequisites
 1. Ubuntu - **Anaconda should not be installed** on your system. Anaconda includes a Protobuf version that is incompatible with Caffe. Either you uninstall anaconda and install protobuf via apt-get, or you compile your own Caffe and link it to OpenPose.
 2. Install **CMake GUI**:
     - Ubuntu 20: Run the command `sudo apt-get install cmake-qt-gui`.
@@ -34,7 +34,7 @@ These tips are **very important** and avoid many bugs:
         - Run `./configure --qt-gui`. Make sure no error occurred.
         - Run ``./bootstrap && make -j`nproc` && sudo make install -j`nproc` ``. Make sure no error occurred.
         - Assuming your CMake downloaded folder is in {CMAKE_FOLDER_PATH}, everytime these instructions mentions `cmake-gui`, you will have to replace that line by `{CMAKE_FOLDER_PATH}/bin/cmake-gui`.
-    - Ubuntu 14 or 16: Run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [doc/installation/README.md#CMake-Command-Line-Configuration-(Ubuntu-Only)](README.md#cmake-command-line-configuration-ubuntu-only).
+    - Ubuntu 14 or 16: Run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [doc/installation/0_index.md#CMake-Command-Line-Configuration-(Ubuntu-Only)](0_index.md#cmake-command-line-configuration-ubuntu-only).
 3. Nvidia GPU version prerequisites:
     1. **Note: OpenPose has been tested extensively with CUDA 11.1.1 (cuDNN 8.0.5) for Ubuntu 20**. Older OpenPose versions (v1.6.X and v1.5.X) were tested with **CUDA 10.1 (cuDNN 7.5.1) for Ubuntu 18 and CUDA 8.0 (cuDNN 5.1) for Ubuntu 14 and 16**. We highly recommend using those combinations to minimize potential installation issues. Other combinations should also work, but we do not provide any support about installation/compilation issues related to CUDA/cuDNN or their integration with OpenPose.
     2. Upgrade your Nvidia drivers to the latest version.
@@ -70,14 +70,14 @@ sudo pip install numpy opencv-python
 
 
 
-### Mac OS Prerequisites
+## Mac OS Prerequisites
 1. If you don't have `brew`, install it by running `bash scripts/osx/install_brew.sh` on your terminal.
 2. Install **CMake GUI**: Run the command `brew cask install cmake`.
 3. Install **Caffe, OpenCV, and Caffe prerequisites**: Run `bash scripts/osx/install_deps.sh`.
 
 
 
-### Windows Prerequisites
+## Windows Prerequisites
 NOTE: These instructions are only required when compiling OpenPose brom source. If you simply wanna use the OpenPose binaries for Windows, skip this step.
 
 1. Install **CMake GUI**: Download and install the `Latest Release` of CMake `Windows win64-x64 Installer` from the [CMake download website](https://cmake.org/download/), called `cmake-X.X.X-win64-x64.msi`.

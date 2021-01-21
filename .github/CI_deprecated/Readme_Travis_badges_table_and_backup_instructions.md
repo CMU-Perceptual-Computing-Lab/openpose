@@ -1,6 +1,7 @@
 In order to recover Travis:
 1. Uncomment all the lines of code in ".travis.yml" and move it back to the main folder (e.g., at the same level than the global README.md and CMakeLists.txt files).
-2. Re-add the table of badges in the README.md:
+2. Move `generate_gh_pages.sh` back to `scripts/generate_gh_pages.sh`.
+3. Re-add the table of badges in the README.md:
 
 |                  |`Default Config`  |`CUDA (+Python)`  |`CPU (+Python)`   |`OpenCL (+Python)`| `Debug`          | `Unity`          |
 | :---:            | :---:            | :---:            | :---:            | :---:            | :---:            | :---:            |

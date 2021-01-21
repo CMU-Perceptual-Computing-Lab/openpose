@@ -1022,7 +1022,7 @@ if (UNIX OR APPLE)
     find_package(Doxygen)
     if (DOXYGEN_FOUND)
       # Set input and output files
-      set(DOXYGEN_FILE ${CMAKE_SOURCE_DIR}/scripts/doc_autogeneration.doxygen)
+      set(DOXYGEN_FILE ${CMAKE_SOURCE_DIR}/.doc_autogeneration.doxygen)
 
       # Custom target to build the documentation
       add_custom_target(doc_doxygen ALL

@@ -20,7 +20,7 @@ Check the [OpenPose Benchmark](https://docs.google.com/spreadsheets/d/1-DynFGvoS
 ### CPU Version
 The CPU version runs at about 0.3 FPS on the COCO model, and at about 0.1 FPS (i.e., about 15 sec / frame) on the default BODY_25 model. Switch to COCO model and/or reduce the `net_resolution` as indicated above. Contradictory fact: BODY_25 model is about 5x slower than COCO on CPU-only version, but it is about 40% faster on GPU version.
 
-On Ubuntu (for OS versions older than 20), you can also boost CPU-only speed by 2-3x by following [installation/README.md#faster-cpu-version-ubuntu-only](installation/README.md#faster-cpu-version-ubuntu-only).
+On Ubuntu (for OS versions older than 20), you can also boost CPU-only speed by 2-3x by following [installation/0_index.md#faster-cpu-version-ubuntu-only](installation/0_index.md#faster-cpu-version-ubuntu-only).
 
 
 
@@ -48,7 +48,7 @@ Some speed tips to maximize the OpenPose runtime speed while preserving the accu
 ## Speed Up and Memory Reduction
 Some speed tips to highly maximize the OpenPose speed, but keep in mind the accuracy trade-off:
 
-    1. Reduce the `--net_resolution` (e.g., to 320x176) (lower accuracy). Note: For maximum accuracy, follow [doc/demo_quick_start.md#maximum-accuracy-configuration](demo_quick_start.md#maximum-accuracy-configuration).
+    1. Reduce the `--net_resolution` (e.g., to 320x176) (lower accuracy). Note: For maximum accuracy, follow [doc/1_demo.md#maximum-accuracy-configuration](1_demo.md#maximum-accuracy-configuration).
     2. For face, reduce the `--face_net_resolution`. The resolution 320x320 usually works pretty decently.
     3. Points 1-2 will also reduce the GPU memory usage (or RAM memory for CPU version).
     4. Use the `BODY_25` model for maximum speed. Use `MPI_4_layers` model for minimum GPU memory usage (but lower accuracy, speed, and number of parts).

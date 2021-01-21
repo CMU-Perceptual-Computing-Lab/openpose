@@ -1,4 +1,4 @@
-﻿OpenPose Doc - Advanced Doc - OpenPose 3-D Reconstruction Module and Demo
+﻿OpenPose Advanced Doc - 3-D Reconstruction Module and Demo
 =============================================
 
 ## Contents
@@ -23,13 +23,13 @@ This module performs 3-D keypoint (body, face, and hand) reconstruction and rend
 
 
 ## Installation
-Check [doc/installation/README.md#3d-reconstruction-module](../installation/README.md#3d-reconstruction-module) for installation steps.
+Check [doc/installation/0_index.md#3d-reconstruction-module](../installation/0_index.md#3d-reconstruction-module) for installation steps.
 
 
 
 
 ## Non Linear Optimization
-In order to increase the 3-D reconstruction accuracy, OpenPose optionally performs non-linear optimization if Ceres solver support is enabled (only available in Ubuntu for now). To enable it, check [doc/installation/README.md#3d-reconstruction-module](../installation/README.md#3d-reconstruction-module) for more details.
+In order to increase the 3-D reconstruction accuracy, OpenPose optionally performs non-linear optimization if Ceres solver support is enabled (only available in Ubuntu for now). To enable it, check [doc/installation/0_index.md#3d-reconstruction-module](../installation/0_index.md#3d-reconstruction-module) for more details.
 
 
 
@@ -86,7 +86,7 @@ OpenPose will display the cameras sorted by serial number, starting in the left 
 
 
 ## Quick Start
-Check the [doc/demo_quick_start.md#3-d-reconstruction](../demo_quick_start.md#3-d-reconstruction) for basic examples.
+Check the [doc/1_demo.md#3-d-reconstruction](../1_demo.md#3-d-reconstruction) for basic examples.
 
 
 
@@ -101,6 +101,8 @@ It should be similar to the following image.
 
 <p align="center">
     <img src="../../.github/media/openpose3d.gif">
+    <br>
+    <sup><a href="https://ziutinyat.github.io/" target="_blank">Tianyi Zhao</a> testing the 3-D Module</a></sup>
 </p>
 
 

@@ -321,7 +321,7 @@ namespace op
         m.def("get_images_on_directory", &getImagesFromDirectory, "Get Images On Directory");
 
         // Pose Mapping
-        // Code example in doc/output.md, section Keypoint Ordering in C++/Python
+        // Code example in doc/2_output.md, section Keypoint Ordering in C++/Python
         m.def("getPoseBodyPartMapping", &getPoseBodyPartMapping, "getPoseBodyPartMapping");
         m.def("getPoseNumberBodyParts", &getPoseNumberBodyParts, "getPoseNumberBodyParts");
         m.def("getPosePartPairs", &getPosePartPairs, "getPosePartPairs");

@@ -8,7 +8,7 @@
 # # Environment variables + OS + other parameters
 # global:
 #   - GH_REPO_NAME: openpose
-#   - DOXYFILE: $CI_BUILD_DIR/scripts/doc_autogeneration.doxygen
+#   - DOXYFILE: $CI_BUILD_DIR/.doc_autogeneration.doxygen
 #   # Set this in Environment Variables on travis-ci.org
 #   # - GH_REPO_REF: github.com/<user_name>/openpose.git
 # matrix:

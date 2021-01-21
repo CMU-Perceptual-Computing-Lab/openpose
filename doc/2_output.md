@@ -25,8 +25,9 @@ OpenPose Doc - Output
 
 ## UI and Visual Output
 The visual GUI should show the original image with the poses blended on it, similarly to the pose of this gif:
+
 <p align="center">
-    <img src="../.github/media/shake.gif", width="720">
+    <img src="../.github/media/shake.gif" width="720">
 </p>
 
 
@@ -38,28 +39,28 @@ The output of the JSON files consist of a set of keypoints, whose ordering is re
 
 ### Pose Output Format (BODY_25)
 <p align="center">
-    <img src="../.github/media/keypoints_pose_25.png", width="480">
+    <img src="../.github/media/keypoints_pose_25.png" width="480">
 </p>
 
 
 
 ### Pose Output Format (COCO)
 <p align="center">
-    <img src="../.github/media/keypoints_pose_18.png", width="480">
+    <img src="../.github/media/keypoints_pose_18.png" width="480">
 </p>
 
 
 
 ### Face Output Format
 <p align="center">
-    <img src="../.github/media/keypoints_face.png", width="480">
+    <img src="../.github/media/keypoints_face.png" width="480">
 </p>
 
 
 
 ### Hand Output Format
 <p align="center">
-    <img src="../.github/media/keypoints_hand.png", width="480">
+    <img src="../.github/media/keypoints_hand.png" width="480">
 </p>
 
 
@@ -260,4 +261,4 @@ If you need to use the camera calibration or 3D modules, the camera matrix outpu
 
 
 ### Heatmaps
-If you need to use heatmaps, check [doc/output_advanced_heatmaps.md](output_advanced_heatmaps.md).
+If you need to use heatmaps, check [doc/advanced/heatmap_output.md](advanced/heatmap_output.md).

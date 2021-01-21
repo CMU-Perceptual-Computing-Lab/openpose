@@ -1,4 +1,4 @@
-OpenPose Doc - Advanced Doc - OpenPose Calibration Module and Demo
+OpenPose Advanced Doc - Calibration Module and Demo
 =============================================
 
 ## Contents
@@ -31,7 +31,7 @@ Note: We are not aiming to have the best calibration toolbox, but the simplest o
 
 
 ## Installing the Calibration Module
-Check [doc/installation/README.md#calibration-module](../installation/README.md#calibration-module) for installation steps.
+Check [doc/installation/0_index.md#calibration-module](../installation/0_index.md#calibration-module) for installation steps.
 
 
 

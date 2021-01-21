@@ -1,5 +1,5 @@
 <div align="center">
-    <img src=".github/Logo_main_black.png", width="300">
+    <img src=".github/Logo_main_black.png" width="300">
 </div>
 
 -----------------
@@ -10,12 +10,12 @@
 
 [**OpenPose**](https://github.com/CMU-Perceptual-Computing-Lab/openpose) has represented the **first real-time multi-person system to jointly detect human body, hand, facial, and foot keypoints (in total 135 keypoints) on single images**.
 
-It is **authored by [Ginés Hidalgo](https://www.gineshidalgo.com), [Zhe Cao](https://people.eecs.berkeley.edu/~zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Hanbyul Joo](https://jhugestar.github.io), and [Yaser Sheikh](http://www.cs.cmu.edu/~yaser)**, and **maintained by [Ginés Hidalgo](https://www.gineshidalgo.com) and [Yaadhav Raaj](https://www.raaj.tech)**. OpenPose would not be possible without the [**CMU Panoptic Studio dataset**](http://domedb.perception.cs.cmu.edu). We would also like to thank all the people who helped OpenPose in any way ([doc/authors_and_contributors.md](doc/authors_and_contributors.md)).
+It is **authored by** [**Ginés Hidalgo**](https://www.gineshidalgo.com), [**Zhe Cao**](https://people.eecs.berkeley.edu/~zhecao), [**Tomas Simon**](http://www.cs.cmu.edu/~tsimon), [**Shih-En Wei**](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [**Hanbyul Joo**](https://jhugestar.github.io), **and** [**Yaser Sheikh**](http://www.cs.cmu.edu/~yaser). It is **maintained by** [**Ginés Hidalgo**](https://www.gineshidalgo.com) **and** [**Yaadhav Raaj**](https://www.raaj.tech). OpenPose would not be possible without the [**CMU Panoptic Studio dataset**](http://domedb.perception.cs.cmu.edu). We would also like to thank all the people who [has helped OpenPose in any way](doc/8_authors_and_contributors.md).
 
 
 
 <p align="center">
-    <img src=".github/media/pose_face_hands.gif", width="480">
+    <img src=".github/media/pose_face_hands.gif" width="480">
     <br>
     <sup>Authors <a href="https://www.gineshidalgo.com" target="_blank">Ginés Hidalgo</a> (left) and <a href="https://jhugestar.github.io" target="_blank">Hanbyul Joo</a> (right) in front of the <a href="http://domedb.perception.cs.cmu.edu" target="_blank">CMU Panoptic Studio</a></sup>
 </p>
@@ -37,39 +37,39 @@ It is **authored by [Ginés Hidalgo](https://www.gineshidalgo.com), [Zhe Cao](ht
 ## Results
 ### Body and Foot Estimation
 <p align="center">
-    <img src=".github/media/dance_foot.gif", width="360">
+    <img src=".github/media/dance_foot.gif" width="360">
     <br>
     <sup>Testing the <a href="https://www.youtube.com/watch?v=2DiQUX11YaY" target="_blank"><i>Crazy Uptown Funk flashmob in Sydney</i></a> video sequence with OpenPose</sup>
 </p>
 
 ### 3D Reconstruction Module (Body, Foot, Face, and Hands)
 <p align="center">
-    <img src=".github/media/openpose3d.gif", width="360">
+    <img src=".github/media/openpose3d.gif" width="360">
     <br>
     <sup>Testing the 3D Reconstruction Module of OpenPose</sup>
 </p>
 
 ### Body, Foot, Face, and Hands Estimation
 <p align="center">
-    <img src=".github/media/pose_face.gif", width="360">
-    <img src=".github/media/pose_hands.gif", width="360">
+    <img src=".github/media/pose_face.gif" width="360">
+    <img src=".github/media/pose_hands.gif" width="360">
     <br>
     <sup>Authors <a href="https://www.gineshidalgo.com" target="_blank">Ginés Hidalgo</a> (left image) and <a href="http://www.cs.cmu.edu/~tsimon" target="_blank">Tomas Simon</a> (right image) testing OpenPose</sup>
 </p>
 
 ### Unity Plugin
 <p align="center">
-    <img src=".github/media/unity_main.png", width="240">
-    <img src=".github/media/unity_body_foot.png", width="240">
-    <img src=".github/media/unity_hand_face.png", width="240">
+    <img src=".github/media/unity_main.png" width="240">
+    <img src=".github/media/unity_body_foot.png" width="240">
+    <img src=".github/media/unity_hand_face.png" width="240">
     <br>
-    <sup><a href="http://tianyizhao.com" target="_blank">Tianyi Zhao</a> and <a href="https://www.gineshidalgo.com" target="_blank">Ginés Hidalgo</a> testing the <a href="https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin" target="_blank">OpenPose Unity Plugin</a></sup>
+    <sup><a href="https://ziutinyat.github.io/" target="_blank">Tianyi Zhao</a> and <a href="https://www.gineshidalgo.com" target="_blank">Ginés Hidalgo</a> testing the <a href="https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin" target="_blank">OpenPose Unity Plugin</a></sup>
 </p>
 
 ### Runtime Analysis
 We show an inference time comparison between the 3 available pose estimation libraries (same hardware and conditions): OpenPose, Alpha-Pose (fast Pytorch version), and Mask R-CNN. The OpenPose runtime is constant, while the runtime of Alpha-Pose and Mask R-CNN grow linearly with the number of people. More details [**here**](https://arxiv.org/abs/1812.08008).
 <p align="center">
-    <img src=".github/media/openpose_vs_competition.png", width="360">
+    <img src=".github/media/openpose_vs_competition.png" width="360">
 </p>
 
 
@@ -91,10 +91,10 @@ We show an inference time comparison between the 3 available pose estimation lib
 - **OS**: Ubuntu (20, 18, 16, 14), Windows (10, 8), Mac OSX, Nvidia TX2.
 - **Hardware compatibility**: CUDA (Nvidia GPU), OpenCL (AMD GPU), and non-GPU (CPU-only) versions.
 - **Usage Alternatives**:
-    - [**Command-line demo**](doc/demo_quick_start.md) for built-in functionality.
-    - [**C++ API**](examples/tutorial_api_cpp/) and [**Python API**](doc/python_api.md) for custom functionality. E.g., adding your custom inputs, pre-processing, post-posprocessing, and output steps.
+    - [**Command-line demo**](doc/1_demo.md) for built-in functionality.
+    - [**C++ API**](examples/tutorial_api_cpp/) and [**Python API**](doc/3_python_api.md) for custom functionality. E.g., adding your custom inputs, pre-processing, post-posprocessing, and output steps.
 
-For further details, check the [major released features](doc/major_released_features.md) and [release notes](doc/release_notes.md) docs.
+For further details, check the [major released features](doc/6_major_released_features.md) and [release notes](doc/7_release_notes.md) docs.
 
 
 
@@ -107,9 +107,9 @@ For further details, check the [major released features](doc/major_released_feat
 
 
 ## Installation
-If you want to use OpenPose without compiling or writing any code, simply [download and use the latest Windows portable version of OpenPose](doc/installation/README.md#windows-portable-demo)! Otherwise, you can also [build OpenPose from source](doc/installation/README.md#compiling-and-running-openpose-from-source).
+If you want to use OpenPose without compiling or writing any code, simply [download and use the latest Windows portable version of OpenPose](doc/installation/0_index.md#windows-portable-demo)! Otherwise, you can also [build OpenPose from source](doc/installation/0_index.md#compiling-and-running-openpose-from-source).
 
-See [doc/installation/README.md](doc/installation/README.md) for more details.
+See [doc/installation/0_index.md](doc/installation/0_index.md) for more details.
 
 
 
@@ -134,7 +134,7 @@ You can also add any of the available flags in any order. Do you also want to ad
 bin\OpenPoseDemo.exe --video examples\media\video.avi --face --hand --write_json output_json_folder/
 ```
 
-After [installing](#installation) OpenPose, check [doc/README.md](doc/README.md) for a quick overview of all the alternatives and tutorials.
+After [installing](#installation) OpenPose, check [doc/0_index.md](doc/0_index.md) for a quick overview of all the alternatives and tutorials.
 
 
 
@@ -191,4 +191,4 @@ Paper links:
 
 
 ## License
-OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](LICENSE) for further details. Interested in a commercial license? Check this [FlintBox link](https://cmu.flintbox.com/#technologies/b820c21d-8443-4aa2-a49f-8919d93a8740). For commercial queries, use the `Contact` section from the [FlintBox link](https://cmu.flintbox.com/#technologies/b820c21d-8443-4aa2-a49f-8919d93a8740) and also send a copy of that message to [Yaser Sheikh](mailto:yaser@cs.cmu.edu).
+OpenPose is freely available for free non-commercial use, and may be redistributed under these conditions. Please, see the [license](./LICENSE) for further details. Interested in a commercial license? Check this [FlintBox link](https://cmu.flintbox.com/#technologies/b820c21d-8443-4aa2-a49f-8919d93a8740). For commercial queries, use the `Contact` section from the [FlintBox link](https://cmu.flintbox.com/#technologies/b820c21d-8443-4aa2-a49f-8919d93a8740) and also send a copy of that message to [Yaser Sheikh](mailto:yaser@cs.cmu.edu).

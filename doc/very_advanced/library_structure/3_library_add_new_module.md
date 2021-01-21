@@ -1,4 +1,4 @@
-OpenPose Doc - Advanced Doc - Library Structure - Steps to Add a New Module
+OpenPose Very Advanced Doc - Library Structure - Steps to Add a New Module
 ====================================
 
 ## Developing Steps

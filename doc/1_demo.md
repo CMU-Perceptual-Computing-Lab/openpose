@@ -1,4 +1,4 @@
-OpenPose Doc - Demo - Quick Start
+OpenPose Doc - Demo
 ====================================
 
 Forget about the OpenPose code, just download the portable Windows binaries (or compile the code from source) and use the demo by following this tutorial!
@@ -30,7 +30,7 @@ Forget about the OpenPose code, just download the portable Windows binaries (or 
 ## Quick Start
 In Ubuntu, Mac, and other Unix systems, use `Terminal` or `Terminator`. In Windows, the `Windows PowerShell`. Watch any Youtube video tutorial if you are not familiar with these tools. Make sure that you are in the **root directory of the project** when running any command (i.e., in the OpenPose folder, not inside `build/` nor `windows/` nor `bin/`). In addition, `examples/media/video.avi` and `examples/media` exist, so there is no need to change any lines of code.
 
-Test OpenPose by running the following. The expected visual result should look like [doc/output.md#ui-and-visual-output](output.md#ui-and-visual-output).
+Test OpenPose by running the following. The expected visual result should look like [doc/2_output.md#ui-and-visual-output](2_output.md#ui-and-visual-output).
 ```
 # Ubuntu and Mac
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi
@@ -40,9 +40,9 @@ Test OpenPose by running the following. The expected visual result should look l
 bin\OpenPoseDemo.exe --video examples/media/video.avi
 ```
 
-If you are only using the OpenPose demo, we highly recommend using [the latest Windows portable version of OpenPose](doc/installation/README.md#windows-portable-demo). If you still want to use the demo with Visual Studio, you can copy the `bin/*.dll` files into the final DLL bin location following [doc/installation/README.md#windows](installation/README.md#windows), or you could also simply modify the default flag values from [include/flags.hpp](../include/flags.hpp). If you have copied the DLLs, you can execute this:
+If you are only using the OpenPose demo, we highly recommend using [the latest Windows portable version of OpenPose](doc/installation/0_index.md#windows-portable-demo). If you still want to use the demo with Visual Studio, you can copy the `bin/*.dll` files into the final DLL bin location following [doc/installation/0_index.md#windows](installation/0_index.md#windows), or you could also simply modify the default flag values from [include/flags.hpp](../include/flags.hpp). If you have copied the DLLs, you can execute this:
 ```
-:: Windows - Library - Assuming you have copied the DLLs following doc/installation/README.md#windows
+:: Windows - Library - Assuming you have copied the DLLs following doc/installation/0_index.md#windows
 build\x64\Release\OpenPoseDemo.exe --video examples/media/video.avi
 ```
 
@@ -108,7 +108,7 @@ bin\OpenPoseDemo.exe --face --hand
 ## Different Outputs (JSON, Images, Video, UI)
 All the output options are complementary to each other. E.g., whether you display the images with the skeletons on the UI (or not) is independent on whether you save them on disk (or not).
 
-- Save the skeletons in a set of JSON files with `--write_json {OUTPUT_JSON_PATH}`, see [doc/output.md](output.md) to understand its format.
+- Save the skeletons in a set of JSON files with `--write_json {OUTPUT_JSON_PATH}`, see [doc/2_output.md](2_output.md) to understand its format.
 ```
 # Ubuntu and Mac (same flags for Windows)
 ./build/examples/openpose/openpose.bin --image_dir examples/media/ --write_json output_jsons/
@@ -288,7 +288,7 @@ Since the Windows 10 Anniversary, Kinect 2.0 can be read as a normal webcam. All
 
 
 ### Main Flags
-These are the most common flags, but check [doc/demo_not_quick_start.md](demo_not_quick_start.md) for a full list and description of all of them.
+These are the most common flags, but check [doc/advanced/demo_advanced.md](advanced/demo_advanced.md) for a full list and description of all of them.
 
 - `--face`: Enables face keypoint detection.
 - `--hand`: Enables hand keypoint detection.
@@ -312,7 +312,7 @@ These are the most common flags, but check [doc/demo_not_quick_start.md](demo_no
 
 
 ## Advanced Quick Start
-In order to learn about many more flags, check [doc/demo_not_quick_start.md](demo_not_quick_start.md).
+In order to learn about many more flags, check [doc/advanced/demo_advanced.md](advanced/demo_advanced.md).
 
 
 
@@ -365,4 +365,4 @@ If you only have an integrated Intel Graphics card, then it will most probably b
 
 
 ### FAQ
-Check [doc/faq.md](faq.md) to see if you can find your error, issue, or concern.
+Check [doc/4_faq.md](4_faq.md) to see if you can find your error, issue, or concern.

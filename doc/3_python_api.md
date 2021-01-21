@@ -3,15 +3,21 @@ OpenPose Doc - Python API
 
 ## Contents
 1. [Introduction](#introduction)
-2. [Compatibility](#compatibility)
-3. [Installation](#installation)
-4. [Testing](#testing)
-5. [Exporting Python OpenPose](#exporting-python-openpose)
-6. [Common Issues](#common-issues)
+2. [Advance Introduction (Optional)](#advance-introduction-optional)
+3. [Compatibility](#compatibility)
+4. [Installation](#installation)
+5. [Testing And Developing](#testing-and-developing)
+6. [Exporting Python OpenPose](#exporting-python-openpose)
+7. [Common Issues](#common-issues)
 
 
 
 ## Introduction
+Almost all the OpenPose functionality, but in Python! You should be familiar with the [**OpenPose Demo**](1_demo.md) and the main OpenPose flags before trying to read the C++ or Python API examples. Otherwise, it will be way harder to follow.
+
+
+
+## Advance Introduction (Optional)
 This module exposes a Python API for OpenPose. It is effectively a wrapper that replicates most of the functionality of the [op::Wrapper class](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/include/openpose/wrapper/wrapper.hpp) and allows you to populate and retrieve data from the [op::Datum class](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/include/openpose/core/datum.hpp) using standard Python and Numpy constructs.
 
 The Python API is analagous to the C++ function calls. You may find them in [python/openpose/openpose_python.cpp#L194](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/python/openpose/openpose_python.cpp#L194).
@@ -51,11 +57,11 @@ If run via the command line, you may need to run cmake twice in order for this c
 
 
 ## Installation
-Make sure you followed the Python steps in [doc/installation/README.md#cmake-configuration](installation/README.md#cmake-configuration).
+Make sure you followed the Python steps in [doc/installation/0_index.md#cmake-configuration](installation/0_index.md#cmake-configuration).
 
 
 
-## Testing
+## Testing And Developing
 All the Python examples from the Tutorial API Python module can be found in `build/examples/tutorial_api_python` in your build folder. Navigate directly to this path to run examples.
 
 ```
@@ -72,6 +78,10 @@ python2 01_body_from_image.py
 python2 02_whole_body_from_image.py
 # python2 [any_other_python_example.py]
 ```
+
+For quick prototyping, you can simply duplicate and rename any of the existing sample files in `build/examples/tutorial_api_python` within that same folder and start building in there. These files are copied from [existing example files](../examples/tutorial_api_python/) on compiling time. 2 alternatives:
+- You can either duplicate and create your files in [examples/tutorial_api_python/](../examples/tutorial_api_python/), but you will have to recompile OpenPose every time you make changes to your Python files so they are copied over the `build/` folder.
+- Or you can directly edit them in `build/examples/tutorial_api_python`. This does not require rebuilding, but cleaning OpenPose will remove the whole `build/` folder, so make sure to back your files up!
 
 
 
