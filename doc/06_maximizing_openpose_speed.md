@@ -30,7 +30,7 @@ OpenPose displays the FPS in the basic GUI. However, more complex speed metrics 
 - Time measurement for 1 graphic card: The FPS will be the slowest time displayed in your terminal command line (as OpenPose is multi-threaded). Times are in milliseconds, so `FPS = 1000/millisecond_measurement`.
 - Time measurement for >1 graphic cards: Assuming `n` graphic cards, you will have to wait up to `n` x `F` frames to visualize each graphic card speed (as the frames are splitted among them). In addition, the FPS would be: `FPS = minFPS(speed_per_GPU/n, worst_time_measurement_other_than_GPUs)`. For < 4 GPUs, this is usually `FPS = speed_per_GPU/n`.
 
-Make sure that `wPoseExtractor` time is the slowest timing. Otherwise the input producer (video/webcam codecs issues with OpenCV, images too big, etc.) or the GUI display (use OpenGL support as detailed in [Speed Up Preserving Accuracy](#speed-up-preserving-accuracy)) might not be optimized.
+Make sure that `wPoseExtractor` time is the slowest timing. Otherwise the input producer (video/webcam codecs issues with OpenCV, images too big, etc.) or the GUI display (use OpenGL support as detailed in the next section (`Speed Up Preserving Accuracy`) might not be optimized.
 
 
 

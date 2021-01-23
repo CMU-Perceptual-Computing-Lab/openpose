@@ -199,7 +199,7 @@ There are 3 basic configuration modes: single-threading, multi-threading and sma
     threadManager.add(threadId++, wPose, queueIn++, queueOut++);                                // Thread 2, queues 3 -> 3
     ```
 
-3. Smart multi-threading: Some classes are much more faster than others (e.g., pose estimation takes ~100 ms while extracting frames from a video only ~10 ms). In addition, any machine has a limited number of threads. Therefore, the library allows the user to merge the faster threads in order to potentially speed up the code. Check the [real-time pose demo](../../../examples/openpose/openpose.cpp) too see a more complete example.
+3. Smart multi-threading: Some classes are much more faster than others (e.g., pose estimation takes ~100 ms while extracting frames from a video only ~10 ms). In addition, any machine has a limited number of threads. Therefore, the library allows the user to merge the faster threads in order to potentially speed up the code. Check the [command line demo](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/examples/openpose/openpose.cpp) too see a more complete example.
     ```
     auto threadId = 0;
     auto queueIn = 0;

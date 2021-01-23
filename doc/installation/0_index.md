@@ -72,7 +72,7 @@ OpenPose Doc - Installation
 4. Then, you can run OpenPose from the PowerShell command-line by following [doc/01_demo.md](../01_demo.md).
 
 Note: If you are using the GPU-accelerated version and are seeing `Cuda check failed (3 vs. 0): initialization error` when running OpenPose, you can fix it by doing one of these:
-- Upgrade your Nvidia drivers. If the error persists, make sure your machine does not contain any CUDA version (or if so, that it's the same than the OpenPose portable demo files). Otherwise, uninstall that CUDA version. If you need to keep that CUDA version installed, [compile OpenPose from Source](#compiling-and-running-openpose-from-source) for that CUDA version instead.
+- Upgrade your Nvidia drivers. If the error persists, make sure your machine does not contain any CUDA version (or if so, that it's the same than the OpenPose portable demo files). Otherwise, uninstall that CUDA version. If you need to keep that CUDA version installed, follow [Compiling and Running OpenPose from Source](#compiling-and-running-openpose-from-source) for that particular CUDA version instead.
 - Download an older OpenPose version (v1.6.0 does not show this error).
 
 
@@ -221,7 +221,7 @@ Check OpenPose was properly installed by running any demo example: [doc/01_demo.
 
 
 ### Custom User Code
-You can quickly add your custom code so that quick prototypes can be easily tested without having to create a whole new project just for it. See [examples/user_code/README.md](../../examples/user_code/README.md) for more details.
+You can quickly add your custom code so that quick prototypes can be easily tested without having to create a whole new project just for it. See [examples/user_code/README.md](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/examples/user_code/README.md) for more details.
 
 
 

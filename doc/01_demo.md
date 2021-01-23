@@ -47,9 +47,9 @@ build\x64\Release\OpenPoseDemo.exe --video examples/media/video.avi
 ```
 
 If it worked, continue with the next section. Otherwise:
-- If these failed with an out of memory error, check and follow [Improving Memory and Speed but Decreasing Accuracy](#improving-memory-and-speed-but-decreasing-accuracy).
-- If you are using Mac, make sure to check and follow [Mac OSX Additional Step](#mac-osx-additional-step).
-- Otherwise, check [FAQ](#faq).
+- If these failed with an out of memory error, check and follow the section [Improving Memory and Speed but Decreasing Accuracy](#improving-memory-and-speed-but-decreasing-accuracy).
+- If you are using Mac, make sure to check and follow the section [Mac OSX Additional Step](#mac-osx-additional-step).
+- Otherwise, check the section [FAQ](#faq).
 
 
 

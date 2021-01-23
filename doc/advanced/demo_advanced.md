@@ -82,7 +82,7 @@ There is an exception, for CPU version, the COCO and MPI models seems to be fast
 
 
 ## Help Flag
-We recommend [All Flags](#all-flags) shows them all in this document, which sorts all the flags by category.
+We recommend following the next section (`All Flags`), which shows all the flags in this document and sorts them by category.
 
 However, you could add the flag `--help` at any point to see all the available OpenPose flags. Check only the flags for `examples/openpose/openpose.cpp` itself (i.e., the ones in the section `Flags from examples/openpose/openpose.cpp:`).
 ```

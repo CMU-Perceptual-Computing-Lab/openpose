@@ -83,8 +83,8 @@ python2 02_whole_body_from_image.py
 # python2 [any_other_python_example.py]
 ```
 
-For quick prototyping, you can simply duplicate and rename any of the existing sample files in `build/examples/tutorial_api_python` within that same folder and start building in there. These files are copied from [existing example files](../examples/tutorial_api_python/) on compiling time. 2 alternatives:
-- You can either duplicate and create your files in [examples/tutorial_api_python/](../examples/tutorial_api_python/), but you will have to recompile OpenPose every time you make changes to your Python files so they are copied over the `build/` folder.
+For quick prototyping, you can simply duplicate and rename any of the existing sample files in `build/examples/tutorial_api_python` within that same folder and start building in there. These files are copied from [existing example files](https://github.com/CMU-Perceptual-Computing-Lab/openpose/tree/master/examples/tutorial_api_python) on compiling time. 2 alternatives:
+- You can either duplicate and create your files in [examples/tutorial_api_python/](https://github.com/CMU-Perceptual-Computing-Lab/openpose/tree/master/examples/tutorial_api_python), but you will have to recompile OpenPose every time you make changes to your Python files so they are copied over the `build/` folder.
 - Or you can directly edit them in `build/examples/tutorial_api_python`. This does not require rebuilding, but cleaning OpenPose will remove the whole `build/` folder, so make sure to back your files up!
 
 
