@@ -13,7 +13,11 @@ OpenPose Doc - Python API
 
 
 ## Introduction
-Almost all the OpenPose functionality, but in Python! You should be familiar with the [**OpenPose Demo**](1_demo.md) and the main OpenPose flags before trying to read the C++ or Python API examples. Otherwise, it will be way harder to follow.
+Almost all the OpenPose functionality, but in Python!
+
+When should you look at the [Python](03_python_api.md) or [C++](04_cpp_api.md) APIs? If you want to read a specific input, and/or add your custom post-processing function, and/or implement your own display/saving.
+
+You should be familiar with the [**OpenPose Demo**](01_demo.md) and the main OpenPose flags before trying to read the C++ or Python API examples. Otherwise, it will be way harder to follow.
 
 
 

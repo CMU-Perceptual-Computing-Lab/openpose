@@ -69,7 +69,7 @@ OpenPose Doc - Installation
 1. For maximum speed, you should use OpenPose in a machine with a Nvidia GPU version. If so, you must upgrade your Nvidia drivers to the latest version (in the Nvidia "GeForce Experience" software or its [website](https://www.nvidia.com/Download/index.aspx)).
 2. Download the latest OpenPose version from the [Releases](https://github.com/CMU-Perceptual-Computing-Lab/openpose/releases) section.
 3. Follow the `Instructions.txt` file inside the downloaded zip file to download the models required by OpenPose (about 500 Mb).
-4. Then, you can run OpenPose from the PowerShell command-line by following [doc/1_demo.md](../1_demo.md).
+4. Then, you can run OpenPose from the PowerShell command-line by following [doc/01_demo.md](../01_demo.md).
 
 Note: If you are using the GPU-accelerated version and are seeing `Cuda check failed (3 vs. 0): initialization error` when running OpenPose, you can fix it by doing one of these:
 - Upgrade your Nvidia drivers. If the error persists, make sure your machine does not contain any CUDA version (or if so, that it's the same than the OpenPose portable demo files). Otherwise, uninstall that CUDA version. If you need to keep that CUDA version installed, [compile OpenPose from Source](#compiling-and-running-openpose-from-source) for that CUDA version instead.
@@ -85,7 +85,7 @@ The instructions in the following subsections describe the steps to build OpenPo
 
 
 ### Problems and Errors Installing OpenPose
-Any problem installing OpenPose while following this guidelines? Check [doc/4_faq.md](../4_faq.md) and/or check existing GitHub issues. If you do you find your issue, post a new one. We will not respond to duplicated issues, as well as GitHub issues about Caffe, OpenCV or CUDA installation errors, as well as issues that do not fill all the information that the GitHub template asks for.
+Any problem installing OpenPose while following this guidelines? Check [doc/05_faq.md](../05_faq.md) and/or check existing GitHub issues. If you do you find your issue, post a new one. We will not respond to duplicated issues, as well as GitHub issues about Caffe, OpenCV or CUDA installation errors, as well as issues that do not fill all the information that the GitHub template asks for.
 
 
 
@@ -132,7 +132,7 @@ cmake-gui ..
 
 5. Set the `GPU_MODE` flag to the proper value and click `Configure` again:
     1. If your machine has an Nvidia GPU, you should most probably not modify this flag and skip this step. Cases in which you might have to change it:
-        - If you have a Nvidia GPU with 2GB of memory or less: Then you will have to follow some of the tricks in [doc/5_maximizing_openpose_speed.md](../5_maximizing_openpose_speed.md) or change `GPU_MODE` back to `CPU_ONLY`.
+        - If you have a Nvidia GPU with 2GB of memory or less: Then you will have to follow some of the tricks in [doc/06_maximizing_openpose_speed.md](../06_maximizing_openpose_speed.md) or change `GPU_MODE` back to `CPU_ONLY`.
         - If you cannot install CUDA, then you can also set `GPU_MODE` to `CPU_ONLY`.
     2. Mac OSX and machines with a non-Nvidia GPU (Intel or AMD GPUs): Set the `GPU_MODE` flag to `CPU_ONLY` (easier to install but slower runtime) or `OPENCL` (GPU-accelerated, it is harder to install but provides a faster runtime speed). For more details on OpenCV support, see [doc/1_prerequisites.md](1_prerequisites.md) and [OpenCL Version](#opencl-version).
     3. If your machine does not have any GPU, set the `GPU_MODE` flag to `CPU_ONLY`.
@@ -216,7 +216,7 @@ We welcome users to send us their installation videos (e.g., sharing them as Git
 
 
 ### Running OpenPose
-Check OpenPose was properly installed by running any demo example: [doc/1_demo.md](../1_demo.md).
+Check OpenPose was properly installed by running any demo example: [doc/01_demo.md](../01_demo.md).
 
 
 
@@ -276,7 +276,7 @@ See [doc/advanced/deployment.md](../advanced/deployment.md).
 
 
 ### Maximum Speed
-Check the OpenPose Benchmark as well as some hints to speed up and/or reduce the memory requirements to run OpenPose on [doc/5_maximizing_openpose_speed.md](../5_maximizing_openpose_speed.md).
+Check the OpenPose Benchmark as well as some hints to speed up and/or reduce the memory requirements to run OpenPose on [doc/06_maximizing_openpose_speed.md](../06_maximizing_openpose_speed.md).
 
 
 
@@ -297,7 +297,7 @@ export MKL_NUM_THREADS="8"
 export OMP_NUM_THREADS="8"
 ```
 
-Increasing the number of threads results in a higher RAM memory usage. You can check the [doc/5_maximizing_openpose_speed.md](../5_maximizing_openpose_speed.md) for more information about speed and memory requirements in several CPUs and GPUs.
+Increasing the number of threads results in a higher RAM memory usage. You can check the [doc/06_maximizing_openpose_speed.md](../06_maximizing_openpose_speed.md) for more information about speed and memory requirements in several CPUs and GPUs.
 
 
 
@@ -313,7 +313,7 @@ Lastly, OpenCL version does not support unfixed `--net_resolution`. So a folder 
 
 
 ### COCO and MPI Models
-By default, the body `COCO` and `MPI` models are not downloaded (they are slower and less accurate than `BODY_25`, so not useful in most cases!). But you can download them by turning on the `DOWNLOAD_BODY_COCO_MODEL` or `DOWNLOAD_BODY_MPI_MODEL` flags. Check the differences between these models in [doc/4_faq.md#difference-between-body_25-vs-coco-vs-mpi](../4_faq.md#difference-between-body_25-vs-coco-vs-mpi).
+By default, the body `COCO` and `MPI` models are not downloaded (they are slower and less accurate than `BODY_25`, so not useful in most cases!). But you can download them by turning on the `DOWNLOAD_BODY_COCO_MODEL` or `DOWNLOAD_BODY_MPI_MODEL` flags. Check the differences between these models in [doc/05_faq.md#difference-between-body_25-vs-coco-vs-mpi](../05_faq.md#difference-between-body_25-vs-coco-vs-mpi).
 
 
 

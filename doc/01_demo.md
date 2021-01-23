@@ -30,7 +30,7 @@ Forget about the OpenPose code, just download the portable Windows binaries (or 
 ## Quick Start
 In Ubuntu, Mac, and other Unix systems, use `Terminal` or `Terminator`. In Windows, the `Windows PowerShell`. Watch any Youtube video tutorial if you are not familiar with these tools. Make sure that you are in the **root directory of the project** when running any command (i.e., in the OpenPose folder, not inside `build/` nor `windows/` nor `bin/`). In addition, `examples/media/video.avi` and `examples/media` exist, so there is no need to change any lines of code.
 
-Test OpenPose by running the following. The expected visual result should look like [doc/2_output.md#ui-and-visual-output](2_output.md#ui-and-visual-output).
+Test OpenPose by running the following. The expected visual result should look like [doc/02_output.md#ui-and-visual-output](02_output.md#ui-and-visual-output).
 ```
 # Ubuntu and Mac
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi
@@ -108,7 +108,7 @@ bin\OpenPoseDemo.exe --face --hand
 ## Different Outputs (JSON, Images, Video, UI)
 All the output options are complementary to each other. E.g., whether you display the images with the skeletons on the UI (or not) is independent on whether you save them on disk (or not).
 
-- Save the skeletons in a set of JSON files with `--write_json {OUTPUT_JSON_PATH}`, see [doc/2_output.md](2_output.md) to understand its format.
+- Save the skeletons in a set of JSON files with `--write_json {OUTPUT_JSON_PATH}`, see [doc/02_output.md](02_output.md) to understand its format.
 ```
 # Ubuntu and Mac (same flags for Windows)
 ./build/examples/openpose/openpose.bin --image_dir examples/media/ --write_json output_jsons/
@@ -365,4 +365,4 @@ If you only have an integrated Intel Graphics card, then it will most probably b
 
 
 ### FAQ
-Check [doc/4_faq.md](4_faq.md) to see if you can find your error, issue, or concern.
+Check [doc/05_faq.md](05_faq.md) to see if you can find your error, issue, or concern.

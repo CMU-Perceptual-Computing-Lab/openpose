@@ -16,15 +16,15 @@ You can quickly add your custom code into this folder so that quick prototypes c
 5. Then, you can simply modify their content.
 6. You can know compile OpenPose after each change in your files:
 	- Ubuntu:
-```
-cd build/
-make -j`nproc`
-```
+	```
+	cd build/
+	make -j`nproc`
+	```
 	- Mac:
-```
-cd build/
-make -j`sysctl -n hw.logicalcpu`
-```
+	```
+	cd build/
+	make -j`sysctl -n hw.logicalcpu`
+	```
 	- Windows: Compile from Visual Studio (F5, F7, green play button, etc.).
 5. **Run step 4 every time that you make changes into your code**.
 

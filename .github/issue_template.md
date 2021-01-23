@@ -1,6 +1,6 @@
 ### Posting rules
 1. **No duplicated posts, only 1 new post opened a day, and up to 2 opened a week**. Otherwise, extrict user bans will occur.
-    - Check the [FAQ](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/4_faq.md) section, other GitHub issues, and general documentation before posting. E.g., **low-speed, out-of-memory, output format, 0-people detected, installation issues, ...**).
+    - Check the [FAQ](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/05_faq.md) section, other GitHub issues, and general documentation before posting. E.g., **low-speed, out-of-memory, output format, 0-people detected, installation issues, ...**).
     - Keep posting all your issues in the same post.
     - No bans if you are unsure whether the post is duplicated!
 2. **Fill all** the **Your System Configuration section** if you are facing an error or unexpected behavior. Some posts (e.g., feature requests) might not require it.
@@ -82,4 +82,4 @@ Select the topic(s) on your post, delete the rest:
     - Portable demo or compiled library?
 
 10. If **speed performance** issue:
-    - Report OpenPose timing speed based on [this link](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/5_maximizing_openpose_speed.md#profiling-speed).
+    - Report OpenPose timing speed based on the [profiling documentation](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/06_maximizing_openpose_speed.md#profiling-speed).

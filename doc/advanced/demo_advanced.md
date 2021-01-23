@@ -1,7 +1,7 @@
 OpenPose Advanced Doc - Demo - Advanced
 ====================================
 
-This document is a more detailed continuation of [doc/1_demo.md](../1_demo.md), and it assumes the user is quite familiar with the OpenPose demo and the contents of [doc/1_demo.md](../1_demo.md).
+This document is a more detailed continuation of [doc/01_demo.md](../01_demo.md), and it assumes the user is quite familiar with the OpenPose demo and the contents of [doc/01_demo.md](../01_demo.md).
 
 
 
@@ -25,7 +25,7 @@ This document is a more detailed continuation of [doc/1_demo.md](../1_demo.md), 
 In general, there are 3 ways to reduce the latency (with some drawbacks each one):
 
 - Reducing `--output_resolution`: It will slightly reduce the latency and increase the FPS. But the quality of the displayed image will deteriorate.
-- Reducing `--net_resolution` and/or `--face_net_resolution` and/or `--hand_net_resolution`: It will increase the FPS and reduce the latency. But the accuracy will drop, specially for small people in the image. Note: For maximum accuracy, follow [doc/1_demo.md#maximum-accuracy-configuration](../1_demo.md#maximum-accuracy-configuration).
+- Reducing `--net_resolution` and/or `--face_net_resolution` and/or `--hand_net_resolution`: It will increase the FPS and reduce the latency. But the accuracy will drop, specially for small people in the image. Note: For maximum accuracy, follow [doc/01_demo.md#maximum-accuracy-configuration](../01_demo.md#maximum-accuracy-configuration).
 - Enabling `--disable_multi_thread`: The latency should be reduced. But the speed will drop to 1-GPU speed (as it will only use 1 GPU). Note that it's practical only for body, if hands and face are also extracted, it's usually not worth it.
 
 
@@ -217,7 +217,7 @@ Now that you are more familiar with OpenPose, this is a list with all the availa
 - DEFINE_int32(write_coco_json_variants,  1,              "Add 1 for body, add 2 for foot, 4 for face, and/or 8 for hands. Use 0 to use all the possible candidates. E.g., 7 would mean body+foot+face COCO JSON.");
 - DEFINE_int32(write_coco_json_variant,   0,              "Currently, this option is experimental and only makes effect on car JSON generation. It selects the COCO variant for cocoJsonSaver.");
 - DEFINE_string(write_heatmaps,           "",             "Directory to write body pose heatmaps in PNG format. At least 1 `add_heatmaps_X` flag must be enabled.");
-- DEFINE_string(write_heatmaps_format,    "png",          "File extension and format for `write_heatmaps`, analogous to `write_images_format`. For lossless compression, recommended `png` for integer `heatmaps_scale` and `float` for floating values. See `doc/2_output.md` for more details.");
+- DEFINE_string(write_heatmaps_format,    "png",          "File extension and format for `write_heatmaps`, analogous to `write_images_format`. For lossless compression, recommended `png` for integer `heatmaps_scale` and `float` for floating values. See `doc/02_output.md` for more details.");
 - DEFINE_string(write_keypoint,           "",             "(Deprecated, use `write_json`) Directory to write the people pose keypoint data. Set format with `write_keypoint_format`.");
 - DEFINE_string(write_keypoint_format,    "yml",          "(Deprecated, use `write_json`) File extension and format for `write_keypoint`: json, xml, yaml & yml. Json not available for OpenCV < 3.0, use `write_json` instead.");
 

@@ -86,7 +86,7 @@ OpenPose will display the cameras sorted by serial number, starting in the left 
 
 
 ## Quick Start
-Check the [doc/1_demo.md#3-d-reconstruction](../1_demo.md#3-d-reconstruction) for basic examples.
+Check the [doc/01_demo.md#3-d-reconstruction](../01_demo.md#3-d-reconstruction) for basic examples.
 
 
 
@@ -102,7 +102,7 @@ It should be similar to the following image.
 <p align="center">
     <img src="../../.github/media/openpose3d.gif">
     <br>
-    <sup><a href="https://ziutinyat.github.io/" target="_blank">Tianyi Zhao</a> testing the 3-D Module</a></sup>
+    <sup><a href="https://ziutinyat.github.io/" target="_blank">Tianyi Zhao</a> testing the OpenPose 3D Module</a></sup>
 </p>
 
 

@@ -109,7 +109,7 @@ For problem 2, try the following solutions (in this order):
 #### Very Few People Detected
 **Q: Low detection rate. It can detect the person on some images (usually higher contrast, with bigger people), but it will fail for most of images with low resolution or small people.**
 
-**A**: Images with low resolution, or with people too tiny will simply not work too well. However, it can be highly improved by using the maximum accuracy configuration detailed in [doc/1_demo.md#maximum-accuracy-configuration](1_demo.md#maximum-accuracy-configuration).
+**A**: Images with low resolution, or with people too tiny will simply not work too well. However, it can be highly improved by using the maximum accuracy configuration detailed in [doc/01_demo.md#maximum-accuracy-configuration](01_demo.md#maximum-accuracy-configuration).
 
 
 
@@ -207,26 +207,26 @@ git submodule update --init --recursive --remote
 #### Speed Up, Memory Reduction, and Benchmark
 **Q: Low speed** - OpenPose is quite slow, is it normal? How can I speed it up?
 
-**A**: Check [doc/5_maximizing_openpose_speed.md](5_maximizing_openpose_speed.md) to discover the approximate speed of your graphics card and some speed tips.
+**A**: Check [doc/06_maximizing_openpose_speed.md](06_maximizing_openpose_speed.md) to discover the approximate speed of your graphics card and some speed tips.
 
 
 
 #### How to Measure the Latency Time?
 **Q: How to measure/calculate/estimate the latency/lag time?**
 
-**A**: [Profile](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/5_maximizing_openpose_speed.md#profiling-speed) the OpenPose speed. For 1-GPU or CPU-only systems (use `--disable_multi_thread` for simplicity in multi-GPU systems for latency measurement), the latency will be roughly the sum of all the reported measurements.
+**A**: [Profile](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/06_maximizing_openpose_speed.md#profiling-speed) the OpenPose speed. For 1-GPU or CPU-only systems (use `--disable_multi_thread` for simplicity in multi-GPU systems for latency measurement), the latency will be roughly the sum of all the reported measurements.
 
 
 
 #### CPU Version Too Slow
 **Q: The CPU version is insanely slow compared to the GPU version.**
 
-**A**: Check [doc/5_maximizing_openpose_speed.md#cpu-version](5_maximizing_openpose_speed.md#cpu-version) to discover the approximate speed and some speed tips.
+**A**: Check [doc/06_maximizing_openpose_speed.md#cpu-version](06_maximizing_openpose_speed.md#cpu-version) to discover the approximate speed and some speed tips.
 
 
 
 #### Profiling Speed and Estimating FPS without Display
-Check the [doc/5_maximizing_openpose_speed.md#profiling-speed](5_maximizing_openpose_speed.md#profiling-speed) section.
+Check the [doc/06_maximizing_openpose_speed.md#profiling-speed](06_maximizing_openpose_speed.md#profiling-speed) section.
 
 
 
@@ -241,7 +241,7 @@ Check the [doc/5_maximizing_openpose_speed.md#profiling-speed](5_maximizing_open
 
 ### Accuracy Issues
 #### Is Maximum Accuracy Configuration Possible on Lower End GPUs?
-**Q**: I've read that this command provides the most accurate results possible on Openpose so far: https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/1_demo.md#maximum-accuracy-configuration. However, a 8GB GPU (e.g., 1080 or 2080) will run out of memory, is there any method to achieve the same accuracy on GPU using less memory even if it meant sacrificing speed?
+**Q**: I've read that this command provides the most accurate results possible on Openpose so far: https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/01_demo.md#maximum-accuracy-configuration. However, a 8GB GPU (e.g., 1080 or 2080) will run out of memory, is there any method to achieve the same accuracy on GPU using less memory even if it meant sacrificing speed?
 
 **A**: Unfortunately no, there is no way at the moment. Caffe just takes so much memory doing that. You can try with `--scale_number 3` instead of 4, reducing a bit the `net_resolution` (e.g. `720` vs. `736`) and starting the computer without GUI (which also takes about 1GB of memory just to keep the computer GUI running).
 

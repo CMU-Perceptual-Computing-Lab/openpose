@@ -15,7 +15,7 @@ OpenPose Advanced Doc - Heatmap Output
 
 
 ## Keypoints
-Check [doc/output_keypoints.md](../2_output.md) for the basic output information. This document is for users that want to use the heatmaps.
+Check [doc/output_keypoints.md](../02_output.md) for the basic output information. This document is for users that want to use the heatmaps.
 
 
 

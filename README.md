@@ -10,7 +10,7 @@
 
 [**OpenPose**](https://github.com/CMU-Perceptual-Computing-Lab/openpose) has represented the **first real-time multi-person system to jointly detect human body, hand, facial, and foot keypoints (in total 135 keypoints) on single images**.
 
-It is **authored by** [**Ginés Hidalgo**](https://www.gineshidalgo.com), [**Zhe Cao**](https://people.eecs.berkeley.edu/~zhecao), [**Tomas Simon**](http://www.cs.cmu.edu/~tsimon), [**Shih-En Wei**](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [**Hanbyul Joo**](https://jhugestar.github.io), **and** [**Yaser Sheikh**](http://www.cs.cmu.edu/~yaser). It is **maintained by** [**Ginés Hidalgo**](https://www.gineshidalgo.com) **and** [**Yaadhav Raaj**](https://www.raaj.tech). OpenPose would not be possible without the [**CMU Panoptic Studio dataset**](http://domedb.perception.cs.cmu.edu). We would also like to thank all the people who [has helped OpenPose in any way](doc/8_authors_and_contributors.md).
+It is **authored by** [**Ginés Hidalgo**](https://www.gineshidalgo.com), [**Zhe Cao**](https://people.eecs.berkeley.edu/~zhecao), [**Tomas Simon**](http://www.cs.cmu.edu/~tsimon), [**Shih-En Wei**](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [**Hanbyul Joo**](https://jhugestar.github.io), **and** [**Yaser Sheikh**](http://www.cs.cmu.edu/~yaser). It is **maintained by** [**Ginés Hidalgo**](https://www.gineshidalgo.com) **and** [**Yaadhav Raaj**](https://www.raaj.tech). OpenPose would not be possible without the [**CMU Panoptic Studio dataset**](http://domedb.perception.cs.cmu.edu). We would also like to thank all the people who [has helped OpenPose in any way](doc/09_authors_and_contributors.md).
 
 
 
@@ -27,7 +27,7 @@ It is **authored by** [**Ginés Hidalgo**](https://www.gineshidalgo.com), [**Zhe
 2. [Features](#features)
 3. [Related Work](#related-work)
 4. [Installation](#installation)
-5. [Quick Start](#quick-start)
+5. [Quick Start Overview](#quick-start-overview)
 6. [Send Us Feedback!](#send-us-feedback)
 7. [Citation](#citation)
 8. [License](#license)
@@ -35,39 +35,34 @@ It is **authored by** [**Ginés Hidalgo**](https://www.gineshidalgo.com), [**Zhe
 
 
 ## Results
-### Body and Foot Estimation
+### Whole-body (Body, Foot, Face, and Hands) 2D Pose Estimation
 <p align="center">
-    <img src=".github/media/dance_foot.gif" width="360">
+    <img src=".github/media/dance_foot.gif" width="310">
+    <img src=".github/media/pose_face.gif" width="310">
+    <img src=".github/media/pose_hands.gif" width="310">
     <br>
-    <sup>Testing the <a href="https://www.youtube.com/watch?v=2DiQUX11YaY" target="_blank"><i>Crazy Uptown Funk flashmob in Sydney</i></a> video sequence with OpenPose</sup>
+    <sup>Testing OpenPose: (Left) <a href="https://www.youtube.com/watch?v=2DiQUX11YaY" target="_blank"><i>Crazy Uptown Funk flashmob in Sydney</i></a> video sequence. (Center and right) Authors <a href="https://www.gineshidalgo.com" target="_blank">Ginés Hidalgo</a> and <a href="http://www.cs.cmu.edu/~tsimon" target="_blank">Tomas Simon</a> testing face and hands</sup>
 </p>
 
-### 3D Reconstruction Module (Body, Foot, Face, and Hands)
+### Whole-body 3D Pose Reconstruction and Estimation
 <p align="center">
     <img src=".github/media/openpose3d.gif" width="360">
     <br>
-    <sup>Testing the 3D Reconstruction Module of OpenPose</sup>
-</p>
-
-### Body, Foot, Face, and Hands Estimation
-<p align="center">
-    <img src=".github/media/pose_face.gif" width="360">
-    <img src=".github/media/pose_hands.gif" width="360">
-    <br>
-    <sup>Authors <a href="https://www.gineshidalgo.com" target="_blank">Ginés Hidalgo</a> (left image) and <a href="http://www.cs.cmu.edu/~tsimon" target="_blank">Tomas Simon</a> (right image) testing OpenPose</sup>
+    <sup><a href="https://ziutinyat.github.io/" target="_blank">Tianyi Zhao</a> testing the OpenPose 3D Module</a></sup>
 </p>
 
 ### Unity Plugin
 <p align="center">
-    <img src=".github/media/unity_main.png" width="240">
-    <img src=".github/media/unity_body_foot.png" width="240">
-    <img src=".github/media/unity_hand_face.png" width="240">
+    <img src=".github/media/unity_main.png" width="310">
+    <img src=".github/media/unity_body_foot.png" width="310">
+    <img src=".github/media/unity_hand_face.png" width="310">
     <br>
     <sup><a href="https://ziutinyat.github.io/" target="_blank">Tianyi Zhao</a> and <a href="https://www.gineshidalgo.com" target="_blank">Ginés Hidalgo</a> testing the <a href="https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin" target="_blank">OpenPose Unity Plugin</a></sup>
 </p>
 
 ### Runtime Analysis
 We show an inference time comparison between the 3 available pose estimation libraries (same hardware and conditions): OpenPose, Alpha-Pose (fast Pytorch version), and Mask R-CNN. The OpenPose runtime is constant, while the runtime of Alpha-Pose and Mask R-CNN grow linearly with the number of people. More details [**here**](https://arxiv.org/abs/1812.08008).
+
 <p align="center">
     <img src=".github/media/openpose_vs_competition.png" width="360">
 </p>
@@ -91,10 +86,10 @@ We show an inference time comparison between the 3 available pose estimation lib
 - **OS**: Ubuntu (20, 18, 16, 14), Windows (10, 8), Mac OSX, Nvidia TX2.
 - **Hardware compatibility**: CUDA (Nvidia GPU), OpenCL (AMD GPU), and non-GPU (CPU-only) versions.
 - **Usage Alternatives**:
-    - [**Command-line demo**](doc/1_demo.md) for built-in functionality.
-    - [**C++ API**](examples/tutorial_api_cpp/) and [**Python API**](doc/3_python_api.md) for custom functionality. E.g., adding your custom inputs, pre-processing, post-posprocessing, and output steps.
+    - [**Command-line demo**](doc/01_demo.md) for built-in functionality.
+    - [**C++ API**](doc/04_cpp_api.md/) and [**Python API**](doc/03_python_api.md) for custom functionality. E.g., adding your custom inputs, pre-processing, post-posprocessing, and output steps.
 
-For further details, check the [major released features](doc/6_major_released_features.md) and [release notes](doc/7_release_notes.md) docs.
+For further details, check the [major released features](doc/07_major_released_features.md) and [release notes](doc/08_release_notes.md) docs.
 
 
 
@@ -102,19 +97,19 @@ For further details, check the [major released features](doc/6_major_released_fe
 - [**OpenPose training code**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_train)
 - [**OpenPose foot dataset**](https://cmu-perceptual-computing-lab.github.io/foot_keypoint_dataset/)
 - [**OpenPose Unity Plugin**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin)
-- OpenPose papers published in [**IEEE TPAMI** and **CVPR**](#citation). [Cite them](#citation) in your publications if it helps your research!
+- OpenPose papers published in **IEEE TPAMI and CVPR**. Cite them in your publications if OpenPose helps your research! (Links and more details in the [Citation](#citation) section below).
 
 
 
 ## Installation
-If you want to use OpenPose without compiling or writing any code, simply [download and use the latest Windows portable version of OpenPose](doc/installation/0_index.md#windows-portable-demo)! Otherwise, you can also [build OpenPose from source](doc/installation/0_index.md#compiling-and-running-openpose-from-source).
+If you want to use OpenPose without installing or writing any code, simply [download and use the latest Windows portable version of OpenPose](doc/installation/0_index.md#windows-portable-demo)!
 
-See [doc/installation/0_index.md](doc/installation/0_index.md) for more details.
+Otherwise, you could [build OpenPose from source](doc/installation/0_index.md#compiling-and-running-openpose-from-source). See the [installation doc](doc/installation/0_index.md) for all the alternatives.
 
 
 
-## Quick Start
-Most users do not need to know C++ or Python, they can simply use the OpenPose Demo in their command-line tool (e.g., PowerShell/Terminal). E.g., this would run OpenPose on the webcam and display the body keypoints:
+## Quick Start Overview
+Simply use the OpenPose Demo from your favorite command-line tool (e.g., Windows PowerShell or Ubuntu Terminal). E.g., this example runs OpenPose on your webcam and displays the body keypoints:
 ```
 # Ubuntu
 ./build/examples/openpose/openpose.bin
@@ -124,7 +119,7 @@ Most users do not need to know C++ or Python, they can simply use the OpenPose D
 bin\OpenPoseDemo.exe --video examples\media\video.avi
 ```
 
-You can also add any of the available flags in any order. Do you also want to add face and/or hands? Add the `--face` and/or `--hand` flags. Do you also want to save the output keypoints on JSON files on disk? Add the `--write_json` flag, etc.
+You can also add any of the available flags in any order. E.g., the following example runs on a video (`--video {PATH}`), enables face (`--face`) and hands (`--hand`), and saves the output keypoints on JSON files on disk (`--write_json {PATH}`).
 ```
 # Ubuntu
 ./build/examples/openpose/openpose.bin --video examples/media/video.avi --face --hand --write_json output_json_folder/
@@ -134,23 +129,19 @@ You can also add any of the available flags in any order. Do you also want to ad
 bin\OpenPoseDemo.exe --video examples\media\video.avi --face --hand --write_json output_json_folder/
 ```
 
-After [installing](#installation) OpenPose, check [doc/0_index.md](doc/0_index.md) for a quick overview of all the alternatives and tutorials.
+Optionally, you can also extend OpenPose's functionality from its Python and C++ APIs. After [installing](doc/installation/0_index.md) OpenPose, check its [official doc](doc/00_index.md) for a quick overview of all the alternatives and tutorials.
 
 
 
 ## Send Us Feedback!
-Our library is open source for research purposes, and we want to continuously improve it! So let us know if you...
-1. Find any bug (in functionality or speed).
-2. Add some functionality on top of OpenPose which we might want to add.
-3. Know how to speed up or improve any part of OpenPose.
-4. Want to share your cool demo or project made on top of OpenPose (you can email it to us too!).
-
-Just create a new GitHub issue or a pull request and we will answer as soon as possible!
+Our library is open source for research purposes, and we want to improve it! So let us know (create a new GitHub issue or pull request, email us, etc.) if you...
+1. Find/fix any bug (in functionality or speed) or know how to speed up or improve any part of OpenPose.
+2. Want to add/show some cool functionality/demo/project made on top of OpenPose. We can add your project link to our [Community-based Projects](doc/10_community_projects.md) section or even integrate it with OpenPose!
 
 
 
 ## Citation
-Please cite these papers in your publications if it helps your research. All of OpenPose is based on [OpenPose: Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields](https://arxiv.org/abs/1812.08008), while the hand and face detectors also use [Hand Keypoint Detection in Single Images using Multiview Bootstrapping](https://arxiv.org/abs/1704.07809) (the face detector was trained using the same procedure than the hand detector).
+Please cite these papers in your publications if OpenPose helps your research. All of OpenPose is based on [OpenPose: Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields](https://arxiv.org/abs/1812.08008), while the hand and face detectors also use [Hand Keypoint Detection in Single Images using Multiview Bootstrapping](https://arxiv.org/abs/1704.07809) (the face detector was trained using the same procedure than the hand detector).
 
     @article{8765346,
       author = {Z. {Cao} and G. {Hidalgo Martinez} and T. {Simon} and S. {Wei} and Y. A. {Sheikh}},

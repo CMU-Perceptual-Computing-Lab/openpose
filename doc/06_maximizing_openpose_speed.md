@@ -48,7 +48,7 @@ Some speed tips to maximize the OpenPose runtime speed while preserving the accu
 ## Speed Up and Memory Reduction
 Some speed tips to highly maximize the OpenPose speed, but keep in mind the accuracy trade-off:
 
-    1. Reduce the `--net_resolution` (e.g., to 320x176) (lower accuracy). Note: For maximum accuracy, follow [doc/1_demo.md#maximum-accuracy-configuration](1_demo.md#maximum-accuracy-configuration).
+    1. Reduce the `--net_resolution` (e.g., to 320x176) (lower accuracy). Note: For maximum accuracy, follow [doc/01_demo.md#maximum-accuracy-configuration](01_demo.md#maximum-accuracy-configuration).
     2. For face, reduce the `--face_net_resolution`. The resolution 320x320 usually works pretty decently.
     3. Points 1-2 will also reduce the GPU memory usage (or RAM memory for CPU version).
     4. Use the `BODY_25` model for maximum speed. Use `MPI_4_layers` model for minimum GPU memory usage (but lower accuracy, speed, and number of parts).

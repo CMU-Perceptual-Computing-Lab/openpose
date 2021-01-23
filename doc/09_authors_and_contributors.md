@@ -3,14 +3,14 @@ OpenPose Doc - Authors and Contributors
 
 
 
-### Authors
+## Authors
 OpenPose is authored by [Ginés Hidalgo](https://www.gineshidalgo.com), [Zhe Cao](https://people.eecs.berkeley.edu/~zhecao), [Tomas Simon](http://www.cs.cmu.edu/~tsimon), [Shih-En Wei](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [Hanbyul Joo](https://jhugestar.github.io), and [Yaser Sheikh](http://www.cs.cmu.edu/~yaser). It is maintained by [Ginés Hidalgo](https://www.gineshidalgo.com) and [Yaadhav Raaj](https://www.raaj.tech).
 
 OpenPose would not be possible without the [**CMU Panoptic Studio dataset**](http://domedb.perception.cs.cmu.edu). The body pose estimation work is based on the following and original 2 repositories: [CVPR 2017 repository](https://github.com/ZheC/Multi-Person-Pose-Estimation) and [ECCV 2016 repository](https://github.com/CMU-Perceptual-Computing-Lab/caffe_rtpose).
 
 
 
-### Contributors
+## Contributors
 We would also like to thank the following people, who have contributed to key components of OpenPose:
 1. [Yaadhav Raaj](https://www.raaj.tech): OpenPose maintainer, CPU version, OpenCL version, Mac version, Python API, and person tracker.
 2. [Bikramjot Hanzra](https://www.linkedin.com/in/bikz05): Former OpenPose maintainer, CMake (Ubuntu and Windows) version, and initial Travis Build version for Ubuntu.

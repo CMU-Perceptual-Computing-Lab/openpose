@@ -4,8 +4,9 @@
     // 2. Extract and render body/hand/face/foot keypoint/heatmap/PAF of that image.
     // 3. Save the results on disk.
     // 4. Display the rendered pose.
-// If the user wants to learn to use the OpenPose C++ library, we highly recommend to start with the examples in
-// `examples/tutorial_api_cpp/`.
+// For more details on the OpenPose examples, see
+// - https://cmu-perceptual-computing-lab.github.io/openpose/web/html/doc/
+// - https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/00_index.md
 
 // Command-line user interface
 #include <openpose/flags.hpp>

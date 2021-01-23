@@ -2,16 +2,16 @@ OpenPose Doc
 ==========================
 
 The OpenPose documentation is available in 2 different formats, choose your preferred one!
-- As a traditional website (recommended): [cmu-perceptual-computing-lab.github.io/openpose/web/html/doc](https://cmu-perceptual-computing-lab.github.io/openpose/web/html/doc/).
-- As markdown files: [github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/0_index.md](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/0_index.md).
+- As a traditional website (recommended): [cmu-perceptual-computing-lab.github.io/openpose/web/html/doc/](https://cmu-perceptual-computing-lab.github.io/openpose/web/html/doc/).
+- As markdown files: [github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/00_index.md](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/00_index.md).
 
 Most users can simply use the OpenPose Demo without reading any C++/Python code. Users that need to add additional functionality (new inputs, outputs, etc) should check the C++/Python APIs:
 
-- If you face issues with any of these steps, keep in mind to check the [FAQ](installation/4_faq.md) section.
+- If you face issues with any of these steps, keep in mind to check the [FAQ](installation/05_faq.md) section.
 
 - The first step for any software, [install it](installation/0_index.md)!
 
-- [OpenPose Demo](1_demo.md): Choose your input (e.g., images, video, webcam), set of algorithms (body, hand, face), output (e.g., display, JSON keypoint saving, image+keypoints), and run OpenPose from your terminal or PowerShell!
+- [OpenPose Demo](01_demo.md): Choose your input (e.g., images, video, webcam), set of algorithms (body, hand, face), output (e.g., display, JSON keypoint saving, image+keypoints), and run OpenPose from your terminal or PowerShell!
     - E.g.: Given an input video (`--video`), extract body (by default), face (`--face`) and hand (`--hand`) keypoints, save the keypoints in a JSON file (`--write_json`), and display (by default) the results in the screen. You can remove any of the flags to remove that particular functionality or add any other.
 ```
 # Ubuntu
@@ -21,15 +21,13 @@ Most users can simply use the OpenPose Demo without reading any C++/Python code.
 bin\OpenPoseDemo.exe --video examples\media\video.avi --face --hand --write_json output_json_folder/
 ```
 
-- [Output information](2_output.md): Learn about the output format, keypoint index ordering, etc.
+- [Output information](02_output.md): Learn about the output format, keypoint index ordering, etc.
 
-- [OpenPose Python API](3_python_api.md): Almost all the OpenPose functionality, but in Python!
+- [OpenPose Python API](03_python_api.md): Almost all the OpenPose functionality, but in Python! If you want to read a specific input, and/or add your custom post-processing function, and/or implement your own display/saving.
 
-- [OpenPose C++ API](../examples/tutorial_api_cpp/): If you want to read a specific input, and/or add your custom post-processing function, and/or implement your own display/saving.
-    - You should be familiar with the [OpenPose Demo](1_demo.md) and the main OpenPose flags before trying to read the C++ or Python API examples. Otherwise, it will be way harder to follow.
-    - For quick prototyping: You can easily **create your custom code** on [examples/user_code/](../examples/user_code/) and CMake will automatically compile it together with the whole OpenPose project. See [examples/user_code/README.md](../examples/user_code/README.md) for more details.
+- [OpenPose C++ API](04_cpp_api.md): If you want to read a specific input, and/or add your custom post-processing function, and/or implement your own display/saving.
 
-- [Maximizing OpenPose speed and benchmark](5_maximizing_openpose_speed.md): Check the OpenPose Benchmark as well as some hints to speed up and/or reduce the memory requirements for OpenPose.
+- [Maximizing OpenPose speed and benchmark](06_maximizing_openpose_speed.md): Check the OpenPose Benchmark as well as some hints to speed up and/or reduce the memory requirements for OpenPose.
 
 - [Calibration toolbox](advanced/calibration_module.md) and [3D OpenPose](advanced/3d_reconstruction_module.md): Calibrate your cameras for 3D OpenPose (or any other stereo vision tasks) and start obtaining 3D keypoints!
 
