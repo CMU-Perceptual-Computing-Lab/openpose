@@ -10,7 +10,7 @@
 
 [**OpenPose**](https://github.com/CMU-Perceptual-Computing-Lab/openpose) has represented the **first real-time multi-person system to jointly detect human body, hand, facial, and foot keypoints (in total 135 keypoints) on single images**.
 
-It is **authored by** [**Ginés Hidalgo**](https://www.gineshidalgo.com), [**Zhe Cao**](https://people.eecs.berkeley.edu/~zhecao), [**Tomas Simon**](http://www.cs.cmu.edu/~tsimon), [**Shih-En Wei**](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [**Hanbyul Joo**](https://jhugestar.github.io), **and** [**Yaser Sheikh**](http://www.cs.cmu.edu/~yaser). It is **maintained by** [**Ginés Hidalgo**](https://www.gineshidalgo.com) **and** [**Yaadhav Raaj**](https://www.raaj.tech). OpenPose would not be possible without the [**CMU Panoptic Studio dataset**](http://domedb.perception.cs.cmu.edu). We would also like to thank all the people who [has helped OpenPose in any way](doc/09_authors_and_contributors.md).
+It is **authored by** [**Ginés Hidalgo**](https://www.gineshidalgo.com), [**Zhe Cao**](https://people.eecs.berkeley.edu/~zhecao), [**Tomas Simon**](http://www.cs.cmu.edu/~tsimon), [**Shih-En Wei**](https://scholar.google.com/citations?user=sFQD3k4AAAAJ&hl=en), [**Yaadhav Raaj**](https://www.raaj.tech), [**Hanbyul Joo**](https://jhugestar.github.io), **and** [**Yaser Sheikh**](http://www.cs.cmu.edu/~yaser). It is **maintained by** [**Ginés Hidalgo**](https://www.gineshidalgo.com) **and** [**Yaadhav Raaj**](https://www.raaj.tech). OpenPose would not be possible without the [**CMU Panoptic Studio dataset**](http://domedb.perception.cs.cmu.edu). We would also like to thank all the people who [has helped OpenPose in any way](doc/09_authors_and_contributors.md).
 
 
 
@@ -37,9 +37,9 @@ It is **authored by** [**Ginés Hidalgo**](https://www.gineshidalgo.com), [**Zhe
 ## Results
 ### Whole-body (Body, Foot, Face, and Hands) 2D Pose Estimation
 <p align="center">
-    <img src=".github/media/dance_foot.gif" width="310">
-    <img src=".github/media/pose_face.gif" width="310">
-    <img src=".github/media/pose_hands.gif" width="310">
+    <img src=".github/media/dance_foot.gif" width="300">
+    <img src=".github/media/pose_face.gif" width="300">
+    <img src=".github/media/pose_hands.gif" width="300">
     <br>
     <sup>Testing OpenPose: (Left) <a href="https://www.youtube.com/watch?v=2DiQUX11YaY" target="_blank"><i>Crazy Uptown Funk flashmob in Sydney</i></a> video sequence. (Center and right) Authors <a href="https://www.gineshidalgo.com" target="_blank">Ginés Hidalgo</a> and <a href="http://www.cs.cmu.edu/~tsimon" target="_blank">Tomas Simon</a> testing face and hands</sup>
 </p>
@@ -53,9 +53,9 @@ It is **authored by** [**Ginés Hidalgo**](https://www.gineshidalgo.com), [**Zhe
 
 ### Unity Plugin
 <p align="center">
-    <img src=".github/media/unity_main.png" width="310">
-    <img src=".github/media/unity_body_foot.png" width="310">
-    <img src=".github/media/unity_hand_face.png" width="310">
+    <img src=".github/media/unity_main.png" width="300">
+    <img src=".github/media/unity_body_foot.png" width="300">
+    <img src=".github/media/unity_hand_face.png" width="300">
     <br>
     <sup><a href="https://ziutinyat.github.io/" target="_blank">Tianyi Zhao</a> and <a href="https://www.gineshidalgo.com" target="_blank">Ginés Hidalgo</a> testing the <a href="https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin" target="_blank">OpenPose Unity Plugin</a></sup>
 </p>
