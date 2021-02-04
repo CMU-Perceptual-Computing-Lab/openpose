@@ -22,7 +22,8 @@ These tips are **very important** and avoid many bugs:
 
 
 ## Ubuntu Prerequisites
-1. Ubuntu - **Anaconda should not be installed** on your system. Anaconda includes a Protobuf version that is incompatible with Caffe. Either you uninstall anaconda and install protobuf via apt-get, or you compile your own Caffe and link it to OpenPose.
+1. Ubuntu - **Anaconda should be deactivated** with the command ```conda deactivate``` (twice if not in base environment). Anaconda includes a Protobuf version that is incompatible with Caffe.
+
 2. Install **CMake GUI**:
     - Ubuntu 20: Run the command `sudo apt-get install cmake-qt-gui`.
     - Ubuntu 18: **Download and compile CMake-gui from source**. The default CMake-gui version (3.10) installed via `sudo apt-get install cmake-qt-gui` provokes some compiling errors. Required CMake version >= 3.12.
