@@ -145,7 +145,7 @@ cmake-gui ..
 
 7. Press the `Generate` button and proceed to [Compilation](#compilation). You can now close CMake.
 
-Note: If you prefer to use your own custom Caffe or OpenCV versions, see [Custom Caffe](#custom-caffe) or [Custom OpenCV](#custom-opencv) respectively.
+Note: If you prefer to use your own custom Caffe or OpenCV versions, see [Custom Caffe](#custom-caffe) or [Custom OpenCV](#custom-opencv) respectively. For Ubuntu 18, if you have a conda environment run ```conda deactivate``` so conda will not interfere in the installation (for either OpenPose Caffe or Custom Caffe). 
 
 
 
