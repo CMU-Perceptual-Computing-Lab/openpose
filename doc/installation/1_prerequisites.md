@@ -22,7 +22,7 @@ These tips are **very important** and avoid many bugs:
 
 
 ## Ubuntu Prerequisites
-1. Ubuntu - **Anaconda should be deactivated** with the command ```conda deactivate``` (twice if not in base environment). Anaconda includes a Protobuf version that is incompatible with Caffe.
+1. Ubuntu - **Anaconda should not be installed** on your system **or should be deactivated**. Anaconda includes a Protobuf version that is incompatible with Caffe. Either you uninstall anaconda and install protobuf via apt-get, or you deactivate Conda with the command ```conda deactivate``` (twice if not in base environment).
 
 2. Install **CMake GUI**:
     - Ubuntu 20: Run the command `sudo apt-get install cmake-qt-gui`.
