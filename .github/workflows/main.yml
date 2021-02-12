@@ -279,6 +279,8 @@ jobs:
         mkdir -p doxygen_final/web/.github/media/ && cp -rf .github/media/ doxygen_final/web/.github/
         mkdir -p doxygen_final/web/html/.github/media/ && cp -rf .github/media/ doxygen_final/web/html/.github/
         mkdir -p doxygen_final/web/html/doc/.github/media/ && cp -rf .github/media/ doxygen_final/web/html/doc/.github/
+        echo 'Copying index.html to root pointing to actual docs'
+        cp .github/root_index.html doxygen_final/index.html
       if: ${{ matrix.DOCS }}
     - name: Deploy Docs
       uses: peaceiris/actions-gh-pages@v3
