@@ -69,7 +69,7 @@ namespace op
                         const Type l2Dist = sqrt((Type)(vectorAToBX*vectorAToBX + vectorAToBY*vectorAToBY));
                         const Type threshold = sqrt((Type)(heatmapWidth*heatmapHeight))/150; // 3.3 for 368x656, 6.6 for 2x resolution
                         if (l2Dist < threshold)
-                            return Type(defaultNmsThreshold+1e-6); // Without 1e-6 will not work because I use strict greater
+                            return (Type)(defaultNmsThreshold+1e-6); // Without 1e-6 will not work because I use strict greater
                     }
                 }
                 return -1;
