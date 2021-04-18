@@ -269,9 +269,6 @@ jobs:
         cd ${{ github.workspace }}
         echo 'Generating Doxygen code documentation...'
         doxygen $DOXYFILE 2>&1 | tee doxygen.log
-        echo 'Creating .nojekyll and copying log...'
-        echo "" > doxygen/html/.nojekyll
-        cp doxygen.log doxygen/html/doxygen.log
         # Required so Doxygen links/finds the license file
         cp LICENSE doxygen/html/LICENSE
         # Required in order to link .github/media/ images with doc without modifying doc links. Remove if using `publish_dir: doxygen/html/`
@@ -279,6 +276,10 @@ jobs:
         mkdir -p doxygen_final/web/.github/media/ && cp -rf .github/media/ doxygen_final/web/.github/
         mkdir -p doxygen_final/web/html/.github/media/ && cp -rf .github/media/ doxygen_final/web/html/.github/
         mkdir -p doxygen_final/web/html/doc/.github/media/ && cp -rf .github/media/ doxygen_final/web/html/doc/.github/
+        echo 'Copying log...'
+        cp doxygen.log doxygen_final/doxygen.log
+        echo 'Copying index.html to root pointing to actual docs'
+        cp .github/root_index.html doxygen_final/index.html
       if: ${{ matrix.DOCS }}
     - name: Deploy Docs
       uses: peaceiris/actions-gh-pages@v3
