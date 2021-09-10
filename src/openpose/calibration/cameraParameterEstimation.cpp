@@ -196,7 +196,7 @@ namespace op
         try
         {
             // Return angle in range [0,2pi)
-            return std::fmod(angle, 360);    // floating-point remainder
+            return std::fmod(angle + 2 * PI, 2 * PI);    // floating-point remainder
             // double result{angle};
 
             // Return angle in range [0,2pi)
