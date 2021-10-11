@@ -171,7 +171,7 @@ In order to build the project, select and run only one of the 2 following altern
 
 - **CMake-GUI alternative (recommended)**:
     1. Open the Visual Studio solution (Windows) by clicking in `Open Project` in CMake (or alternatively `build/OpenPose.sln`). Then, set the configuration from `Debug` to `Release`.
-    2. Press <kbd>F7</kbd> (or `Build` menu and click on `Build Solution`).
+    2. Press <kbd>F6</kbd> (or `Build` menu and click on `Build Solution`).
     3. **Important for Python version**: Make sure not to skip step 2, it is not enough to click on <kbd>F5</kbd> (Run), you must also `Build Solution` for the Python bindings to be generated.
     4. After it has compiled, and if you have a webcam, you can press the green triangle icon (alternatively <kbd>F5</kbd>) to run the OpenPose demo with the default settings on the webcam.
 
