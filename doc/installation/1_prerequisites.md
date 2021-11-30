@@ -79,7 +79,7 @@ sudo pip install numpy opencv-python
 
 
 ## Windows Prerequisites
-NOTE: These instructions are only required when compiling OpenPose brom source. If you simply wanna use the OpenPose binaries for Windows, skip this step.
+NOTE: These instructions are only required when compiling OpenPose from source. If you simply wanna use the OpenPose binaries for Windows, skip this step.
 
 1. Install **CMake GUI**: Download and install the `Latest Release` of CMake `Windows win64-x64 Installer` from the [CMake download website](https://cmake.org/download/), called `cmake-X.X.X-win64-x64.msi`.
 2. Install **Microsoft Visual Studio (VS) 2019 Enterprise**, **Microsoft Visual Studio (VS) 2017 Enterprise** or **VS 2015 Enterprise Update 3**:
