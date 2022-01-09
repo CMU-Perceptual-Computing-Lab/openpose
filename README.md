@@ -60,10 +60,6 @@ It is **authored by** [**Ginés Hidalgo**](https://www.gineshidalgo.com), [**Zhe
     <sup><a href="https://ziutinyat.github.io/" target="_blank">Tianyi Zhao</a> and <a href="https://www.gineshidalgo.com" target="_blank">Ginés Hidalgo</a> testing the <a href="https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin" target="_blank">OpenPose Unity Plugin</a></sup>
 </p>
 
-### Huggingface Web Demo
-
-Integrated to [Huggingface Spaces](https://huggingface.co/spaces) with [Gradio](https://github.com/gradio-app/gradio). See demo: [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/akhaliq/openpose)
-
 ### Runtime Analysis
 We show an inference time comparison between the 3 available pose estimation libraries (same hardware and conditions): OpenPose, Alpha-Pose (fast Pytorch version), and Mask R-CNN. The OpenPose runtime is constant, while the runtime of Alpha-Pose and Mask R-CNN grow linearly with the number of people. More details [**here**](https://arxiv.org/abs/1812.08008).
 
