@@ -70,15 +70,6 @@ jobs:
               WITH_CUDA: false
               WITH_CUDNN: false
               CI_OS_NAME: linux
-          # Ubuntu 16.04 - Python - CMake - CPU
-          - os: ubuntu-16.04
-            os_name: linux
-            env:
-              NAME: U16-python-cmake-cpu
-              WITH_PYTHON: true
-              WITH_CUDA: false
-              WITH_CUDNN: false
-              CI_OS_NAME: linux
           # TO-DO (not passing)
           # # Ubuntu 20.04 - Python - CMake - OpenCL
           # - os: ubuntu-20.04
@@ -101,16 +92,6 @@ jobs:
               WITH_CUDNN: false
               WITH_OPEN_CL: true
               CI_OS_NAME: linux
-          # Ubuntu 16.04 - Python - CMake - OpenCL
-          - os: ubuntu-16.04
-            os_name: linux
-            env:
-              NAME: U16-python-cmake-opencl
-              WITH_PYTHON: true
-              WITH_CUDA: false
-              WITH_CUDNN: false
-              WITH_OPEN_CL: true
-              CI_OS_NAME: linux
           # Ubuntu 20.04 - Python - CMake - CPU - Debug
           - os: ubuntu-20.04
             os_name: linux
@@ -127,16 +108,6 @@ jobs:
             os_name: linux
             env:
               NAME: U18-python-cmake-cpu-debug
-              WITH_PYTHON: true
-              WITH_CUDA: false
-              WITH_CUDNN: false
-              WITH_DEBUG: true
-              CI_OS_NAME: linux
-          # Ubuntu 16.04 - Python - CMake - CPU - Debug
-          - os: ubuntu-16.04
-            os_name: linux
-            env:
-              NAME: U16-python-cmake-cpu-debug
               WITH_PYTHON: true
               WITH_CUDA: false
               WITH_CUDNN: false
@@ -230,6 +201,37 @@ jobs:
           #     WITH_CUDNN: false
           #     WITH_CMAKE: false
           #     CI_OS_NAME: linux
+
+          # Ubuntu 16 no longer works
+#           # Ubuntu 16.04 - Python - CMake - CPU
+#           - os: ubuntu-16.04
+#             os_name: linux
+#             env:
+#               NAME: U16-python-cmake-cpu
+#               WITH_PYTHON: true
+#               WITH_CUDA: false
+#               WITH_CUDNN: false
+#               CI_OS_NAME: linux
+#           # Ubuntu 16.04 - Python - CMake - OpenCL
+#           - os: ubuntu-16.04
+#             os_name: linux
+#             env:
+#               NAME: U16-python-cmake-opencl
+#               WITH_PYTHON: true
+#               WITH_CUDA: false
+#               WITH_CUDNN: false
+#               WITH_OPEN_CL: true
+#               CI_OS_NAME: linux
+#           # Ubuntu 16.04 - Python - CMake - CPU - Debug
+#           - os: ubuntu-16.04
+#             os_name: linux
+#             env:
+#               NAME: U16-python-cmake-cpu-debug
+#               WITH_PYTHON: true
+#               WITH_CUDA: false
+#               WITH_CUDNN: false
+#               WITH_DEBUG: true
+#               CI_OS_NAME: linux
 
     steps:
     - uses: actions/checkout@v2

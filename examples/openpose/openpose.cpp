@@ -5,7 +5,7 @@
     // 3. Save the results on disk.
     // 4. Display the rendered pose.
 // For more details on the OpenPose examples, see
-// - https://cmu-perceptual-computing-lab.github.io/openpose/web/html/doc/
+// - https://cmu-perceptual-computing-lab.github.io/openpose
 // - https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/00_index.md
 
 // Command-line user interface

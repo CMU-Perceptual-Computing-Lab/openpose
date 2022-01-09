@@ -10,8 +10,10 @@ sudo apt-get --assume-yes install build-essential
 # General dependencies
 sudo apt-get --assume-yes install libatlas-base-dev libprotobuf-dev libleveldb-dev libsnappy-dev libhdf5-serial-dev protobuf-compiler
 sudo apt-get --assume-yes install --no-install-recommends libboost-all-dev
-# Remaining dependencies, 14.04
-sudo apt-get --assume-yes install libgflags-dev libgoogle-glog-dev liblmdb-dev
+# Remaining dependencies
+sudo apt-get --assume-yes install libgflags-dev libgoogle-glog-dev
+# LMDB is needed for Caffe training, but very likely not for inference-only
+sudo apt-get --assume-yes install liblmdb-dev
 
 # Python2 libs (Official Ubuntu support dropped after Ubuntu 20)
 if [[ $UBUNTU_VERSION == *"14."* ]] || [[ $UBUNTU_VERSION == *"15."* ]] || [[ $UBUNTU_VERSION == *"16."* ]] || [[ $UBUNTU_VERSION == *"17."* ]] || [[ $UBUNTU_VERSION == *"18."* ]]; then

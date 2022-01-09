@@ -2,7 +2,7 @@ OpenPose Doc
 ==========================
 
 The OpenPose documentation is available in 2 different formats, choose your preferred one!
-- As a traditional website (recommended): [cmu-perceptual-computing-lab.github.io/openpose/web/html/doc/](https://cmu-perceptual-computing-lab.github.io/openpose/web/html/doc/).
+- As a traditional website (recommended): [cmu-perceptual-computing-lab.github.io/openpose](https://cmu-perceptual-computing-lab.github.io/openpose).
 - As markdown files: [github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/00_index.md](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/00_index.md).
 
 Most users can simply use the OpenPose Demo without reading any C++/Python code. Users that need to add additional functionality (new inputs, outputs, etc) should check the C++/Python APIs:
