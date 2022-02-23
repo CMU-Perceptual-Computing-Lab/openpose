@@ -59,6 +59,7 @@ These tips are **very important** and avoid many bugs:
     - OpenCV must be already installed on your machine. It can be installed with `sudo apt-get install libopencv-dev`. You could also use your own compiled OpenCV version.
     - Caffe prerequisites: By default, OpenPose uses Caffe under the hood. If you have not used Caffe previously, install its dependencies by running `sudo bash ./scripts/ubuntu/install_deps.sh` after installing your desired CUDA and cuDNN versions.
     - CMake config generation prerequisites: `sudo apt install protobuf-compiler libgoogle-glog-dev`
+    - OpenPose make prerequisites: `sudo apt install libboost-all-dev libhdf5-dev libatlas-base-dev
 7. Python prerequisites (optional, only if you plan to use the Python API): python-dev, Numpy (for array management), and OpenCV (for image loading).
 ```
 # Python 3 (default and recommended)
