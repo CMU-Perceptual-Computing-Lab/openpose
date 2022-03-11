@@ -233,7 +233,7 @@ bin\OpenPoseDemo.exe --flir_camera --3d --number_people_max 1 --face --hand
 ./build/examples/openpose/openpose.bin --flir_camera --num_gpu 0 --write_images output_folder_path/ --write_images_format jpg
 ```
 
-4. Reading and processing previouly saved stereo camera images
+4. Reading and processing previously saved stereo camera images
 ```
 # Ubuntu and Mac (same flags for Windows)
 # Optionally add `--face` and/or `--hand` to include face and/or hands
@@ -348,7 +348,7 @@ Additional notes:
 ### Mac OSX Additional Step
 **If you are not using Mac, or you are using Mac with `CPU_only`, you can skip this section.**
 
-If you are using a Mac and selected `OPENCL` support, and it has an AMD graphics card, that means that the machine has 2 GPUs that are not compatible with each other (AMD and Intel). Then, you will have to manually select one of them (the AMD one should be more poweful). To do that, first check which device your Graphics card is set under. Most likely, your AMD device will be device 2.
+If you are using a Mac and selected `OPENCL` support, and it has an AMD graphics card, that means that the machine has 2 GPUs that are not compatible with each other (AMD and Intel). Then, you will have to manually select one of them (the AMD one should be more powerful). To do that, first check which device your Graphics card is set under. Most likely, your AMD device will be device 2.
 ```bash
 clinfo
 ```

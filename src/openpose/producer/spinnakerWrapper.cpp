@@ -290,7 +290,7 @@ namespace op
                 // ptrTriggerSource->SetIntValue(ptrTriggerSourceHardware->GetValue());
                 // opLog("Trigger source set to hardware...", Priority::High);
 
-                // Set trigger mode to sofware
+                // Set trigger mode to software
                 Spinnaker::GenApi::CEnumEntryPtr ptrTriggerSourceSoftware = ptrTriggerSource->GetEntryByName("Software");
                 if (!Spinnaker::GenApi::IsAvailable(ptrTriggerSourceSoftware)
                     || !Spinnaker::GenApi::IsReadable(ptrTriggerSourceSoftware))
@@ -415,7 +415,7 @@ namespace op
                         // // In OpenCV 2.4, cv::undistort is exactly equal than cv::initUndistortRectifyMap
                         // (with CV_16SC2) + cv::remap (with LINEAR). I.e., opLog(cv::norm(cvMatMethod1-cvMatMethod2)) = 0.
                         // Option b - 15 ms / 3 images (LINEAR) or 25 ms (CUBIC)
-                        // Distorsion removal - not required and more expensive (applied to the whole image instead of
+                        // Distortion removal - not required and more expensive (applied to the whole image instead of
                         // only to our interest points)
                         if (mRemoveDistortionMaps1[i].empty() || mRemoveDistortionMaps2[i].empty())
                         {

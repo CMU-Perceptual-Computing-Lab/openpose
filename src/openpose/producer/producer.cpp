@@ -46,11 +46,11 @@ namespace op
                 // If no stereo --> Set to 1
                 if (mNumberViews <= 0)
                     mNumberViews = 1;
-                // Get camera paremeters
+                // Get camera parameters
                 if (mNumberViews > 1 || undistortImage)
                 {
                     const auto extension = getFileExtension(cameraParameterPath);
-                    // Get camera paremeters
+                    // Get camera parameters
                     if (extension == "xml" || extension == "XML")
                         mCameraParameterReader.readParameters(
                             getFileParentFolderPath(cameraParameterPath), getFileNameNoExtension(cameraParameterPath));
@@ -62,7 +62,7 @@ namespace op
                         // Get serial numbers
                         for (auto& serialNumber : serialNumbers)
                             serialNumber = getFileNameNoExtension(serialNumber);
-                        // Get camera paremeters
+                        // Get camera parameters
                         mCameraParameterReader.readParameters(cameraParameterPathCleaned, serialNumbers);
                     }
                     // Sanity check
@@ -226,7 +226,7 @@ namespace op
                 return mProperties[(unsigned char)property];
             else
             {
-                error("Unkown ProducerProperty.", __LINE__, __FUNCTION__, __FILE__);
+                error("Unknown ProducerProperty.", __LINE__, __FUNCTION__, __FILE__);
                 return 0.;
             }
         }

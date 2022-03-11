@@ -54,7 +54,7 @@ public:
         if (mClosed || mImageFiles.size() <= mCounter)
         {
             op::opLog("Last frame read and added to queue. Closing program after it is processed.", op::Priority::High);
-            // This funtion stops this worker, which will eventually stop the whole thread system once all the frames
+            // This function stops this worker, which will eventually stop the whole thread system once all the frames
             // have been processed
             mClosed = true;
             return nullptr;
@@ -132,7 +132,7 @@ public:
         if (datumsPtr != nullptr && !datumsPtr->empty())
         {
             op::opLog("\nKeypoints:");
-            // Accesing each element of the keypoints
+            // Accessing each element of the keypoints
             const auto& poseKeypoints = datumsPtr->at(0)->poseKeypoints;
             op::opLog("Person pose keypoints:");
             for (auto person = 0 ; person < poseKeypoints.getSize(0) ; person++)

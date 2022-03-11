@@ -385,7 +385,7 @@ namespace op
 //                        bool debug = false;
 ////                        nmsRegisterKernel(cl::EnqueueArgs(OpenCL::getInstance(gpuID)->getQueue(), cl::NDRange(width, height)),
 ////                                          kernelBuffer, sourceBuffer, width, height, threshold, debug);
-//                        // This is a really bad approach. We need to write a custom accumalator to run on gpu
+//                        // This is a really bad approach. We need to write a custom accumulator to run on gpu
 //                        // Download it to CPU
 ////                        OpenCL::getInstance(gpuID)->getQueue().enqueueReadBuffer(kernelBuffer, CL_TRUE, 0,
 ////                                                                                     sizeof(int) *  width * height, &kernelCPU[0]);

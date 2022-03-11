@@ -293,7 +293,7 @@ namespace op
                     // (score, indexA, indexB). Inverted order for easy std::sort
                     std::vector<std::tuple<double, int, int>> allABConnections;
                     // Note: Problem of this function, if no right PAF between A and B, both elements are
-                    // discarded. However, they should be added indepently, not discarded
+                    // discarded. However, they should be added independently, not discarded
                     if (heatMapPtr != nullptr)
                     {
                         const auto* mapX = heatMapPtr

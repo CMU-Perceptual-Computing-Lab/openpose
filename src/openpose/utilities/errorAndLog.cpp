@@ -54,7 +54,7 @@ namespace op
         }
     #endif
 
-    // Private auxiliar functions
+    // Private auxiliary functions
     bool checkIfErrorHas(const ErrorMode errorMode)
     {
         for (const auto& sErrorMode : ConfigureError::getErrorModes())

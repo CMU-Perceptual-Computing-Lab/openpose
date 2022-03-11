@@ -355,8 +355,8 @@ namespace op
                         keepRoiInside(rectangleInt, inputNetData[0].getSize(3), inputNetData[0].getSize(2));
                         // Input size
                         // // Note: In order to preserve speed but maximize accuracy
-                        // // If e.g. rectange = 10x1 and inputSize = 656x368 --> targetSize = 656x368
-                        // // Note: If e.g. rectange = 1x10 and inputSize = 656x368 --> targetSize = 368x656
+                        // // If e.g. rectangle = 10x1 and inputSize = 656x368 --> targetSize = 656x368
+                        // // Note: If e.g. rectangle = 1x10 and inputSize = 656x368 --> targetSize = 368x656
                         // const auto width = ( ? rectangleInt.width : rectangleInt.height);
                         // const auto height = (width == rectangleInt.width ? rectangleInt.height : rectangleInt.width);
                         // const Point<int> inputSize{width, height};
@@ -405,7 +405,7 @@ namespace op
                             scaleNetToRoi = resizeGetScaleFactor(
                                 Point<int>{rectangleInt.width, rectangleInt.height}, targetSize);
                         }
-                        // No if scaleNetToRoi < 1 (image would be shrinked, so we assume best result already obtained)
+                        // No if scaleNetToRoi < 1 (image would be shrunken, so we assume best result already obtained)
                         if (scaleNetToRoi > 1)
                         {
                             const auto areaInput = inputNetData[0].getVolume(2,3);

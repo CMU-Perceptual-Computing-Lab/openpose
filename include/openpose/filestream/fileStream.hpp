@@ -39,7 +39,7 @@ namespace op
     OP_API Matrix loadData(
         const std::string& cvMatName, const std::string& fileNameNoExtension, const DataFormat dataFormat);
 
-    // Json - Saving as *.json not available in OpenCV verions < 3.0, this function is a quick fix
+    // Json - Saving as *.json not available in OpenCV versions < 3.0, this function is a quick fix
     OP_API void savePeopleJson(
         const Array<float>& keypoints, const std::vector<std::vector<std::array<float,3>>>& candidates,
         const std::string& keypointName, const std::string& fileName, const bool humanReadable);

@@ -254,7 +254,7 @@ namespace op
             if (!keypointsReconstructed)
                 opLog("No keypoints were reconstructed on this frame. It might be simply a challenging frame."
                     " However, if this message appears frequently, OpenPose is facing some unknown issue,"
-                    " mabe the calibration parameters are not accurate. Feel free to open a GitHub issue"
+                    " maybe the calibration parameters are not accurate. Feel free to open a GitHub issue"
                     " (remember to fill all the required information detailed in the GitHub issue template"
                     " when it is created).", Priority::High);
             // Return results

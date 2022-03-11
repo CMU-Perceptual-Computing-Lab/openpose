@@ -38,7 +38,7 @@ namespace op
     public:
         /**
          * Constructor.
-         * @param threadManagerMode Thread syncronization mode. If set to ThreadManagerMode::Synchronous, everything
+         * @param threadManagerMode Thread synchronization mode. If set to ThreadManagerMode::Synchronous, everything
          * will run inside the WrapperT. If ThreadManagerMode::Synchronous(In/Out), then input (frames producer) and/or
          * output (GUI, writing results, etc.) will be controlled outside the WrapperT class by the user. See
          * ThreadManagerMode for a detailed explanation of when to use each one.

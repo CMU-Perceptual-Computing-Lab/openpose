@@ -166,7 +166,7 @@ namespace op
             const auto calibrationIsCorrect = cv::checkRange(intrinsics.cameraMatrix)
                                             && cv::checkRange(intrinsics.distortionCoefficients);
             if (!calibrationIsCorrect)
-                error("Unvalid cameraMatrix and/or distortionCoefficients.", __LINE__, __FUNCTION__, __FILE__);
+                error("Invalid cameraMatrix and/or distortionCoefficients.", __LINE__, __FUNCTION__, __FILE__);
 
             double totalAvgErr;
             std::vector<double> reprojectionErrors;
@@ -1369,7 +1369,7 @@ namespace op
                 //         }
                 //         counterRansac++;
                 //     }
-                //     // Asign back
+                //     // Assign back
                 //     std::swap(points2DVectorsExtrinsic, points2DVectorsExtrinsicRansac);
                 //     std::swap(points3D, points3DRansac);
                 //     std::swap(BAValid, BAValidRansac);

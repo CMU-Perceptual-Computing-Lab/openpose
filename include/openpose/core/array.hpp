@@ -482,7 +482,7 @@ namespace op
         std::pair<bool, Matrix> mCvMatData;
 
         /**
-         * Auxiliar function that both operator[](const std::vector<int>& indexes) and
+         * Auxiliary function that both operator[](const std::vector<int>& indexes) and
          * operator[](const std::vector<int>& indexes) const use.
          * It turn the multi-dimensions indexes into the 1-dimension equivalent index.
          * @param indexes Vector with the desired memory location.
@@ -500,7 +500,7 @@ namespace op
         int getIndexAndCheck(const std::vector<int>& indexes) const;
 
         /**
-         * Auxiliar function that both at(const int index) and at(const int index) const use.
+         * Auxiliary function that both at(const int index) and at(const int index) const use.
          * @param index The desired memory location.
          * @return A non-editable reference to the data on the desired index location.
          */

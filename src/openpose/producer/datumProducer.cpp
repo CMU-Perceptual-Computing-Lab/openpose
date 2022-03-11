@@ -130,7 +130,7 @@ namespace op
                     opLog(commonMessage + " Converting grey image into BGR.", Priority::High);
                     cv::Mat inputData = OP_OP2CVMAT(inputDataMatrix);
                     cv::cvtColor(inputData, inputData, CV_GRAY2BGR);
-                    // Diferent memory size --> new cv::Mat raw ptr memory --> new Matrix
+                    // Different memory size --> new cv::Mat raw ptr memory --> new Matrix
                     inputDataMatrix = OP_CV2OPMAT(inputData);
                 }
                 else

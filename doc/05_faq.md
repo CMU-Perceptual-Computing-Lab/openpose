@@ -41,7 +41,7 @@ OpenPose Doc - Frequently Asked Questions (FAQ)
 ## FAQ
 ### Errors
 #### Download Server Down
-**Q: The download server is down, Download Hash missmatch, Error 502: Bad Gateway, etc. I.e., I cannot download the OpenPose models and/or 3rd party libraries.**
+**Q: The download server is down, Download Hash mismatch, Error 502: Bad Gateway, etc. I.e., I cannot download the OpenPose models and/or 3rd party libraries.**
 **A**: The are 2 alternatives. Option 1 (recommended): Download the links from [1602#issuecomment-641653411](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/1602#issuecomment-641653411) and download them in the places indicated by [doc/1_prerequisites.md](1_prerequisites.md). Option 2: If you downloaded the models and dependencies to some local server, you could set the advanced CMake property `DOWNLOAD_SERVER` to link OpenPose to your local mirror server instead.
 
 
@@ -261,7 +261,7 @@ Check the [doc/06_maximizing_openpose_speed.md#profiling-speed](06_maximizing_op
 COCO model will eventually be removed. BODY_25 model is faster, more accurate, and it includes foot keypoints. However, `COCO` requires less memory on GPU (being able to fit into 2GB GPUs with the default settings) and it runs faster on CPU-only mode. `MPI` model is only meant for people requiring the MPI-keypoint structure. It is also slower than BODY_25 and far less accurate.
 
 Key differences:
-- `BODY_25` is the fastest one on the GPU, the most accurate one, and the one with the highest number of keypoints (including foot keypoints!), highly recommended. It also uses the most ammount of RAM/GPU memory.
+- `BODY_25` is the fastest one on the GPU, the most accurate one, and the one with the highest number of keypoints (including foot keypoints!), highly recommended. It also uses the most amount of RAM/GPU memory.
 - `COCO` is faster than `BODY_25` on the CPU but slower on the GPU and less accurate.
 - `MPI` is the fastest on the CPU but the least accurate of all 3.
 

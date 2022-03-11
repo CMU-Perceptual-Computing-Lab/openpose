@@ -54,7 +54,7 @@ namespace op
             // Multi-scale merging
             else
             {
-                // Construct temp targets. We resuse targetPtr to store first scale
+                // Construct temp targets. We reuse targetPtr to store first scale
                 std::vector<std::unique_ptr<T>> tempTargetPtrs;
                 for (auto n = 1; n < nums; n++){
                     tempTargetPtrs.emplace_back(std::unique_ptr<T>(new T[targetChannelOffset * channels]()));
