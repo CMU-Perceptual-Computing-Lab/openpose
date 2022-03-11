@@ -75,7 +75,7 @@ namespace op
             // Radius (r) = floor(patchSize/2)
             const int r = patchSize / 2;
 
-            // Temporal scalars
+            // Temporary scalars
             float dx = 0.0, dy = 0.0, dt = 0.0;
 
             // Accumulate sum over patch
