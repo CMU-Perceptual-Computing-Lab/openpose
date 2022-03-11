@@ -108,7 +108,7 @@
  * the presence of the standard library unless requested otherwise.
  * We use std::array, std::vector, std::shared_ptr and std::string
  * throughout to safely manage memory and reduce the chance of a
- * recurrance of earlier memory management bugs.
+ * recurrence of earlier memory management bugs.
  *
  * These classes are used through typedefs in the cl namespace:
  * cl::array, cl::vector, cl::pointer and cl::string.
@@ -211,7 +211,7 @@
  * The following example shows a general use case for the C++
  * bindings, including support for the optional exception feature and
  * also the supplied vector and string classes, see following sections for
- * decriptions of these features.
+ * descriptions of these features.
  *
  * \code
     #define CL_HPP_ENABLE_EXCEPTIONS
@@ -1921,7 +1921,7 @@ namespace detail {
 #endif // #if defined(CL_HPP_ENABLE_EXCEPTIONS)
 
 
-/*! \stuct ImageFormat
+/*! \struct ImageFormat
  *  \brief Adds constructors and member functions for cl_image_format.
  *
  *  \see cl_image_format
@@ -3621,19 +3621,19 @@ cl::pointer<T, detail::Deleter<SVMAllocator<T, SVMTrait>>> allocate_svm(const cl
 }
 #endif // #if !defined(CL_HPP_NO_STD_UNIQUE_PTR)
 
-/*! \brief Vector alias to simplify contruction of coarse-grained SVM containers.
+/*! \brief Vector alias to simplify construction of coarse-grained SVM containers.
  *
  */
 template < class T >
 using coarse_svm_vector = vector<T, cl::SVMAllocator<int, cl::SVMTraitCoarse<>>>;
 
-/*! \brief Vector alias to simplify contruction of fine-grained SVM containers.
+/*! \brief Vector alias to simplify construction of fine-grained SVM containers.
 *
 */
 template < class T >
 using fine_svm_vector = vector<T, cl::SVMAllocator<int, cl::SVMTraitFine<>>>;
 
-/*! \brief Vector alias to simplify contruction of fine-grained SVM containers that support platform atomics.
+/*! \brief Vector alias to simplify construction of fine-grained SVM containers that support platform atomics.
 *
 */
 template < class T >
@@ -5907,7 +5907,7 @@ public:
      *       in the context associated with kernel support it.
      *
      * \param svmEnabled True if fine-grained system SVM is requested. False otherwise.
-     * \return CL_SUCCESS if the function was executed succesfully. CL_INVALID_OPERATION
+     * \return CL_SUCCESS if the function was executed successfully. CL_INVALID_OPERATION
      *         if no devices in the context support fine-grained system SVM.
      *
      * \see clSetKernelExecInfo

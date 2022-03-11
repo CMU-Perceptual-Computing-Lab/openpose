@@ -46,7 +46,7 @@ namespace op
                     if (poseFinalScores[person] > threshold)
                         numberPeopleAboveThreshold++;
 
-                // Remove extra people - Fille topPeopleArray
+                // Remove extra people - Fill topPeopleArray
                 // assignedPeopleOnThreshold avoids that people with repeated threshold remove higher elements.
                 // In our case, it will keep the first N people with score = threshold, while keeping all the
                 // people with higher scores.

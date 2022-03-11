@@ -49,7 +49,7 @@ namespace op
         Point<int> outputSize;
 
         /**
-         * Final scale of the Array<float> Datum.poseKeypoints and the writen pose data.
+         * Final scale of the Array<float> Datum.poseKeypoints and the written pose data.
          * The final Datum.poseKeypoints can be scaled with respect to input size (ScaleMode::InputResolution), net
          * output size (ScaleMode::NetOutputResolution), output rendering size (ScaleMode::OutputResolution), from 0 to
          * 1 (ScaleMode::ZeroToOne(FixedAspect)), and -1 to 1 (ScaleMode::PlusMinusOne(FixedAspect)).

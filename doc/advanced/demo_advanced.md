@@ -153,7 +153,7 @@ Now that you are more familiar with OpenPose, this is a list with all the availa
 - DEFINE_bool(part_candidates,            false,          "Also enable `write_json` in order to save this information. If true, it will fill the op::Datum::poseCandidates array with the body part candidates. Candidates refer to all the detected body parts, before being assembled into people. Note that the number of candidates is equal or higher than the number of final body parts (i.e., after being assembled into people). The empty body parts are filled with 0s. Program speed will slightly decrease. Not required for OpenPose, enable it only if you intend to explicitly use this information.");
 
 6. OpenPose Face
-- DEFINE_bool(face,                       false,          "Enables face keypoint detection. It will share some parameters from the body pose, e.g. `model_folder`. Note that this will considerable slow down the performance and increse the required GPU memory. In addition, the greater number of people on the image, the slower OpenPose will be.");
+- DEFINE_bool(face,                       false,          "Enables face keypoint detection. It will share some parameters from the body pose, e.g. `model_folder`. Note that this will considerable slow down the performance and increase the required GPU memory. In addition, the greater number of people on the image, the slower OpenPose will be.");
 - DEFINE_int32(face_detector,             0,              "Kind of face rectangle detector. Select 0 (default) to select OpenPose body detector (most accurate one and fastest one if body is enabled), 1 to select OpenCV face detector (not implemented for hands), 2 to indicate that it will be provided by the user, or 3 to also apply hand tracking (only for hand). Hand tracking might improve hand keypoint detection for webcam (if the frame rate is high enough, i.e., >7 FPS per GPU) and video. This is not person ID tracking, it simply looks for hands in positions at which hands were located in previous frames, but it does not guarantee the same person ID among frames.");
 - DEFINE_string(face_net_resolution,      "368x368",      "Multiples of 16 and squared. Analogous to `net_resolution` but applied to the face keypoint detector. 320x320 usually works fine while giving a substantial speed up when multiple faces on the image.");
 
@@ -171,7 +171,7 @@ Now that you are more familiar with OpenPose, this is a list with all the availa
 
 9. Extra algorithms
 - DEFINE_bool(identification,             false,          "Experimental, not available yet. Whether to enable people identification across frames.");
-- DEFINE_int32(tracking,                  -1,             "Experimental, not available yet. Whether to enable people tracking across frames. The value indicates the number of frames where tracking is run between each OpenPose keypoint detection. Select -1 (default) to disable it or 0 to run simultaneously OpenPose keypoint detector and tracking for potentially higher accurary than only OpenPose.");
+- DEFINE_int32(tracking,                  -1,             "Experimental, not available yet. Whether to enable people tracking across frames. The value indicates the number of frames where tracking is run between each OpenPose keypoint detection. Select -1 (default) to disable it or 0 to run simultaneously OpenPose keypoint detector and tracking for potentially higher accuracy than only OpenPose.");
 - DEFINE_int32(ik_threads,                0,              "Experimental, not available yet. Whether to enable inverse kinematics (IK) from 3-D keypoints to obtain 3-D joint angles. By default (0 threads), it is disabled. Increasing the number of threads will increase the speed but also the global system latency.");
 
 10. OpenPose Rendering
@@ -201,7 +201,7 @@ Now that you are more familiar with OpenPose, this is a list with all the availa
 - DEFINE_bool(no_gui_verbose,             false,          "Do not write text on output images on GUI (e.g., number of current frame and people). It does not affect the pose rendering.");
 - DEFINE_int32(display,                   -1,             "Display mode: -1 for automatic selection; 0 for no display (useful if there is no X server and/or to slightly speed up the processing if visual output is not required); 2 for 2-D display; 3 for 3-D display (if `--3d` enabled); and 1 for both 2-D and 3-D display.");
 
-15. Command Line Inteface Verbose
+15. Command Line Interface Verbose
 - DEFINE_double(cli_verbose,              -1.f,           "If -1, it will be disabled (default). If it is a positive integer number, it will print on the command line every `verbose` frames. If number in the range (0,1), it will print the progress every `verbose` times the total of frames.");
 
 16. Result Saving

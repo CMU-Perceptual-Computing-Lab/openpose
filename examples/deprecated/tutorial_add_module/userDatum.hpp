@@ -6,7 +6,7 @@
 
 namespace op
 {
-    // If the user needs his own variables to be shared accross Worker classes, he can directly add them here.
+    // If the user needs his own variables to be shared across Worker classes, he can directly add them here.
     struct UserDatum : public Datum
     {
         /**

@@ -24,7 +24,7 @@ You should be familiar with the [**OpenPose Demo**](01_demo.md) and the main Ope
 ## Advance Introduction (Optional)
 This module exposes a Python API for OpenPose. It is effectively a wrapper that replicates most of the functionality of the [op::Wrapper class](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/include/openpose/wrapper/wrapper.hpp) and allows you to populate and retrieve data from the [op::Datum class](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/include/openpose/core/datum.hpp) using standard Python and Numpy constructs.
 
-The Python API is analagous to the C++ function calls. You may find them in [python/openpose/openpose_python.cpp#L194](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/python/openpose/openpose_python.cpp#L194).
+The Python API is analogous to the C++ function calls. You may find them in [python/openpose/openpose_python.cpp#L194](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/python/openpose/openpose_python.cpp#L194).
 
 The Python API is rather simple: `op::Array<float>` and `cv::Mat` objects get casted to numpy arrays automatically. Every other data structure based on the standard library is automatically converted into Python objects. For example, an `std::vector<std::vector<float>>` would become `[[item, item], [item, item]]`, etc. We also provide a casting of `op::Rectangle` and `op::Point` which simply expose setter getter for [x, y, width, height], etc.
 
@@ -90,7 +90,7 @@ For quick prototyping, you can simply duplicate and rename any of the existing s
 
 
 ## Exporting Python OpenPose
-Note: This step is only required if you are moving the `*.py` files outside their original location, or writting new `*.py` scripts outside `build/examples/tutorial_api_python`.
+Note: This step is only required if you are moving the `*.py` files outside their original location, or writing new `*.py` scripts outside `build/examples/tutorial_api_python`.
 
 Ubuntu/OSX:
 

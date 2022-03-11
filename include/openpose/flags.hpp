@@ -12,7 +12,7 @@
     namespace gflags = google;
 #endif
 
-// See all the available parameter options withe the `--help` flag. E.g., `build/examples/openpose/openpose.bin --help`
+// See all the available parameter options with the `--help` flag. E.g., `build/examples/openpose/openpose.bin --help`
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
 // executable. E.g., for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
 // Debugging/Other
@@ -137,7 +137,7 @@ DEFINE_double(upsampling_ratio,         0.,             "Upsampling ratio betwee
                                                         " or equal than 0 (default) will use the network default value (recommended).");
 // OpenPose Face
 DEFINE_bool(face,                       false,          "Enables face keypoint detection. It will share some parameters from the body pose, e.g."
-                                                        " `model_folder`. Note that this will considerable slow down the performance and increse"
+                                                        " `model_folder`. Note that this will considerable slow down the performance and increase"
                                                         " the required GPU memory. In addition, the greater number of people on the image, the"
                                                         " slower OpenPose will be.");
 DEFINE_int32(face_detector,             0,              "Kind of face rectangle detector. Select 0 (default) to select OpenPose body detector (most"
@@ -179,7 +179,7 @@ DEFINE_bool(identification,             false,          "Experimental, not avail
 DEFINE_int32(tracking,                  -1,             "Experimental, not available yet. Whether to enable people tracking across frames. The"
                                                         " value indicates the number of frames where tracking is run between each OpenPose keypoint"
                                                         " detection. Select -1 (default) to disable it or 0 to run simultaneously OpenPose keypoint"
-                                                        " detector and tracking for potentially higher accurary than only OpenPose.");
+                                                        " detector and tracking for potentially higher accuracy than only OpenPose.");
 DEFINE_int32(ik_threads,                0,              "Experimental, not available yet. Whether to enable inverse kinematics (IK) from 3-D"
                                                         " keypoints to obtain 3-D joint angles. By default (0 threads), it is disabled. Increasing"
                                                         " the number of threads will increase the speed but also the global system latency.");

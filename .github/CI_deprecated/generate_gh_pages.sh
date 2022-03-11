@@ -9,7 +9,7 @@ __AUTHOR__="openpose"
 #   must be installed.
 # - Doxygen configuration file must have the destination directory empty and
 #   source code directory with a $(CI_BUILD_DIR) prefix.
-# - An gh-pages branch should already exist. See below for mor info on hoe to
+# - An gh-pages branch should already exist. See below for more info on how to
 #   create a gh-pages branch.
 #
 # Required global variables:
@@ -93,7 +93,7 @@ if [ -d "html" ] && [ -f "html/index.html" ]; then
     git commit -m "Deploy code docs to GitHub Pages Travis build: ${CI_BUILD_NUMBER}" -m "Commit: ${CI_COMMIT}"
 
     # Force push to the remote gh-pages branch.
-    # The ouput is redirected to /dev/null to hide any sensitive credential data
+    # The output is redirected to /dev/null to hide any sensitive credential data
     # that might otherwise be exposed.
     git push --force "https://${GH_REPO_TOKEN}@${GH_REPO_REF}" > /dev/null 2>&1
 else

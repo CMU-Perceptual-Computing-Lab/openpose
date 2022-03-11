@@ -14,7 +14,7 @@ OpenPose would not be possible without the [**CMU Panoptic Studio dataset**](htt
 We would also like to thank the following people, who have contributed to key components of OpenPose:
 1. [Bikramjot Hanzra](https://www.linkedin.com/in/bikz05): Former OpenPose maintainer, CMake (Ubuntu and Windows) version, and initial Travis Build version for Ubuntu.
 2. [Donglai Xiang](https://xiangdonglai.github.io): Camera calibration toolbox improvement, including the implementation of its bundle adjustment algorithm.
-3. [Luis Fernando Fraga](https://github.com/fragalfernando): Implementation of Lukas-Kanade algorith and person ID extractor.
+3. [Luis Fernando Fraga](https://github.com/fragalfernando): Implementation of Lukas-Kanade algorithm and person ID extractor.
 4. [Akash Patwal](https://www.linkedin.com/in/akash-patwal-63a12012a): Speedup of the CUDA image resize and visual skeleton rendering, as well as extension that allows OpenPose to speedup linearly to more than 4 GPUs.
 5. [Helen Medina](https://github.com/helen-medina): First Windows version.
 6. [Matthijs van der Burgh](https://github.com/MatthijsBurgh): First GitHub Actions CI version for Ubuntu and Mac, and ported all the deprecated Travis CI tests into the new CI system.

@@ -34,7 +34,7 @@ These tips are **very important** and avoid many bugs:
         - Unzip it and go inside that folder from the terminal.
         - Run `./configure --qt-gui`. Make sure no error occurred.
         - Run ``./bootstrap && make -j`nproc` && sudo make install -j`nproc` ``. Make sure no error occurred.
-        - Assuming your CMake downloaded folder is in {CMAKE_FOLDER_PATH}, everytime these instructions mentions `cmake-gui`, you will have to replace that line by `{CMAKE_FOLDER_PATH}/bin/cmake-gui`.
+        - Assuming your CMake downloaded folder is in {CMAKE_FOLDER_PATH}, every time these instructions mentions `cmake-gui`, you will have to replace that line by `{CMAKE_FOLDER_PATH}/bin/cmake-gui`.
     - Ubuntu 14 or 16: Run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [doc/installation/0_index.md#CMake-Command-Line-Configuration-(Ubuntu-Only)](0_index.md#cmake-command-line-configuration-ubuntu-only).
 3. Nvidia GPU version prerequisites:
     1. **Note: OpenPose has been tested extensively with CUDA 11.1.1 (cuDNN 8.1.0) for Ubuntu 20**. Older OpenPose versions (v1.6.X and v1.5.X) were tested with **CUDA 10.1 (cuDNN 7.5.1) for Ubuntu 18 and CUDA 8.0 (cuDNN 5.1) for Ubuntu 14 and 16**. We highly recommend using those combinations to minimize potential installation issues. Other combinations should also work, but we do not provide any support about installation/compilation issues related to CUDA/cuDNN or their integration with OpenPose.
@@ -102,7 +102,7 @@ NOTE: These instructions are only required when compiling OpenPose from source. 
     - CMake automatically downloads all the Windows DLLs. Alternatively, you might prefer to download them manually:
         - Dependencies:
             - Note: Leave the zip files in `3rdparty/windows/` so that CMake does not try to download them again.
-            - Caffe (if you are not sure which one you need, donwload the default one):
+            - Caffe (if you are not sure which one you need, download the default one):
                 - [CUDA Caffe (Default)](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_16_2020_11_14.zip): Unzip as `3rdparty/windows/caffe/`.
                 - [CPU Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_cpu_2018_05_27.zip): Unzip as `3rdparty/windows/caffe_cpu/`.
                 - [OpenCL Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_opencl_2018_02_13.zip): Unzip as `3rdparty/windows/caffe_opencl/`.

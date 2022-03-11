@@ -81,7 +81,7 @@ namespace op
                     // Error if folder cannot be created
                     if (status != 0)
                         error("Could not create directory: " + formatedPath + ". Status error = "
-                              + std::to_string(status) + ". Does the parent folder exist and/or do you have writting"
+                              + std::to_string(status) + ". Does the parent folder exist and/or do you have writing"
                               " access to that path?", __LINE__, __FUNCTION__, __FILE__);
                 }
             }

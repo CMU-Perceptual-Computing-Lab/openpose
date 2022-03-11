@@ -64,7 +64,7 @@ namespace op
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
                 // Add ID
                 for (auto& tDatumPtr : *tDatums)
-                    // To avoid overwritting ID if e.g., custom input has already filled it
+                    // To avoid overwriting ID if e.g., custom input has already filled it
                     if (tDatumPtr->id == std::numeric_limits<unsigned long long>::max())
                         tDatumPtr->id = mGlobalCounter;
                 // Increase ID

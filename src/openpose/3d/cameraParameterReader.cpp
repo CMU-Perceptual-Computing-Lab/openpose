@@ -362,7 +362,7 @@ namespace op
                     // // In OpenCV 2.4, cv::undistort is exactly equal than cv::initUndistortRectifyMap
                     // (with CV_16SC2) + cv::remap (with LINEAR). I.e., opLog(cv::norm(cvMatMethod1-cvMatMethod2)) = 0.
                     // Option b - 15 ms / 3 images (LINEAR) or 25 ms (CUBIC)
-                    // Distorsion removal - not required and more expensive (applied to the whole image instead of
+                    // Distortion removal - not required and more expensive (applied to the whole image instead of
                     // only to our interest points)
                     cv::initUndistortRectifyMap(
                         cvCameraIntrinsics, cvCameraDistorsions, cv::Mat(),

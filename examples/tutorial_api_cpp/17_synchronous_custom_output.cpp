@@ -33,7 +33,7 @@ public:
             {
                 // Show in command line the resulting pose keypoints for body, face and hands
                 op::opLog("\nKeypoints:");
-                // Accesing each element of the keypoints
+                // Accessing each element of the keypoints
                 const auto& poseKeypoints = datumsPtr->at(0)->poseKeypoints;
                 op::opLog("Person pose keypoints:");
                 for (auto person = 0 ; person < poseKeypoints.getSize(0) ; person++)

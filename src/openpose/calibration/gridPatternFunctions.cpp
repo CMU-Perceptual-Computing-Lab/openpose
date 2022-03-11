@@ -266,7 +266,7 @@ namespace op
         {
             // Draw every corner
             cv::drawChessboardCorners(image, gridInnerCorners, cv::Mat(points2DVector), true/*found*/);
-            // Draw 4 outter corners
+            // Draw 4 outer corners
             const auto radiusAndThickness = std::max(5,
                                                      (int)std::round(std::sqrt(image.cols * image.rows) / 100));
             const auto outterCornerIndices = getOutterCornerIndices(points2DVector, gridInnerCorners);
@@ -390,7 +390,7 @@ namespace op
                 // Debugging
                 if (debugging)
                     opLog("\naverageSquareSizePx: " + std::to_string(averageSquareSizePx));
-                // How many pixels does the outter square has?
+                // How many pixels does the outer square has?
                 // 0.67 is a threshold to be safe
                 const auto diagonalLength = 0.67 * std::sqrt(2) * averageSquareSizePx;
                 // Debugging
@@ -433,7 +433,7 @@ namespace op
                     opLog(" ");
                 }
 
-                // Get line to check whether outter grid color is black
+                // Get line to check whether outer grid color is black
                 auto pointLimit = fourPointsVector; // Initialization
                 for (auto i = 0u ; i < fourPointsVector.size() ; i++)
                     pointLimit[i] = fourPointsVector[i] + diagonalLength * pointDirection[i];

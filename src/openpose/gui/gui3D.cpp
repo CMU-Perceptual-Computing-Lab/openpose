@@ -200,7 +200,7 @@ namespace op
                 0.0, 1.0, 0.  // up is in positive Y direction
             );
 
-            // Adjust cube position to be asthetic angle
+            // Adjust cube position to be aesthetic angle
             glTranslatef(0.0, 0.0, -1.0);
             glRotatef(60, 1.0, 0.0, 0.0);
             glRotatef(-20, 0.0, 0.0, 1.0);

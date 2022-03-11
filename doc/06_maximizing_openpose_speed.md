@@ -28,7 +28,7 @@ On Ubuntu (for OS versions older than 20), you can also boost CPU-only speed by 
 OpenPose displays the FPS in the basic GUI. However, more complex speed metrics can be obtained from the command line while running OpenPose. In order to obtain those, compile OpenPose with the `PROFILER_ENABLED` flag on CMake-gui. OpenPose will automatically display time measurements for each subthread after processing `F` frames (by default `F = 1000`, but it can be modified with the `--profile_speed` flag, e.g. `--profile_speed 100`).
 
 - Time measurement for 1 graphic card: The FPS will be the slowest time displayed in your terminal command line (as OpenPose is multi-threaded). Times are in milliseconds, so `FPS = 1000/millisecond_measurement`.
-- Time measurement for >1 graphic cards: Assuming `n` graphic cards, you will have to wait up to `n` x `F` frames to visualize each graphic card speed (as the frames are splitted among them). In addition, the FPS would be: `FPS = minFPS(speed_per_GPU/n, worst_time_measurement_other_than_GPUs)`. For < 4 GPUs, this is usually `FPS = speed_per_GPU/n`.
+- Time measurement for >1 graphic cards: Assuming `n` graphic cards, you will have to wait up to `n` x `F` frames to visualize each graphic card speed (as the frames are split among them). In addition, the FPS would be: `FPS = minFPS(speed_per_GPU/n, worst_time_measurement_other_than_GPUs)`. For < 4 GPUs, this is usually `FPS = speed_per_GPU/n`.
 
 Make sure that `wPoseExtractor` time is the slowest timing. Otherwise the input producer (video/webcam codecs issues with OpenCV, images too big, etc.) or the GUI display (use OpenGL support as detailed in the next section (`Speed Up Preserving Accuracy`) might not be optimized.
 

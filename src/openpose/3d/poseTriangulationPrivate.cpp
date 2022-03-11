@@ -129,7 +129,7 @@ namespace op
             if (cameraMatrices.empty())
                 error("numberCameras.empty()",
                       __LINE__, __FUNCTION__, __FILE__);
-            // Create and fill A for homogenous equation system Ax = 0
+            // Create and fill A for homogeneous equation system Ax = 0
             const auto numberCameras = (int)cameraMatrices.size();
             cv::Mat A = cv::Mat::zeros(numberCameras*2, 4, CV_64F);
             for (auto i = 0 ; i < numberCameras ; i++)

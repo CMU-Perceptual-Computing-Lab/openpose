@@ -77,7 +77,7 @@ You can include the 3D reconstruction module by:
 
 1. Install the FLIR camera software, Spinnaker SDK. It is a proprietary software, so we cannot provide direct download link. Note: You might skip this step if you intend to use the 3-D OpenPose module with a different camera brand.
     1. Ubuntu: Get and install the latest Spinnaker SKD version in their default path. OpenPose will automatically find it. Otherwise, set the right path with CMake.
-    2. Windows: Donwload the latest Spinnaker SKD version from [https://www.ptgrey.com/support/downloads](https://www.ptgrey.com/support/downloads).
+    2. Windows: Download the latest Spinnaker SKD version from [https://www.ptgrey.com/support/downloads](https://www.ptgrey.com/support/downloads).
         - Copy `{PointGreyParentDirectory}\Point Grey Research\Spinnaker\bin64\vs2015\` as `{OpenPoseDirectory}\3rdparty\windows\spinnaker\bin\`. You can remove all the *.exe files.
         - Copy `{PointGreyParentDirectory}\Point Grey Research\Spinnaker\include\` as `{OpenPoseDirectory}\3rdparty\windows\spinnaker\include\`.
         - Copy `Spinnaker_v140.lib` and `Spinnakerd_v140.lib` from `{PointGreyParentDirectory}\Point Grey Research\Spinnaker\lib64\vs2015\` into `{OpenPoseDirectory}\3rdparty\windows\spinnaker\lib\`.
@@ -101,7 +101,7 @@ After installation, check the [doc/advanced/3d_reconstruction_module.md](../adva
 
 
 ### Calibration Module
-The instrinsic camera calibration toolbox is included by default.
+The intrinsic camera calibration toolbox is included by default.
 
 To enable the extrinsic camera parameter estimation toolbox, you must also enable `WITH_EIGEN` in CMake during [CMake Configuration](#cmake-configuration). You can perform any of the 3 following options (but only 1 of them!)
 - Recommended: Simply set the `WITH_EIGEN` flag to `AUTOBUILD`. CMake will automatically download Eigen and configure OpenPose to use it. If you prefer to download it manually (or if your firewall blocks CMake from downloading it):
