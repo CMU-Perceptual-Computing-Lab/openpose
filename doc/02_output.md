@@ -68,7 +68,7 @@ The output of the JSON files consist of a set of keypoints, whose ordering is re
 
 
 ## JSON Output Format
-There are 2 alternatives to save the OpenPose output. But both of them follow the keypoint ordering described in the the section [Keypoint Ordering in C++/Python](#body-keypoints-in-c-python) section (which you should read next).
+There are 2 alternatives to save the OpenPose output. But both of them follow the keypoint ordering described in the section [Keypoint Ordering in C++/Python](#body-keypoints-in-c-python) section (which you should read next).
 
 1. The `--write_json` flag saves the people pose data into JSON files. Each file represents a frame, it has a `people` array of objects, where each object has:
     1. `pose_keypoints_2d`: Body part locations (`x`, `y`) and detection confidence (`c`) formatted as `x0,y0,c0,x1,y1,c1,...`. The coordinates `x` and `y` can be normalized to the range [0,1], [-1,1], [0, source size], [0, output size], etc. (see the flag `--keypoint_scale` for more information), while the confidence score (`c`) in the range [0,1].

@@ -139,7 +139,7 @@ namespace op
                 roi.y -= marginY;
                 roi.width += 2*marginX;
                 roi.height += 2*marginY;
-                // partFirstNon0+1 for for loops
+                // partFirstNon0+1 for loops
                 partLastNon0++;
                 // From [p1, p2] to [p1, width, height]
                 // +1 to account for 1-line keypoints

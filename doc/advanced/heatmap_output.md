@@ -75,4 +75,4 @@ arrayData = x[1+int(round(x[0])):]
 
 
 ## Heatmap Scaling
-Note that `--net_resolution` sets the size of the network, thus also the size of the output heatmaps. This heatmaps are resized while keeping the aspect ratio. When aspect ratio of the the input and network are not the same, padding is added at the bottom and/or right part of the output heatmaps.
+Note that `--net_resolution` sets the size of the network, thus also the size of the output heatmaps. This heatmaps are resized while keeping the aspect ratio. When aspect ratio of the input and network are not the same, padding is added at the bottom and/or right part of the output heatmaps.
