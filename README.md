@@ -81,13 +81,18 @@ We show an inference time comparison between the 3 available pose estimation lib
     - Compatible with Flir/Point Grey cameras.
 - [**Calibration toolbox**](doc/advanced/calibration_module.md): Estimation of distortion, intrinsic, and extrinsic camera parameters.
 - **Single-person tracking** for further speedup or visual smoothing.
+
 **Input**: Image, video, webcam, Flir/Point Grey, IP camera, and support to add your own custom input source (e.g., depth camera).
+
 **Output**: Basic image + keypoint display/saving (PNG, JPG, AVI, ...), keypoint saving (JSON, XML, YML, ...), keypoints as array class, and support to add your own custom output code (e.g., some fancy UI).
+
 **OS**: Ubuntu (20, 18, 16, 14), Windows (10, 8), Mac OSX, Nvidia TX2.
+
 **Hardware compatibility**: CUDA (Nvidia GPU), OpenCL (AMD GPU), and non-GPU (CPU-only) versions.
+
 **Usage Alternatives**:
-    - [**Command-line demo**](doc/01_demo.md) for built-in functionality.
-    - [**C++ API**](doc/04_cpp_api.md/) and [**Python API**](doc/03_python_api.md) for custom functionality. E.g., adding your custom inputs, pre-processing, post-posprocessing, and output steps.
+- [**Command-line demo**](doc/01_demo.md) for built-in functionality.
+- [**C++ API**](doc/04_cpp_api.md/) and [**Python API**](doc/03_python_api.md) for custom functionality. E.g., adding your custom inputs, pre-processing, post-posprocessing, and output steps.
 
 For further details, check the [major released features](doc/07_major_released_features.md) and [release notes](doc/08_release_notes.md) docs.
 
