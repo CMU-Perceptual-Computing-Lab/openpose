@@ -21,7 +21,6 @@ It is **authored by** [**Ginés Hidalgo**](https://www.gineshidalgo.com), [**Zhe
 </p>
 
 
-
 ## Contents
 1. [Results](#results)
 2. [Features](#features)
@@ -58,6 +57,12 @@ It is **authored by** [**Ginés Hidalgo**](https://www.gineshidalgo.com), [**Zhe
     <img src=".github/media/unity_hand_face.png" width="300">
     <br>
     <sup><a href="https://ziutinyat.github.io/" target="_blank">Tianyi Zhao</a> and <a href="https://www.gineshidalgo.com" target="_blank">Ginés Hidalgo</a> testing the <a href="https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin" target="_blank">OpenPose Unity Plugin</a></sup>
+</p>
+
+### Live API Demo 
+
+<p align="center">
+<a href="https://console.tiyaro.ai/explore?q=openpose&pub=opensource"> <img src="https://tiyaro-public-docs.s3.us-west-2.amazonaws.com/assets/try_on_tiyaro_badge.svg"></a>
 </p>
 
 ### Runtime Analysis
@@ -103,7 +108,7 @@ For further details, check the [major released features](doc/07_major_released_f
 - [**OpenPose foot dataset**](https://cmu-perceptual-computing-lab.github.io/foot_keypoint_dataset/)
 - [**OpenPose Unity Plugin**](https://github.com/CMU-Perceptual-Computing-Lab/openpose_unity_plugin)
 - OpenPose papers published in **IEEE TPAMI and CVPR**. Cite them in your publications if OpenPose helps your research! (Links and more details in the [Citation](#citation) section below).
-
+- [**Live Demo OpenPose API at Tiyaro.ai**](https://console.tiyaro.ai/explore/opensource-1-OpenPose/demo)
 
 
 ## Installation
