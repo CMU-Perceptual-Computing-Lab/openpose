@@ -12,9 +12,10 @@ OpenPose Doc - Installation
     5. [Compilation](#compilation)
     6. [Running OpenPose](#running-openpose)
     7. [Custom User Code](#custom-user-code)
-4. [Compiling and Running OpenPose from Source on ROS, Docker, and Google Colab - Community-Based Work](#compiling-and-running-openpose-from-source-on-ros-docker-and-google-colab-community-based-work)
-5. [Uninstalling, Reinstalling, or Updating OpenPose](#Uninstalling-reinstalling-or-updating-openpose)
-6. [Additional Settings (Optional)](#additional-settings-optional)
+4. [Compiling and Running OpenPose from Source on ROS, Docker, and Google Colab - Community-Based Work](#compiling-and-running-openpose-from-source-on-ros-docker-and-google-colab---community-based-work)
+5. [OpenPose Live Demo at Tiyaro - Community-Based Work](#openpose-live-demo-from-tiyaro---community-based-work)
+6. [Uninstalling, Reinstalling, or Updating OpenPose](#uninstalling-reinstalling-or-updating-openpose)
+7. [Additional Settings (Optional)](#additional-settings-optional)
 
 
 
@@ -236,6 +237,14 @@ If you do not want to use the Windows portable binaries nor compile it from sour
     - [Google Colab with Openpose 1.7.0](https://colab.research.google.com/github/miu200521358/motion_trace_colab/blob/master/OpenposeDemo.ipynb): For questions and more details, read and post ONLY on [issue thread #949](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/949).
     - [Google Colab 2/3](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/1736#issuecomment-736846794): For questions and more details, read and post ONLY on [issue thread #1736](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/1736).
     - [Google Colab 3/3](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/949#issue-387855863): For questions and more details, read and post ONLY on [issue thread #949](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/949).
+
+
+
+
+
+## OpenPose Live Demo at Tiyaro - Community-Based Work
+You can find a [Live Demo of the OpenPose API at Tiyaro.ai](https://console.tiyaro.ai/explore/opensource-1-OpenPose/demo). We do not officially support it, but a Tiyaro co-founder added this support in [2129]. Feel free to comment in that post to him if you have questions about it.
+<p align="center"><a href="https://console.tiyaro.ai/explore?q=openpose&pub=opensource"> <img src="https://tiyaro-public-docs.s3.us-west-2.amazonaws.com/assets/try_on_tiyaro_badge.svg"></a></p>
 
 
 
