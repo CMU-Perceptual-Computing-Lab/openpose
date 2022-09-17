@@ -46,7 +46,7 @@ These tips are **very important** and avoid many bugs:
         - Ubuntu 14 or 16 ([**CUDA 8**](https://developer.nvidia.com/cuda-80-ga2-download-archive) **or 10**): Run `sudo ./scripts/ubuntu/install_cuda.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX) or alternatively download and install it from their website.
     4. **cuDNN**:
         - Download it (usually called `cuDNN Library for Linux (x86_64)`):
-            - Ubuntu 20: [**cuDNN 8.5.0**](https://developer.nvidia.com/cudnn). cuDNN is currently not recommended due to performance degradation issues outlined in [#1864](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/1864#issuecomment-774706976)
+            - Ubuntu 20: [**cuDNN 8.5.0**](https://developer.nvidia.com/cudnn). cuDNN is currently not recommended due to performance degradation issues outlined in [#1864](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/1864#issuecomment-774706976).
             - Ubuntu 18: [**cuDNN 7.5.1**](https://developer.nvidia.com/rdp/cudnn-archive).
             - Ubuntu 14 or 16 (**cuDNN 5.1 or 7.2**): Run `sudo ./scripts/ubuntu/install_cudnn_up_to_Ubuntu16.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX) or alternatively [download it from their website](https://developer.nvidia.com/rdp/cudnn-archive).
         - And install it:
@@ -59,6 +59,8 @@ These tips are **very important** and avoid many bugs:
 5. Install **Caffe, OpenCV, and Caffe prerequisites**:
     - OpenCV must be already installed on your machine. It can be installed with `sudo apt-get install libopencv-dev`. You could also use your own compiled OpenCV version.
     - Caffe prerequisites: By default, OpenPose uses Caffe under the hood. If you have not used Caffe previously, install its dependencies by running `sudo bash ./scripts/ubuntu/install_deps.sh` after installing your desired CUDA and cuDNN versions.
+    - CMake config generation prerequisites (they might be already installed by default): `sudo apt install protobuf-compiler libgoogle-glog-dev`.
+    - OpenPose make prerequisites (they might be already installed by default): `sudo apt install libboost-all-dev libhdf5-dev libatlas-base-dev`.
 6. Python prerequisites (optional, only if you plan to use the Python API): python-dev, Numpy (for array management), and OpenCV (for image loading).
 ```
 # Python 3 (default and recommended)
