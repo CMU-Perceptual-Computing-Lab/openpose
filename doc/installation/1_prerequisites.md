@@ -37,16 +37,16 @@ These tips are **very important** and avoid many bugs:
         - Assuming your CMake downloaded folder is in {CMAKE_FOLDER_PATH}, every time these instructions mentions `cmake-gui`, you will have to replace that line by `{CMAKE_FOLDER_PATH}/bin/cmake-gui`.
     - Ubuntu 14 or 16: Run the command `sudo apt-get install cmake-qt-gui`. Note: If you prefer to use CMake through the command line, see [doc/installation/0_index.md#CMake-Command-Line-Configuration-(Ubuntu-Only)](0_index.md#cmake-command-line-configuration-ubuntu-only).
 3. Nvidia GPU version prerequisites:
-    1. **Note: OpenPose has been tested extensively with CUDA 11.5.2 (cuDNN 8.3.2) for Ubuntu 20**. Older OpenPose versions (v1.6.X and v1.5.X) were tested with **CUDA 10.1 (cuDNN 7.5.1) for Ubuntu 18 and CUDA 8.0 (cuDNN 5.1) for Ubuntu 14 and 16**. We highly recommend using those combinations to minimize potential installation issues. Other combinations should also work, but we do not provide any support about installation/compilation issues related to CUDA/cuDNN or their integration with OpenPose. Note: If Secure Boot is enabled (by default it is not), the MOK key installation part might be mandatory. For that, record the public key output path and invoke into `sudo mokutil --import PATH_TO_PUBLIC_KEY` manually if automatic install failed.
+    1. **Note: OpenPose has been tested extensively with CUDA 11.7.1 (cuDNN 8.5.0) for Ubuntu 20**. Older OpenPose versions (v1.6.X and v1.5.X) were tested with **CUDA 10.1 (cuDNN 7.5.1) for Ubuntu 18 and CUDA 8.0 (cuDNN 5.1) for Ubuntu 14 and 16**. We highly recommend using those combinations to minimize potential installation issues. Other combinations should also work, but we do not provide any support about installation/compilation issues related to CUDA/cuDNN or their integration with OpenPose. Note: If Secure Boot is enabled (by default it is not), the MOK key installation part might be mandatory. For that, record the public key output path and invoke into `sudo mokutil --import PATH_TO_PUBLIC_KEY` manually if automatic install failed.
     2. Upgrade your Nvidia drivers to the latest version.
-        - For Ubuntu 20, download ([495.29](https://www.nvidia.com/download/driverResults.aspx/181159/en-us))
+        - For Ubuntu 20, download ([515.65](https://www.nvidia.com/Download/driverResults.aspx/191961/en-us/))
     3. **CUDA**: You can simply run `sudo bash ./scripts/ubuntu/install_cuda.sh` if you are not too familiar with CUDA. If you are, then you could also do one of the following instead:
-        - Ubuntu 20 ([**CUDA 11.5.2**](https://developer.nvidia.com/cuda-11-5-2-download-archive)): Download CUDA 11.5.2 from their [official website](https://developer.nvidia.com/cuda-11-5-2-download-archive). Most Ubuntu computers use the `Architecture` named `x86_64`, and we personally recommend the `Installer Type` named `runfile (local)`. Then, follow the Nvidia website installation instructions. When installing, make sure to enable the symbolic link in `usr/local/cuda` to minimize potential future errors. If the (Nvidia) drivers were installed manually, untick the "install driver" option.
+        - Ubuntu 20 ([**CUDA 11.7.1**](https://developer.nvidia.com/cuda-11-7-1-download-archive)): Download CUDA 11.7.1 from their [official website](https://developer.nvidia.com/cuda-11-7-1-download-archive). Most Ubuntu computers use the `Architecture` named `x86_64`, and we personally recommend the `Installer Type` named `runfile (local)`. Then, follow the Nvidia website installation instructions. When installing, make sure to enable the symbolic link in `usr/local/cuda` to minimize potential future errors. If the (Nvidia) drivers were installed manually, untick the "install driver" option.
         - Ubuntu 18 ([**CUDA 10.1**](https://developer.nvidia.com/cuda-10.1-download-archive-base)): Analog to the instructions for Ubuntu 20, but using CUDA version 10.1.
         - Ubuntu 14 or 16 ([**CUDA 8**](https://developer.nvidia.com/cuda-80-ga2-download-archive) **or 10**): Run `sudo ./scripts/ubuntu/install_cuda.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX) or alternatively download and install it from their website.
     4. **cuDNN**:
         - Download it (usually called `cuDNN Library for Linux (x86_64)`):
-            - Ubuntu 20: [**cuDNN 8.3.2**](https://developer.nvidia.com/cudnn).
+            - Ubuntu 20: [**cuDNN 8.5.0**](https://developer.nvidia.com/cudnn). cuDNN is currently not recommended due to performance degradation issues outlined in [#1864](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/1864#issuecomment-774706976).
             - Ubuntu 18: [**cuDNN 7.5.1**](https://developer.nvidia.com/rdp/cudnn-archive).
             - Ubuntu 14 or 16 (**cuDNN 5.1 or 7.2**): Run `sudo ./scripts/ubuntu/install_cudnn_up_to_Ubuntu16.sh` (if Ubuntu 16 or 14 and for Graphic cards up to 10XX) or alternatively [download it from their website](https://developer.nvidia.com/rdp/cudnn-archive).
         - And install it:
@@ -59,8 +59,8 @@ These tips are **very important** and avoid many bugs:
 5. Install **Caffe, OpenCV, and Caffe prerequisites**:
     - OpenCV must be already installed on your machine. It can be installed with `sudo apt-get install libopencv-dev`. You could also use your own compiled OpenCV version.
     - Caffe prerequisites: By default, OpenPose uses Caffe under the hood. If you have not used Caffe previously, install its dependencies by running `sudo bash ./scripts/ubuntu/install_deps.sh` after installing your desired CUDA and cuDNN versions.
-    - CMake config generation prerequisites: `sudo apt install protobuf-compiler libgoogle-glog-dev`
-    - OpenPose make prerequisites: `sudo apt install libboost-all-dev libhdf5-dev libatlas-base-dev`
+    - CMake config generation prerequisites (they might be already installed by default): `sudo apt install protobuf-compiler libgoogle-glog-dev`.
+    - OpenPose make prerequisites (they might be already installed by default): `sudo apt install libboost-all-dev libhdf5-dev libatlas-base-dev`.
 6. Python prerequisites (optional, only if you plan to use the Python API): python-dev, Numpy (for array management), and OpenCV (for image loading).
 ```
 # Python 3 (default and recommended)
