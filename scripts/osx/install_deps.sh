@@ -6,6 +6,10 @@ do
     brew install "$pkg" || brew upgrade "$pkg"
 done
 
+# fix for caffe
+brew uninstall --force caffe
+brew install --build-from-source caffe
+
 # with Python pycaffe needs dependencies built from source
 #brew install --build-from-source --with-python -vd protobuf
 #brew install --build-from-source -vd boost boost-python
