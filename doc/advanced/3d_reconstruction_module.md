@@ -23,13 +23,13 @@ This module performs 3-D keypoint (body, face, and hand) reconstruction and rend
 
 
 ## Installation
-Check [doc/installation/0_index.md#3d-reconstruction-module](../installation/0_index.md#3d-reconstruction-module) for installation steps.
+Check [doc/installation/2_additional_settings.md#3d-reconstruction-module](../installation/2_additional_settings.md#3d-reconstruction-module) for installation steps.
 
 
 
 
 ## Non Linear Optimization
-In order to increase the 3-D reconstruction accuracy, OpenPose optionally performs non-linear optimization if Ceres solver support is enabled (only available in Ubuntu for now). To enable it, check [doc/installation/0_index.md#3d-reconstruction-module](../installation/0_index.md#3d-reconstruction-module) for more details.
+In order to increase the 3-D reconstruction accuracy, OpenPose optionally performs non-linear optimization if Ceres solver support is enabled (only available in Ubuntu for now). To enable it, check [doc/installation/2_additional_settings.md#3d-reconstruction-module](../installation/2_additional_settings.md#3d-reconstruction-module) for more details.
 
 
 
