@@ -192,6 +192,8 @@ In order to build the project, select and run only one of the 2 following altern
     copy x64\Release\*  bin\
     ```
 
+**NOTE**: To set `GPU_MODE` flag to `CPU_ONLY` when building the tool via cli, append `-D GPU_MODE:STRINGS=CPU_ONLY` to the `cmake` command.
+
 **VERY IMPORTANT NOTE**: In order to use OpenPose outside Visual Studio, and assuming you have not unchecked the `BUILD_BIN_FOLDER` flag in CMake, copy all DLLs from `{build_directory}/bin` into the folder where the generated `openpose.dll` and `*.exe` demos are, e.g., `{build_directory}x64/Release` for the 64-bit release version.
 
 If you are facing errors with these instructions, these are a set of alternative instructions created by the community:
