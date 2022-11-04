@@ -1,5 +1,5 @@
 #!/bin/bash
-brew_packages="openblas snappy leveldb gflags glog szip lmdb hdf5 opencv protobuf boost cmake viennacl"
+brew_packages="openblas snappy leveldb gflags glog lmdb hdf5 opencv protobuf boost cmake viennacl"
 for pkg in $brew_packages
 do
     echo "brew install $pkg || brew upgrade $pkg"
