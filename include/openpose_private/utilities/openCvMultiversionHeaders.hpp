@@ -3,7 +3,7 @@
 
 #include <opencv2/opencv.hpp>
 
-// Compabitility for OpenCV 4.0 while preserving 2.4.X and 3.X HEADERS
+// Compatibility for OpenCV 4.0 while preserving 2.4.X and 3.X HEADERS
 // Note:
 // - CV_VERSION:         2.4.9.1 | 4.0.0-beta
 // - CV_MAJOR_VERSION:         2 | 4

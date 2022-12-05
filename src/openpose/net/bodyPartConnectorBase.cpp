@@ -139,7 +139,7 @@ namespace op
                 roi.y -= marginY;
                 roi.width += 2*marginX;
                 roi.height += 2*marginY;
-                // partFirstNon0+1 for for loops
+                // partFirstNon0+1 for loops
                 partLastNon0++;
                 // From [p1, p2] to [p1, width, height]
                 // +1 to account for 1-line keypoints
@@ -293,7 +293,7 @@ namespace op
                     // (score, indexA, indexB). Inverted order for easy std::sort
                     std::vector<std::tuple<double, int, int>> allABConnections;
                     // Note: Problem of this function, if no right PAF between A and B, both elements are
-                    // discarded. However, they should be added indepently, not discarded
+                    // discarded. However, they should be added independently, not discarded
                     if (heatMapPtr != nullptr)
                     {
                         const auto* mapX = heatMapPtr

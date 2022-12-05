@@ -62,7 +62,7 @@ void printKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>
             // // Alternative 3
             // std::cout << datumsPtr->at(0)->poseKeypoints << std::endl;
 
-            // // Alternative 4 - Accesing each element of the keypoints
+            // // Alternative 4 - Accessing each element of the keypoints
             // op::opLog("\nKeypoints:", op::Priority::High);
             // const auto& poseKeypoints = datumsPtr->at(0)->poseKeypoints;
             // op::opLog("Person pose keypoints:", op::Priority::High);

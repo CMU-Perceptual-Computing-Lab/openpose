@@ -60,7 +60,7 @@ public:
             {
                 op::opLog(
                     "Last frame read and added to queue. Closing program after it is processed.", op::Priority::High);
-                // This funtion stops this worker, which will eventually stop the whole thread system once all the
+                // This function stops this worker, which will eventually stop the whole thread system once all the
                 // frames have been processed
                 this->stop();
                 return nullptr;
@@ -155,7 +155,7 @@ public:
             {
                 // Show in command line the resulting pose keypoints for body, face and hands
                 op::opLog("\nKeypoints:");
-                // Accesing each element of the keypoints
+                // Accessing each element of the keypoints
                 const auto& poseKeypoints = datumsPtr->at(0)->poseKeypoints;
                 op::opLog("Person pose keypoints:");
                 for (auto person = 0 ; person < poseKeypoints.getSize(0) ; person++)

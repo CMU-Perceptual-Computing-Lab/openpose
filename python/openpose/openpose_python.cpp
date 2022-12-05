@@ -477,7 +477,7 @@ template <> struct type_caster<op::Array<float>> {
         {
             UNUSED(defval);
             if (m.getSize().size() == 0) {
-                return none();
+                return Py_BuildValue("");
             }
             std::string format = format_descriptor<float>::format();
             return array(buffer_info(
@@ -513,7 +513,7 @@ template <> struct type_caster<op::Array<long long>> {
         {
             UNUSED(defval);
             if (m.getSize().size() == 0) {
-                return none();
+                return Py_BuildValue("");
             }
             std::string format = format_descriptor<long long>::format();
             return array(buffer_info(

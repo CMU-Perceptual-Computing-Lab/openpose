@@ -141,7 +141,7 @@ namespace op
                             auto type = platforms[0].getDevices(CL_DEVICE_TYPE_GPU, &devices);
                             if ( type == CL_SUCCESS)
                             {
-                                // Get only relavent device
+                                // Get only relevant device
                                 cl::Context allContext(devices);
                                 std::vector<cl::Device> gpuDevices;
                                 gpuDevices = allContext.getInfo<CL_CONTEXT_DEVICES>();
@@ -173,7 +173,7 @@ namespace op
                             auto type = platforms[0].getDevices(CL_DEVICE_TYPE_CPU, &devices);
                             if ( type == CL_SUCCESS)
                             {
-                                // Get only relavent device
+                                // Get only relevant device
                                 std::vector<cl::Device> devices;
                                 cl::Context allContext(devices);
                                 std::vector<cl::Device> cpuDevices;
@@ -204,7 +204,7 @@ namespace op
                             auto type = platforms[0].getDevices(CL_DEVICE_TYPE_ACCELERATOR, &devices);
                             if ( type == CL_SUCCESS)
                             {
-                                // Get only relavent device
+                                // Get only relevant device
                                 std::vector<cl::Device> devices;
                                 cl::Context allContext(devices);
                                 std::vector<cl::Device> accDevices;

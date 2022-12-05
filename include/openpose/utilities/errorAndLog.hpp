@@ -28,7 +28,7 @@ namespace op
     }
 
     /**
-     * Differences between different kind of errrors:
+     * Differences between different kind of errors:
      *  - error() is a normal error in the code.
      *  - errorWorker() is an error that occurred on a thread. Therefore, the machine will stop the threads, go back
      *    to the main thread, and then throw the error.
@@ -36,7 +36,7 @@ namespace op
      *    so we simply output an error message via std::cerr.
      */
 
-    // Error managment - How to use:
+    // Error management - How to use:
         // error(message, __LINE__, __FUNCTION__, __FILE__);
     OP_API void error(
         const std::string& message, const int line = -1, const std::string& function = "",
@@ -49,7 +49,7 @@ namespace op
         error(tToString(message), line, function, file);
     }
 
-    // Worker error managment
+    // Worker error management
     OP_API void checkWorkerErrors();
 
     OP_API void errorWorker(
@@ -63,7 +63,7 @@ namespace op
         errorWorker(tToString(message), line, function, file);
     }
 
-    // Destructor error managment
+    // Destructor error management
     OP_API void errorDestructor(
         const std::string& message, const int line = -1, const std::string& function = "",
         const std::string& file = "");

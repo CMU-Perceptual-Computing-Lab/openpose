@@ -41,7 +41,7 @@ public:
             {
                 op::opLog("Last frame read and added to queue. Closing program after it is processed.",
                         op::Priority::High);
-                // This funtion stops this worker, which will eventually stop the whole thread system once all the
+                // This function stops this worker, which will eventually stop the whole thread system once all the
                 // frames have been processed
                 this->stop();
                 return nullptr;

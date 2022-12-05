@@ -18,7 +18,7 @@
 namespace op
 {
     /**
-     * Private auxiliar function that sets the cv::Mat wrapper and makes it point to the same data than
+     * Private auxiliary function that sets the cv::Mat wrapper and makes it point to the same data than
      * std::shared_ptr points to.
      */
     template<typename T>
@@ -581,7 +581,7 @@ namespace op
                 // Adding element separated by a space
                 string += std::to_string(pData[i]) + " ";
                 // Introduce an enter for each dimension change
-                // If comented, all values will be printed in the same line
+                // If commented, all values will be printed in the same line
                 auto multiplier = 1;
                 for (auto dimension = (int)(mSize.size() - 1u) ; dimension > 0
                       && (int(i/multiplier) % getSize(dimension) == getSize(dimension)-1) ; dimension--)

@@ -12,9 +12,10 @@ OpenPose Doc - Installation
     5. [Compilation](#compilation)
     6. [Running OpenPose](#running-openpose)
     7. [Custom User Code](#custom-user-code)
-4. [Compiling and Running OpenPose from Source on ROS, Docker, and Google Colab - Community-Based Work](#compiling-and-running-openpose-from-source-on-ros-docker-and-google-colab-community-based-work)
-5. [Uninstalling, Reinstalling, or Updating OpenPose](#Uninstalling-reinstalling-or-updating-openpose)
-6. [Additional Settings (Optional)](#additional-settings-optional)
+4. [Compiling and Running OpenPose from Source on ROS, Docker, and Google Colab - Community-Based Work](#compiling-and-running-openpose-from-source-on-ros-docker-and-google-colab---community-based-work)
+5. [OpenPose Live Demo at Tiyaro - Community-Based Work](#openpose-live-demo-from-tiyaro---community-based-work)
+6. [Uninstalling, Reinstalling, or Updating OpenPose](#uninstalling-reinstalling-or-updating-openpose)
+7. [Additional Settings (Optional)](#additional-settings-optional)
 
 
 
@@ -71,7 +72,7 @@ The instructions in the following subsections describe the steps to build OpenPo
 
 
 ### Problems and Errors Installing OpenPose
-Any problem installing OpenPose while following this guidelines? Check [doc/05_faq.md](../05_faq.md) and/or check existing GitHub issues. If you do you find your issue, post a new one. We will not respond to duplicated issues, as well as GitHub issues about Caffe, OpenCV or CUDA installation errors, as well as issues that do not fill all the information that the GitHub template asks for.
+Any problem installing OpenPose while following this guidelines? Check [doc/05_faq.md](../05_faq.md) and/or check existing GitHub issues. If you don't find your issue, post a new one. We will not respond to duplicated issues, as well as GitHub issues about Caffe, OpenCV or CUDA installation errors, as well as issues that do not fill all the information that the GitHub template asks for.
 
 
 
@@ -191,6 +192,8 @@ In order to build the project, select and run only one of the 2 following altern
     copy x64\Release\*  bin\
     ```
 
+**NOTE**: To set `GPU_MODE` flag to `CPU_ONLY` when building the tool via cli, append `-D GPU_MODE:STRINGS=CPU_ONLY` to the `cmake` command.
+
 **VERY IMPORTANT NOTE**: In order to use OpenPose outside Visual Studio, and assuming you have not unchecked the `BUILD_BIN_FOLDER` flag in CMake, copy all DLLs from `{build_directory}/bin` into the folder where the generated `openpose.dll` and `*.exe` demos are, e.g., `{build_directory}x64/Release` for the 64-bit release version.
 
 If you are facing errors with these instructions, these are a set of alternative instructions created by the community:
@@ -241,6 +244,14 @@ If you do not want to use the Windows portable binaries nor compile it from sour
 
 
 
+## OpenPose Live Demo at Tiyaro - Community-Based Work
+You can find a [Live Demo of the OpenPose API at Tiyaro.ai](https://console.tiyaro.ai/explore/opensource-1-OpenPose/demo). We do not officially support it, but a Tiyaro co-founder added this support in [2129]. Feel free to comment in that post to him if you have questions about it.
+<p align="center"><a href="https://console.tiyaro.ai/explore?q=openpose&pub=opensource"> <img src="https://tiyaro-public-docs.s3.us-west-2.amazonaws.com/assets/try_on_tiyaro_badge.svg"></a></p>
+
+
+
+
+
 ## Uninstalling, Reinstalling, or Updating OpenPose
 OpenPose can be easily uninstalled:
 1. (Ubuntu and Mac) If you ran `sudo make install` (which we do not recommend), then run `sudo make uninstall` in `build/`.
@@ -256,17 +267,17 @@ In order to update it or reinstall it:
 
 ## Additional Settings (Optional)
 Check the [Additional Settings (Optional)](2_additional_settings.md) documentation if you want to:
-1. [Deploy or Export OpenPose to Other Projects](2_advanced_settings.md#deploy-or-export-openpose-to-other-projects)
-2. [Maximum Speed](2_advanced_settings.md#maximum-speed)
-3. [Faster CPU Version (Ubuntu Only)](2_advanced_settings.md#faster-cpu-version-ubuntu-only)
-4. [OpenCL Version](2_advanced_settings.md#opencl-version)
-5. [COCO and MPI Models](2_advanced_settings.md#coco-and-mpi-models)
-6. [3D Reconstruction Module](2_advanced_settings.md#3d-reconstruction-module)
-7. [Calibration Module](2_advanced_settings.md#calibration-module)
-8. [Unity Compatible Version](2_advanced_settings.md#unity-compatible-version)
-9. [Compile without cuDNN](2_advanced_settes.md#compiling-without-cudnn)
-10. [Custom Caffe](2_advanced_settings.md#custom-caffe)
-11. [Custom NVIDIA NVCaffe](2_advanced_settings.md#custom-nvidia-nvcaffe)
-12. [Custom OpenCV](2_advanced_settings.md#custom-opencv)
-13. [Doxygen Documentation Autogeneration (Ubuntu Only)](2_advanced_settings.md#doxygen-documentation-autogeneration-ubuntu-only)
-14. [CMake Command Line Configuration (Ubuntu Only)](2_advanced_settings.md#cmake-command-line-configuration-ubuntu-only)
+1. [Deploy or Export OpenPose to Other Projects](2_additional_settings.md#deploy-or-export-openpose-to-other-projects)
+2. [Maximum Speed](2_additional_settings.md#maximum-speed)
+3. [Faster CPU Version (Ubuntu Only)](2_additional_settings.md#faster-cpu-version-ubuntu-only)
+4. [OpenCL Version](2_additional_settings.md#opencl-version)
+5. [COCO and MPI Models](2_additional_settings.md#coco-and-mpi-models)
+6. [3D Reconstruction Module](2_additional_settings.md#3d-reconstruction-module)
+7. [Calibration Module](2_additional_settings.md#calibration-module)
+8. [Unity Compatible Version](2_additional_settings.md#unity-compatible-version)
+9. [Compile without cuDNN](2_additional_settings.md#compiling-without-cudnn)
+10. [Custom Caffe](2_additional_settings.md#custom-caffe)
+11. [Custom NVIDIA NVCaffe](2_additional_settings.md#custom-nvidia-nvcaffe)
+12. [Custom OpenCV](2_additional_settings.md#custom-opencv)
+13. [Doxygen Documentation Autogeneration (Ubuntu Only)](2_additional_settings.md#doxygen-documentation-autogeneration-ubuntu-only)
+14. [CMake Command Line Configuration (Ubuntu Only)](2_additional_settings.md#cmake-command-line-configuration-ubuntu-only)

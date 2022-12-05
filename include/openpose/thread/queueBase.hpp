@@ -104,7 +104,7 @@ namespace op
     {
     }
 
-    // Virutal destructor
+    // Virtual destructor
     template<typename TDatums, typename TQueue>
     QueueBase<TDatums, TQueue>::~QueueBase()
     {

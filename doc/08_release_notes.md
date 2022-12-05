@@ -160,7 +160,7 @@ OpenPose Doc - Release Notes
     5. Added `--write_json` as a new version of `--write_keypoint_json`. It includes the body part candidates (if enabled), as well as any extra information added in the future (e.g., person ID).
     6. Body part candidates can be retrieved in Datum and saved with `--write_json`.
 2. Functions or parameters renamed:
-    1. `PoseParameters` splitted into `PoseParameters` and `PoseParametersRender` and const parameters turned into functions for more clarity.
+    1. `PoseParameters` split into `PoseParameters` and `PoseParametersRender` and const parameters turned into functions for more clarity.
 3. Main bugs fixed:
     1. Render working on images > 4K (#324).
     2. Cleaned redundant arguments on `getAverageScore` and `getKeypointsArea`.
@@ -235,7 +235,7 @@ OpenPose Doc - Release Notes
     11. 3D keypoints and camera parameters in meters (instead of millimeters) in order to reduce numerical errors.
     12. New `PoseExtractor` class to contain future ID and tracking algorithms as well as the current OpenPose keypoint detection algorithm.
     13. Added initial alpha versions of the `tracking` and `identification` modules (for now disabled but available in the source code), including `PersonIdExtractor` and `PersonTracker`. `PersonIdExtractor` includes greedy matrix OP-LK matching.
-    14. Added catchs to all demos for higher debug information.
+    14. Added catches to all demos for higher debug information.
     15. GUI includes the capability of dynamically enabling/disabling the face, hand, and 3-D rendering, as well as more clear visualization for skeleton, background, heatmap addition, and PAF addition channels.
     16. When GUI changes some parameter from PoseExtractorNet, there is a log to notify the user of the change.
     17. Deprecated flag `--write_keypoint_json` removed (`--write_json` is the equivalent since version 1.2.1).
@@ -387,7 +387,7 @@ OpenPose Doc - Release Notes
 1. Main improvements:
     1. Multi-camera (3D) working on Asynchronous mode.
         1. Functions `WrapperT::waitAndEmplace()` and `WrapperT::tryEmplace()` improved, allowing multi-camera/3-D (`TDatums` of size > 1).
-        2. Added `createMultiviewTDatum()` to auto-generate a `TDatums` for multi-camera/3-D from a single cv::Mat (that is splitted) and the desired camera parameter matrices.
+        2. Added `createMultiviewTDatum()` to auto-generate a `TDatums` for multi-camera/3-D from a single cv::Mat (that is split) and the desired camera parameter matrices.
         3. Added `examples/tutorial_api_cpp/11_asynchronous_custom_input_multi_camera.cpp` for a test example.
     2. Created Matrix as container of cv::Mat, and String as container of std::string.
     3. After replacing cv::Mat by Matrix, headers do not contain any 3rd-party library includes nor functions. This way, OpenPose can be exported without needing 3rd-party includes nor static library files (e.g., lib files in Windows), allowing people to use their own versions of OpenCV, Eigen, etc. without conflicting with OpenPose. Dynamic library files (e.g., `dll` files in Windows, `so` in Ubuntu) are still required.

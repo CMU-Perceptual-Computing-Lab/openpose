@@ -437,7 +437,7 @@ namespace op
             for (auto part = 0u ; part < numberBodyParts ; part++)
             {
                 const auto offsetOrigin = part * heatMapArea;
-                // __saturatef = trucate to [0,1]
+                // __saturatef = truncate to [0,1]
                 const auto value = __saturatef(heatMapPtr[offsetOrigin + yHeatMap*widthHeatMap + xHeatMap]);
                 const auto rgbColorIndex = (part%numberColors)*3;
                 rgbColor[0] += value*COCO_COLORS[rgbColorIndex];

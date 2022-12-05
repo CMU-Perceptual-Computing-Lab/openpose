@@ -1,7 +1,7 @@
 OpenPose Very Advanced Doc - Library Structure
 ====================================
 
-As a user, you do not need to know anything about this section! This section is intended for OpenPose internal developpers. It is exposed publicly, but you can skip this whole folder if you are just trying to use OpenPose or create new code/demos using OpenPose.
+As a user, you do not need to know anything about this section! This section is intended for OpenPose internal developers. It is exposed publicly, but you can skip this whole folder if you are just trying to use OpenPose or create new code/demos using OpenPose.
 
 Even if you want to e.g., change internal functions and/or extend the OpenPose functionality, the easiest solution as a user is to follow the [OpenPose C++ API](../../doc/04_cpp_api.md). If the new functionality is cool, make a pull request so we can add it to OpenPose!
 

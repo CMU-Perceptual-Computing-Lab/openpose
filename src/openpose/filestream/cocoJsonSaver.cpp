@@ -38,7 +38,7 @@ namespace op
                 error("Empty path given as output file path for saving COCO JSON format.",
                       __LINE__, __FUNCTION__, __FILE__);
             if (cocoJsonVariants >= 32)
-                error("Unkown value for cocoJsonFormat (flag `--write_coco_json_variants`).",
+                error("Unknown value for cocoJsonFormat (flag `--write_coco_json_variants`).",
                       __LINE__, __FUNCTION__, __FILE__);
             // Open mJsonOfstreams
             const auto filePath = getFullFilePathNoExtension(filePathToSave);

@@ -35,7 +35,7 @@ namespace op
         /**
          * Whether to enable people tracking across frames. The value indicates the number of frames where tracking
          * is run between each OpenPose keypoint detection. Select -1 (default) to disable it or 0 to run
-         * simultaneously OpenPose keypoint detector and tracking for potentially higher accurary than only OpenPose.
+         * simultaneously OpenPose keypoint detector and tracking for potentially higher accuracy than only OpenPose.
          */
         int tracking;
 

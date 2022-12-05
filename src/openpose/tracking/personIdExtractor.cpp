@@ -196,7 +196,7 @@ namespace op
                     const auto personDistanceThreshold = fastMax(10.f,
                         distanceThreshold*float(std::sqrt(imagePrevious.cols*imagePrevious.rows)) / 960.f);
 
-                    // Find best correspondance in the LK set
+                    // Find best correspondence in the LK set
                     for (const auto& personEntry : personEntries)
                     {
                         if (used.find(personEntry.first) != used.end())
@@ -313,7 +313,7 @@ namespace op
     //                 const auto personDistanceThreshold = fastMax(10.f,
     //                     distanceThreshold*float(std::sqrt(imagePrevious.cols*imagePrevious.rows)) / 960.f);
 
-    //                 // Find best correspondance in the LK set
+    //                 // Find best correspondence in the LK set
     //                 auto bestMatch = -1ll;
     //                 auto bestScore = 0.f;
     //                 for (const auto& personEntry : personEntries)

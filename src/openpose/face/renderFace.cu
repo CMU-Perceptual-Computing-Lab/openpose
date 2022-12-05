@@ -53,7 +53,7 @@ namespace op
         {
             if (numberPeople > 0)
             {
-                // Get bouding boxes
+                // Get bounding boxes
                 const dim3 threadsPerBlockBoundBox = {1, 1, 1};
                 const dim3 numBlocksBox{getNumberCudaBlocks(POSE_MAX_PEOPLE, threadsPerBlockBoundBox.x)};
                 getBoundingBoxPerPersonFace<<<threadsPerBlockBoundBox, numBlocksBox>>>(

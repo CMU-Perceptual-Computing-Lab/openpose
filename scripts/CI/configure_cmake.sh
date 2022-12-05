@@ -18,7 +18,7 @@ if [[ $WITH_PYTHON == true ]] ; then
     if [[ $PYTHON3_VERSION ]] ; then
       ARGS="$ARGS -DPYTHON_EXECUTABLE=/usr/bin/${PYTHON3_VERSION} -DPYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/lib${PYTHON3_VERSION}m.so"
     else
-      echo "No Python version defined (or unkown one used), using the default v2.7"
+      echo "No Python version defined (or unknown one used), using the default v2.7"
       ARGS="$ARGS -DPYTHON_EXECUTABLE=/usr/bin/python2.7 -DPYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython2.7m.so"
     fi
   fi

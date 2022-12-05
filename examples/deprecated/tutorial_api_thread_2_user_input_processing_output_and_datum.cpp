@@ -16,7 +16,7 @@
 // OpenPose dependencies
 #include <openpose/headers.hpp>
 
-// See all the available parameter options withe the `--help` flag. E.g., `build/examples/openpose/openpose.bin --help`
+// See all the available parameter options with the `--help` flag. E.g., `build/examples/openpose/openpose.bin --help`
 // Note: This command will show you flags for other unnecessary 3rdparty files. Check only the flags for the OpenPose
 // executable. E.g., for `openpose.bin`, look for `Flags from examples/openpose/openpose.cpp:`.
 // Debugging/Other
@@ -70,7 +70,7 @@ public:
             {
                 op::opLog(
                     "Last frame read and added to queue. Closing program after it is processed.", op::Priority::High);
-                // This funtion stops this worker, which will eventually stop the whole thread system once all the
+                // This function stops this worker, which will eventually stop the whole thread system once all the
                 // frames have been processed
                 this->stop();
                 return nullptr;

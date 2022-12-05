@@ -115,7 +115,7 @@ namespace op
     //                 const auto peakLocX = (int)(globalIdx % width);
     //                 const auto peakLocY = (int)(globalIdx / width);
 
-    //                 // Accurate peak location: considered neighboors
+    //                 // Accurate peak location: considered neighbors
     //                 if (peakIndex < maxPeaks) // limitation
     //                 {
     //                     T xAcc = 0.f;
@@ -173,7 +173,7 @@ namespace op
         const auto channelOffsetSource = channel * width*height;
         const auto channelOffset = channel * offsetTarget;
 
-        // We need to substract the peak at pixel 0 of the current channel for all values
+        // We need to subtract the peak at pixel 0 of the current channel for all values
         if (threadIdx.x == 0)
             kernel0 = kernelPtr[channelOffsetSource];
         __syncthreads();
@@ -199,7 +199,7 @@ namespace op
                     const auto peakLocX = (int)(globalIdx % width);
                     const auto peakLocY = (int)(globalIdx / width);
 
-                    // Accurate peak location: considered neighboors
+                    // Accurate peak location: considered neighbors
                     if (peakIndex < maxPeaks) // limitation
                     {
                         T xAcc = 0.f;
