@@ -1,6 +1,9 @@
 [submodule "3rdparty/caffe"]
-	path = 3rdparty/caffe
-	url = https://github.com/CMU-Perceptual-Computing-Lab/caffe.git
+        path = 3rdparty/caffe
+        url = https://github.com/cheneeheng/caffe.git
 [submodule "3rdparty/pybind11"]
 	path = 3rdparty/pybind11
 	url = https://github.com/pybind/pybind11.git
+[submodule "3rdparty/cudnn-frontend"]
+	path = 3rdparty/cudnn-frontend
+	url = https://github.com/NVIDIA/cudnn-frontend.git
