@@ -79,8 +79,8 @@ You can include the 3D reconstruction module by:
     1. Ubuntu: Get and install the latest Spinnaker SDK version in their default path. OpenPose will automatically find it. Otherwise, set the right path with CMake.
     2. Windows: Download the latest Spinnaker SDK version from [https://www.flir.com/products/spinnaker-sdk/](https://www.flir.com/products/spinnaker-sdk/).
         - Copy `{FLIR Systems Directory}\Spinnaker\bin64\vs2015\` as `{OpenPoseDirectory}\3rdparty\windows\spinnaker\bin\`. You can remove all the *.exe files.
-        - Copy `{FLIR Systems Director}\Spinnaker\include\` as `{OpenPoseDirectory}\3rdparty\windows\spinnaker\include\`.
-        - Copy `Spinnaker_v140.lib` and `Spinnakerd_v140.lib` from `{PointGreyParentDirectory}\Point Grey Research\Spinnaker\lib64\vs2015\` into `{OpenPoseDirectory}\3rdparty\windows\spinnaker\lib\`.
+        - Copy `{FLIR Systems Directory}\Spinnaker\include\` as `{OpenPoseDirectory}\3rdparty\windows\spinnaker\include\`.
+        - Copy `Spinnaker_v140.lib` and `Spinnakerd_v140.lib` from `{FLIR Systems Directory}\Spinnaker\lib64\vs2015\` into `{OpenPoseDirectory}\3rdparty\windows\spinnaker\lib\`.
 2. Install the 3D visualizer, FreeGLUT:
     1. Ubuntu: run `sudo apt-get update && sudo apt-get install build-essential freeglut3 freeglut3-dev libxmu-dev libxi-dev` and reboot your PC.
     2. Windows:
