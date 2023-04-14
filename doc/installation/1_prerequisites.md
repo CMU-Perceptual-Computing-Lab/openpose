@@ -76,7 +76,7 @@ sudo pip install numpy opencv-python
 
 ## Mac OS Prerequisites
 1. If you don't have `brew`, install it by running `bash scripts/osx/install_brew.sh` on your terminal.
-2. Install **CMake GUI**: Run the command `brew cask install cmake`.
+2. Install **CMake GUI**: Run the command `brew install --cask cmake`.
 3. Install **Caffe, OpenCV, and Caffe prerequisites**: Run `bash scripts/osx/install_deps.sh`.
 
 
