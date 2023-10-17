@@ -72,7 +72,7 @@ The instructions in the following subsections describe the steps to build OpenPo
 
 
 ### Problems and Errors Installing OpenPose
-Any problem installing OpenPose while following this guidelines? Check [doc/05_faq.md](../05_faq.md) and/or check existing GitHub issues. If you do you find your issue, post a new one. We will not respond to duplicated issues, as well as GitHub issues about Caffe, OpenCV or CUDA installation errors, as well as issues that do not fill all the information that the GitHub template asks for.
+Any problem installing OpenPose while following this guidelines? Check [doc/05_faq.md](../05_faq.md) and/or check existing GitHub issues. If you don't find your issue, post a new one. We will not respond to duplicated issues, as well as GitHub issues about Caffe, OpenCV or CUDA installation errors, as well as issues that do not fill all the information that the GitHub template asks for.
 
 
 
@@ -191,6 +191,8 @@ In order to build the project, select and run only one of the 2 following altern
     cmake --build . --config Release
     copy x64\Release\*  bin\
     ```
+
+**NOTE**: To set `GPU_MODE` flag to `CPU_ONLY` when building the tool via cli, append `-D GPU_MODE:STRINGS=CPU_ONLY` to the `cmake` command.
 
 **VERY IMPORTANT NOTE**: In order to use OpenPose outside Visual Studio, and assuming you have not unchecked the `BUILD_BIN_FOLDER` flag in CMake, copy all DLLs from `{build_directory}/bin` into the folder where the generated `openpose.dll` and `*.exe` demos are, e.g., `{build_directory}x64/Release` for the 64-bit release version.
 
