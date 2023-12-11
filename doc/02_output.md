@@ -118,6 +118,7 @@ There are 2 alternatives to save the OpenPose output. But both of them follow th
 
 2. (Deprecated) `--write_keypoint` uses the OpenCV `cv::FileStorage` default formats, i.e., JSON (if OpenCV 3 or higher), XML, and YML. It only prints 2D body information (no 3D or face/hands).
 
+(Low level details) If you wanted to change anything in this file format (e.g., the output file name), you could check and/or modify [peopleJsonSaver.cpp](../src/openpose/filestream/peopleJsonSaver.cpp).
 
 
 
