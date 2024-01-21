@@ -8,7 +8,6 @@ set(OpenPose_VERSION ${OpenPose_VERSION_MAJOR}.${OpenPose_VERSION_MINOR}.${OpenP
 ### OS-DEPENDENT FLAGS
 set(CMAKE_MACOSX_RPATH 1)
 
-
 ### CMAKE HEADERS
 # Ubuntu 18 default. After 3.8, no need for find_CUDA
 # https://cmake.org/cmake/help/v3.10/module/FindCUDA.html
@@ -64,7 +63,6 @@ else (${CMAKE_BUILD_TYPE_KNOWN})
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
 endif (${CMAKE_BUILD_TYPE_KNOWN})
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Release" "Debug" "MinSizeRel" "RelWithDebInfo")
-
 
 ### FLAGS
 if (WIN32)
@@ -164,7 +162,6 @@ endif (WIN32)
 #     add_definitions("/arch:IA32")
 #   endif (${INSTRUCTION_SET} MATCHES "SSE")
 # endif (WIN32)
-
 
 ### PROJECT OPTIONS
 # Select the DL Framework
@@ -313,7 +310,7 @@ option(DOWNLOAD_HAND_MODEL "Download hand model." ON)
 # More options
 option(BUILD_EXAMPLES "Build OpenPose examples." ON)
 option(BUILD_DOCS "Build OpenPose documentation." OFF)
-option(BUILD_PYTHON "Build OpenPose python." OFF)
+option(BUILD_PYTHON "Build OpenPose python." ON)
 if (WIN32)
   option(BUILD_BIN_FOLDER "Copy all required 3rd-party DLL files into {build_directory}/bin. Disable to save some memory." ON)
 endif (WIN32)
