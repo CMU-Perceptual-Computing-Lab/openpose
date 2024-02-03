@@ -6,6 +6,7 @@ env:
   GH_REPO_NAME: ${{ github.event.repository.name }}
   DOXYFILE: ${{ github.workspace }}/.doc_autogeneration.doxygen
   GH_REPO_REF: ${{ github.repositoryUrl }}
+  PYTHON3_VERSION: python3.8
 
 jobs:
   build:
@@ -41,7 +42,6 @@ jobs:
               CI_OS_NAME: linux
               CI_BUILD_NUMBER: ${{ github.run_number }}
               CI_COMMIT: ${{ github.sha }}
-              PYTHON3_VERSION: python3.8
             DOCS: true
           # Ubuntu 18.04 - Python - CMake - CUDA
           - os: ubuntu-18.04
@@ -60,7 +60,6 @@ jobs:
               WITH_CUDA: false
               WITH_CUDNN: false
               CI_OS_NAME: linux
-              PYTHON3_VERSION: python3.8
           # Ubuntu 18.04 - Python - CMake - CPU
           - os: ubuntu-18.04
             os_name: linux
@@ -81,7 +80,6 @@ jobs:
           #     WITH_CUDNN: false
           #     WITH_OPEN_CL: true
           #     CI_OS_NAME: linux
-          #     PYTHON3_VERSION: python3.8
           # Ubuntu 18.04 - Python - CMake - OpenCL
           - os: ubuntu-18.04
             os_name: linux
@@ -102,7 +100,6 @@ jobs:
               WITH_CUDNN: false
               WITH_DEBUG: true
               CI_OS_NAME: linux
-              PYTHON3_VERSION: python3.8
           # Ubuntu 18.04 - Python - CMake - CPU - Debug
           - os: ubuntu-18.04
             os_name: linux
@@ -123,7 +120,6 @@ jobs:
               WITH_CUDA: false
               WITH_CUDNN: false
               CI_OS_NAME: linux
-              PYTHON3_VERSION: python3.8
           # Ubuntu 20.04 - Default - CMake - CPU
           - os: ubuntu-20.04
             os_name: linux
@@ -238,9 +234,9 @@ jobs:
       with:
         fetch-depth: 0
         submodules: recursive
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v5
       with:
-        python-version: 2.x
+        python-version: 3.8
       if: ${{ matrix.env.WITH_PYTHON }}
     - name: Install (Linux)
       run: scripts/CI/install_deps_ubuntu.sh
