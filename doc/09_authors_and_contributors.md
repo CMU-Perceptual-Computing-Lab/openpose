@@ -19,4 +19,4 @@ We would also like to thank the following people, who have contributed to key co
 5. [Helen Medina](https://github.com/helen-medina): First Windows version.
 6. [Matthijs van der Burgh](https://github.com/MatthijsBurgh): First GitHub Actions CI version for Ubuntu and Mac, and ported all the deprecated Travis CI tests into the new CI system.
 
-We would also like to thank all the people who [has helped OpenPose in any way](https://github.com/CMU-Perceptual-Computing-Lab/openpose/graphs/contributors).
+We would also like to thank all the people who [have helped OpenPose in any way](https://github.com/CMU-Perceptual-Computing-Lab/openpose/graphs/contributors).
