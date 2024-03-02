@@ -66,6 +66,10 @@ if [[ $WITH_DEBUG == true ]] ; then
   ARGS="$ARGS -DCMAKE_BUILD_TYPE=Debug"
 fi
 
+if [[ $CI_OS_NAME == "osx" ]] ; then
+  ARGS="$ARGS -DUSE_LEVELDB=OFF";
+fi
+
 echo "ARGS = ${ARGS}."
 
 cmake .. $ARGS
