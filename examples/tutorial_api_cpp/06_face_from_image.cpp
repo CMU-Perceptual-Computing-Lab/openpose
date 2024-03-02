@@ -151,7 +151,7 @@ void configureWrapper(op::Wrapper& opWrapper)
             op::String(FLAGS_write_video), FLAGS_write_video_fps, FLAGS_write_video_with_audio,
             op::String(FLAGS_write_heatmaps), op::String(FLAGS_write_heatmaps_format), op::String(FLAGS_write_video_3d),
             op::String(FLAGS_write_video_adam), op::String(FLAGS_write_bvh), op::String(FLAGS_udp_host),
-            op::String(FLAGS_udp_port)};
+            op::String(FLAGS_udp_port),FLAGS_udp_json_output };
         opWrapper.configure(wrapperStructOutput);
         // No GUI. Equivalent to: opWrapper.configure(op::WrapperStructGui{});
         // Set to single-thread (for sequential processing and/or debugging and/or reducing latency)

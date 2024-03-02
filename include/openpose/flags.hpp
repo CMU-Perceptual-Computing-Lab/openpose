@@ -273,6 +273,7 @@ DEFINE_string(write_keypoint_format,    "yml",          "(Deprecated, use `write
 // Result Saving - Extra Algorithms
 DEFINE_string(write_bvh,                "",             "Experimental, not available yet. E.g., `~/Desktop/mocapResult.bvh`.");
 // UDP Communication
+DEFINE_bool(udp_json_output,            false,          "Will output JSON format data to the udp_host and udp_port values instead of to the fileoutput.");
 DEFINE_string(udp_host,                 "",             "Experimental, not available yet. IP for UDP communication. E.g., `192.168.0.1`.");
 DEFINE_string(udp_port,                 "8051",         "Experimental, not available yet. Port number for UDP communication.");
 #endif // OPENPOSE_FLAGS_DISABLE_POSE
