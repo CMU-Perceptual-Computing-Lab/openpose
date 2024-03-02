@@ -292,6 +292,78 @@ namespace op
     {
     }
 
+    Array<float> Datum::getPoseKeypoints(){
+        if(!poseKeypoints.empty()){
+            return poseKeypoints;
+        }
+        else {
+            return Array<float>(1, -1);
+        }
+    }
+
+    Array<float> Datum::getPoseIds(){
+        if(!poseIds.empty()){
+            return poseIds;
+        }
+        else {
+            return Array<float>(1, -1);
+        }
+    }
+
+    Array<float> Datum::getPoseScores(){
+        if(!poseScores.empty()){
+            return poseScores;
+        }
+        else {
+            return Array<float>(1, -1);
+        }
+    }
+
+    Array<float> Datum::getPoseHeatMaps(){
+        if(!poseHeatMaps.empty()){
+            return poseHeatMaps;
+        }
+        else {
+            return Array<float>(1, -1);
+        }
+    }
+
+    Array<float> Datum::getFaceKeypoints(){
+        if(!faceKeypoints.empty()){
+            return faceKeypoints;
+        }
+        else {
+            return Array<float>(1, -1);
+        }
+    }
+
+    Array<float> Datum::getFaceHeatMaps(){
+        if(!faceHeatMaps.empty()){
+            return faceHeatMaps;
+        }
+        else {
+            return Array<float>(1, -1);
+        }
+    }
+
+    Array<float> Datum::getPoseKeypoints3D(){
+        if(!poseKeypoints3D.empty()){
+            return poseKeypoints3D;
+        }
+        else {
+            return Array<float>(1, -1);
+        }
+    }
+
+    Array<float> Datum::getFaceKeypoints3D(){
+        if(!faceKeypoints3D.empty()){
+            return faceKeypoints3D;
+        }
+        else {
+            return Array<float>(1, -1);
+        }
+    }
+
     Datum Datum::clone() const
     {
         try
