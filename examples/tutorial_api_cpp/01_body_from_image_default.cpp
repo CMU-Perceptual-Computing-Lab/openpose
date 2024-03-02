@@ -57,10 +57,10 @@ void printKeypoints(const std::shared_ptr<std::vector<std::shared_ptr<op::Datum>
             op::opLog("Body keypoints: " + datumsPtr->at(0)->poseKeypoints.toString(), op::Priority::High);
 
             // // Alternative 2
-            // op::opLog(datumsPtr->at(0)->poseKeypoints, op::Priority::High);
+            op::opLog(datumsPtr->at(0)->poseKeypoints, op::Priority::High);
 
             // // Alternative 3
-            // std::cout << datumsPtr->at(0)->poseKeypoints << std::endl;
+            std::cout << datumsPtr->at(0)->poseKeypoints << std::endl;
 
             // // Alternative 4 - Accessing each element of the keypoints
             // op::opLog("\nKeypoints:", op::Priority::High);
