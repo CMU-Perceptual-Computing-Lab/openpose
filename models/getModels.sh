@@ -1,3 +1,29 @@
+# ------------------------- Downlaod MODELS -------------------------
+# (ISSUE #1602) Maintainer has provided alternative model link with google drive.
+# https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/1602#issuecomment-641653411
+MODEL_URL="https://drive.google.com/uc?id=1QCSxJZpnWvM00hx49CJ2zky7PWGzpcEh"
+FILENAME='models.zip'
+
+# Supplementary package 'gdown' to download google drive
+if ! [ -x "$(command -v gdown)" ]; then
+    echo "Please install gdown package with pip"
+    exit
+fi
+
+cd ..
+gdown ${MODEL_URL} -O ${FILENAME}
+unzip ${FILENAME}
+cd -
+
+RESULT=$?
+if [ $RESULT -eq 0 ]; then
+  echo "Model download success"
+  exit
+else
+  echo "Model download failure"
+  echo "Fallback to original approach"
+fi
+
 # ------------------------- BODY, FOOT, FACE, AND HAND MODELS -------------------------
 # Downloading body pose (COCO and MPI), face and hand models
 OPENPOSE_URL="http://posefs1.perception.cs.cmu.edu/OpenPose/models/"
