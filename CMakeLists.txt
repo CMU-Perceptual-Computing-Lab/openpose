@@ -272,6 +272,7 @@ endif (${GPU_MODE} MATCHES "CUDA")
 # Suboptions for acceleration library
 if (${GPU_MODE} MATCHES "CUDA")
   option(USE_CUDNN "Build OpenPose with cuDNN library support." ON)
+  option(USE_CUDNN_FRONTEND "Build OpenPose with cuDNN front end API (v8)." OFF)
 endif (${GPU_MODE} MATCHES "CUDA")
 
 # Suboptions for OpenPose 3D Reconstruction module and demo
@@ -721,11 +722,23 @@ if (UNIX OR APPLE)
         message(STATUS "Caffe has already been downloaded.")
       endif (CAFFE_DIR_VALID_LENGTH EQUAL 0)
 
+      if (USE_CUDNN_FRONTEND)
+        file(GLOB CUDNN_FRONTEND_DIR_VALID ${CMAKE_SOURCE_DIR}/3rdparty/cudnn-frontend/*)
+        list(LENGTH CUDNN_FRONTEND_DIR_VALID CUDNN_FRONTEND_DIR_VALID_LENGTH)
+        if (CUDNN_FRONTEND_DIR_VALID_LENGTH EQUAL 0)
+          execute_process(COMMAND git submodule update --init ${CMAKE_SOURCE_DIR}/3rdparty/cudnn-frontend)
+        else (CUDNN_FRONTEND_DIR_VALID_LENGTH EQUAL 0)
+          message(STATUS "cudnn-frontend has already been downloaded.")
+        endif (CUDNN_FRONTEND_DIR_VALID_LENGTH EQUAL 0)
+        set(CUDNN8_FRONTEND_INCLUDE "${CMAKE_SOURCE_DIR}/3rdparty/cudnn-frontend/include")
+        set(CUDNN8_FRONTEND_SAMPLES "${CMAKE_SOURCE_DIR}/3rdparty/cudnn-frontend/samples")
+      endif (USE_CUDNN_FRONTEND)
+
       # Build Process
       set(CAFFE_CPU_ONLY OFF)
       if (${GPU_MODE} MATCHES "CUDA")
-        # execute_process(COMMAND git checkout master WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
-        execute_process(COMMAND git checkout 1807aad WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+        execute_process(COMMAND git checkout master WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
+        # execute_process(COMMAND git checkout 1807aad WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
       elseif (${GPU_MODE} MATCHES "CPU_ONLY")
         if (USE_MKL)
           #execute_process(COMMAND git checkout intel WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
@@ -765,9 +778,11 @@ if (UNIX OR APPLE)
         endif (USE_MKL)
         set(CAFFE_CPU_ONLY ON)
         set(USE_CUDNN OFF)
+        set(USE_CUDNN_FRONTEND OFF)
       elseif (${GPU_MODE} MATCHES "OPENCL")
         execute_process(COMMAND git checkout fe2a1102 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/caffe)
         set(USE_CUDNN OFF)
+        set(USE_CUDNN_FRONTEND OFF)
       endif (${GPU_MODE} MATCHES "CUDA")
 
       # Build Caffe
@@ -787,6 +802,9 @@ if (UNIX OR APPLE)
           -DMKLDNN_INSTALL_DIR:PATH=<INSTALL_DIR>
           -DUSE_MKL2017_AS_DEFAULT_ENGINE=${CAFFE_CPU_ONLY}
           -DUSE_CUDNN=${USE_CUDNN}
+          -DUSE_CUDNN_FRONTEND=${USE_CUDNN_FRONTEND}
+          -DCUDNN8_FRONTEND_INCLUDE=${CUDNN8_FRONTEND_INCLUDE}
+          -DCUDNN8_FRONTEND_SAMPLES=${CUDNN8_FRONTEND_SAMPLES}
           -DCUDA_ARCH_NAME=${CUDA_ARCH}
           -DCUDA_ARCH_BIN=${CUDA_ARCH_BIN}
           -DCUDA_ARCH_PTX=${CUDA_ARCH_PTX}
@@ -806,6 +824,9 @@ if (UNIX OR APPLE)
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
           -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
           -DUSE_CUDNN=${USE_CUDNN}
+          -DUSE_CUDNN_FRONTEND=${USE_CUDNN_FRONTEND}
+          -DCUDNN8_FRONTEND_INCLUDE=${CUDNN8_FRONTEND_INCLUDE}
+          -DCUDNN8_FRONTEND_SAMPLES=${CUDNN8_FRONTEND_SAMPLES}
           -DCUDA_ARCH_NAME=${CUDA_ARCH}
           -DCUDA_ARCH_BIN=${CUDA_ARCH_BIN}
           -DCUDA_ARCH_PTX=${CUDA_ARCH_PTX}
@@ -906,6 +927,7 @@ if (WIN32)
   include_directories(${WINDOWS_INCLUDE_DIRS})
 endif (WIN32)
 
+include_directories("3rdparty/cudnn-frontend/include")
 
 ### COLLECT ALL 3RD-PARTY LIBRARIES TO BE LINKED AGAINST
 if (UNIX OR APPLE)
