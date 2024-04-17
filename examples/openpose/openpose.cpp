@@ -153,6 +153,9 @@ int openPoseDemo()
 int main(int argc, char *argv[])
 {
     // Parsing command line flags
+    // FALGS_model_pose = "COCO";
+
+
     gflags::ParseCommandLineFlags(&argc, &argv, true);
 
     // Running openPoseDemo
