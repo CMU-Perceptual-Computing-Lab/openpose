@@ -143,6 +143,11 @@ namespace op
         String udpPort;
 
         /**
+         * Whether to output json coordinates to a udp stream using udpHost and udpPort.
+         */
+        bool udpJsonOutput;
+
+        /**
          * Constructor of the struct.
          * It has the recommended and default values we recommend for each element of the struct.
          * Since all the elements of the struct are public, they can also be manually filled.
@@ -157,7 +162,7 @@ namespace op
             const String& writeHeatMaps = "", const String& writeHeatMapsFormat = "png",
             const String& writeVideo3D = "", const String& writeVideoAdam = "",
             const String& writeBvh = "", const String& udpHost = "",
-            const String& udpPort = "8051");
+            const String& udpPort = "8051", const bool udpJsonOutput = false);
     };
 }
 

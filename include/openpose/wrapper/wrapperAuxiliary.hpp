@@ -778,6 +778,14 @@ namespace op
                 const auto peopleJsonSaver = std::make_shared<PeopleJsonSaver>(writeJsonCleaned);
                 outputWs.emplace_back(std::make_shared<WPeopleJsonSaver<TDatumsSP>>(peopleJsonSaver));
             }
+
+            //Enable the json over UDP output
+            if (wrapperStructOutput.udpJsonOutput) {
+                const auto udpJsonSender = std::make_shared<UdpJsonSender>(wrapperStructOutput.udpHost.getStdString(),
+                    wrapperStructOutput.udpPort.getStdString());
+                outputWs.emplace_back(std::make_shared<WUdpJsonSender<TDatumsSP>>(udpJsonSender));
+            }
+
             opLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
             // Write people pose/foot/face/hand/etc. data on disk (COCO validation JSON format)
             if (!wrapperStructOutput.writeCocoJson.empty())
