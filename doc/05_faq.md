@@ -42,7 +42,7 @@ OpenPose Doc - Frequently Asked Questions (FAQ)
 ### Errors
 #### Download Server Down
 **Q: The download server is down, Download Hash mismatch, Error 502: Bad Gateway, etc. I.e., I cannot download the OpenPose models and/or 3rd party libraries.**
-**A**: The are 2 alternatives. Option 1 (recommended): Download the links from [1602#issuecomment-641653411](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/1602#issuecomment-641653411) and download them in the places indicated by [doc/1_prerequisites.md](1_prerequisites.md). Option 2: If you downloaded the models and dependencies to some local server, you could set the advanced CMake property `DOWNLOAD_SERVER` to link OpenPose to your local mirror server instead.
+**A**: The are 2 alternatives. Option 1 (recommended): Download the links from [1602#issuecomment-641653411](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/1602#issuecomment-641653411) and download them in the places indicated by [doc/1_prerequisites.md](installation/1_prerequisites.md). Option 2: If you downloaded the models and dependencies to some local server, you could set the advanced CMake property `DOWNLOAD_SERVER` to link OpenPose to your local mirror server instead.
 
 
 
