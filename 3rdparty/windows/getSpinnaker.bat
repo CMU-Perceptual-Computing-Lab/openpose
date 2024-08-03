@@ -9,7 +9,7 @@ echo ----- Downloading Caffe -----
 SET SPINNAKER_FOLDER=spinnaker\
 SET ZIP_NAME=spinnaker_2018_01_24.zip
 SET ZIP_FULL_PATH=%SPINNAKER_FOLDER%%ZIP_NAME%
-%WGET_EXE% -c http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/%ZIP_NAME% -P %SPINNAKER_FOLDER%
+%WGET_EXE% -c http://vcl.snu.ac.kr/OpenPose/3rdparty/windows/%ZIP_NAME% -P %SPINNAKER_FOLDER%
 echo:
 
 echo ----- Unzipping Caffe -----

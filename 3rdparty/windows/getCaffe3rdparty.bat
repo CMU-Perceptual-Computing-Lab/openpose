@@ -9,7 +9,7 @@ echo ----- Downloading Caffe -----
 SET CAFEE_FOLDER=caffe3rdparty\
 SET ZIP_NAME=caffe3rdparty_16_2020_11_14.zip
 SET ZIP_FULL_PATH=%CAFEE_FOLDER%%ZIP_NAME%
-%WGET_EXE% -c http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/%ZIP_NAME% -P %CAFEE_FOLDER%
+%WGET_EXE% -c http://vcl.snu.ac.kr/OpenPose/3rdparty/windows/%ZIP_NAME% -P %CAFEE_FOLDER%
 echo:
 
 echo ----- Unzipping Caffe -----
