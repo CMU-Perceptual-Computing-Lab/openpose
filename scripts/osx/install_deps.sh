@@ -1,10 +1,14 @@
 #!/bin/bash
-brew_packages="openblas snappy leveldb gflags glog szip lmdb hdf5 opencv protobuf boost cmake viennacl"
+brew_packages="openblas snappy leveldb gflags glog libaec lmdb hdf5 opencv protobuf boost cmake viennacl"
 for pkg in $brew_packages
 do
     echo "brew install $pkg || brew upgrade $pkg"
     brew install "$pkg" || brew upgrade "$pkg"
 done
+
+# fix for caffe
+brew uninstall --force caffe
+brew install --build-from-source caffe
 
 # with Python pycaffe needs dependencies built from source
 #brew install --build-from-source --with-python -vd protobuf
