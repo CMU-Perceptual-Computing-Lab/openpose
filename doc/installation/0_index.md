@@ -12,7 +12,7 @@ OpenPose Doc - Installation
     5. [Compilation](#compilation)
     6. [Running OpenPose](#running-openpose)
     7. [Custom User Code](#custom-user-code)
-4. [Compiling and Running OpenPose from Source on ROS, Docker, and Google Colab - Community-Based Work](#compiling-and-running-openpose-from-source-on-ros-docker-and-google-colab---community-based-work)
+4. [Compiling and Running OpenPose from Source on ROS, Docker, Kaggle and Google Colab - Community-Based Work](#compiling-and-running-openpose-from-source-on-ros-docker-and-google-colab---community-based-work)
 5. [OpenPose Live Demo at Tiyaro - Community-Based Work](#openpose-live-demo-from-tiyaro---community-based-work)
 6. [Uninstalling, Reinstalling, or Updating OpenPose](#uninstalling-reinstalling-or-updating-openpose)
 7. [Additional Settings (Optional)](#additional-settings-optional)
@@ -214,7 +214,7 @@ You can quickly add your custom code so that quick prototypes can be easily test
 
 
 
-## Compiling and Running OpenPose from Source on ROS, Docker, and Google Colab - Community-Based Work
+## Compiling and Running OpenPose from Source on ROS, Docker, Kaggle and Google Colab - Community-Based Work
 If you do not want to use the Windows portable binaries nor compile it from source code, we add links to some community-based work based on OpenPose. Note: We do not support them, and we will remove new GitHub issues opened asking about them as well as block those users from posting again. If you face any issue, comment only in the GitHub issues links especified below, or ask the owner of them.
 
 - ROS examples:
@@ -240,8 +240,11 @@ If you do not want to use the Windows portable binaries nor compile it from sour
     - [Google Colab 2/3](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/1736#issuecomment-736846794): For questions and more details, read and post ONLY on [issue thread #1736](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/1736).
     - [Google Colab 3/3](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/949#issue-387855863): For questions and more details, read and post ONLY on [issue thread #949](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/949).
 
-
-
+- Kaggle Notebooks: Suite of Kaggle notebooks tailored to set up and run OpenPose efficiently within Kaggle's GPU environments, specifically targeting Tesla T4 and Tesla P100 GPUs. These notebooks streamline the deployment process, offering both direct inference and build options. For questions and more details, read and post ONLY on [issue thread #2298](https://github.com/CMU-Perceptual-Computing-Lab/openpose/issues/2298)
+    - [Tesla T4x2 Inference Notebook](https://www.kaggle.com/code/jesherjoshua/open-pose-t4x2-saved-build-inference-notebook)
+    - [Tesla P100 Inference Notebook](https://www.kaggle.com/code/jesherjoshua/open-pose-p100-saved-build-inference-notebook)
+    - [Tesla T4x2 Build Notebook](https://www.kaggle.com/code/jesherjoshua/openpose-t4x2-build)
+    - [Tesla P100 Build Notebook](https://www.kaggle.com/code/jesherjoshua/openpose-p100-build)
 
 
 ## OpenPose Live Demo at Tiyaro - Community-Based Work
