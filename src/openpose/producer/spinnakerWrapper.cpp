@@ -8,6 +8,7 @@
 #endif
 #ifdef USE_FLIR_CAMERA
     #include <Spinnaker.h>
+    #include <ImageProcessor.h>
 #endif
 #include <openpose/3d/cameraParameterReader.hpp>
 
@@ -151,8 +152,8 @@ namespace op
             }
         }
 
-        Spinnaker::ImagePtr spinnakerImagePtrToColor(const Spinnaker::ImagePtr &imagePtr)
-        {
+        //Spinnaker::ImagePtr spinnakerImagePtrToColor(const Spinnaker::ImagePtr &imagePtr)
+        //{
             // Original image --> BGR uchar image
             // Print image information
             // Convert image to RGB
@@ -211,10 +212,10 @@ namespace op
             // ~115, too slow
             // return imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::RIGOROUS);
             // ~1.7 ms, slightly worse than HQ_LINEAR
-            return imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::IPP);
+            //return imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::IPP);
             // ~30 ms, ideally best quality?
             // return imagePtr->Convert(Spinnaker::PixelFormat_BGR8, Spinnaker::DIRECTIONAL_FILTER);
-        }
+        //}
 
         /*
          * This function converts between Spinnaker::ImagePtr container to cv::Mat container used in OpenCV.
@@ -399,7 +400,10 @@ namespace op
                 try
                 {
                     // Original image --> BGR uchar image
-                    const auto imagePtrColor = spinnakerImagePtrToColor(imagePtr);
+                    //const auto imagePtrColor = spinnakerImagePtrToColor(imagePtr);
+                    Spinnaker::ImageProcessor imageProc;
+                    Spinnaker::ImagePtr imagePtrStore = imageProc.Convert(imagePtr, Spinnaker::PixelFormatEnums::PixelFormat_BGR8);
+                    const auto imagePtrColor = imagePtrStore;
                     // Spinnaker to cv::Mat
                     const auto cvMatDistorted = spinnakerWrapperToCvMat(imagePtrColor);
                     // const auto cvMatDistorted = spinnakerWrapperToCvMat(imagePtr);
