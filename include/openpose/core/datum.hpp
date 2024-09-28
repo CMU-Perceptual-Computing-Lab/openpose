@@ -332,7 +332,69 @@ namespace op
          */
         Datum clone() const;
 
+        /**
+         * Safe poseKeypoint get function
+         * If the body poses are empty, it returns an empty array instead of NULL
+         * Returning too many NULLs can cause python to die
+         * @return extracted poseKeypoints if not none, empty list if none
+         */
+        Array<float> getPoseKeypoints();
 
+        /**
+         * Safe poseIds get function
+         * If the body poses are empty, it returns an empty array instead of NULL
+         * Returning too many NULLs can cause python to die
+         * @return extracted poseIds if not none, empty list if none
+        */
+        Array<float> getPoseIds();
+
+        /**
+         * Safe poseScores get function
+         * If the body poses are empty, it returns an empty array instead of NULL
+         * Returning too many NULLs can cause python to die
+         * @return extracted poseScores if not none, empty list if none
+        */
+        Array<float> getPoseScores();
+
+        /**
+         * Safe poseHeatMaps get function
+         * If the body poses are empty, it returns an empty array instead of NULL
+         * Returning too many NULLs can cause python to die
+         * @return extracted poseHeatMaps if not none, empty list if none
+        */
+        Array<float> getPoseHeatMaps();
+
+        /**
+         * Safe faceKeypoints get function
+         * If the face keypoints are empty, it returns an empty array instead of NULL
+         * Returning too many NULLs can cause python to die
+         * @return extracted faceKeypoints if not none, empty list if none
+        */
+        Array<float> getFaceKeypoints();
+
+        /**
+         * Safe faceHeatMaps get function
+         * If the face keypoints are empty, it returns an empty array instead of NULL
+         * Returning too many NULLs can cause python to die
+         * @return extracted faceHeatMaps if not none, empty list if none
+        */
+        Array<float> getFaceHeatMaps();
+
+        /**
+         * Safe poseKeypoints3D get function
+         * If the pose keypoints are empty, it returns an empty array instead of NULL
+         * Returning too many NULLs can cause python to die
+         * @return extracted poseKeypoints3D if not none, empty list if none
+        */
+        Array<float> getPoseKeypoints3D();
+
+        /**
+         * Safe faceKeypoints3D get function
+         * If the face keypoints are empty, it returns an empty array instead of NULL
+         * Returning too many NULLs can cause python to die
+         * @return extracted faceKeypoints3D if not none, empty list if none
+        */
+        Array<float> getFaceKeypoints3D();
 
 
 
