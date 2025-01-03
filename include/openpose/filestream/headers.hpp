@@ -12,6 +12,7 @@
 #include <openpose/filestream/jsonOfstream.hpp>
 #include <openpose/filestream/keypointSaver.hpp>
 #include <openpose/filestream/peopleJsonSaver.hpp>
+#include <openpose/filestream/udpJsonSender.hpp>
 #include <openpose/filestream/udpSender.hpp>
 #include <openpose/filestream/videoSaver.hpp>
 #include <openpose/filestream/wBvhSaver.hpp>
@@ -23,6 +24,7 @@
 #include <openpose/filestream/wPeopleJsonSaver.hpp>
 #include <openpose/filestream/wPoseSaver.hpp>
 #include <openpose/filestream/wUdpSender.hpp>
+#include <openpose/filestream/wUdpJsonSender.hpp>
 #include <openpose/filestream/wVideoSaver.hpp>
 #include <openpose/filestream/wVideoSaver3D.hpp>
 

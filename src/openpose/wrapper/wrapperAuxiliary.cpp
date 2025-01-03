@@ -67,6 +67,7 @@ namespace op
                     !wrapperStructOutput.writeImages.empty() || !wrapperStructOutput.writeVideo.empty()
                         || !wrapperStructOutput.writeKeypoint.empty() || !wrapperStructOutput.writeJson.empty()
                         || !wrapperStructOutput.writeCocoJson.empty() || !wrapperStructOutput.writeHeatMaps.empty()
+						|| wrapperStructOutput.udpJsonOutput
                 );
                 const auto savingCvOutput = (
                     !wrapperStructOutput.writeImages.empty() || !wrapperStructOutput.writeVideo.empty()
