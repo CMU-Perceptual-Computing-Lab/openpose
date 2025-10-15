@@ -13,11 +13,11 @@ OpenPose Doc - Installation - Prerequisites
 These tips are **very important** and avoid many bugs:
 - Install the latest CUDA version or make sure your GPU is compatible with the CUDA version you have in your system. E.g., Nvidia 30XX GPUs require at least CUDA 11, others (GTX 20XX, V100, Volta or Turing GPUs) require at least CUDA 10.
 - CMake automatically downloads all the OpenPose models. However, **some firewall or company networks block these downloads**. If so, you might need to download them manually:
-    - [BODY_25 model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/body_25/pose_iter_584000.caffemodel): download in `models/pose/body_25/`.
-    - [COCO model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/coco/pose_iter_440000.caffemodel): download in `models/pose/coco/`.
-    - [MPI model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/mpi/pose_iter_160000.caffemodel): download in `models/pose/mpi/`.
-    - [Face model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/face/pose_iter_116000.caffemodel): download in `models/face/`.
-    - [Hands model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/hand/pose_iter_102000.caffemodel): download in `models/hand/`.
+    - [BODY_25 model](http://vcl.snu.ac.kr/OpenPose/models/pose/body_25/pose_iter_584000.caffemodel): download in `models/pose/body_25/`.
+    - [COCO model](http://vcl.snu.ac.kr/OpenPose/models/pose/coco/pose_iter_440000.caffemodel): download in `models/pose/coco/`.
+    - [MPI model](http://vcl.snu.ac.kr/OpenPose/models/pose/mpi/pose_iter_160000.caffemodel): download in `models/pose/mpi/`.
+    - [Face model](http://vcl.snu.ac.kr/OpenPose/models/face/pose_iter_116000.caffemodel): download in `models/face/`.
+    - [Hands model](http://vcl.snu.ac.kr/OpenPose/models/hand/pose_iter_102000.caffemodel): download in `models/hand/`.
 
 
 
@@ -106,11 +106,11 @@ NOTE: These instructions are only required when compiling OpenPose from source. 
         - Dependencies:
             - Note: Leave the zip files in `3rdparty/windows/` so that CMake does not try to download them again.
             - Caffe (if you are not sure which one you need, download the default one):
-                - [CUDA Caffe (Default)](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_16_2020_11_14.zip): Unzip as `3rdparty/windows/caffe/`.
-                - [CPU Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_cpu_2018_05_27.zip): Unzip as `3rdparty/windows/caffe_cpu/`.
-                - [OpenCL Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_opencl_2018_02_13.zip): Unzip as `3rdparty/windows/caffe_opencl/`.
-            - [Caffe dependencies](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe3rdparty_16_2020_11_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
-            - [OpenCV 4.2.0](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_450_v15_2020_11_18.zip): Unzip as `3rdparty/windows/opencv/`.
+                - [CUDA Caffe (Default)](http://vcl.snu.ac.kr/OpenPose/3rdparty/windows/caffe_16_2020_11_14.zip): Unzip as `3rdparty/windows/caffe/`.
+                - [CPU Caffe](http://vcl.snu.ac.kr/OpenPose/3rdparty/windows/caffe_cpu_2018_05_27.zip): Unzip as `3rdparty/windows/caffe_cpu/`.
+                - [OpenCL Caffe](http://vcl.snu.ac.kr/OpenPose/3rdparty/windows/caffe_opencl_2018_02_13.zip): Unzip as `3rdparty/windows/caffe_opencl/`.
+            - [Caffe dependencies](http://vcl.snu.ac.kr/OpenPose/3rdparty/windows/caffe3rdparty_16_2020_11_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
+            - [OpenCV 4.2.0](http://vcl.snu.ac.kr/OpenPose/3rdparty/windows/opencv_450_v15_2020_11_18.zip): Unzip as `3rdparty/windows/opencv/`.
 7. Python prerequisites (optional, only if you plan to use the Python API): Install any [Python 3.X](https://www.python.org/downloads/windows/) version for Windows, and then:
 ```
 sudo pip install numpy opencv-python

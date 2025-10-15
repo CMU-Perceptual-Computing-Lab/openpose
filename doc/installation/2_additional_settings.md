@@ -88,7 +88,7 @@ You can include the 3D reconstruction module by:
         1. It is automatically downloaded by the CMake installer.
         2. Alternatively, if you prefer to download it yourself, you could either:
             1. Double click on `3rdparty\windows\getFreeglut.bat`.
-            2. Download [this version from our server](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/freeglut_2018_01_14.zip) and unzip it in `{OpenPoseDirectory}\3rdparty\windows\freeglut\`.
+            2. Download [this version from our server](http://vcl.snu.ac.kr/OpenPose/3rdparty/windows/freeglut_2018_01_14.zip) and unzip it in `{OpenPoseDirectory}\3rdparty\windows\freeglut\`.
             3. Download the latest `MSVC Package` from [http://www.transmissionzero.co.uk/software/freeglut-devel/](http://www.transmissionzero.co.uk/software/freeglut-devel/).
                 - Copy `{freeglutParentDirectory}\freeglut\bin\x64\` as `{OpenPoseDirectory}\3rdparty\windows\freeglut\bin\`.
                 - Copy `{freeglutParentDirectory}\freeglut\include\` as `{OpenPoseDirectory}\3rdparty\windows\freeglut\include\`.
@@ -105,7 +105,7 @@ The intrinsic camera calibration toolbox is included by default.
 
 To enable the extrinsic camera parameter estimation toolbox, you must also enable `WITH_EIGEN` in CMake during [CMake Configuration](#cmake-configuration). You can perform any of the 3 following options (but only 1 of them!)
 - Recommended: Simply set the `WITH_EIGEN` flag to `AUTOBUILD`. CMake will automatically download Eigen and configure OpenPose to use it. If you prefer to download it manually (or if your firewall blocks CMake from downloading it):
-    - [Eigen 3.3.8](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/eigen_2020_11_18.zip): Unzip it as `3rdparty/eigen/`.
+    - [Eigen 3.3.8](http://vcl.snu.ac.kr/OpenPose/3rdparty/eigen_2020_11_18.zip): Unzip it as `3rdparty/eigen/`.
 - Advanced (not recommended): If you set `WITH_EIGEN` to `FIND`, you must have Eigen already installed in your system. Note that [Eigen <= 3.3.6 is not supported by CUDA >=9.1](https://bitbucket.org/eigen/eigen/commits/034b6c3e101792a3cc3ccabd9bfaddcabe85bb58?at=default). In order to install it (make sure that Eigen version is compatible with CUDA!):
     - Run `sudo apt-get install libeigen3-dev` and link CMake to the right CMake.
 - Advanced (not recommended): Or you could also use your own version of Eigen by setting `WITH_EIGEN` to `AUTOBUILD`, click `Configure` to let CMake download the zip file, and replace `3rdparty/eigen/` by your own version.

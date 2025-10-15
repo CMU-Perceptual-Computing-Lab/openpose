@@ -135,14 +135,14 @@ Note: This installer will not incorporate any new features, we recommend to use 
 
 1. Download the OpenPose dependencies and models (body, face and hand models) by double-clicking on `{openpose_path}\windows\download_3rdparty_and_models.bat`. Alternatively, you might prefer to download them manually:
     - Models:
-        - [COCO model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/coco/pose_iter_440000.caffemodel): download in `models/pose/coco/`.
-        - [MPI model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/mpi/pose_iter_160000.caffemodel): download in `models/pose/mpi/`.
-        - [Face model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/face/pose_iter_116000.caffemodel): download in `models/face/`.
-        - [Hands model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/hand/pose_iter_102000.caffemodel): download in `models/hand/`.
+        - [COCO model](http://vcl.snu.ac.kr/OpenPose/models/pose/coco/pose_iter_440000.caffemodel): download in `models/pose/coco/`.
+        - [MPI model](http://vcl.snu.ac.kr/OpenPose/models/pose/mpi/pose_iter_160000.caffemodel): download in `models/pose/mpi/`.
+        - [Face model](http://vcl.snu.ac.kr/OpenPose/models/face/pose_iter_116000.caffemodel): download in `models/face/`.
+        - [Hands model](http://vcl.snu.ac.kr/OpenPose/models/hand/pose_iter_102000.caffemodel): download in `models/hand/`.
     - Dependencies:
-        - [Caffe](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe_16_2020_11_14.zip): Unzip as `3rdparty/windows/caffe/`.
-        - [Caffe dependencies](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/caffe3rdparty_16_2020_11_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
-        - [OpenCV 4.2.0](http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/opencv_450_v15_2020_11_18.zip): Unzip as `3rdparty/windows/opencv/`.
+        - [Caffe](http://vcl.snu.ac.kr/OpenPose/3rdparty/windows/caffe_16_2020_11_14.zip): Unzip as `3rdparty/windows/caffe/`.
+        - [Caffe dependencies](http://vcl.snu.ac.kr/OpenPose/3rdparty/windows/caffe3rdparty_16_2020_11_14.zip): Unzip as `3rdparty/windows/caffe3rdparty/`.
+        - [OpenCV 4.2.0](http://vcl.snu.ac.kr/OpenPose/3rdparty/windows/opencv_450_v15_2020_11_18.zip): Unzip as `3rdparty/windows/opencv/`.
 2. Open the Visual Studio project sln file by double-cliking on `{openpose_path}\windows\OpenPose.sln`.
 3. In order to verify OpenPose is working, try compiling and executing the demo:
     1. Right click on `OpenPoseDemo` --> `Set as StartUp Project`.

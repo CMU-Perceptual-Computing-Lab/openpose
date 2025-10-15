@@ -9,7 +9,7 @@ echo ----- Downloading OpenCV -----
 SET OPENCV_FOLDER=opencv\
 SET ZIP_NAME=opencv_450_v15_2020_11_18.zip
 SET ZIP_FULL_PATH=%OPENCV_FOLDER%%ZIP_NAME%
-%WGET_EXE% -c http://posefs1.perception.cs.cmu.edu/OpenPose/3rdparty/windows/%ZIP_NAME% -P %OPENCV_FOLDER%
+%WGET_EXE% -c http://vcl.snu.ac.kr/OpenPose/3rdparty/windows/%ZIP_NAME% -P %OPENCV_FOLDER%
 echo:
 
 echo ----- Unzipping OpenCV -----
