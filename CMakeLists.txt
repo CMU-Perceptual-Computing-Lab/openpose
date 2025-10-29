@@ -31,7 +31,7 @@ elseif (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
 else (${CMAKE_VERSION} VERSION_GREATER 3.9.0)
   project(OpenPose)
 endif (${CMAKE_VERSION} VERSION_GREATER 3.9.0)
-cmake_minimum_required(VERSION 3.0 FATAL_ERROR) # required by cmake eigen finder to find locally installed versions (e.g., CUDA 9.2 support was added in eigen 3.3.5)
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR) # required by cmake eigen finder to find locally installed versions (e.g., CUDA 9.2 support was added in eigen 3.3.5)
 # cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR) # min. cmake version recommended by Caffe
 
 
